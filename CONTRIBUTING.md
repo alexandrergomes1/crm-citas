@@ -1,6 +1,6 @@
 # Como contribuir com o crm-citas
 
-> Rascunho para o dono aprovar (E14). Escrito por: Engenheiro de DevOps · Revisado por: (a preencher) ·
+> Rascunho para o dono aprovar (E14). Escrito por: Engenheiro de DevOps · Revisado por: Gerente de projeto ·
 > Norma: trunk-based development, Conventional Commits e DORA. Este arquivo só resume e aponta: a regra
 > vale onde está escrita (`AGENTS.md`, `ARCHITECTURE.md`, `docs/guias/processo-sdd.md`, `docs/moldes/pergunta.md`).
 
@@ -9,7 +9,7 @@ Leia o `AGENTS.md` (regras de trabalho), o `ARCHITECTURE.md` (como o sistema é 
 (aparência). A pasta em que você mexe pode ter o próprio `AGENTS.md`; a ordem em conflito está no `AGENTS.md` §6.
 
 ## 2. De onde vem a tarefa
-Só do primeiro item livre de `docs/BACKLOG.md` ou de um pedido literal do dono. Ninguém escolhe nem inventa
+Só do primeiro item livre de `docs/BACKLOG.md` ou de um pedido literal do dono. A IA não escolhe nem inventa
 tarefa (`AGENTS.md` §5).
 
 ## 3. Branch
@@ -41,8 +41,7 @@ Regras: `AGENTS.md` §8 e `docs/guias/processo-sdd.md` §2 (etapas 12 e 13).
 
 ## 8. O que nunca fazer
 - Enviar direto à `previas` ou à `main`, ou juntar sem autorização do dono.
-- Publicar ou aplicar mudança no banco remoto: o banco só muda pela CI (`AGENTS.md` §1, `ARCHITECTURE.md` §8).
-- Pôr segredo, dado pessoal ou de saúde em código, registro, endereço (URL) ou notificação (`AGENTS.md` §6).
-- Mexer fora dos arquivos que o plano permite, ou adivinhar biblioteca, API, esquema ou comando.
-- Copiar algo do projeto antigo sem autorização do dono, item por item (`AGENTS.md` §3).
+- Publicar sem autorização do dono ou aplicar mudança no banco remoto: o banco só muda pela CI (`AGENTS.md` §1, `ARCHITECTURE.md` §8).
+- Pôr segredo, dado pessoal ou de saúde onde o `AGENTS.md` §6 proíbe.
+- Mexer fora dos arquivos que o plano permite, ou adivinhar biblioteca, API, esquema ou comando (`AGENTS.md` §6).
 - Enviar outra mudança depois do pedido de merge sem refazer a revisão e o pedido.
