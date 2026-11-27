@@ -16,8 +16,10 @@ página interna de vitrine onde o dono e o Revisor de design conferem cada peça
 Nenhuma tela de módulo é construída aqui.
 
 ## 2. Dependências
-- **D-1.** Item 2 da fila (fundação técnica: app vazio em TanStack Start, pnpm, Vitest, Playwright, CI) juntado na
-  `previas`. Sem ele esta spec não passa da etapa 7 para a construção.
+- **D-1.** Item 2 da fila (fundação técnica: app vazio em TanStack Start, pnpm, Vitest, Playwright, CI). Decisão do
+  dono E22·B (28/11/2026, "E22b"; registrada em `docs/decisoes/` na branch `docs/produto-modulos`, PR #2): a
+  construção sai em PR de rascunho a partir da branch do item 2 (`chore/fundacao-tecnica`), antes da aprovação
+  dela, e nada é juntado sem o dono.
 - **D-2.** Spec Kit instalado (item 2), para a checagem automática da etapa 5.
 
 ## 3. Escopo
@@ -39,7 +41,7 @@ Fonte única: `DESIGN.md`. Valor diferente do `DESIGN.md` é defeito.
   pendência `#8A5205`; fundo da pílula cinza `rgba(22,24,29,.07)`; anel do escolhido do seletor `#D8D7D1`.
 - **RT-3 Tipografia** (`DESIGN.md` §4): fonte Geist; escala 20 forte · 18 forte · 16 forte · 15 · 14 · 13 · 12 · 11
   (mínimo, só barra de baixo, menu recolhido, hora da grade); pesos citados 500 e 600 (§8b). Peso de "forte" e
-  altura de linha: ver E25·3.
+  altura de linha: ver E25·2.
 - **RT-4 Espaços** (§4): 4 · 8 · 12 · 16 · 20 · 24 · 32; margem da tela 16 (celular) e 24 (computador); entre blocos 12.
 - **RT-5 Raios** (§4, §8b): pílula (botão, campo de uma linha, busca, chip, seletor, item de menu aberto, aviso);
   bloco e menu aberto 20; campo de várias linhas 16; item do menu recolhido 16; janelinha 24; folha 28 no topo;
@@ -63,7 +65,7 @@ Só as peças que o `DESIGN.md` define (§2, §5, §8, §8b). Cada uma com o des
 
 | # | Componente | Fonte no `DESIGN.md` |
 |---|---|---|
-| RC-1 | Botão: ação principal (preto `--ink`), claro (`--btn`), com contorno ("+ Adicionar" do celular, 1 px `--ink3`, fundo transparente), Excluir (texto vermelho), desativado (60 %), nota "em desenvolvimento" | §5, §8 |
+| RC-1 | Botão: ação principal (preto `--ink`), claro (`--btn`), com contorno ("+ Adicionar" do celular, 1 px `--ink3`, fundo transparente), Excluir (texto vermelho, sem fundo), desativado (60 %), nota "em desenvolvimento" | §5, §8 |
 | RC-2 | Botão de ícone sem fundo (fechar, voltar, ⋮, ajuda, notificações, funil, ícone de painel) | §5 |
 | RC-3 | Botão com ícone e nome (Filtros, Ordenar, Categoria, Modelo, modo de ver, Equipe, Lista de espera) e só nome (Opções, Hoje) | §5 |
 | RC-4 | Pílula de contador: cinza (total) e âmbar suave (há pendência); zero não aparece; em botão de ícone (ícone + pílula, folga 12/10, espaço 6) | §5, §8b, E13·1, E13·3 |
@@ -76,7 +78,7 @@ Só as peças que o `DESIGN.md` define (§2, §5, §8, §8b). Cada uma com o des
 | RC-11 | Bloco (superfície `--card`, canto 20); controle nunca direto sobre `--page` | §2 |
 | RC-12 | Linha de lista 64 (com faixa de categoria 4 px), linha e cabeçalho de tabela, cabeçalho de grupo (14 forte + pílula), ⋮ no fim da linha | §3, §4, §5, §8b |
 | RC-13 | Menu aberto (Opções e ⋮; Editar · Duplicar · Arquivar · Excluir, nesta ordem) | §5, §6, §8 |
-| RC-14 | Janelinha de confirmação (340; Excluir em vermelho) | §8, §8b |
+| RC-14 | Janelinha de confirmação (340; Excluir com texto vermelho, sem fundo: vale o texto do `DESIGN.md` §8, não a imagem 06, que mostra fundo vermelho claro) | §8, §8b |
 | RC-15 | Aviso embaixo depois de uma ação, com "Desfazer" quando der | §8 |
 | RC-16 | Folha de baixo (celular, canto 28 no topo, linhas que abrem com ▾/▴) e painel à direita (computador, 480); botão de confirmar da camada é preto | §8, §8b |
 | RC-17 | Estados de tela: vazio ("Ainda não há <itens>" + frase + "Adicionar <item>" com contorno), sem resultado ("Limpar filtros"), carregando (linhas cinza só depois de 0,3 s, anunciado ao leitor), erro ("Tentar de novo"), sucesso (aviso) | §8, §8b |
@@ -95,7 +97,7 @@ Só as peças que o `DESIGN.md` define (§2, §5, §8, §8b). Cada uma com o des
   erro, ligado/desligado, vazio, carregando).
 - **RV-2** Dados da vitrine são fictícios, sem nome real de pessoa e sem dado de saúde (E12·3; `AGENTS.md` §6).
 - **RV-3** A vitrine respeita as regras de tela do `DESIGN.md` em cada quadro (uma ação preta por quadro; controle
-  sobre superfície branca). Onde fica disponível: E25·2.
+  sobre superfície branca). Onde fica disponível: E25·1.
 
 ## 7. Requisitos de acessibilidade (WCAG 2.2 AA; `DESIGN.md` §9)
 - **RA-1** Contraste: texto ≥ 4,5:1 sobre `--page`, `--card` e `--track`; contorno de campo e ícone de estado ≥ 3:1.
@@ -116,7 +118,7 @@ Só as peças que o `DESIGN.md` define (§2, §5, §8, §8b). Cada uma com o des
 | CA-5 | 0 violação de nível A e AA na vitrine | checagem automática de acessibilidade em 390 e 1440 |
 | CA-6 | Tab percorre todos os controles com anel visível; Esc fecha folha, painel e janelinha; setas trocam a aba do seletor | teste de ponta a ponta por teclado |
 | CA-7 | Captura de tela da vitrine inteira em 390 e 1440 guardada como prova do teste | arquivos de captura gerados pelo teste na CI |
-| CA-8 | Capturas da vitrine batem com as imagens aprovadas 01, 02, 03 e 06 de `docs/design/imagens/` (onde texto e imagem divergem, vale o texto) | ficha visual (etapa 6) e Revisor de design pelo checklist §10 |
+| CA-8 | Capturas da vitrine batem com as imagens aprovadas 01, 02, 03 e 06 de `docs/design/imagens/` (onde texto e imagem divergem, vale o texto: o Excluir é texto vermelho sem fundo, e o Designer de produto registra na ficha visual a diferença da imagem 06) | ficha visual (etapa 6) e Revisor de design pelo checklist §10 |
 | CA-9 | Nenhuma peça, cor, nome ou medida fora do `DESIGN.md` | Revisor de design, checklist §10 item 8 |
 | CA-10 | Tipos, lint, testes de unidade e de ponta a ponta verdes na CI | CI do PR |
 
@@ -126,13 +128,13 @@ a ficha é a **comparação lado a lado**: imagem aprovada (antes) × captura da
 pelo Designer de produto e conferida pelo Revisor de design antes do dono.
 
 ## 10. Dúvidas para o dono (E25)
-- **E25·1 · Comentário do botão preto e do Agendar.** A: manter só registrado; a vitrine segue o `DESIGN.md` de hoje
-  ("+ Adicionar" com contorno no celular, Agendar preto). B: aplicar agora; antes muda o `DESIGN.md` (nova cor do
-  Agendar com o dono) e só depois o código. Desfaz: A muda depois só nos tokens e no botão; B volta pelo `DESIGN.md`.
-  **Recomendo A** (o dono disse "não precisa mexer nisso agora"; os tokens deixam a troca barata depois).
-- **E25·2 · Onde a vitrine fica.** A: só em desenvolvimento e na prévia, fora da produção. B: também na produção,
+**Já decidido, não é pergunta:** o comentário do botão preto e do Agendar fica só registrado; a vitrine segue o
+`DESIGN.md` de hoje ("+ Adicionar" com contorno no celular, Agendar preto). Decisão do dono, "Comentário" em
+`docs/decisoes/2026-11-27-fundacao.md`: "nao precisa mexer nisso agora. só registro no design."
+
+- **E25·1 · Onde a vitrine fica.** A: só em desenvolvimento e na prévia, fora da produção. B: também na produção,
   atrás do login. Desfaz: ligar ou desligar a rota. **Recomendo A** (não expõe página interna aos estúdios).
-- **E25·3 · Peso "forte" e altura de linha** (o `DESIGN.md` não fixa número). A: usar os do canvas aprovado
+- **E25·2 · Peso "forte" e altura de linha** (o `DESIGN.md` não fixa número). A: usar os do canvas aprovado
   (`docs/design/canvas/v6.css`: forte = 600; altura de linha 1,2 nos títulos e 1,4 no texto) e gravar no
   `DESIGN.md`. B: o Designer de produto propõe outros valores na ficha. Desfaz: troca de um token.
   **Recomendo A** (é o que está nas imagens aprovadas).
