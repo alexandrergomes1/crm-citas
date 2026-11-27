@@ -2,7 +2,7 @@
 name: falar-com-o-dono
 description: "Montar a mensagem ao dono do crm-citas em toda parada (pergunta, ficha visual, aprovação da spec, pedido de merge ou de publicação), pelo molde docs/moldes/pergunta.md. Use sempre que for parar esperando o dono."
 ---
-> Rascunho para o dono aprovar (E16). Escrito por: Arquiteto de software · Revisado por: Gerente de projeto
+> Aprovado pelo dono em 27/11/2026 (E16). Escrito por: Arquiteto de software · Revisado por: Gerente de projeto
 
 Receita: só aponta. A regra vale onde está escrita: `AGENTS.md` §5 e §7 e `docs/moldes/pergunta.md`.
 
@@ -14,7 +14,7 @@ Receita: só aponta. A regra vale onde está escrita: `AGENTS.md` §5 e §7 e `d
 6. **Nada de lista ou documento longo:** o detalhe fica no arquivo, com o link (`AGENTS.md` §7). No máximo 3 dúvidas por spec, juntas (`AGENTS.md` §4).
 7. **Uma mensagem por parada**, que se entende sozinha (molde, "Regras de toda mensagem").
 8. **Avise no celular** em uma linha, sem dado pessoal, pelo meio de aviso da ferramenta em uso; sem ele, diga ao dono em uma linha que não pôde avisar (`AGENTS.md` §7).
-9. **Pare** até a resposta. Depois, `documentador` registra em `docs/decisoes/` o que fica fora de spec (`.claude/agents/documentador.md`). Lacuna: quem grava a linha "Aprovação do dono" na spec.
+9. **Pare** até a resposta. Depois, `documentador` registra em `docs/decisoes/` o que fica fora de spec (`.claude/agents/documentador.md`). A linha "Aprovação do dono" na spec, o `analista-requisitos` grava (E16·3).
 
 - Termo técnico com uma linha de explicação na primeira vez (`AGENTS.md` §7).
 - Pedido para o dono fazer algo: link, cliques e nomes exatos (`AGENTS.md` §7).

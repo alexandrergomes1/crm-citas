@@ -1,8 +1,9 @@
 ---
 name: construir-tarefa
 description: "Construir, revisar e pedir o merge de uma tarefa do crm-citas, das etapas 8 a 13 do docs/guias/processo-sdd.md. Use só quando a spec da tarefa tem Status: Approved e a linha Aprovação do dono."
+disable-model-invocation: true
 ---
-> Rascunho para o dono aprovar (E16). Escrito por: Arquiteto de software · Revisado por: Gerente de projeto
+> Aprovado pelo dono em 27/11/2026 (E16). Escrito por: Arquiteto de software · Revisado por: Gerente de projeto
 
 Receita: só aponta. A regra vale onde está escrita: `AGENTS.md` §3, §6, §8 e §9, `docs/guias/processo-sdd.md` §2 a §4.
 
@@ -11,7 +12,7 @@ Receita: só aponta. A regra vale onde está escrita: `AGENTS.md` §3, §6, §8 
 9. **Revisar:** os revisores do tipo (`processo-sdd.md` §3), nunca quem construiu (`AGENTS.md` §3 item 2):
    - Código: `revisor-codigo` · Banco: `engenheiro-dados` (outra instância, que não fez) e `auditor-risco` · Tela: `revisor-design` · Texto e regras: outro papel que não escreveu (`processo-sdd.md` §3).
    - Segurança, dinheiro, login, ficha de saúde, integração: `auditor-risco` e `engenheiro-seguranca`.
-   - Por último, `analista-qa` junta os relatórios e dá o veredito com a prova do tipo (`AGENTS.md` §9). Algo com "Bloqueia": não segue (`processo-sdd.md` §2, etapa 9).
+   - Por último, `analista-qa` junta os relatórios e dá o veredito com a prova do tipo (`AGENTS.md` §9). Algo com "Bloqueia": volta a quem construiu e o mesmo revisor confere de novo; dois bloqueios no mesmo ponto, pare e avise o dono (E16·2; `processo-sdd.md` §2).
 10. **Conferir o pedido:** `analista-requisitos`, item por item.
 11. **Fechar:** `documentador` atualiza fila, estado e registros no mesmo PR.
 12. **Pedir o merge:** `engenheiro-devops` informa a CI; `gerente-projeto` manda o "Pedido de merge" (`docs/moldes/pergunta.md`) com o commit, a CI verde e, em tela, o link da prévia. **Pare** e avise no celular (`AGENTS.md` §7).

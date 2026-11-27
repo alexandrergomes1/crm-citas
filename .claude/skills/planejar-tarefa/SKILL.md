@@ -2,7 +2,7 @@
 name: planejar-tarefa
 description: "Planejar uma tarefa do crm-citas, das etapas 1 a 7 do docs/guias/processo-sdd.md: pegar a tarefa, abrir a branch, spec, plano, conferência, ficha visual (só tela) e parada na aprovação do dono. Use quando a tarefa ainda não tem spec aprovada."
 ---
-> Rascunho para o dono aprovar (E16). Escrito por: Arquiteto de software · Revisado por: Gerente de projeto
+> Aprovado pelo dono em 27/11/2026 (E16). Escrito por: Arquiteto de software · Revisado por: Gerente de projeto
 
 Receita: só aponta. A regra vale onde está escrita: `AGENTS.md` §3 a §5 e §7, `docs/guias/processo-sdd.md` §2 a §4.
 
@@ -15,6 +15,6 @@ Receita: só aponta. A regra vale onde está escrita: `AGENTS.md` §3 a §5 e §
 7. **Aprovação:** `analista-requisitos` monta a mensagem "Aprovação da spec" (`docs/moldes/pergunta.md`). **Pare aqui** e avise no celular (`AGENTS.md` §7).
 
 - Aprovada = "Status: Approved" e a linha "Aprovação do dono" (fala literal, data, link) (`AGENTS.md` §3 item 1).
-- Depois de cada resposta do dono, `documentador` registra em `docs/decisoes/` o que fica fora de spec (`.claude/agents/documentador.md`). Lacuna: quem grava a linha "Aprovação do dono" na spec.
+- Depois de cada resposta do dono, `documentador` registra em `docs/decisoes/` o que fica fora de spec (`.claude/agents/documentador.md`). A linha "Aprovação do dono" na spec, o `analista-requisitos` grava (E16·3).
 - Quem escreveu um arquivo não o revisa (`AGENTS.md` §3 item 2). Construir só pela receita `construir-tarefa`.
 - Acesso, dado de cliente ou de saúde, dinheiro e produção nunca em "Assumptions" (`AGENTS.md` §4).

@@ -23,7 +23,8 @@ a cada envio) · **prévia** (endereço onde o dono vê a mudança antes de ir p
 | 4 | Planejar | Arquiteto de software | `plan.md` (como e quais arquivos podem mudar) e `tasks.md` | — |
 | 5 | Conferir os três | Analista de requisitos | a análise do Spec Kit sem problema crítico | — |
 | 6 | Ficha visual (só tela) | Designer de produto + Revisor de design | imagens de antes e depois, nas larguras de teste do `DESIGN.md` | **sim** |
-| 7 | Aprovação | Dono | spec com "Status: Approved" e a linha "Aprovação do dono" (fala literal, data, link) | **sim** |
+| 6b | Revisar spec e plano | Gerente de projeto | spec e plano conferidos antes de ir ao dono (E16) | não |
+| 7 | Aprovação | Dono; o Analista de requisitos grava | spec com "Status: Approved" e a linha "Aprovação do dono" (fala literal, data, link), gravada pelo Analista de requisitos (E16·3) | **sim** |
 | 8 | Construir | Engenheiro de software | só os arquivos do plano; testes junto | não |
 | 9 | Revisar | os revisores do tipo (§3) e o QA | relatórios e veredito; nada com "Bloqueia" | não |
 | 10 | Conferir o pedido | Analista de requisitos | o que o dono pediu foi cumprido, item por item | não |
@@ -34,6 +35,8 @@ a cada envio) · **prévia** (endereço onde o dono vê a mudança antes de ir p
 - Toda etapa marcada "sim" sai com o aviso no celular (`AGENTS.md` §7).
 - Depois do pedido de merge, só entra na branch o commit que grava a "Aprovação do merge". Qualquer outra mudança
   pede revisão e pedido novos.
+- Revisor bloqueia: o trabalho volta a quem construiu, o mesmo revisor confere de novo; dois bloqueios no mesmo
+  ponto, o trabalho para e o dono é avisado (E16·2).
 
 ## 3. Quem revisa cada tipo de trabalho
 O QA dá o veredito em todos os tipos.

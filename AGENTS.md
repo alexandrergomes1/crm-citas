@@ -39,6 +39,7 @@ Um papel não faz o trabalho do outro.
 3. **Toda decisão técnica fica escrita**, com o motivo e a norma (`docs/adr/`), e é avisada ao dono em uma linha.
 4. **Nada se copia do projeto antigo** (repositório `alexandrergomes1/crm-agenda`, só leitura) **sem a autorização
    do dono, item por item**, e cada item copiado é conferido.
+   O papel da área decide copiar, reescrever ou descartar, registra o motivo em `docs/adr/`, e outro papel confere (E16·1).
 5. **Toda entrega e toda mensagem ao dono dizem qual papel fala e qual norma seguiu**, são curtas e trazem
    recomendação (§7).
 6. **Reuse antes de criar:** antes de escrever algo novo, procure o que já existe no projeto ou uma solução de
