@@ -1,8 +1,8 @@
 ---
 name: trazer-do-antigo
-description: "Trazer um item do projeto antigo (repositório alexandrergomes1/crm-agenda, só leitura) para o crm-citas. Use só quando o dono autorizou aquele item, um por um; sem a autorização, não abra o projeto antigo."
+description: "Trazer um item do projeto antigo (repositório alexandrergomes1/crm-agenda, só leitura) para o crm-citas. Use só quando o dono autorizou aquele item, um por um; sem a autorização, nada se copia."
 ---
-> Rascunho para o dono aprovar (E16). Escrito por: Arquiteto de software · Revisado por: (a preencher)
+> Rascunho para o dono aprovar (E16). Escrito por: Arquiteto de software · Revisado por: Gerente de projeto
 
 Receita: só aponta. A regra vale onde está escrita: `AGENTS.md` §3 itens 1 a 4, §5 e §6.
 
