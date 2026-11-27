@@ -17,5 +17,6 @@
 | 11 | Veredito, refazendo §5.1 a §5.3 | QA |
 | 12 | Conferir o pedido item por item (etapa 10) | Analista de requisitos |
 | 13 | Atualizar `docs/BACKLOG.md`, `docs/STATUS.md` e, se valer, `CHANGELOG.md`, no mesmo PR | Documentador |
-| 14 | Pedir o merge no molde, com o commit e a CI verde | Gerente de projeto |
+| 13b | Ler o que o Documentador escreveu (passos 4 e 13: `docs/decisoes/2026-11-27-fundacao.md`, BACKLOG, STATUS, CHANGELOG) e devolver o que achar; "Bloqueia" volta ao Documentador | Gerente de projeto |
+| 14 | Pedir o merge no molde (`docs/moldes/pergunta.md`), com o commit; como a CI ainda não existe (entra no item 2 da fila), o pedido traz a exceção "merge sem CI" para o dono autorizar, como no E19, com as conferências do `plan.md` §5 no lugar da CI | Gerente de projeto |
 | 15 | Gravar "Aprovação do merge" na spec e juntar só esse commit | Engenheiro de DevOps |
