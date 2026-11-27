@@ -12,10 +12,10 @@ As regras do negócio, em TypeScript puro, com teste (`ARCHITECTURE.md` §3). A 
 - Idioma, fuso horário e moeda são por estúdio (`ARCHITECTURE.md` §11).
 - Biblioteca ou API só depois de lida no código ou na documentação oficial (`AGENTS.md` §6).
 - Só os arquivos que o plano da spec permite (`AGENTS.md` §6).
+- Sessão, estúdio e configuração chegam por parâmetro, vindos do `src/server`; aqui nada os busca (dedução de `ARCHITECTURE.md` §3 e §4).
 
 ## Nunca aqui
 - Importar `src/app`, `src/server`, `src/data`, o cliente do banco ou o framework (`ARCHITECTURE.md` §3).
-- Sessão, estúdio e configuração chegam por parâmetro, vindos do `src/server`; aqui nada os busca (dedução de `ARCHITECTURE.md` §3 e §4).
 - Pôr dado pessoal ou de saúde em registro de erro, endereço (URL) ou notificação (`ARCHITECTURE.md` §7).
 
 ## Prova exigida
