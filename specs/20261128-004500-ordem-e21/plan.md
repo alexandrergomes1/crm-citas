@@ -11,7 +11,7 @@ Qualquer arquivo fora desta lista bloqueia (`AGENTS.md` §6, escopo estrito).
 | Arquivo | Trecho | Quem escreve |
 |---|---|---|
 | `ARCHITECTURE.md` | só o §2 (coluna "Quando entra" e a frase da ordem) | Arquiteto de software |
-| `SECURITY.md` | só o §1 (frase sobre repositório privado e aviso do GitHub) | Engenheiro de segurança |
+| `SECURITY.md` | só o §1 (frase sobre repositório privado e aviso do GitHub) | Arquiteto de software (o Engenheiro de segurança desta equipe só tem ferramentas de leitura) |
 | `specs/20261128-004500-ordem-e21/` | `spec.md`, `plan.md`, `tasks.md` | o papel dono de cada arquivo |
 | `docs/decisoes/2026-11-27-fundacao.md` | falas da E21·1 e da troca do E19·1: grava só se o PR #2 (`docs/produto-modulos`, que já as grava) não tiver entrado antes; se entrou, nada a gravar (evita conflito) | Documentador |
 | `docs/STATUS.md` | estado da tarefa | Documentador |
@@ -21,14 +21,13 @@ Qualquer arquivo fora desta lista bloqueia (`AGENTS.md` §6, escopo estrito).
 
 ## 2. Como fazer
 1. Arquiteto muda o `ARCHITECTURE.md` §2 conforme spec §2 itens 1 e 2 (CA1, CA2). Nenhuma outra seção.
-2. Engenheiro de segurança muda o `SECURITY.md` §1 conforme spec §2 item 3 (CA3): diz que o repositório é público e
+2. Arquiteto muda o `SECURITY.md` §1 conforme spec §2 item 3 (CA3): diz que o repositório é público e
    que o aviso privado do GitHub existe; o meio continua o da E14·1. Não manda usar o aviso do GitHub.
 3. Documentador registra as falas em `docs/decisoes/` e atualiza `docs/STATUS.md` (e `CHANGELOG.md`, se valer).
 
 ## 3. Quem revisa
-- **Revisor de texto:** Documentador (Diátaxis) revisa o `ARCHITECTURE.md` e o `SECURITY.md`; o Engenheiro de
-  segurança confere o §2 do `ARCHITECTURE.md` e o Arquiteto confere o §1 do `SECURITY.md` (ninguém revisa o que
-  escreveu, `AGENTS.md` §3 item 2). Os registros do Documentador são revisados pelo Analista de requisitos.
+- **Revisores:** Documentador (Diátaxis) revisa o `ARCHITECTURE.md`; Engenheiro de segurança (OWASP ASVS) revisa o
+  `SECURITY.md` (o Arquiteto escreveu os dois e não revisa nenhum, `AGENTS.md` §3 item 2). Os registros do Documentador são revisados pelo Analista de requisitos.
 - **QA:** veredito, refazendo as conferências do §4.
 - **Analista de requisitos:** confere CA1 a CA5 item por item.
 
