@@ -7,8 +7,8 @@
 
 ## 1. Como avisar uma falha de segurança (E14·1)
 - Avise diretamente o dono do projeto, em particular. Quando o sistema tiver domínio próprio, um e-mail de segurança
-  entra aqui. (Este repositório é público, então o aviso privado de falha do GitHub passa a existir; o jeito de
-  avisar continua o desta seção, E14·1.)
+  entra aqui. (Este repositório é público, então o aviso privado de falha do GitHub pode ser ligado nas configurações do
+  GitHub, mas não está em uso; o jeito de avisar continua o desta seção, E14·1.)
 - Não abra issue pública, não comente em PR e não publique a falha antes de ela ser corrigida.
 - No aviso, nunca coloque dado pessoal, dado de saúde, senha, chave ou token.
 
