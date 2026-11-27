@@ -1,0 +1,9 @@
+# Regras padrão do gitleaks + exceção para chave PUBLICÁVEL do Supabase (sb_publishable_...).
+# Ela é pública por definição (vai para o navegador, a RLS protege os dados). Chave secreta (sb_secret_,
+# service_role) continua sendo achado.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Chave publishable do Supabase (pública)"
+regexes = ['''sb_publishable_[A-Za-z0-9_-]+''']

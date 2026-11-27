@@ -1,0 +1,23 @@
+version: 2
+updates:
+  # PR com base `previas` (docs/guias/git-e-deploy.md): nunca direto no main.
+  # Uma vez por mês e num pacote só (menos minutos do GitHub); versão maior vem separada, no máximo 2 abertas.
+  - package-ecosystem: npm
+    directory: /
+    target-branch: previas
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 2
+    cooldown:
+      default-days: 3
+    groups:
+      dependencias:
+        update-types: [minor, patch]
+  - package-ecosystem: github-actions
+    directory: /
+    target-branch: previas
+    schedule:
+      interval: monthly
+    groups:
+      acoes:
+        patterns: ['*']

@@ -1,0 +1,85 @@
+# Ordem real em que as migrations foram aplicadas no banco de produção.
+# O nome dos arquivos antigos não segue a ordem de aplicação (ex.: 20260614_001 é
+# anterior a 20260614212111 em produção, mas vem depois na ordem alfabética), então
+# o replay segue esta lista. Arquivos novos que não estão aqui entram depois, em
+# ordem de nome. Uma linha por arquivo; "#" inicia comentário.
+# Fonte: supabase_migrations.schema_migrations (conferido em 29 out 2026).
+
+# Fundação aplicada antes do histórico de migrations do Supabase
+20260609_001_foundation.sql
+20260609_002_rls.sql
+20260609_003_seed.sql
+20260609_004_staff_shifts_unique.sql
+
+20260610_001_products_packages.sql            # 20260610145520
+20260610_002_finance_sales.sql                # 20260610145603
+20260610_003_seed_demo_data.sql               # 20260610152959
+20260610_004_anamnese.sql                     # 20260610155636
+20260611_001_agenda_time_blocks.sql           # 20260611203053
+20260612_001_operational_ledgers.sql          # 20260612090358
+20260612_002_client_entitlements.sql          # 20260612091026
+20260612_003_catalog_extensions.sql           # 20260612094213
+20260612_004_stock_entries.sql                # 20260612140450
+20260612_005_appointment_deposits.sql         # 20260612235044
+20260613_001_fix_core_rpc_integrity.sql       # 20260613024951
+20260613_002_complete_core_rpc_integrity.sql  # 20260613025330
+20260613_003_enforce_core_rpc_integrity.sql   # 20260613025534
+20260613_004_recurring_appointments_and_client_blocks.sql  # 20260613121447
+20260613_005_atomic_recurrence_updates.sql    # 20260613121907
+20260613_006_fix_recurrence_retry_code.sql    # 20260613122425
+20260613_007_anamnese_notes_audit.sql         # 20260613132800
+20260613_008_anamnese_professional_data.sql   # 20260613142338
+20260613_009_anamnese_professional_lifecycle.sql  # 20260613165829
+20260613_009_checkout_support.sql             # 20260613171500
+20260613_010_confirm_checkout_atomic.sql      # 20260613171501
+20260613_011_checkout_partial_continuation.sql  # 20260613173524
+20260613_012_anamnese_photos_bucket.sql       # 20260614010023
+20260614_001_agenda_timezone_and_indexes.sql  # 20260614015721
+20260614_002_agenda_atomic_appointment_rpcs.sql  # 20260614015816
+20260614_003_agenda_atomic_update_rpc.sql     # 20260614015858
+20260614_004_agenda_status_and_reschedule_rpcs.sql  # 20260614015939
+20260614_005_agenda_atomic_time_blocks.sql    # 20260614020013
+20260614_006_sync_appointment_staff_name.sql  # 20260614020850
+20260614_007_enforce_appointment_client.sql   # 20260614021105
+20260614_008_core_relation_indexes_and_admin_rpc_grants.sql  # 20260614023359
+20260614_009_remove_duplicate_anamnese_token_index.sql  # 20260614024154
+20260614_010_enforce_appointment_insert_integrity.sql  # 20260614024422
+20260614172305_protect_signed_anamnese_evidence.sql  # 20260614172415
+20260614212111_unify_anamnese_appointment_gate.sql
+20260614212151_add_anamnese_gate_functions.sql
+20260614212230_add_anamnese_atomic_creation.sql
+20260614212313_add_anamnese_gate_fk_indexes.sql
+20260615022715_preserve_appointment_status_on_checkout_draft.sql
+20260615183500_audit_anamnese_professional_lifecycle.sql  # 20260615085420
+20260615144330_international_client_identity.sql
+20260615171959_catalog_contract_hardening.sql  # 20260615173639
+20260615173836_catalog_fk_indexes.sql          # 20260615173857
+20260615174119_catalog_rls_hardening.sql       # 20260615174307
+20260615174121_catalog_atomic_rpcs.sql         # 20260615174343
+20260615174426_catalog_protected_deletion.sql  # 20260615174506
+20260615213917_catalog_service_bundles.sql     # 20260615215006
+20260616102418_atomic_client_balance_ledger.sql  # 20260616103215
+20260616105906_atomic_client_balance_cash_method.sql  # 20260616110106
+20260616143752_reconcile_finance_ledger_entries.sql
+20260616144032_revoke_balance_rpc_public_execute.sql
+20260616152537_balance_reversal_ledger.sql
+20260616153359_balance_reversal_fk_indexes.sql
+20260616220600_appointment_bundle_origin.sql   # 20260616201316
+20260616213047_restore_bundle_appointment_rpc_status_encoding.sql
+20260616223025_marketing_foundation.sql
+20260620000001_add_anamnese_template_is_active.sql  # 20260620001448
+20260619225200_agenda_status_notes_core_02.sql  # 20260622125625
+20260622143743_client_notes_edit_audit.sql
+20260619165814_agenda_blocks_filters_01.sql    # 20260701183204
+20260702090000_void_appointment_deposit.sql    # 20260702135123
+20261029010000_fix_utf8_status_functions.sql   # 20261028232958 (aplicada em 29 out, antes da de acesso)
+
+# A família 20260601* é uma fundação alternativa antiga (enum user_role) que
+# conflita com 20260609* e nunca foi aplicada em produção. Fica no repositório
+# (regra: não apagar migrations) e o replay a ignora.
+!20260601000001_foundation.sql
+!20260601000002_clients.sql
+!20260601000003_catalog.sql
+!20260601000004_staff.sql
+!20260601000005_appointments.sql
+!20260601000006_finance.sql

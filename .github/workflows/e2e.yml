@@ -1,0 +1,78 @@
+name: E2E
+
+on:
+  pull_request:
+    # ready_for_review: quando o PR sai de rascunho, o E2E roda uma vez antes da fusão.
+    types: [opened, synchronize, reopened, ready_for_review]
+    # PR só de texto (docs, .md, instruções do Claude) não gasta minutos aqui: nada a testar.
+    paths-ignore: ['docs/**', '**/*.md', '.claude/**']
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  e2e:
+    name: Ponta a ponta (Supabase local)
+    # Só com o PR pronto (fora de rascunho) ou manual. Rascunho não gasta minutos de E2E.
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.draft == false
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      # Versão do pnpm vem do packageManager do package.json.
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 3.1.0
+      # Supabase local, migrations na ordem de produção e estúdio do E2E (script trazido do crm-agenda).
+      - name: Supabase local + migrations + dados do E2E
+        run: bash e2e/ci/setup-local.sh
+      # O Worker local lê as variáveis do .dev.vars (só nesta máquina; nunca versionado).
+      - name: Variáveis do Worker local
+        run: |
+          {
+            echo "SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL"
+            echo "SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY"
+            echo "SUPABASE_SERVICE_ROLE_KEY=$SUPABASE_SERVICE_ROLE_KEY"
+            echo "APP_ORIGIN=http://localhost:3000"
+          } > .dev.vars
+      - name: Navegador
+        run: pnpm exec playwright install --with-deps chromium
+      # Fundação do crm-citas: as telas do crm-agenda não vieram (cada módulo volta pelo fluxo, com os E2E dele).
+      # Por enquanto roda todo spec de e2e/ nas duas larguras (playwright.config.ts).
+      - name: E2E (bloqueia)
+        env:
+          CI: 'true'
+          E2E_WEB_COMMAND: pnpm build && pnpm preview > /tmp/app-server.log 2>&1
+        run: pnpm exec playwright test
+      # O relatório da CI não abre de fora: o retrato da tela no momento da falha vai para o log.
+      - name: Tela no momento da falha
+        if: failure()
+        run: |
+          find test-results -name 'error-context.md' 2>/dev/null | head -8 | while read -r f; do
+            echo "::group::$f"; head -c 6000 "$f"; echo; echo "::endgroup::"
+          done
+      - name: Erros do servidor
+        if: failure()
+        run: |
+          [ -f /tmp/app-server.log ] || exit 0
+          msg=$(grep -iE "error|exception|PGRST|relation|function|column|falhou" /tmp/app-server.log \
+            | grep -vE '^\s+at |GET /assets/' | sort | uniq -c | sort -rn | head -25 | cut -c1-300)
+          msg="${msg//'%'/'%25'}"; msg="${msg//$'\n'/'%0A'}"; msg="${msg//$'\r'/'%0D'}"
+          echo "::error title=Servidor do app::${msg:-sem linhas de erro no log}"
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report
+          retention-days: 7

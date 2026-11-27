@@ -1,0 +1,95 @@
+# desligado até a virada do banco (ver docs/STATUS.md)
+name: Backup diário do banco
+
+# Copia o banco todos os dias, criptografa e guarda em dois lugares (Cloudflare R2 e Backblaze B2).
+# Só roda quando os segredos existirem (ver docs/runbooks/backup-restore.md). Falha = e-mail automático do GitHub.
+
+# Agendamento DESLIGADO até a virada (F4): o banco de teste tem dados fictícios e a produção ainda não tem clientes.
+# Para religar na produção: restaurar o cron '17 3 * * *' e trocar os segredos (ver docs/runbooks/go-live.md, passo 5).
+# Continua disponível manualmente (Actions › Run workflow).
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: backup-diario
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    name: Copiar, criptografar e guardar
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+      BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+      R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+      R2_BUCKET: ${{ secrets.R2_BUCKET }}
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      B2_ENDPOINT: ${{ secrets.B2_ENDPOINT }}
+      B2_BUCKET: ${{ secrets.B2_BUCKET }}
+      B2_ACCESS_KEY_ID: ${{ secrets.B2_ACCESS_KEY_ID }}
+      B2_SECRET_ACCESS_KEY: ${{ secrets.B2_SECRET_ACCESS_KEY }}
+    steps:
+      - name: Conferir segredos
+        id: check
+        run: |
+          missing=""
+          for v in SUPABASE_DB_URL BACKUP_PASSPHRASE R2_ENDPOINT R2_BUCKET R2_ACCESS_KEY_ID R2_SECRET_ACCESS_KEY; do
+            [ -n "${!v}" ] || missing="$missing $v"
+          done
+          if [ -n "$missing" ]; then
+            echo "::warning title=Backup desligado::Faltam segredos:$missing (ver docs/runbooks/backup-restore.md)"
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: supabase/setup-cli@v1
+        if: steps.check.outputs.ready == 'true'
+        with:
+          version: 3.1.0
+
+      - name: Copiar o banco (papéis, estrutura e dados)
+        if: steps.check.outputs.ready == 'true'
+        run: |
+          set -euo pipefail
+          mkdir -p dump
+          supabase db dump --db-url "$SUPABASE_DB_URL" --role-only -f dump/roles.sql
+          supabase db dump --db-url "$SUPABASE_DB_URL" -f dump/schema.sql
+          supabase db dump --db-url "$SUPABASE_DB_URL" --data-only --use-copy -f dump/data.sql
+          # Conferência mínima: estrutura e dados não podem vir vazios.
+          [ -s dump/schema.sql ] && [ -s dump/data.sql ]
+          date -u +%FT%TZ > dump/criado-em.txt
+          ls -la dump
+
+      - name: Criptografar
+        if: steps.check.outputs.ready == 'true'
+        run: |
+          set -euo pipefail
+          STAMP=$(date -u +%Y-%m-%dT%H%MZ)
+          tar -czf - -C dump . | gpg --batch --yes --quiet --pinentry-mode loopback \
+            --passphrase-fd 3 --symmetric --cipher-algo AES256 -o "backup-$STAMP.tar.gz.gpg" 3<<<"$BACKUP_PASSPHRASE"
+          rm -rf dump
+          echo "FILE=backup-$STAMP.tar.gz.gpg" >> "$GITHUB_ENV"
+
+      - name: Guardar no R2 (diário, semanal aos domingos, mensal no dia 1)
+        if: steps.check.outputs.ready == 'true'
+        run: |
+          set -euo pipefail
+          export AWS_ACCESS_KEY_ID="$R2_ACCESS_KEY_ID" AWS_SECRET_ACCESS_KEY="$R2_SECRET_ACCESS_KEY" AWS_DEFAULT_REGION=auto
+          aws s3 cp "$FILE" "s3://$R2_BUCKET/diario/$FILE" --endpoint-url "$R2_ENDPOINT" --only-show-errors
+          [ "$(date -u +%u)" = "7" ] && aws s3 cp "$FILE" "s3://$R2_BUCKET/semanal/$FILE" --endpoint-url "$R2_ENDPOINT" --only-show-errors || true
+          [ "$(date -u +%d)" = "01" ] && aws s3 cp "$FILE" "s3://$R2_BUCKET/mensal/$FILE" --endpoint-url "$R2_ENDPOINT" --only-show-errors || true
+          echo "Guardado no R2: $FILE"
+
+      - name: Segunda cópia no Backblaze B2
+        if: steps.check.outputs.ready == 'true' && env.B2_BUCKET != ''
+        run: |
+          set -euo pipefail
+          export AWS_ACCESS_KEY_ID="$B2_ACCESS_KEY_ID" AWS_SECRET_ACCESS_KEY="$B2_SECRET_ACCESS_KEY"
+          aws s3 cp "$FILE" "s3://$B2_BUCKET/diario/$FILE" --endpoint-url "$B2_ENDPOINT" --only-show-errors
+          echo "Guardado no B2: $FILE"

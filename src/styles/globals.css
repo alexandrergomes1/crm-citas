@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+/* Mínimo da fundação: a fonte Geist (fonts.css) e o fundo. Tokens e peças chegam com o design system (DESIGN.md). */
+:root {
+  color-scheme: light;
+  --bg: #FFFFFF;
+  --ink: #14161A;
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.inicio {
+  display: grid;
+  min-height: 100dvh;
+  place-items: center;
+  padding: 16px;
+  text-align: center;
+}
+
+.inicio h1 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+}

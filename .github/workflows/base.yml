@@ -1,0 +1,51 @@
+name: Travas do Claude Code
+
+# Roda os testes das travas (spec: .claude/hooks/TRAVAS.md §9) e confere as aprovações do dono (§4)
+# quando as travas, os workflows, as decisões, as specs ou o Spec Kit mudam. Sem IA, poucos segundos.
+# O ci.yml ignora .claude/**, então sem este arquivo ninguém os testaria.
+on:
+  pull_request:
+    paths: ['.claude/hooks/**', '.claude/settings.json', '.github/workflows/**', 'docs/BACKLOG.md', 'docs/STATUS.md', 'docs/OWNER.md',
+      'docs/decisoes/**', 'specs/**', '.specify/**', '.githooks/**', 'scripts/conferir-pedido*']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  hooks:
+    name: Testes dos hooks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      # A trava confere se uma migration já existe na branch de integração: precisa da referência.
+      - name: Buscar a branch de integração
+        run: git fetch --no-tags origin +refs/heads/previas:refs/remotes/origin/previas
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Configuração é JSON válido
+        run: node -e "JSON.parse(require('fs').readFileSync('.claude/settings.json','utf8'))"
+      - name: Trava (guarda.mjs)
+        run: node .claude/hooks/guarda.test.mjs
+      - name: Decisões com prova (docs/decisoes/ e specs aprovadas)
+        run: node .claude/hooks/decisao-com-prova.test.mjs && node .claude/hooks/decisao-com-prova.mjs
+      - name: Gancho de envio para outras IAs (.githooks/pre-push)
+        run: node .githooks/pre-push.test.mjs
+      - name: Conferências antes de começar (scripts/conferir-pedido)
+        run: node scripts/conferir-pedido.test.mjs
+      - name: Início de sessão
+        run: node .claude/hooks/inicio-de-sessao.test.mjs
+      # Roda o início de sessão nos arquivos reais: se um documento mudar de nome ou perder o título que ele lê, falha aqui.
+      - name: Início de sessão nos arquivos reais
+        env: { INICIO_SEM_GIT: '1', INICIO_PACOTES_DIR: '', INICIO_SYNCED_DIR: '' }
+        run: |
+          out=$(CLAUDE_PROJECT_DIR="$PWD" node .claude/hooks/inicio-de-sessao.mjs)
+          echo "$out"
+          echo "$out" | grep -q '## Próxima tarefa' && ! echo "$out" | grep -q 'AVISO do hook'
