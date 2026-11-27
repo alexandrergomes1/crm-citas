@@ -3,10 +3,11 @@
 > **Aprovado pelo dono em 27/11/2026** (o design feito com ele nesse dia). Fonte única de aparência e comportamento
 > das telas: toda tela segue só o que está aqui. Peça, cor, nome ou medida que não está aqui **não se usa**: entra
 > aqui primeiro, com aprovação do dono. Escrito pelo Designer de produto; normas: WCAG 2.2, Material Design, Apple HIG.
-> Imagens: `docs/design/imagens/`. Canvas com todas as versões, para consulta: `docs/design/README.md`.
+> Imagens: `docs/design/imagens/`. **Se texto e imagem divergirem, vale este texto; a imagem é corrigida.** Canvas com todas as versões, para consulta: `docs/design/README.md`.
 >
 > **Comentário do dono para debater depois (27/11, não é decisão):** "nao gostei do botao branco e prefiro o preto
 > em cada tela e o de agendar outra cor sem competir". Hoje vale o que está abaixo.
+
 ## 1. Hierarquia: três níveis de atenção
 
 | Nível | O que é | Como aparece |
@@ -43,14 +44,14 @@ Se duas coisas da mesma tela disputam o olho, uma delas está no nível errado.
 | `--danger` / `--dangerSoft` | #B3261E / #FBEAE8 | vermelho: erro, ausência, bloqueio, excluir · o claro só como fundo do ícone de erro |
 | `--c1`…`--c4` | #7D5A8C · #B0583A · #A07A2C · #5C7F6A | cor de categoria, na ordem em que as categorias foram criadas (a 5ª volta à 1ª): faixa de 4 px à esquerda da linha, sempre com o nome escrito (cabeçalho do grupo ou detalhe da linha) |
 
-Contraste conferido: todo texto ≥ 4,5:1 sobre fundo, superfície e trilho; contorno de campo ≥ 3:1. Outros temas de cor (ex.: barbearia): mesmas regras, cores a definir com o dono.
+Contraste conferido: todo texto ≥ 4,5:1 sobre fundo, superfície e trilho; contorno de campo ≥ 3:1. Temas Barbearia e Essencial: mesmas regras, cores a definir com o dono.
 
 ## 4. Texto, espaços, formas, alturas
 
 - **Fonte:** Geist. **Escala:** 20 forte (título da tela) · 18 forte (título de folha e janela) · 16 forte (título de bloco) · 15 (texto no celular) · 14 (texto e botão no computador) · 13 (detalhe, subtítulo, tabela do computador) · 12 (cabeçalho de tabela, etiqueta, contador) · 11 (mínimo: só barra de baixo, menu recolhido, hora da grade, número de contador).
 - **Espaços:** 4 · 8 · 12 · 16 · 20 · 24 · 32. Margem da tela 16 no celular e 24 no computador; entre blocos 12.
 - **Formas:** tudo em pílula (botão, campo de uma linha, busca, chip, seletor, item de menu aberto, aviso). Exceções: bloco e menu aberto canto 20; campo de várias linhas canto 16; item do menu recolhido 16; janelinha 24; folha 28 no topo; quadrado da inicial 10; caixinha 7.
-- **Alturas:** celular 44 (botão, campo, botão de ícone), linha de lista 64, barra de baixo 72, cabeçalho 64. Computador 40 (botão, busca, botão de ícone, item de menu), linha de tabela 40 com texto 13 (DS2·A), barra do topo 64, menu aberto 232 e recolhido 84, submenu 216.
+- **Alturas:** celular 44 (botão, campo, botão de ícone), linha de lista 64, barra de baixo 72, cabeçalho 64. Computador 40 (botão, busca, botão de ícone, item de menu), linha de tabela 40 com texto 13, barra do topo 64, menu aberto 232 e recolhido 84, submenu 216.
 - **Toque:** 44 no celular e 40 no computador, mesmo quando o desenho é menor (área invisível).
 - **Sombra:** só no que flutua (menu aberto, folha, painel, aviso), no escolhido do seletor e na borda do cabeçalho.
 
@@ -75,7 +76,7 @@ Contraste conferido: todo texto ≥ 4,5:1 sobre fundo, superfície e trilho; con
 | Filtros | esconder o que não interessa | "Filtros ▾" com a pílula de contador dentro; abre painel à direita | funil com a pílula ao lado, no mesmo botão claro; abre folha de baixo | filtro solto na tela; valores dos filtros escritos na tela |
 | Ordenar | mudar a ordem | "Ordenar: <ordem atual> ▾" | primeira linha da folha de Filtros, escrita "Ordenar" com o valor à direita | "Ajustar ordem" (é mover à mão; fica em Opções) |
 | Contador | quantos há ali | **pílula cinza suave** (fundo rgba(22,24,29,.07), número 12 `--ink2`) com o **total**; a mesma pílula em **âmbar suave** (`--warnSoft`, número #8A5205) quando há pendência dentro, e o número continua o total; no subtítulo, número e palavra ("4 pendentes"); igual nas seções, no seletor, nas abas, nas listas e nos botões | igual · sempre o total, mesmo em dia · zero não aparece | número solto sem pílula; número flutuando sobre ícone; pílula escura ou azul |
-| Contador em botão de ícone | filtros ligados, avisos não lidos | o ícone e a pílula juntos no mesmo botão (funil + 2; sininho + 3 em âmbar suave, porque não lido pede atenção) | igual | número flutuando no canto do ícone (R2, 27/11) |
+| Contador em botão de ícone | filtros ligados, avisos não lidos | o ícone e a pílula juntos no mesmo botão (funil + 2; sininho + 3 em âmbar suave, porque não lido pede atenção) | igual | número flutuando no canto do ícone |
 | Etiqueta | marca da cliente ou item | ícone + palavra, sem fundo | igual | fundo colorido; cor fora de estado |
 | Status | situação | botão "ícone + nome ▾" no agendamento; ícone + palavra nas listas | igual; no cartão pequeno da Agenda só o ícone (nome no leitor) | bolinha de cor |
 | Topo | ajuda, notificações, sua conta | ajuda, sininho com a pílula ao lado e Sua conta, sempre | sininho e Sua conta só no topo do nível 1 de cada módulo; nas telas internas, ‹ voltar | contador preto ou azul |
