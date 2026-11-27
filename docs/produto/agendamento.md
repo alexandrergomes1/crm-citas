@@ -8,7 +8,7 @@ dona, recepção, profissional
 
 ## Recursos
 Lista candidata; o que entra na primeira versão se decide na spec do módulo.
-- novo agendamento em etapas: cliente, serviço, data e hora, conferência
+- novo agendamento em etapas: cliente, serviços, data e hora, conferência
 - atendimento de balcão sem reserva
 - remarcar
 - status
