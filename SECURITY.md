@@ -1,13 +1,13 @@
 # Política de segurança do crm-citas
 
-> Rascunho para o dono aprovar (E14). Escrito por: Engenheiro de segurança · Revisado por: Auditor de risco ·
+> Aprovado pelo dono em 27/11/2026 (E14). Escrito por: Engenheiro de segurança · Revisado por: Auditor de risco ·
 > Norma: OWASP ASVS 4.0.3 (nível 2 no sistema todo; requisitos de nível 3 aplicados ao módulo da ficha de saúde),
 > RGPD e LGPD.
 > Fonte: `AGENTS.md`, `ARCHITECTURE.md` e `docs/decisoes/2026-11-27-fundacao.md`. Este arquivo não cria regra nova.
 
-## 1. Como avisar uma falha de segurança (proposta dentro do E14)
-- Avise em particular, pela aba Security do GitHub: **Report a vulnerability**. O aviso chega a quem administra o
-  repositório.
+## 1. Como avisar uma falha de segurança (E14·1)
+- Avise diretamente o dono do projeto, em particular. Quando o sistema tiver domínio próprio, um e-mail de segurança
+  entra aqui. (O aviso privado do GitHub só existe em repositório público, e este é privado.)
 - Não abra issue pública, não comente em PR e não publique a falha antes de ela ser corrigida.
 - No aviso, nunca coloque dado pessoal, dado de saúde, senha, chave ou token.
 
