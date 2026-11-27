@@ -1,7 +1,7 @@
 # AGENTS.md · src/server (camada única de serviço)
 
-> Rascunho para o dono aprovar (E15). Escrito por: Arquiteto de software · Revisado por: (a preencher) · Norma: modelo C4, Clean Architecture, padrão agents.md, OWASP ASVS 4.0.3.
-> Fonte: `AGENTS.md`, `ARCHITECTURE.md`, `SECURITY.md`, `docs/guias/processo-sdd.md`. Este arquivo não cria regra nova.
+> Rascunho para o dono aprovar (E15). Escrito por: Arquiteto de software · Revisado por: Revisor de código · Norma: modelo C4, Clean Architecture, padrão agents.md, OWASP ASVS 4.0.3.
+> Fonte: `AGENTS.md`, `ARCHITECTURE.md`, `SECURITY.md`, `docs/guias/processo-sdd.md`. Este arquivo não cria regra nova; deduções marcadas como tal.
 
 ## O que mora aqui
 A camada única de serviço: todo pedido (telas, painel admin, portal, parceiros) entra aqui e passa pelas 6 portas (`ARCHITECTURE.md` §3 e §4). Usa `src/domain` para as regras e `src/data` para o banco.
@@ -19,4 +19,4 @@ A camada única de serviço: todo pedido (telas, painel admin, portal, parceiros
 - Segredo no código ou em registro; dado pessoal ou de saúde em registro de erro, endereço (URL) ou notificação (`SECURITY.md` §2 e §4).
 
 ## Prova exigida
-Código: testes de unidade e CI verde (`AGENTS.md` §9). Login, acesso, dinheiro, ficha de saúde ou integração: mais a revisão do Auditor de risco e do Engenheiro de segurança (`docs/guias/processo-sdd.md` §3).
+Código: testes de unidade e CI verde (`AGENTS.md` §9). Segurança, dinheiro, login, ficha de saúde, integração: revisam o Auditor de risco e o Engenheiro de segurança; prova: o da área, mais a revisão de risco (`docs/guias/processo-sdd.md` §3).
