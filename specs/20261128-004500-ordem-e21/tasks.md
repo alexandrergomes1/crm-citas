@@ -7,7 +7,7 @@
 |---|---|---|---|---|
 | T1 | Nova ordem na coluna "Quando entra" e frase da ordem citando E21·1 | Arquiteto de software | `ARCHITECTURE.md` §2 | CA1, CA2 |
 | T2 | Repositório público; aviso privado do GitHub existe; meio segue E14·1 | Engenheiro de segurança | `SECURITY.md` §1 | CA3 |
-| T3 | Registrar as falas do dono (E21·1 e visibilidade) | Documentador | `docs/decisoes/2026-11-27-fundacao.md` | falas literais com data e link |
+| T3 | Registrar as falas do dono (E21·1 e troca do E19·1) só se o PR #2 (`docs/produto-modulos`) não tiver entrado antes; se entrou, nada a gravar (evita conflito) | Documentador | `docs/decisoes/2026-11-27-fundacao.md` | falas literais com data e link, ou "já gravado pelo PR #2" |
 | T4 | Atualizar estado (e versões, se valer) | Documentador | `docs/STATUS.md`, `CHANGELOG.md` | estado da tarefa correto |
 | T5 | Revisão cruzada (quem escreveu não revisa) | Documentador; Engenheiro de segurança (T1); Arquiteto (T2); Analista de requisitos (T3, T4) | — | sem "Bloqueia" (CA5) |
 | T6 | Conferências do `plan.md` §4 e veredito | QA | — | escopo só do `plan.md` §1 (CA4) |

@@ -13,7 +13,7 @@ Qualquer arquivo fora desta lista bloqueia (`AGENTS.md` §6, escopo estrito).
 | `ARCHITECTURE.md` | só o §2 (coluna "Quando entra" e a frase da ordem) | Arquiteto de software |
 | `SECURITY.md` | só o §1 (frase sobre repositório privado e aviso do GitHub) | Engenheiro de segurança |
 | `specs/20261128-004500-ordem-e21/` | `spec.md`, `plan.md`, `tasks.md` | o papel dono de cada arquivo |
-| `docs/decisoes/2026-11-27-fundacao.md` | registro das falas da E21·1 e da visibilidade | Documentador |
+| `docs/decisoes/2026-11-27-fundacao.md` | falas da E21·1 e da troca do E19·1: grava só se o PR #2 (`docs/produto-modulos`, que já as grava) não tiver entrado antes; se entrou, nada a gravar (evita conflito) | Documentador |
 | `docs/STATUS.md` | estado da tarefa | Documentador |
 | `CHANGELOG.md` | entrada, se o Documentador julgar que vale | Documentador |
 

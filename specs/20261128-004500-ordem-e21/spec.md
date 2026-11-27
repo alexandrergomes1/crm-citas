@@ -8,8 +8,8 @@
 ## 1. Pedido literal do dono (28/11/2026, https://claude.ai/code/session_018cV8b9epaQJNqguG5c5Aqb)
 - **E21·1:** "E21-1: Módulos, inverta o partes do sistema pelo "depois um por vez". Pois esses do item 2(partes do
   sistema) é novo e entra depois dos "um por vez"."
-- **Visibilidade:** "Eu deixei público o projeto para vc ter os actions pra usar se preciso pq no privado tá sem
-  limite. Salvo se conseguires mudar entre público e privado qdo precisar ."
+- **E19·1 (troca), visibilidade:** "Eu deixei público o projeto para vc ter os actions pra usar se preciso pq no
+  privado tá sem limite. Salvo se conseguires mudar entre público e privado qdo precisar ."
 
 ## 2. O que muda
 1. **`ARCHITECTURE.md` §2, coluna "Quando entra"** — nova ordem (E21·1, substitui a E4·3):
@@ -45,4 +45,5 @@ Nenhuma: as duas decisões já foram dadas pelo dono.
 - **A1.** "Inverter pelo depois um por vez" foi lido como: os outros módulos vêm logo após o núcleo, e o painel admin
   e as demais partes novas vêm depois deles, mantendo entre si a ordem que já tinham.
 - **A2.** A API pública fica por último e mantém a condição da E4·1 ("só quando precisarem").
-- **A3.** O registro das falas em `docs/decisoes/` é do Documentador na etapa 11, no mesmo PR.
+- **A3.** As falas já estão em `docs/decisoes/` na branch `docs/produto-modulos` (PR #2). O Documentador só as grava
+  nesta branch, na etapa 11, se o PR #2 não tiver entrado antes.
