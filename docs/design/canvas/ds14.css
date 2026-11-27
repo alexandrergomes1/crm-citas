@@ -249,3 +249,11 @@ svg.i.s14{width:14px;height:14px} svg.i.s16{width:16px;height:16px} svg.i.s18{wi
 .seg span.ct::after,.seg span.pend::after,.seg span.ctf::after{display:none}
 .z .icb.wc,.pc .icb.wc{width:auto; padding:0 10px 0 12px; border-radius:999px; display:inline-flex; align-items:center; gap:6px; background:var(--btn)}
 .topp .icb.wc,.top .icb.wc{background:transparent}
+
+/* ===== E12·3 (27/11): imagens iguais ao DESIGN.md ===== */
+/* pílula âmbar: fundo --warnSoft (#FBEFD9), número 600 #8A5205 (DESIGN.md §3 e §8b) */
+.pend,.seg span.pend,.nv .pend,.icb .pend{background:var(--warnSoft); color:#8A5205}
+/* sininho com a pílula ao lado: ícone universal, sem fundo (§5 Botão de ícone e Topo) */
+.z .icb.wc.bare,.pc .icb.wc.bare{background:transparent}
+/* desativado: esmaecido, opacidade 60 % (§8) */
+.z .btn.off{background:var(--btn); color:var(--ink); opacity:.6}
