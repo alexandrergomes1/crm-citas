@@ -1,11 +1,13 @@
 # Política de segurança do crm-citas
 
-> Rascunho para o dono aprovar (E14). Escrito por: Engenheiro de segurança · Revisado por: (a preencher) ·
-> Norma: OWASP ASVS 4.0.3 (nível 2 no sistema; nível 3 no módulo da ficha de saúde), RGPD e LGPD.
+> Rascunho para o dono aprovar (E14). Escrito por: Engenheiro de segurança · Revisado por: Auditor de risco ·
+> Norma: OWASP ASVS 4.0.3 (nível 2 no sistema todo; requisitos de nível 3 aplicados ao módulo da ficha de saúde),
+> RGPD e LGPD.
 > Fonte: `AGENTS.md`, `ARCHITECTURE.md` e `docs/decisoes/2026-11-27-fundacao.md`. Este arquivo não cria regra nova.
 
-## 1. Como avisar uma falha de segurança
-- Avise em particular, pela aba Security do GitHub: **Report a vulnerability**. O aviso chega só ao dono.
+## 1. Como avisar uma falha de segurança (proposta dentro do E14)
+- Avise em particular, pela aba Security do GitHub: **Report a vulnerability**. O aviso chega a quem administra o
+  repositório.
 - Não abra issue pública, não comente em PR e não publique a falha antes de ela ser corrigida.
 - No aviso, nunca coloque dado pessoal, dado de saúde, senha, chave ou token.
 
@@ -26,12 +28,13 @@
   estúdio nunca vê o outro (`ARCHITECTURE.md` §5).
 - Um estúdio não atrapalha os outros: limite de pedidos por estúdio, listas paginadas, limite de idas ao banco por tela.
 - Cada pessoa tem um papel em cada estúdio (dona, recepção, profissional) (`ARCHITECTURE.md` §6).
-- Painel admin: área separada, login próprio e dupla verificação (E4·2).
+- Painel admin: área separada, login próprio e dupla verificação; o dono pode entrar como o estúdio para suporte,
+  sem aviso ao estúdio (E4·2).
 - Avisos de parceiros (pagamento, mensagem) têm a assinatura conferida e são processados uma vez só (`ARCHITECTURE.md` §10).
 - O banco só muda por migration aplicada pela CI; a IA nunca publica nem aplica mudança no banco remoto (`AGENTS.md` §1).
 
 ## 4. Dado pessoal e ficha de saúde
-- Todos os dados na União Europeia (E5·1). Cópias e fornecedores também na UE, ou com contrato de tratamento de
+- Todos os dados na União Europeia (E5·1; rever se o Brasil ficar lento). Cópias e fornecedores também na UE, ou com contrato de tratamento de
   dados (DPA) e base para a transferência.
 - Dado pessoal e de saúde nunca em registro de erro, endereço (URL) ou notificação.
 - Respostas da ficha de saúde cifradas no banco (E5·2; ASVS V6.1.2).
@@ -62,7 +65,10 @@ Nada disto está construído; cada item entra por spec própria (`ARCHITECTURE.m
 - [ ] Cifra da ficha de saúde e cofre da chave, com troca planejada.
 - [ ] Consentimento, DPIA e contrato estúdio–plataforma para a ficha de saúde.
 - [ ] Fornecedores na UE ou com DPA.
-- [ ] Roteiro de incidente escrito.
+- [ ] Roteiro de incidente escrito, com o papel de operadora (avisar o estúdio sem demora) e os prazos de aviso às
+  pessoas afetadas.
+- [ ] Ligar o aviso privado de falha (Private vulnerability reporting) no GitHub.
+- [ ] gitleaks e Dependabot (proposta E2b), confirmados com o dono na vez deles.
 - [ ] Cópia diária cifrada e restauração testada.
 - [ ] Exportar, cancelar e apagar dados; pedidos de "apagar os meus dados".
 - [ ] Monitoramento sem dado pessoal (Sentry e UptimeRobot, como proposta E2b, confirmados com o dono na vez deles).
