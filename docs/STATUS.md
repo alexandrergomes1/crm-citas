@@ -1,6 +1,6 @@
 # Estado do projeto
 
-> Rascunho para o dono aprovar (E18). Escrito por: Documentador · Revisado por: (a preencher)
+> Rascunho para o dono aprovar (E18). Escrito por: Documentador · Revisado por: Gerente de projeto
 
 ## Onde estamos
 - **Fase:** base de regras quase pronta. Ainda não há código.
@@ -30,11 +30,11 @@
 | E17 | etapa 5b: o Gerente de projeto confere spec e plano antes do dono |
 
 ## Falta na base
-- `README.md` (rascunho junto deste, aguarda E18).
+- `docs/BACKLOG.md`, `docs/STATUS.md` e `README.md` (rascunhos, aguardam E18).
 - `docs/produto/`: um arquivo por módulo (item 1 da fila).
+- Pendências: e-mail de segurança quando houver domínio (E14·1); gitleaks e Dependabot (E14·3).
 
 ## O que o dono faz agora
 1. Aprovar a fila, este estado e o README (**E18**).
 2. Se ainda não criou a branch `previas` no GitHub:
    - Abra https://github.com/alexandrergomes1/crm-citas/branches → **New branch** → nome `previas`, a partir de `main`.
-   - Depois: **Settings** → **General** → **Default branch** → escolha `previas`.

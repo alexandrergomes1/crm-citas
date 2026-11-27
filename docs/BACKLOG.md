@@ -1,18 +1,18 @@
 # Fila de tarefas
 
-> Rascunho para o dono aprovar (E18). Escrito por: Documentador · Revisado por: (a preencher)
+> Rascunho para o dono aprovar (E18). Escrito por: Documentador · Revisado por: Gerente de projeto
 
 **Como usar:** o primeiro item livre é o que se faz (`AGENTS.md` §5). Só o Documentador muda este arquivo.
 Cada item entra por spec própria (`docs/guias/processo-sdd.md`).
 
-**Ordem: proposta, o dono aprova a ordem.** Fontes: E3·2, E4·3, E8, pedido de módulos de ajuda e IA
+**Ordem: proposta, o dono aprova a ordem.** Fontes: pedidos anteriores ao E1, E3·2, E4·3, E8, E14·3, pedido de módulos de ajuda e IA
 (`docs/decisoes/2026-11-27-fundacao.md`) e `ARCHITECTURE.md` §2.
 
 | # | Tarefa | Fonte | Situação |
 |---|---|---|---|
-| 1 | Terminar a base: um arquivo por módulo em `docs/produto/`, com autorização do dono para ler o projeto antigo | E8 (item 8) | livre |
-| 2 | Fundação técnica: ferramentas, app vazio, Spec Kit instalado, travas automáticas e CI | `ARCHITECTURE.md` §12 | livre |
-| 3 | Ligar o banco existente, tabela por tabela, com autorização do dono item por item | `AGENTS.md` §3 regra 4 | livre |
+| 1 | Terminar a base: um arquivo por módulo em `docs/produto/`, com autorização do dono para ler o projeto antigo | E8 (item 8), pedido (b) anterior ao E1 | livre |
+| 2 | Fundação técnica: ferramentas, app vazio, Spec Kit instalado, travas automáticas (gitleaks e Dependabot, E14·3) e CI | `AGENTS.md` §1, E14·3 | livre |
+| 3 | Ligar o banco existente, tabela por tabela, com autorização do dono item por item | pedido (a) anterior ao E1, `AGENTS.md` §3 regra 4 | livre |
 | 4 | Design system no código | `DESIGN.md` | livre |
 | 5 | Núcleo, um módulo por spec: Agenda, Agendamento, Clientes, Formulários, Catálogo, Checkout, Caixa | E3·2, `ARCHITECTURE.md` §2 | livre |
 | 6 | Painel admin básico | E4·2, E4·3 | livre |

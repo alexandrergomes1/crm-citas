@@ -1,6 +1,6 @@
 # crm-citas
 
-> Rascunho para o dono aprovar (E18). Escrito por: Documentador · Revisado por: (a preencher)
+> Rascunho para o dono aprovar (E18). Escrito por: Documentador · Revisado por: Gerente de projeto
 
 Sistema de gestão (SaaS) para estúdios de estética, usado pela dona, pela recepção e pelas profissionais, com o
 celular em primeiro lugar. Idiomas de uso: português, espanhol e inglês. Nome provisório (E3·3).
@@ -21,6 +21,7 @@ Entra com a spec da fundação técnica. Ainda não há código.
 | Regras de trabalho | `AGENTS.md` |
 | Planta | `ARCHITECTURE.md` |
 | Aparência | `DESIGN.md` |
+| Design (canvas e imagens) | `docs/design/` |
 | Segurança | `SECURITY.md` |
 | Como contribuir | `CONTRIBUTING.md` |
 | Fila | `docs/BACKLOG.md` |
