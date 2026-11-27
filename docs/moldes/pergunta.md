@@ -1,6 +1,6 @@
 # Molde de mensagem ao dono
 
-> Aprovado pelo dono em 27/11/2026 (E9). **Ajustes da revisão aguardando aprovação (E12).**
+> Aprovado pelo dono em 27/11/2026 (E9). Ajustes da revisão aprovados em 27/11/2026 (E12·2).
 > Escrito por: Gerente de projeto · Revisado por: Gerente de projeto (outra instância, que não escreveu) ·
 > Norma: Scrum Guide e Kanban. Regra: `AGENTS.md` §7. Vale para toda parada em que a IA espera o dono.
 
