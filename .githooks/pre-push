@@ -1,0 +1,4 @@
+#!/bin/sh
+# Gancho de git (pre-push) para Cursor, Codex e qualquer pessoa: mesmas regras de envio da trava do
+# Claude Code (.claude/hooks/TRAVAS.md §4 e §8). Liga-se com: git config core.hooksPath .githooks
+exec node "$(dirname "$0")/pre-push.mjs" "$@"

@@ -1,0 +1,169 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__github__list_pull_requests",
+      "mcp__github__pull_request_read",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git show*)",
+      "Bash(git fetch origin)",
+      "Bash(git fetch origin previas)",
+      "Bash(git branch --show-current)",
+      "Bash(git branch -a*)",
+      "Bash(git branch -r*)",
+      "Bash(git branch --list*)",
+      "Bash(pnpm lint*)",
+      "Bash(pnpm typecheck*)",
+      "Bash(pnpm test*)",
+      "Bash(node .claude/hooks/guarda.test.mjs)",
+      "Bash(node .claude/hooks/inicio-de-sessao.test.mjs)",
+      "Bash(claude plugin list*)"
+    ],
+    "deny": [
+      "Skill(anthropic-skills:ka-ficha-decisao)",
+      "Skill(anthropic-skills:design-system-ka-beauty)",
+      "Skill(anthropic-skills:canvas-design)",
+      "Skill(anthropic-skills:web-artifacts-builder)",
+      "Skill(design-skills:design-elevation)",
+      "Skill(design-skills:ux-research)",
+      "Skill(design-skills:ux-strategy)",
+      "Skill(design-skills:journey-mapping)",
+      "Skill(design:design-critique)",
+      "Skill(design:accessibility-review)",
+      "Skill(design:ux-copy)",
+      "Skill(design:user-research)",
+      "Skill(design:research-synthesis)",
+      "Skill(backend-design:review-migration)",
+      "Skill(commit-commands:commit-push-pr)",
+      "Skill(commit-commands:clean_gone)",
+      "Skill(superpowers:executing-plans)",
+      "Skill(superpowers:subagent-driven-development)",
+      "Skill(superpowers:requesting-code-review)",
+      "Skill(superpowers:finishing-a-development-branch)",
+      "Skill(superpowers:using-git-worktrees)",
+      "Skill(pr-review-toolkit:review-pr)",
+      "Skill(claude-security:scan)",
+      "Skill(loop)",
+      "Skill(engineering:architecture)",
+      "Skill(engineering:system-design)",
+      "Skill(engineering:code-review)",
+      "Skill(engineering:debug)",
+      "Skill(engineering:testing-strategy)",
+      "Skill(engineering:deploy-checklist)",
+      "Skill(engineering:incident-response)",
+      "Skill(engineering:tech-debt)",
+      "Skill(engineering:documentation)",
+      "Skill(engineering:standup)",
+      "Skill(product-management:brainstorm)",
+      "Skill(product-management:product-brainstorming)",
+      "Skill(product-management:write-spec)",
+      "Skill(product-management:sprint-planning)",
+      "Skill(product-management:roadmap-update)",
+      "Skill(product-management:metrics-review)",
+      "Skill(product-management:synthesize-research)",
+      "Skill(product-management:competitive-brief)",
+      "Skill(product-management:stakeholder-update)",
+      "Agent(backend-design:schema-reviewer)",
+      "Agent(backend-design:security-reviewer)",
+      "Agent(pr-review-toolkit:code-reviewer)",
+      "Agent(pr-review-toolkit:code-simplifier)",
+      "Agent(pr-review-toolkit:comment-analyzer)",
+      "Agent(pr-review-toolkit:type-design-analyzer)",
+      "Agent(claude-security:claude-security)",
+      "mcp__claude-code-remote__create_session",
+      "Skill(design:design-system)",
+      "Agent(backend-design:component-architect)",
+      "Agent(backend-design:incident-investigator)",
+      "Agent(backend-design:incident-thinker)",
+      "Skill(speckit-constitution)",
+      "Skill(speckit-clarify)",
+      "Skill(speckit-converge)",
+      "Skill(speckit-checklist)",
+      "Skill(superpowers:brainstorming)",
+      "Skill(superpowers:writing-plans)",
+      "Skill(ui-design-review:compare)",
+      "Skill(ui-design-review:polish)",
+      "Skill(ui-design-review:review)",
+      "Skill(ui-design-review:ui-compare)",
+      "Skill(ui-design-review:ui-polish)",
+      "Skill(ui-design-review:ui-review)"
+    ]
+  },
+  "enabledPlugins": {
+    "superpowers@synced": true,
+    "design-skills@synced": true,
+    "design@synced": true,
+    "commit-commands@synced": true,
+    "backend-design@synced": true,
+    "supabase@synced": true,
+    "playwright@synced": true,
+    "skill-reviewer@synced": true,
+    "claude-md-management@synced": true,
+    "skill-creator@synced": true,
+    "claude-code-setup@synced": true,
+    "agencia-360@synced": false,
+    "animatedwebs@synced": false,
+    "brand-voice@synced": false,
+    "career-compass@synced": false,
+    "claude-security@synced": false,
+    "cowork-plugin-management@synced": false,
+    "customer-support@synced": false,
+    "expo@synced": false,
+    "finance@synced": false,
+    "frontend-design@synced": true,
+    "humanizer@synced": false,
+    "image-generation@synced": false,
+    "instagram@synced": false,
+    "instagram-agent@synced": false,
+    "jd-resume-tailor@synced": false,
+    "job-hunt-skills@synced": false,
+    "marketing@synced": false,
+    "mcp-search-console@synced": false,
+    "pdf-viewer@synced": false,
+    "postiz@synced": false,
+    "pr-review-toolkit@synced": false,
+    "productivity@synced": false,
+    "rankedin@synced": false,
+    "remotion@synced": false,
+    "sales@synced": false,
+    "searchfit-seo@synced": false,
+    "small-business@synced": false,
+    "social-media-skills@synced": false,
+    "ui-design-review@synced": false
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/inicio-de-sessao.mjs\""
+          }
+        ]
+      },
+      {
+        "matcher": "compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/inicio-de-sessao.mjs\" --resumida"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash|Write|Edit|MultiEdit|NotebookEdit|Read|Grep|Glob|mcp__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/guarda.mjs\"",
+            "timeout": 120
+          }
+        ]
+      }
+    ]
+  }
+}
