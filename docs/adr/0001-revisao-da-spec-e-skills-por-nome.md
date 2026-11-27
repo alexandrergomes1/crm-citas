@@ -1,6 +1,6 @@
 # ADR 0001 · Revisão da spec e do plano pelo Gerente e skills só por nome
 
-- **Status:** Decisão 1 (etapa 5b): Proposto, aguarda aprovação do dono (E17), porque é mudança de processo e não só decisão técnica. Decisão 2 (campo das skills): Aceita, decisão técnica · 27/11/2026
+- **Status:** Decisão 1 (etapa 5b): Aceito: aprovado pelo dono em 27/11/2026 (E17). Decisão 2 (campo das skills): Aceita, decisão técnica · 27/11/2026
 - **Autor:** Arquiteto de software · **Revisão:** pendente (outro papel)
 - **Aviso ao dono:** as duas foram avisadas ao dono na mensagem do E16, em 27/11/2026 (`AGENTS.md` §3 item 3); a 1 vai à aprovação no E17.
 

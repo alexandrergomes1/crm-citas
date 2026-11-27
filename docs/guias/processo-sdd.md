@@ -22,7 +22,7 @@ a cada envio) · **prévia** (endereço onde o dono vê a mudança antes de ir p
 | 3 | Escrever a spec | Analista de requisitos | `spec.md`: o que muda, critérios de aceite, até 3 dúvidas, "Assumptions" | — |
 | 4 | Planejar | Arquiteto de software | `plan.md` (como e quais arquivos podem mudar) e `tasks.md` | — |
 | 5 | Conferir os três | Analista de requisitos | a análise do Spec Kit sem problema crítico | — |
-| 5b | Revisar spec e plano | Gerente de projeto | spec e plano conferidos antes da ficha visual e do dono, em todo tipo (ADR 0001; aguarda aprovação do dono, E17) | não |
+| 5b | Revisar spec e plano | Gerente de projeto | spec e plano conferidos antes da ficha visual e do dono, em todo tipo (ADR 0001; aprovado pelo dono, E17) | não |
 | 6 | Ficha visual (só tela) | Designer de produto + Revisor de design | imagens de antes e depois, nas larguras de teste do `DESIGN.md` | **sim** |
 | 7 | Aprovação | Dono; o Analista de requisitos grava | spec com "Status: Approved" e a linha "Aprovação do dono" (fala literal, data, link), gravada pelo Analista de requisitos (E16·3) | **sim** |
 | 8 | Construir | Engenheiro de software | só os arquivos do plano; testes junto | não |
