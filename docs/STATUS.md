@@ -1,6 +1,6 @@
 # Estado do projeto
 
-> Rascunho para o dono aprovar (E18). Escrito por: Documentador · Revisado por: Gerente de projeto
+> Aprovado pelo dono em 27/11/2026 (E18). Escrito por: Documentador · Revisado por: Gerente de projeto
 
 ## Onde estamos
 - **Fase:** base de regras quase pronta. Ainda não há código.
@@ -28,13 +28,25 @@
 | E15 | regras das 4 pastas de código; larguras 390 px e 1440 px |
 | E16 | as 4 skills e as regras de cópia, bloqueio e gravação das aprovações |
 | E17 | etapa 5b: o Gerente de projeto confere spec e plano antes do dono |
+| E18 | ordem da fila (`docs/BACKLOG.md`, itens 1 a 10); este estado e o `README.md` seguem como referência aprovada |
 
 ## Falta na base
-- `docs/BACKLOG.md`, `docs/STATUS.md` e `README.md` (rascunhos, aguardam E18).
 - `docs/produto/`: um arquivo por módulo (item 1 da fila).
-- Pendências: e-mail de segurança quando houver domínio (E14·1); gitleaks e Dependabot (E14·3).
+- Pendências: e-mail de segurança quando houver domínio (E14·1); gitleaks e Dependabot (E14·3); travas automáticas do projeto antigo (item 2 da fila).
 
-## O que o dono faz agora
-1. Aprovar a fila, este estado e o README (**E18**).
-2. Se ainda não criou a branch `previas` no GitHub:
-   - Abra https://github.com/alexandrergomes1/crm-citas/branches → **New branch** → nome `previas`, a partir de `main`.
+## Como continuar numa conversa nova
+
+**Onde estão as coisas**
+- Repositório `alexandrergomes1/crm-citas`, branch `chore/base-fundacao` (a base). A branch `previas` foi criada vazia, a partir de `main`.
+- Respostas do dono: `docs/decisoes/2026-11-27-fundacao.md`.
+- Histórico anterior ao projeto novo (só consulta): repositório `crm-agenda`, branches `chore/reorganizacao-base` (pasta `docs/reorganizacao/`) e `feat/ds-premium` (spec do design).
+
+**Próximo passo**
+1. O Engenheiro de DevOps abre o PR `chore/base-fundacao` → `previas`, e o Gerente de projeto pede o merge ao dono no molde (`docs/moldes/pergunta.md`).
+2. Item 1 da fila (`docs/BACKLOG.md`).
+
+**Prompt pronto para o dono colar**
+
+```
+Leia AGENTS.md do repositório alexandrergomes1/crm-citas (branch chore/base-fundacao). Estado: docs/STATUS.md. Decisões: docs/decisoes/2026-11-27-fundacao.md. Use os papéis de .claude/agents e as skills de .claude/skills em tudo, declarando papel e norma. Primeiro: abra o PR da base (chore/base-fundacao → previas), faça a revisão e me peça o merge no molde. Depois: item 1 da fila (docs/BACKLOG.md). Nada se constrói nem se copia do projeto antigo sem a minha autorização.
+```

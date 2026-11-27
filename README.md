@@ -1,6 +1,6 @@
 # crm-citas
 
-> Rascunho para o dono aprovar (E18). Escrito por: Documentador · Revisado por: Gerente de projeto
+> Aprovado pelo dono em 27/11/2026 (E18). Escrito por: Documentador · Revisado por: Gerente de projeto
 
 Sistema de gestão (SaaS) para estúdios de estética, usado pela dona, pela recepção e pelas profissionais, com o
 celular em primeiro lugar. Idiomas de uso: português, espanhol e inglês. Nome provisório (E3·3).
