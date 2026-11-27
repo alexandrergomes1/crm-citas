@@ -48,7 +48,7 @@ Contraste conferido: todo texto ≥ 4,5:1 sobre fundo, superfície e trilho; con
 
 ## 4. Texto, espaços, formas, alturas
 
-- **Fonte:** Geist. **Escala:** 20 forte (título da tela) · 18 forte (título de folha e janela) · 16 forte (título de bloco) · 15 (texto no celular) · 14 (texto e botão no computador) · 13 (detalhe, subtítulo, tabela do computador) · 12 (cabeçalho de tabela, etiqueta, contador) · 11 (mínimo: só barra de baixo, menu recolhido, hora da grade, número de contador).
+- **Fonte:** Geist. **Escala:** 20 forte (título da tela) · 18 forte (título de folha e janela) · 16 forte (título de bloco) · 15 (texto no celular) · 14 (texto e botão no computador) · 13 (detalhe, subtítulo, tabela do computador) · 12 (cabeçalho de tabela, etiqueta, número de contador) · 11 (mínimo: só barra de baixo, menu recolhido, hora da grade).
 - **Espaços:** 4 · 8 · 12 · 16 · 20 · 24 · 32. Margem da tela 16 no celular e 24 no computador; entre blocos 12.
 - **Formas:** tudo em pílula (botão, campo de uma linha, busca, chip, seletor, item de menu aberto, aviso). Exceções: bloco e menu aberto canto 20; campo de várias linhas canto 16; item do menu recolhido 16; janelinha 24; folha 28 no topo; quadrado da inicial 10; caixinha 7.
 - **Alturas:** celular 44 (botão, campo, botão de ícone), linha de lista 64, barra de baixo 72, cabeçalho 64. Computador 40 (botão, busca, botão de ícone, item de menu), linha de tabela 40 com texto 13, barra do topo 64, menu aberto 232 e recolhido 84, submenu 216.
@@ -73,7 +73,7 @@ Contraste conferido: todo texto ≥ 4,5:1 sobre fundo, superfície e trilho; con
 | Modo de ver | a mesma coisa de outro jeito | botão com ícone: "Dia ▾", "Mês ▾" | igual | várias opções expostas |
 | Busca da tela | achar algo nesta tela | campo em pílula, primeiro item da barra | campo em pílula, com o funil ao lado | lupa sozinha (exceção: Agenda no celular) |
 | Busca geral | achar qualquer coisa | "Buscar no sistema ⌘K" no topo | — | confundir com a busca da tela |
-| Filtros | esconder o que não interessa | "Filtros ▾" com a pílula de contador dentro; abre painel à direita | funil com a pílula ao lado, no mesmo botão claro; abre folha de baixo | filtro solto na tela; valores dos filtros escritos na tela |
+| Filtros | esconder o que não interessa | "Filtros ▾" com a pílula de contador dentro; abre painel à direita | funil sem fundo quando nenhum filtro está ligado; com filtro ligado, funil e pílula no mesmo botão claro; abre folha de baixo | filtro solto na tela; valores dos filtros escritos na tela |
 | Ordenar | mudar a ordem | "Ordenar: <ordem atual> ▾" | primeira linha da folha de Filtros, escrita "Ordenar" com o valor à direita | "Ajustar ordem" (é mover à mão; fica em Opções) |
 | Contador | quantos há ali | **pílula cinza suave** (fundo rgba(22,24,29,.07), número 12 `--ink2`) com o **total**; a mesma pílula em **âmbar suave** (`--warnSoft`, número #8A5205) quando há pendência dentro, e o número continua o total; no subtítulo, número e palavra ("4 pendentes"); igual nas seções, no seletor, nas abas, nas listas e nos botões | igual · sempre o total, mesmo em dia · zero não aparece | número solto sem pílula; número flutuando sobre ícone; pílula escura ou azul |
 | Contador em botão de ícone | filtros ligados, avisos não lidos | o ícone e a pílula juntos no mesmo botão (funil + 2; sininho + 3 em âmbar suave, porque não lido pede atenção) | igual | número flutuando no canto do ícone |
@@ -144,7 +144,7 @@ Os outros módulos seguem o mesmo molde, um por spec. O lugar de cada módulo e 
 | Larguras (computador) | título da barra 280 · busca geral 320 · busca da tela 280 · menu aberto 240 · janelinha 340 · painel 480 |
 | Campo de formulário | 44 no celular e no computador |
 | Cabeçalho de tabela | 36, texto 12 forte `--ink3` |
-| Cabeçalho de grupo na lista | 14 forte + quantidade 12 `--ink3` |
+| Cabeçalho de grupo na lista | 14 forte + quantidade na pílula cinza (regra do contador) |
 | Contadores | pílula 20 de altura, mínimo 20 de largura, 7 de folga lateral, canto 10; número 12 (cinza: 500 `--ink2`; pendência: 600 #8A5205 sobre `--warnSoft`) · em botão de ícone: ícone + pílula, folga 12/10, espaço 6 |
 
 **Posição dos controles no computador.** Barra do topo: título e subtítulo · busca geral · Opções · ação principal · divisor · ajuda · notificações · Sua conta. Barra da lista (bloco branco): busca da tela · Categoria · Filtros · (à direita) Ordenar.
