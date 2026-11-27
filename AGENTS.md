@@ -1,6 +1,6 @@
 # AGENTS.md · regras de trabalho do crm-citas
 
-> **Rascunho para o dono aprovar (E7).** Vale para qualquer IA (Claude Code, Cursor, Codex) e qualquer pessoa.
+> **Aprovado pelo dono em 27/11/2026 (E7).** Vale para qualquer IA (Claude Code, Cursor, Codex) e qualquer pessoa.
 > Este arquivo não guarda estado nem histórico. Mudança só com aprovação do dono, registrada em `docs/decisoes/`.
 
 ## 1. O projeto
