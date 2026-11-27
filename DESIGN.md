@@ -3,6 +3,10 @@
 > **Aprovado pelo dono em 27/11/2026** (o design feito com ele nesse dia). Fonte única de aparência e comportamento
 > das telas: toda tela segue só o que está aqui. Peça, cor, nome ou medida que não está aqui **não se usa**: entra
 > aqui primeiro, com aprovação do dono. Escrito pelo Designer de produto; normas: WCAG 2.2, Material Design, Apple HIG.
+> Imagens: `docs/design/imagens/`. Canvas com todas as versões, para consulta: `docs/design/README.md`.
+>
+> **Comentário do dono para debater depois (27/11, não é decisão):** "nao gostei do botao branco e prefiro o preto
+> em cada tela e o de agendar outra cor sem competir". Hoje vale o que está abaixo.
 ## 1. Hierarquia: três níveis de atenção
 
 | Nível | O que é | Como aparece |
