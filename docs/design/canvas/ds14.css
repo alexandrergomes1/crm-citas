@@ -1,0 +1,251 @@
+/* Design system v2 · documento de referência (item 109). Fonte única: toda prancha e toda tela de prova usam só isto. */
+.z{--page:#F1F0EC; --card:#FFFFFF; --track:#E6E5DF; --btn:#E9E8E3; --line:#E6E5E0;
+  --ink:#16181D; --ink2:#4A4F57; --ink3:#5E636B; --field:#8C9098;
+  --id:#3E5C76; --idSoft:#E6EDF3; --brand:#7A5A22;
+  --warn:#9A5B06; --warnSoft:#FBEFD9; --ok:#1F6B45; --okInk:#17583A; --okSoft:#E3F0E8; --danger:#B3261E; --dangerSoft:#FBEAE8;
+  --c1:#7D5A8C; --c2:#B0583A; --c3:#A07A2C; --c4:#5C7F6A;
+  --shadow:0 16px 40px rgba(22,24,29,.18);
+  font-family:Geist,system-ui,sans-serif; font-size:15px; line-height:1.4; color:var(--ink); background:var(--page);
+  box-sizing:border-box; overflow:hidden; position:relative; display:flex; flex-direction:column; -webkit-font-smoothing:antialiased}
+.z *{box-sizing:border-box}
+.z button{font:inherit; color:inherit; cursor:pointer; border:0; margin:0}
+.z a{color:inherit; text-decoration:none}
+.z :focus-visible{outline:2px solid var(--ink3); outline-offset:2px}
+svg.i{width:20px; height:20px; flex:none; fill:none; stroke:currentColor; stroke-width:1.75; stroke-linecap:round; stroke-linejoin:round}
+svg.i.s14{width:14px;height:14px} svg.i.s16{width:16px;height:16px} svg.i.s18{width:18px;height:18px} svg.i.s24{width:24px;height:24px}
+
+/* ---- botões ---- */
+.z .btn{height:44px; padding:0 18px; border-radius:999px; display:inline-flex; align-items:center; justify-content:center; gap:6px; font-weight:500; font-size:15px; white-space:nowrap; flex:none; background:var(--btn); color:var(--ink)}
+.z .btn.pri{background:var(--ink); color:#fff}
+.z .btn.ghost{background:transparent}
+.z .btn.del{background:var(--btn); color:var(--danger)}
+.z .btn.off{background:var(--btn); color:var(--ink3); opacity:.6; cursor:not-allowed}
+.z .btn.w{flex:1}
+.pc .btn{height:40px; font-size:14px; padding:0 16px}
+.z .icb{width:44px; height:44px; border-radius:50%; background:var(--btn); color:var(--ink); display:inline-grid; place-items:center; flex:none; position:relative; padding:0}
+.z .icb.pri{background:var(--ink); color:#fff}
+.z .icb.sm{width:36px; height:36px}
+.z .icb.sm::after{content:""; position:absolute; inset:-4px}
+.pc .icb{width:40px; height:40px}
+.pc .icb.sm{width:32px; height:32px}
+
+/* ---- contadores (três e só três) ---- */
+.ct{font-size:12px; font-weight:500; color:var(--ink3); font-variant-numeric:tabular-nums}
+.ctf{min-width:20px; height:20px; padding:0 6px; border-radius:10px; background:var(--id); color:#fff; font-size:11px; font-weight:600; display:inline-grid; place-items:center}
+.icb .ctf{position:absolute; top:-3px; right:-3px; box-shadow:0 0 0 2px var(--card)}
+
+/* ---- seletor: escolher uma entre opções à vista ---- */
+.seg{display:inline-flex; gap:2px; background:var(--track); border-radius:999px; padding:4px; flex:none; max-width:100%}
+.seg span{height:36px; padding:0 14px; border-radius:999px; display:inline-flex; align-items:center; gap:6px; font-size:14px; font-weight:500; color:var(--ink2); white-space:nowrap; position:relative; flex:none}
+.seg span::after{content:""; position:absolute; left:0; right:0; top:-4px; bottom:-4px}
+.seg .on{background:var(--card); color:var(--ink); font-weight:600; box-shadow:0 1px 3px rgba(22,24,29,.14)}
+.seg.fit{gap:0}
+.seg.fit span{padding:0 7px; font-size:13px}
+.segwrap{overflow:hidden; -webkit-mask-image:linear-gradient(to right,#000 82%,transparent); mask-image:linear-gradient(to right,#000 82%,transparent)}
+
+/* ---- busca, campos ---- */
+.search{height:44px; border-radius:999px; background:var(--card); border:1px solid var(--field); display:flex; align-items:center; gap:8px; padding:0 16px; color:var(--ink3); white-space:nowrap; overflow:hidden; min-width:0; font-size:15px; flex:1}
+.pc .search{height:40px; font-size:14px; flex:none; width:280px}
+.gsearch{height:40px; border-radius:999px; background:var(--page); display:flex; align-items:center; gap:8px; padding:0 14px; color:var(--ink3); font-size:14px; width:320px}
+.gsearch .k{margin-left:auto; font-size:11px; font-weight:600; color:var(--ink2); background:var(--card); border-radius:6px; padding:1px 6px}
+.fld{display:flex; flex-direction:column; gap:6px}
+.fld label{font-size:13px; font-weight:500; color:var(--ink2)}
+.fld label i{color:var(--ink3); font-style:normal}
+.inp{height:44px; border-radius:999px; border:1px solid var(--field); background:var(--card); display:flex; align-items:center; gap:8px; padding:0 16px; font-size:15px}
+.inp.err{border-color:var(--danger)}
+.inp .ph{color:var(--ink3)}
+.fld .msg{font-size:13px; color:var(--danger); display:flex; gap:6px; align-items:center}
+.cb{width:22px; height:22px; border-radius:7px; border:1.5px solid var(--field); display:grid; place-items:center; flex:none; background:var(--card)}
+.cb.on{background:var(--ink); border-color:var(--ink); color:#fff}
+.sw{width:44px; height:26px; border-radius:999px; background:var(--field); position:relative; flex:none}
+.sw::after{content:""; position:absolute; top:3px; left:3px; width:20px; height:20px; border-radius:50%; background:#fff}
+.sw.on{background:var(--ink)} .sw.on::after{left:21px}
+
+/* ---- etiqueta e status ---- */
+.etq{display:inline-flex; align-items:center; gap:4px; font-size:12px; font-weight:600; color:var(--ink2); white-space:nowrap}
+.etq.warn{color:var(--warn)} .etq.ok{color:var(--okInk)} .etq.bad{color:var(--danger)}
+.st{height:36px; padding:0 12px; border-radius:999px; background:var(--btn); display:inline-flex; align-items:center; gap:6px; font-weight:600; font-size:14px; flex:none}
+
+/* ---- estrutura do celular ---- */
+.top{height:64px; flex:none; display:flex; align-items:center; gap:8px; padding:8px 16px 0; background:var(--card)}
+.tt{flex:1; min-width:0}
+.tt h1{font-size:20px; font-weight:600; margin:0; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.tt p{margin:1px 0 0; font-size:13px; color:var(--id); font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.tools{display:flex; gap:8px; align-items:center; padding:8px 16px 0; flex:none}
+.segrow{padding:10px 16px 0; flex:none}
+.scroll{flex:1; min-height:0; overflow:hidden; padding:12px 16px 0; display:flex; flex-direction:column; gap:12px}
+.blk{background:var(--card); border-radius:20px; padding:4px 0; flex:none}
+.blk.pad{padding:16px}
+.bh{display:flex; align-items:center; gap:8px; padding:12px 16px 4px; font-size:16px; font-weight:600}
+.gh{display:flex; align-items:center; gap:8px; padding:14px 16px 4px; font-size:14px; font-weight:600}
+.row{min-height:64px; display:flex; align-items:center; gap:12px; padding:8px 8px 8px 16px; position:relative}
+.row + .row{border-top:1px solid var(--line)}
+.row.cat::before{content:""; position:absolute; left:0; top:12px; bottom:12px; width:4px; border-radius:0 3px 3px 0; background:var(--cat)}
+.av{width:40px; height:40px; border-radius:50%; background:var(--btn); color:var(--ink2); font-size:13px; font-weight:600; display:grid; place-items:center; flex:none}
+.mid{flex:1; min-width:0}
+.mid b{font-weight:600; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.mid span{font-size:13px; color:var(--ink2); display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.val{font-weight:600; font-variant-numeric:tabular-nums}
+.bar{flex:none; margin-top:auto; height:72px; background:var(--card); border-top:1px solid var(--line); display:grid; grid-template-columns:repeat(5,1fr); padding-bottom:4px}
+.bar a{display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; font-size:11px; color:var(--ink3); font-weight:500; position:relative}
+.bar a.on{color:var(--id); font-weight:600}
+.bar a.on::after{content:""; position:absolute; bottom:5px; width:4px; height:4px; border-radius:50%; background:var(--id)}
+.bar a.plus span{width:52px; height:52px; border-radius:50%; background:var(--ink); color:#fff; display:grid; place-items:center}
+.paybar{flex:none; background:var(--card); border-top:1px solid var(--line); padding:10px 16px 14px; display:flex; flex-direction:column; gap:10px}
+.cascade{display:flex; align-items:center; font-size:14px; color:var(--ink2); gap:4px}
+.cascade b{margin-left:auto; font-size:20px; color:var(--ink); font-weight:600}
+
+/* ---- estrutura do computador ---- */
+.pc{flex-direction:row; font-size:14px}
+.nav1{width:232px; flex:none; background:var(--card); border-right:1px solid var(--line); padding:14px 12px; display:flex; flex-direction:column; gap:2px}
+.nav1.mini{width:84px; padding:14px 8px; align-items:center}
+.org{display:flex; align-items:center; gap:10px; padding:0 6px 12px; width:100%}
+.mini .org{justify-content:center}
+.logo{width:32px; height:32px; border-radius:10px; background:var(--brand); color:#fff; font-weight:600; display:grid; place-items:center; font-size:14px; flex:none}
+.nv{height:40px; display:flex; align-items:center; gap:12px; padding:0 12px; border-radius:999px; color:var(--ink2); font-weight:500; font-size:14px; width:100%; white-space:nowrap}
+.nv.on{background:var(--btn); color:var(--ink); font-weight:600}
+.nv.on svg{color:var(--id)}
+.nv .ct{margin-left:auto}
+.mini .nv{flex-direction:column; height:56px; gap:3px; font-size:11px; padding:6px 0; border-radius:16px; justify-content:center}
+.nav2{width:216px; flex:none; background:var(--card); border-right:1px solid var(--line); padding:14px 12px; display:flex; flex-direction:column; gap:2px}
+.mainp{flex:1; min-width:0; display:flex; flex-direction:column}
+.topp{height:64px; flex:none; display:flex; align-items:center; gap:8px; padding:0 24px; background:var(--card); border-bottom:1px solid var(--line)}
+.topp .tt{flex:none; width:280px}
+.vr{width:1px; height:24px; background:var(--line); margin:0 4px; flex:none}
+.photo{width:40px; height:40px; border-radius:50%; background:var(--btn); color:var(--ink2); font-weight:600; font-size:13px; display:grid; place-items:center; flex:none}
+.body{flex:1; min-height:0; overflow:hidden; padding:16px 24px 0; display:flex; flex-direction:column; gap:12px}
+.tbar{background:var(--card); border-radius:20px; padding:10px; display:flex; gap:8px; align-items:center; flex:none}
+.tbl{background:var(--card); border-radius:20px; overflow:hidden}
+.tr{display:grid; column-gap:16px; align-items:center; height:40px; padding:0 12px 0 16px; border-top:1px solid var(--line); font-size:13px}
+.tr.th{height:36px; border-top:0; color:var(--ink3); font-size:12px; font-weight:600}
+.tr .av{width:24px; height:24px; font-size:11px}
+.who{display:flex; align-items:center; gap:10px; min-width:0}
+.who b{font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.mut{color:var(--ink3)}
+
+/* ---- camadas ---- */
+.dim{position:absolute; inset:0; background:rgba(22,24,29,.35)}
+.sheet{background:var(--card); border-radius:28px 28px 0 0; padding:8px 16px 20px; box-shadow:var(--shadow); display:flex; flex-direction:column}
+.grab{width:40px; height:5px; border-radius:3px; background:#D3D3CC; align-self:center; margin-bottom:8px}
+.sh{display:flex; align-items:center; gap:8px; margin:4px 0}
+.sh h2{font-size:18px; font-weight:600; margin:0; flex:1}
+.acc{border-top:1px solid var(--line); min-height:52px; display:flex; align-items:center; gap:12px; font-weight:500}
+.acc .v{margin-left:auto; font-size:13px; color:var(--ink2); font-weight:400; display:flex; align-items:center; gap:6px}
+.menu{background:var(--card); border-radius:20px; box-shadow:var(--shadow); padding:8px; display:flex; flex-direction:column; gap:2px; width:240px}
+.menu .nv{justify-content:flex-start}
+.menu .nv.del{color:var(--danger)}
+.dialog{background:var(--card); border-radius:24px; box-shadow:var(--shadow); padding:22px; width:340px; display:flex; flex-direction:column; gap:10px}
+.dialog h3{margin:0; font-size:18px; font-weight:600}
+.dialog p{margin:0; font-size:14px; color:var(--ink2)}
+.toast{background:var(--card); border-radius:999px; box-shadow:var(--shadow); height:48px; display:inline-flex; align-items:center; gap:10px; padding:0 18px; font-weight:500}
+.state{background:var(--card); border-radius:20px; padding:20px; display:flex; flex-direction:column; align-items:center; text-align:center; gap:6px}
+.state b{font-weight:600; font-size:16px} .state span{font-size:13px; color:var(--ink2)}
+.state .bigi{width:48px; height:48px; border-radius:50%; background:var(--btn); display:grid; place-items:center; margin-bottom:4px}
+.skel{height:14px; border-radius:7px; background:var(--btn); width:100%}
+
+/* ---- pranchas do documento ---- */
+.doc{padding:40px 48px; gap:18px}
+.doc h1{font-size:30px; font-weight:600; margin:0; letter-spacing:-.01em}
+.doc .lead{font-size:16px; color:var(--ink2); margin:0; max-width:1150px}
+.dt{display:grid; background:var(--card); border-radius:20px; overflow:hidden}
+.dt > div{padding:12px 16px; border-top:1px solid var(--line); display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-size:14px; min-height:60px}
+.dt > .h{border-top:0; min-height:0; font-size:12px; font-weight:600; color:var(--ink3); background:#FAFAF8; padding:10px 16px}
+.dt .t{font-weight:600; flex-direction:column; align-items:flex-start; gap:2px; justify-content:center}
+.dt .t small{font-weight:400; color:var(--ink2); font-size:13px}
+.dt .s{font-size:13px; color:var(--ink2)}
+.dt .no{color:var(--danger); font-size:13px}
+.cards{display:grid; gap:16px}
+.card{background:var(--card); border-radius:20px; padding:20px; display:flex; flex-direction:column; gap:12px}
+.card h2{margin:0; font-size:18px; font-weight:600}
+.card p{margin:0; font-size:14px; color:var(--ink2)}
+.card .k{font-size:12px; font-weight:600; color:var(--ink3); letter-spacing:.02em}
+.swc{display:flex; align-items:center; gap:12px; font-size:14px}
+.swc i{width:40px; height:40px; border-radius:12px; border:1px solid var(--line); flex:none}
+.swc b{font-weight:600; display:block} .swc span{color:var(--ink2); font-size:13px}
+.mini-nav{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:8px; display:flex; flex-direction:column; gap:2px}
+/* 2ª revisão: toque mínimo também nas peças pequenas */
+.st,.cb,.sw,.cascade{position:relative}
+.st::after,.cb::after,.sw::after2{content:""}
+.st::after{content:""; position:absolute; left:0; right:0; top:-4px; bottom:-4px}
+.cb::before,.sw::before{content:""; position:absolute; inset:-11px}
+.sw::before{inset:-9px -4px}
+.cascade{min-height:44px; cursor:pointer}
+.ck{display:flex; gap:12px; align-items:center; min-height:44px}
+.mini .nv{font-size:11px}
+
+/* ===== 3ª edição: camadas ===== */
+/* camada 0 fundo · camada 1 superfícies brancas · camada 2 controles claros · camada 3 escolhido e ação */
+.z{--page:#ECEBE6; --btn:#F2F1ED; --track:#F2F1ED; --line:#EAE9E4}
+/* botão de ícone sem fundo (universal); o fundo só aparece ao tocar */
+.z .icb{background:transparent}
+.z .icb.pri{background:var(--ink)}
+.z .icb.ctl{background:var(--btn)}
+/* cabeçalho do celular é superfície branca: título, busca e seletor juntos */
+.hdr{background:var(--card); flex:none; padding-bottom:12px; border-bottom:1px solid var(--line)}
+.hdr .top{padding-top:8px}
+/* contadores: total (texto cinza, em pílula rasa dentro do seletor) e atenção (pílula azul) */
+.seg .ct{background:rgba(22,24,29,.07); border-radius:9px; padding:1px 7px; font-size:12px; color:var(--ink2)}
+.seg .on .ct{background:var(--track)}
+.ctf{background:var(--id); color:#fff}
+/* lista de seções: ícone simples, sem fundo */
+.secico{width:28px; display:grid; place-items:center; color:var(--ink2); flex:none}
+.empty{display:flex; flex-direction:column; align-items:center; text-align:center; gap:6px; padding:28px 20px}
+.empty .bigi{width:48px; height:48px; border-radius:50%; background:var(--btn); display:grid; place-items:center; color:var(--ink2); margin-bottom:4px}
+.empty b{font-size:16px; font-weight:600} .empty span{font-size:13px; color:var(--ink2); max-width:260px}
+.layers{display:grid; grid-template-columns:repeat(4,1fr); gap:12px}
+.layer{border-radius:16px; padding:14px; min-height:96px; display:flex; flex-direction:column; justify-content:flex-end; gap:4px; font-size:13px; color:var(--ink2)}
+.layer b{font-size:14px; color:var(--ink)}
+.seg span.ct,.seg span.ctf{height:20px; min-width:20px; padding:0 7px; border-radius:10px; justify-content:center; font-size:12px; flex:none}
+.seg span.ctf{background:var(--id); color:#fff; font-weight:600; box-shadow:none}
+.seg span.ct::after,.seg span.ctf::after{display:none}
+.paybar .btn{flex:none; width:100%}
+.strow{display:flex; align-items:center; gap:8px; padding:4px 16px 0}
+.z .paybar .btn{flex:none; width:100%}
+
+/* 4ª revisão */
+.tt p{color:var(--ink2)}
+.tt p .att{color:var(--id); font-weight:600}
+.gsearch{background:var(--btn)}
+.nv .ctf{margin-left:auto}
+.seg .on{box-shadow:0 0 0 1px #D8D7D1, 0 1px 3px rgba(22,24,29,.14)}
+.bh{font-size:16px}
+.txa{min-height:96px; border-radius:16px; border:1px solid var(--field); background:var(--card); padding:12px 16px; font-size:15px; color:var(--ink3)}
+
+/* ===== 4ª edição ===== */
+/* contadores: quantidade (cinza neutro) × pendência (âmbar discreto, só texto) */
+.ctf{background:var(--btn); color:var(--ink); box-shadow:none}
+.icb .ctf{background:var(--ink2); color:#fff; box-shadow:0 0 0 2px var(--card)}
+.seg span.ctf{background:rgba(22,24,29,.07); color:var(--ink2)}
+.pend{color:var(--warn); font-weight:600; font-size:12px; display:inline-flex; align-items:center; gap:3px}
+.seg span .pend{height:auto}
+.tt p .att{color:var(--warn)}
+/* barra de baixo: o botão do meio é "Agendar", com ícone próprio e sem competir com a ação da tela */
+.bar a.plus span{background:var(--btn); color:var(--ink); border:1px solid #DCDBD5}
+.bar a.plus{gap:2px; font-size:11px; color:var(--ink2)}
+.bar a.plus span{width:44px; height:44px}
+/* cabeçalho separado do conteúdo por sombra leve */
+.hdr{box-shadow:0 1px 0 var(--line), 0 6px 14px -10px rgba(22,24,29,.25); position:relative; z-index:1}
+.btn .ctf,.icb .ctf{background:var(--ink2); color:#fff}
+.nv .pend{margin-left:auto}
+.seg span.pend{color:var(--warn); height:auto; padding:0; font-weight:600}
+.seg span.pend::after{display:none}
+
+/* ===== 5ª edição: regras finais (substituem tudo acima no que conflitar) ===== */
+/* Agendar: ação principal no celular, preta */
+.bar a.plus span{background:var(--ink); color:#fff; border:0; width:52px; height:52px}
+.bar a.plus{color:var(--ink); font-weight:600}
+/* contador escrito: só o número. cinza = quantidade · âmbar = pendência. nunca pílula */
+.ct,.seg span.ct,.seg .on .ct{background:none; padding:0; height:auto; min-width:0; border-radius:0; font-size:12px; font-weight:500; color:var(--ink3)}
+.pend,.seg span.pend{background:none; padding:0; height:auto; font-size:12px; font-weight:600; color:var(--warn)}
+/* marcador sobre ícone (funil, sino) e dentro do botão Filtros: bolinha escura com o número */
+.ctf,.icb .ctf,.btn .ctf{background:var(--ink2); color:#fff; min-width:18px; height:18px; padding:0 5px; border-radius:9px; font-size:11px; font-weight:600; display:inline-grid; place-items:center; box-shadow:none}
+.icb .ctf{position:absolute; top:-2px; right:-2px; box-shadow:0 0 0 2px var(--card)}
+.seg span{font-size:13px}
+
+/* ===== 6a edicao: R1 e R2 (27/11), vale por cima de tudo acima ===== */
+.z .btn.out{background:transparent; color:var(--ink); box-shadow:inset 0 0 0 1px var(--ink3)}
+.ct,.seg span.ct,.seg .on .ct,.nv .ct,.ctf,.icb .ctf,.btn .ctf,.seg span.ctf{position:static; box-shadow:none; background:rgba(22,24,29,.07); color:var(--ink2); min-width:20px; height:20px; padding:0 7px; border-radius:10px; font-size:12px; font-weight:500; display:inline-grid; place-items:center; font-variant-numeric:tabular-nums; line-height:1}
+.pend,.seg span.pend,.nv .pend,.icb .pend{position:static; box-shadow:none; background:#F6EBD9; color:#8A5205; min-width:20px; height:20px; padding:0 7px; border-radius:10px; font-size:12px; font-weight:600; display:inline-grid; place-items:center; line-height:1}
+.seg span.ct::after,.seg span.pend::after,.seg span.ctf::after{display:none}
+.z .icb.wc,.pc .icb.wc{width:auto; padding:0 10px 0 12px; border-radius:999px; display:inline-flex; align-items:center; gap:6px; background:var(--btn)}
+.topp .icb.wc,.top .icb.wc{background:transparent}
