@@ -40,7 +40,7 @@
 - Pendências: e-mail de segurança quando houver domínio (E14·1); gitleaks e Dependabot (E14·3); travas automáticas do projeto antigo (item 2 da fila).
 - Apagar a branch `chore/base-fundacao`: o acesso da IA foi recusado; o dono apaga no PR #1 (E19·1).
 - Corrigir `ARCHITECTURE.md` §2 (ordem, E21·1) e `SECURITY.md` §1 ("privado", E19·1 troca) no PR `docs/ordem-e21`.
-- E22 (núcleo de uma vez): resposta pendente; sem ela, segue a opção A (só specs).
+- E22·B: pacote da madrugada em PRs de rascunho.
 
 ## Como continuar numa conversa nova
 
@@ -51,7 +51,7 @@
 
 **Próximo passo**
 1. Revisão do PR do item 1 (`docs/produto-modulos` → `previas`) e pedido de merge ao dono no molde (`docs/moldes/pergunta.md`).
-2. PR `docs/ordem-e21` (`ARCHITECTURE.md` §2 e `SECURITY.md` §1) e resposta do dono ao E22.
+2. PR `docs/ordem-e21` (`ARCHITECTURE.md` §2 e `SECURITY.md` §1).
 3. Item 2 da fila (`docs/BACKLOG.md`).
 
 **Prompt pronto para o dono colar**
