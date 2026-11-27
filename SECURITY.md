@@ -1,9 +1,9 @@
 # Política de segurança do crm-citas
 
-> Aprovado pelo dono em 27/11/2026 (E14). Escrito por: Engenheiro de segurança · Revisado por: Auditor de risco ·
+> Aprovado pelo dono em 27/11/2026 (E14; ajustes E14·1, E14·2 e E14·3). Escrito por: Engenheiro de segurança · Revisado por: Auditor de risco ·
 > Norma: OWASP ASVS 4.0.3 (nível 2 no sistema todo; requisitos de nível 3 aplicados ao módulo da ficha de saúde),
 > RGPD e LGPD.
-> Fonte: `AGENTS.md`, `ARCHITECTURE.md` e `docs/decisoes/2026-11-27-fundacao.md`. Este arquivo não cria regra nova.
+> Fonte: `AGENTS.md`, `ARCHITECTURE.md` e `docs/decisoes/2026-11-27-fundacao.md` (até o E14).
 
 ## 1. Como avisar uma falha de segurança (E14·1)
 - Avise diretamente o dono do projeto, em particular. Quando o sistema tiver domínio próprio, um e-mail de segurança
@@ -68,7 +68,7 @@ Nada disto está construído; cada item entra por spec própria (`ARCHITECTURE.m
 - [ ] Roteiro de incidente escrito, com o papel de operadora (avisar o estúdio sem demora, só em vazamento de
   dados, E14·2) e os prazos de aviso às pessoas afetadas.
 - [ ] Criar o e-mail de segurança quando houver domínio (E14·1).
-- [ ] gitleaks e Dependabot (proposta E2b), confirmados com o dono na vez deles.
+- [ ] gitleaks e Dependabot (E14·3), conferindo os limites gratuitos.
 - [ ] Cópia diária cifrada e restauração testada.
 - [ ] Exportar, cancelar e apagar dados; pedidos de "apagar os meus dados".
 - [ ] Monitoramento sem dado pessoal (Sentry e UptimeRobot, como proposta E2b, confirmados com o dono na vez deles).
