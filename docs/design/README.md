@@ -10,13 +10,9 @@
   mapa de ícones (quadro `L7Icones`). Foram feitos para uma versão anterior do design e entram no `DESIGN.md` só com
   aprovação do dono.
 
-## Divergências conhecidas entre imagens e texto (vale o texto do `DESIGN.md`)
-Achadas pelo Revisor de design em 27/11/2026:
-- `02-cores-e-texto.png`: o cinza #5E636B aparece como "contador simples" e o âmbar como "número de pendências";
-  no texto, o número da pílula é `--ink2` e a pílula âmbar mostra sempre o total.
-- `03-controles.png`: coluna "Nunca" de "Botão de ícone" e de "Topo" difere do texto; falta "arquivar" nas ações de
-  uma linha e "Salvar" no rodapé.
-- `04-nomes-dos-botoes.png`: "Voltar" aparece como proibido; no texto é permitido.
-- `06-campos-camadas-estados.png`: "Etiquetas 2" com número sem pílula; botão "em desenvolvimento" desenhado diferente
-  do texto.
-- As provas usam o nome de uma profissional que parece de pessoa real; ao refazer, usar nome fictício.
+## Divergências entre imagens e texto
+Corrigidas em 27/11/2026 (E12·3): o Designer de produto refez as imagens para seguirem o texto, com nomes de
+pessoas fictícios; o Revisor de design conferiu as 10 (veredito OK). Se alguma divergência aparecer, vale o texto.
+
+As páginas antigas do canvas (só histórico) ainda usam nomes de teste do projeto antigo; não valem como dado nem
+como regra.

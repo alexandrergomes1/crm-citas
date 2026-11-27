@@ -1414,7 +1414,7 @@
    "x": 1520,
    "y": 0,
    "w": 1440,
-   "h": 1040,
+   "h": 1360,
    "title": "2 · Cores e texto",
    "page": "ds6"
   },
@@ -1422,7 +1422,7 @@
    "x": 0,
    "y": 1400,
    "w": 1600,
-   "h": 2000,
+   "h": 3040,
    "title": "3 · Controles: um desenho para cada tipo",
    "page": "ds6"
   },
@@ -1430,13 +1430,13 @@
    "x": 1680,
    "y": 1400,
    "w": 1440,
-   "h": 1420,
+   "h": 1320,
    "title": "4 · Nomes dos botões",
    "page": "ds6"
   },
   "K5Modulos.dc.html": {
    "x": 0,
-   "y": 4100,
+   "y": 4800,
    "w": 1900,
    "h": 1100,
    "title": "5 · O que é o quê, em cada módulo",
@@ -1444,7 +1444,7 @@
   },
   "K6Campos.dc.html": {
    "x": 1980,
-   "y": 4100,
+   "y": 4800,
    "w": 1600,
    "h": 1200,
    "title": "6 · Campos, camadas e estados",
@@ -1452,7 +1452,7 @@
   },
   "T1Agendamento.dc.html": {
    "x": 0,
-   "y": 5700,
+   "y": 6200,
    "w": 390,
    "h": 844,
    "title": "Prova · Agendamento (1 formulário pendente)",
@@ -1460,7 +1460,7 @@
   },
   "T2AgendNotas.dc.html": {
    "x": 470,
-   "y": 5700,
+   "y": 6200,
    "w": 390,
    "h": 844,
    "title": "Prova · Agendamento, aba Notas vazia",
@@ -1468,7 +1468,7 @@
   },
   "T3Servicos.dc.html": {
    "x": 940,
-   "y": 5700,
+   "y": 6200,
    "w": 390,
    "h": 844,
    "title": "Prova · Serviços no celular",
@@ -1476,7 +1476,7 @@
   },
   "T4Fichas.dc.html": {
    "x": 1410,
-   "y": 5700,
+   "y": 6200,
    "w": 1440,
    "h": 900,
    "title": "Prova · Fichas no computador",
@@ -1823,7 +1823,7 @@
   },
   "th2": {
    "x": 0,
-   "y": 3800,
+   "y": 4500,
    "text": "5 · o que é o quê por módulo · 6 · campos, camadas e estados",
    "kind": "title1",
    "maxW": 3580,
@@ -1831,7 +1831,7 @@
   },
   "th3": {
    "x": 0,
-   "y": 5400,
+   "y": 5900,
    "text": "Prova · telas feitas só com as peças acima",
    "kind": "title1",
    "maxW": 2850,
