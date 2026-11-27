@@ -11,6 +11,7 @@ Receita: só aponta. A regra vale onde está escrita: `AGENTS.md` §3 a §5 e §
 3. **Spec:** chame `analista-requisitos`: `spec.md` com critérios de aceite, até 3 dúvidas com recomendação e "Assumptions" (`AGENTS.md` §4).
 4. **Plano:** chame `arquiteto-software`: `plan.md` (como e quais arquivos podem mudar), `tasks.md` e ADR em `docs/adr/` se houver decisão técnica, avisada ao dono em uma linha (`AGENTS.md` §3 item 3).
 5. **Conferir os três:** chame `analista-requisitos` para a análise do Spec Kit, sem problema crítico (`processo-sdd.md` §2, etapa 5).
+5b. **Revisar spec e plano:** chame `gerente-projeto`, em todo tipo, antes da ficha visual e do dono (`processo-sdd.md` §2, etapa 5b).
 6. **Ficha visual, só tela:** `designer-produto` faz as imagens de antes e depois nas larguras do `DESIGN.md`; `revisor-design` confere antes do dono. Quem fala é o Designer de produto, no molde "Ficha visual" (`docs/moldes/pergunta.md`). Pare e avise no celular pela receita `falar-com-o-dono` (`AGENTS.md` §7).
 7. **Aprovação:** `analista-requisitos` monta a mensagem "Aprovação da spec" (`docs/moldes/pergunta.md`). **Pare aqui** e avise no celular (`AGENTS.md` §7).
 
