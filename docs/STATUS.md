@@ -39,7 +39,7 @@
 **Onde estão as coisas**
 - Repositório `alexandrergomes1/crm-citas`, branch `chore/base-fundacao` (a base). A branch `previas` foi criada vazia, a partir de `main`.
 - Respostas do dono: `docs/decisoes/2026-11-27-fundacao.md`.
-- Histórico anterior ao projeto novo (só consulta): repositório `crm-agenda`, branches `chore/reorganizacao-base` (pasta `docs/reorganizacao/`) e `feat/ds-premium` (spec do design).
+- Histórico anterior ao projeto novo: repositório `crm-agenda`, branches `chore/reorganizacao-base` (pasta `docs/reorganizacao/`) e `feat/ds-premium` (spec do design). **Só se lê com autorização do dono, item por item** (`AGENTS.md` §3 regra 4; pedido (c) em `docs/decisoes/2026-11-27-fundacao.md`).
 
 **Próximo passo**
 1. O Engenheiro de DevOps abre o PR `chore/base-fundacao` → `previas`, e o Gerente de projeto pede o merge ao dono no molde (`docs/moldes/pergunta.md`).
