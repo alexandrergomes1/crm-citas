@@ -59,7 +59,8 @@ Lista candidata; o que entra na primeira versão se decide na spec do módulo.
 ```
 
 **`README.md`:** `# Produto`, uma frase sobre o sistema (a ideia do `ARCHITECTURE.md` §1, com outras palavras),
-`## Módulos` com três grupos (núcleo, outras partes da plataforma, os outros módulos), uma linha por módulo:
+`## Módulos` com três grupos, na ordem da spec §3 (E21·1): 1º núcleo (§3.1) → 2º depois do núcleo, um por vez
+(§3.2) → 3º partes do sistema, depois dos "um por vez" (§3.3). Uma linha por módulo:
 `- [Nome](arquivo.md): uma frase`.
 
 ## 4. Quem revisa
