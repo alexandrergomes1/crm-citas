@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Gancho pre-push (spec: .claude/hooks/TRAVAS.md §8): as regras de envio do §4 para quem não é o
+// Gancho pre-push (spec: .claude/hooks/TRAVAS.md §7): as regras de envio do §2 para quem não é o
 // Claude Code. Barra: envio à previas ou à main; envio forçado (o commit remoto não está na
 // história do que se envia); branch fora do padrão de nome. Apagar branch comum e enviar tag passam.
 // Limite: pode ser pulado (--no-verify) e só vale onde core.hooksPath aponta para .githooks.

@@ -26,8 +26,8 @@ reescreva estes três documentos.
 ## Ambientes
 | Ambiente | Endereço | Branch | Banco |
 |---|---|---|---|
-| Prévia (onde o dono confere) | https://crm-agenda-previas.alexandrergomes.workers.dev | `previas` | desenvolvimento |
-| Produção | https://crm-agenda.alexandrergomes.workers.dev | `main` | desenvolvimento até a virada; depois, produção |
+| Prévia (onde o dono confere) | https://crm-citas-previas.alexandrergomes.workers.dev | `previas` | desenvolvimento |
+| Produção | https://crm-citas.alexandrergomes.workers.dev | `main` | desenvolvimento até a virada; depois, produção |
 
 ## Bancos (Supabase)
 | Uso | Projeto | Referência |

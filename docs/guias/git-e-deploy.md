@@ -13,9 +13,9 @@ Branch = linha de trabalho separada. PR = pedido para juntar uma branch na outra
 ## Degraus e ambientes
 | Degrau | Branch | Onde se vê | Quando atualiza |
 |---|---|---|---|
-| Tarefa | `tipo/area-assunto` | prévia da branch `https://<branch-com-hifens>-crm-agenda-previas.alexandrergomes.workers.dev` e a CI do PR | a cada envio |
-| Integração e prévia | `previas` | https://crm-agenda-previas.alexandrergomes.workers.dev | quando um PR autorizado é juntado |
-| Produção | `main` | https://crm-agenda.alexandrergomes.workers.dev (Worker `crm-agenda`) | só pelo pedido de publicação |
+| Tarefa | `tipo/area-assunto` | prévia da branch `https://<branch-com-hifens>-crm-citas-previas.alexandrergomes.workers.dev` e a CI do PR | a cada envio |
+| Integração e prévia | `previas` | https://crm-citas-previas.alexandrergomes.workers.dev | quando um PR autorizado é juntado |
+| Produção | `main` | https://crm-citas.alexandrergomes.workers.dev (Worker `crm-citas`; criar na Cloudflare) | só pelo pedido de publicação |
 - A Cloudflare (Workers Builds) publica cada envio no link da branch, com o banco de desenvolvimento. Antes do merge, o dono confere a tela no link da branch; depois, na `previas`.
 - **Publicar à mão é proibido** (`pnpm deploy`, Cloudflare pela linha de comando ou MCP): a publicação sai do GitHub pela Cloudflare.
 - Banco de desenvolvimento único e migrations: `banco.md`. Bancos e demais endereços: `docs/reference/project.md`.

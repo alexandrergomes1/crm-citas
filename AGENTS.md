@@ -1,4 +1,4 @@
-# Constituição do crm-agenda · versão 3.0 (rascunho)
+# Constituição do crm-citas · versão 3.0 (rascunho)
 
 > Vale para qualquer IA (Claude Code, Cursor, Codex…) e qualquer pessoa, em qualquer editor (padrão agents.md). Regras fixas: este arquivo não guarda estado, data nem histórico. Cada regra mora num lugar só: aqui fica a regra; o detalhe fica no guia apontado (`docs/guias/`, `DESIGN.md`, `SECURITY.md`). Tudo o que é preciso está no repositório; não dependa de conversa antiga. O que é exclusivo de uma ferramenta fica fora daqui (Claude Code: `CLAUDE.md`).
 

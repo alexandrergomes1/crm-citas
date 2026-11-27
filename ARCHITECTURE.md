@@ -49,15 +49,15 @@ Supabase Postgres (RLS por org_id; funções RPC para escrita em vários passos)
 `/forms/<token>`, `/pagar/<token>`, `/reset-password`, o modo estúdio `/<estúdio>/anamnese-tablet`, `/login`, `/logout`, `/booking`, `/api/webhooks` e `/_serverFn/` levam `Cache-Control: private, no-store`, `X-Robots-Tag: noindex, nofollow` e `Referrer-Policy: same-origin` (`src/lib/public-paths.ts`, `src/server/public-headers.ts`). O link da ficha é guardado só como hash, com validade.
 
 ## Hospedagem: Cloudflare Workers
-- `wrangler.jsonc`: Worker `crm-agenda`, entrada `@tanstack/react-start/server-entry`, `nodejs_compat`, Smart Placement, registro automático de cada pedido desligado (o endereço leva token). Só valores públicos em `vars`; a chave `service_role` é segredo do painel da Cloudflare.
+- `wrangler.jsonc`: Worker `crm-citas` (prévias: `crm-citas-previas`), entrada `@tanstack/react-start/server-entry`, `nodejs_compat`, Smart Placement, registro automático de cada pedido desligado (o endereço leva token). Só valores públicos em `vars`; a chave `service_role` é segredo do painel da Cloudflare.
 - Publicação pelo Workers Builds ligado ao GitHub, nunca à mão.
 
 ## Ambientes
 | Degrau | Branch | Onde se vê | Banco |
 |---|---|---|---|
-| Tarefa | `tipo/area-assunto` | prévia da branch (`<branch-com-hifens>-crm-agenda-previas.alexandrergomes.workers.dev`) e capturas da CI | desenvolvimento |
-| Integração e prévia | `previas` | https://crm-agenda-previas.alexandrergomes.workers.dev | desenvolvimento |
-| Produção | `main` | Worker `crm-agenda` | desenvolvimento até a virada; depois, produção |
+| Tarefa | `tipo/area-assunto` | prévia da branch (`<branch-com-hifens>-crm-citas-previas.alexandrergomes.workers.dev`) e capturas da CI | desenvolvimento |
+| Integração e prévia | `previas` | https://crm-citas-previas.alexandrergomes.workers.dev | desenvolvimento |
+| Produção | `main` | Worker `crm-citas` | desenvolvimento até a virada; depois, produção |
 
 Banco de desenvolvimento único para todas as branches: a migration tem de funcionar com o código das duas branches. Detalhe: `docs/guias/git-e-deploy.md`.
 

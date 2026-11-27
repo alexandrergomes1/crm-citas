@@ -20,7 +20,7 @@ Toda parada do dono é **uma mensagem só**, autossuficiente (dá para responder
 **Pergunta [código]: [assunto em até 8 palavras]** · O que é · Como está hoje (fato, com arquivo ou imagem) · Opções com o código completo e o que acontece em cada uma · Desfaz-se assim · Recomendação (motivo técnico ou de produto, nunca "já foi aprovado antes").
 
 ## Variante: ficha de tela
-Formato completo na skill `design-decision`. Até 4 decisões por ficha, cada uma com código (AG4, opções AG4·A, AG4·B), imagem real de hoje e de cada opção nas duas larguras, o que muda na tela e recomendação. A linha de base aparece como fato, não como pergunta. Uma vez por ficha: impacto, desfaz-se assim e parecer do `design-critic`.
+Formato completo em `docs/guias/telas.md` §2 (no Claude Code, pela skill `design-decision`). Até 4 decisões por ficha, cada uma com código (AG4, opções AG4·A, AG4·B), imagem real de hoje e de cada opção nas duas larguras, o que muda na tela e recomendação. A linha de base aparece como fato, não como pergunta. Uma vez por ficha: impacto, desfaz-se assim e parecer do `design-critic`.
 
 ## Variante: ficha curta do módulo (passado, uma vez por módulo)
 **Base do módulo [nome]: está certo assim?** · imagem do que o app (`previas`) mostra hoje, nas duas larguras · resumo em até 6 linhas do que o arquivo do módulo diz, com o que ainda está "a confirmar" · onde o app e o arquivo divergem, se houver.

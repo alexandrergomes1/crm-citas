@@ -1,4 +1,4 @@
-# crm-agenda (nome provisório)
+# crm-citas
 
 Sistema de gestão (SaaS) para estúdios de estética: agenda, clientes, ficha de anamnese, comanda, caixa, financeiro, mensagens, marketing e fidelidade. Para a dona do estúdio, a recepção e as profissionais, com uso intenso no celular. Lançamento em Espanha, Brasil e Portugal. Em construção: porte do sistema antigo (`beauty-system`, Next.js) para TanStack Start na Cloudflare.
 
@@ -30,12 +30,12 @@ Usuário e senha de teste nunca ficam no repositório nem no chat.
 | `SECURITY.md` | Segredos, acesso, dado de saúde, o que fazer se algo vazar |
 | `CHANGELOG.md` · `GLOSSARY.md` | O que entrou em cada publicação · termos do domínio |
 | `src/domain/` | Regras de negócio puras (TypeScript, com teste) |
-| `src/data/` | Único lugar que fala com o banco; checagens de acesso em `src/data/auth/` |
+| `src/data/` | Único lugar que fala com o banco; checagens de acesso em `src/data/auth/` (nasce com o primeiro módulo portado) |
 | `src/server/` | Peças do servidor: cabeçalhos, origem, limite de tentativas |
 | `src/workspace/` | Telas por módulo (agenda, clientes, anamnese, catálogo, financeiro…) |
 | `src/routes/` | Rotas do TanStack Router |
-| `src/design-system/` · `src/styles/` | Componentes e tokens de tela |
-| `src/app-shell/` · `src/public-forms/` · `src/public-pay/` · `src/studio-mode/` | Navegação · ficha pública · cobrança pública · modo estúdio |
+| `src/design-system/` (item 2 da fila) · `src/styles/` | Componentes e tokens de tela |
+| `src/app-shell/` · `src/public-forms/` · `src/public-pay/` · `src/studio-mode/` | Navegação · ficha pública · cobrança pública · modo estúdio (nascem com os módulos portados) |
 | `supabase/` | Migrations, seeds e testes de banco |
 | `e2e/` | Testes de ponta a ponta (Playwright) |
 | `specs/` | Uma pasta por tarefa (Spec Kit): spec, plano, tarefas |

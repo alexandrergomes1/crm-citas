@@ -1,6 +1,6 @@
 ---
 name: port-module
-description: Receita para portar um módulo do sistema de origem (Next.js App Router) para o TanStack Start sem mudar as telas nem as regras. Use ao migrar qualquer módulo que ainda falte portar.
+description: Receita para portar um módulo do sistema de origem (Next.js App Router) (crm-agenda) para o crm-citas, sem mudar as regras e já no design novo (DESIGN.md). Use ao migrar qualquer módulo que ainda falte portar.
 ---
 
 # port-module
