@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>1 · Hierarquia e camadas</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds11.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div class="z doc" style="width: 1440px; height: 1080px"><h1>1 · Hierarquia: o que chama atenção</h1><p class="lead">Três níveis de atenção (o que fazer, onde estou, o conteúdo) desenhados em quatro camadas de profundidade. Se duas coisas da mesma tela disputam o olho, uma delas está no nível errado.</p><div class="cards" style="grid-template-columns: repeat(3, 1fr)">
+<div class="card"><span class="k">NÍVEL 1 · O QUE FAZER</span><h2>Ação principal</h2><p>Uma por tela, em preto. No celular é o "+" do meio da barra (novo agendamento); nas telas sem barra, o botão do rodapé (Checkout, Salvar).</p><div style="display: flex; gap: 8px"><button class="btn pri"><svg class="i s18" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg>Adicionar</button><button class="icb pri" aria-label="Novo agendamento"><svg class="i " viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg></button></div></div>
+<div class="card"><span class="k">NÍVEL 2 · ONDE ESTOU E O QUE ESCOLHI</span><h2>Navegação e seleção</h2><p>Discretas: trilho claro com o escolhido em branco, um pouco acima. O menu atual fica num fundo claro com o ícone na cor do sistema.</p><div style="display: flex; flex-direction: column; gap: 10px; align-items: flex-start"><a class="nv on" style="width: auto"><svg class="i s18" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"/></svg>Catálogo</a><div class="seg" role="tablist"><span role="tab" tabindex="0" aria-selected="true" class="on">Resumo</span><span role="tab" tabindex="0" aria-selected="false" class="">Notas</span><span role="tab" tabindex="0" aria-selected="false" class="">Formulários <span class="ctf">1</span></span><span role="tab" tabindex="0" aria-selected="false" class="">Atividade</span></div></div></div>
+<div class="card"><span class="k">NÍVEL 3 · O CONTEÚDO</span><h2>Informação</h2><p>Preto para o que importa, cinza para o detalhe. Cor só para estado, sempre com ícone e palavra.</p><div style="display: flex; flex-direction: column; gap: 6px"><b>Carmen Ruiz</b><span style="color: var(--ink2); font-size: 13px">Próximo: sex, 4 dez · 10:30</span><span class="etq warn"><svg class="i s14" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 22h14"/><path d="M5 2h14"/><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"/><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"/></svg>Aguardando a cliente</span><span class="etq ok"><svg class="i s14" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>Concluída</span></div></div>
+</div>
+<div class="layers"><div class="layer" style="background: var(--page)"><b>Fundo</b>cinza quente, atrás de tudo</div><div class="layer" style="background: #fff; border: 1px solid var(--line)"><b>Superfície</b>branca: cabeçalho, blocos, menu</div><div class="layer" style="background: #fff; border: 1px solid var(--line)"><span style="background: var(--btn); border-radius: 999px; padding: 8px 12px; align-self: flex-start; color: var(--ink)">Filtros</span><b>Controle</b>claro, sempre sobre o branco</div><div class="layer" style="background: #fff; border: 1px solid var(--line)"><span style="display: flex; gap: 8px"><span style="background: #fff; box-shadow: 0 1px 3px rgba(22,24,29,.18); border-radius: 999px; padding: 8px 12px; color: var(--ink); font-weight: 600">Escolhido</span><span style="background: var(--ink); color: #fff; border-radius: 999px; padding: 8px 12px">Ação</span></span><b>Destaque</b>só o escolhido e a ação</div></div>
+<div class="dt" style="grid-template-columns: 280px 1fr"><div class="h">Regra</div><div class="h">Como</div>
+<div class="t">Controle nunca sobre o fundo<small>para não competir</small></div><div>Busca, filtros e seletor ficam numa superfície branca (o cabeçalho), nunca direto no fundo cinza. Dentro do bloco, só uma linha fina entre itens.</div><div class="t">Botão de ícone sem fundo</div><div>Fechar, voltar, ⋮, ajuda e notificações não têm fundo: são universais e não devem chamar atenção.</div>
+<div class="t">Uma ação preta por tela</div><div>O que está marcado (caixinha, interruptor) também é preto. Chip, aba, contador e item de menu nunca são pretos.</div>
+<div class="t">A cor do sistema não é botão</div><div>O azul ardósia marca onde você está e o que pede atenção: ícone do menu atual, item atual da barra de baixo e os contadores de atenção (pendências, filtros ligados, notificações). Subtítulo e totais ficam em cinza. Nunca é botão.</div></div></div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1080}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

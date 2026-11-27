@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>2 · Cores e texto</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="v9.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div class="y doc9" style="width: 1440px; height: 900px"><h1>2 · Cores e texto</h1><p class="lead">Poucas cores, cada uma com um papel só. A cor do sistema (azul ardósia, sua escolha COR2·E) marca onde você está; não é botão.</p><div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px"><div class="lv"><span class="k">Base</span><div class="sw9"><i style="background: #F1F0EC"></i><div><b>Fundo da tela</b><span>#F1F0EC · toda tela</span></div></div><div class="sw9"><i style="background: #FFFFFF"></i><div><b>Bloco</b><span>#FFFFFF · cartões, listas, painéis</span></div></div><div class="sw9"><i style="background: #E6E5DF"></i><div><b>Trilho</b><span>#E6E5DF · fundo do seletor</span></div></div><div class="sw9"><i style="background: #EFEFEA"></i><div><b>Cinza de botão</b><span>#EFEFEA · botão secundário, item atual do menu</span></div></div><div class="sw9"><i style="background: #E8E8E3"></i><div><b>Linha</b><span>#E8E8E3 · separa linhas de lista</span></div></div></div><div class="lv"><span class="k">Texto e ação</span><div class="sw9"><i style="background: #16181D"></i><div><b>Preto</b><span>#16181D · texto principal e ação principal</span></div></div><div class="sw9"><i style="background: #4A4F57"></i><div><b>Cinza escuro</b><span>#4A4F57 · texto de apoio</span></div></div><div class="sw9"><i style="background: #656A73"></i><div><b>Cinza</b><span>#656A73 · rótulos e detalhes</span></div></div><div class="sw9"><i style="background: #3E5C76"></i><div><b>Azul ardósia</b><span>#3E5C76 · cor do sistema: ícone do menu atual, links, contador de filtro</span></div></div><div class="sw9"><i style="background: #7A5A22"></i><div><b>Dourado</b><span>#7A5A22 · só a inicial do estúdio</span></div></div></div><div class="lv"><span class="k">Estado (sempre com ícone e palavra)</span><div class="sw9"><i style="background: #9A5B06"></i><div><b>Âmbar</b><span>#9A5B06 · pendente, reservado, aguardando</span></div></div><div class="sw9"><i style="background: #1F6B45"></i><div><b>Verde</b><span>#1F6B45 · concluído, pago, em dia</span></div></div><div class="sw9"><i style="background: #B3261E"></i><div><b>Vermelho</b><span>#B3261E · erro, ausência, bloqueado</span></div></div></div></div><div class="dtab" style="grid-template-columns: 220px 1fr 1fr"><div class="h">Texto (fonte Geist)</div><div class="h">Celular</div><div class="h">Computador</div>
+<div class="t">Título da tela</div><div style="font-size: 20px; font-weight: 600">Serviços · 20</div><div style="font-size: 20px; font-weight: 600">Serviços · 20</div>
+<div class="t">Texto e nome</div><div>Carmen Ruiz · 15</div><div style="font-size: 13px">Carmen Ruiz · 13 (tabela) / 14</div>
+<div class="t">Detalhe</div><div style="font-size: 13px; color: var(--ink2)">Próximo: sex, 4 dez · 13</div><div style="font-size: 12px; color: var(--ink3)">Cabeçalho de tabela · 12</div></div></div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Clientes: folha de Filtros</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="v5.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div class="z" style="width: 390px; height: 844px">
+<header class="hd"><div class="tt"><h1>Clientes</h1><p>8 de 30 clientes</p></div><button class="ib" aria-label="Mais ações: importar, exportar"><i class="mi m-more" aria-hidden="true"></i></button><button class="ib pr" aria-label="Adicionar"><i class="mi m-plus" aria-hidden="true"></i></button></header>
+<div class="sbar"><div class="search"><i class="mi s18 m-search" aria-hidden="true"></i>Nome, telefone ou e-mail</div><button class="ib" aria-label="Filtros, 2 aplicados"><i class="mi m-funnel" aria-hidden="true"></i><span class="cnt">2</span></button></div>
+<div class="result">Filtros: VIP, Recorrente<span class="sp"></span><a class="tap" href="#">Limpar filtros</a></div>
+<div class="rows">
+<div class="row"><span class="av">AM</span><div class="mid"><b>Ana Martínez</b><span>Próximo: qua, 9 dez · 11:00</span></div><div class="end"><span class="etq vip"><i class="mi s16 m-crown" aria-hidden="true"></i>VIP</span><span class="money">Saldo +50 €</span></div><button class="ib clear" aria-label="Ações de Ana Martínez"><i class="mi m-more" aria-hidden="true"></i></button></div>
+<div class="row"><span class="av">NV</span><div class="mid"><b>Noelia Vega</b><span class="mut">Sem agendamento</span></div><div class="end"><span class="etq ret"><i class="mi s16 m-brush" aria-hidden="true"></i>Retoque pendente</span></div><button class="ib clear" aria-label="Ações de Noelia Vega"><i class="mi m-more" aria-hidden="true"></i></button></div>
+<div class="row"><span class="av">RD</span><div class="mid"><b>Rosa Delgado</b><span>Próximo: sáb, 28 nov · 16:00</span></div><div class="end"><span class="etq vip"><i class="mi s16 m-crown" aria-hidden="true"></i>VIP</span></div><button class="ib clear" aria-label="Ações de Rosa Delgado"><i class="mi m-more" aria-hidden="true"></i></button></div>
+<div class="row"><span class="av">CL</span><div class="mid"><b>Cristina Lara</b><span>Próximo: qua, 2 dez · 17:00</span></div><div class="end"><span class="etq "><i class="mi s16 m-repeat" aria-hidden="true"></i>Recorrente</span></div><button class="ib clear" aria-label="Ações de Cristina Lara"><i class="mi m-more" aria-hidden="true"></i></button></div>
+<div class="row"><span class="av">LF</span><div class="mid"><b>Lucía Fernández</b><span>Próximo: sex, 4 dez · 10:30</span></div><div class="end"><span class="etq "><i class="mi s16 m-repeat" aria-hidden="true"></i>Recorrente</span><span class="money">Saldo +20 €</span></div><button class="ib clear" aria-label="Ações de Lucía Fernández"><i class="mi m-more" aria-hidden="true"></i></button></div>
+<div class="row"><span class="av">IS</span><div class="mid"><b>Irene Salgado</b><span class="mut">Sem agendamento</span></div><div class="end"><span class="etq ret"><i class="mi s16 m-brush" aria-hidden="true"></i>Retoque pendente</span></div><button class="ib clear" aria-label="Ações de Irene Salgado"><i class="mi m-more" aria-hidden="true"></i></button></div>
+<div class="row"><span class="av">EN</span><div class="mid"><b>Elena Navarro</b><span>Próximo: ter, 1 dez · 09:30</span></div><div class="end"><span class="etq vip"><i class="mi s16 m-crown" aria-hidden="true"></i>VIP</span></div><button class="ib clear" aria-label="Ações de Elena Navarro"><i class="mi m-more" aria-hidden="true"></i></button></div>
+<div class="row"><span class="av">TR</span><div class="mid"><b>Tania Ríos</b><span class="mut">Sem agendamento</span></div><div class="end"><span class="etq "><i class="mi s16 m-repeat" aria-hidden="true"></i>Recorrente</span></div><button class="ib clear" aria-label="Ações de Tania Ríos"><i class="mi m-more" aria-hidden="true"></i></button></div>
+</div>
+<nav class="bar" aria-label="Menu principal">
+<a href="#"><i class="mi s24 m-calendar" aria-hidden="true"></i>Agenda</a>
+<a class="on" aria-current="page" href="#"><i class="mi s24 m-users" aria-hidden="true"></i>Clientes</a>
+<a class="plus" href="#" aria-label="Novo agendamento"><span><i class="mi s24 m-plus" aria-hidden="true"></i></span></a>
+<a href="#"><i class="mi s24 m-tag" aria-hidden="true"></i>Catálogo</a>
+<a href="#"><i class="mi s24 m-grid" aria-hidden="true"></i>Mais</a>
+</nav>
+<div class="dim"></div>
+<div class="sheet" role="dialog" aria-label="Filtros" style="top: 72px">
+<span class="grab"></span>
+<div class="sh"><h2>Filtros</h2><button class="ib" aria-label="Fechar"><i class="mi m-x" aria-hidden="true"></i></button></div>
+<div class="lbl">Ordenar por</div>
+<a class="srow" href="#">Ordem<span class="v">Visita mais recente<i class="mi s18 m-right" aria-hidden="true"></i></span></a>
+<div class="lbl">Etiquetas</div>
+<div class="wrap"><span class="chip on"><i class="mi s16 m-check" aria-hidden="true"></i>VIP</span><span class="chip">Fiel</span><span class="chip">Novo</span><span class="chip">Inativo</span><span class="chip">Alérgico</span><span class="chip on"><i class="mi s16 m-check" aria-hidden="true"></i>Recorrente</span><span class="chip">Retoque pendente</span></div>
+<div class="lbl">Cadastro</div>
+<div class="rail"><span class="on">Todos</span><span>Ativos</span><span>Arquivados</span></div>
+<div style="height: 8px"></div>
+<div class="srow">Com saldo<span class="sw"></span></div>
+<div class="srow">Sem retorno há 60 dias<span class="sw"></span></div>
+<div class="srow">Aniversariantes do mês<span class="sw"></span></div>
+<a class="srow" href="#">Origem<span class="v">Todas<i class="mi s18 m-right" aria-hidden="true"></i></span></a>
+<a class="srow" href="#">Data da última visita<span class="v">Qualquer data<i class="mi s18 m-right" aria-hidden="true"></i></span></a>
+<span class="sp"></span>
+<div class="foot"><button class="b s">Limpar</button><button class="b p">Mostrar 8 clientes</button></div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Peças do design system (celular)</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="v5.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div class="z" style="width: 390px; height: 1760px">
+<div class="ttl" style="padding-top: 24px"><h1>Peças</h1><p>Uma régua só, em pílula, sem contornos</p></div>
+<div class="pz">
+<h3>Botões</h3>
+<div class="line"><button class="b p">Salvar</button><button class="b s">Cancelar</button><button class="b g">Agora não</button><button class="b off" disabled>Indisponível</button></div>
+<div class="line"><button class="b s"><i class="mi s18 m-plus" aria-hidden="true"></i>Adicionar</button><button class="b danger">Excluir</button></div>
+<h3>Só ícone, sempre em bolinha cheia (o ⋮ da linha também)</h3>
+<div class="line"><button class="ib" aria-label="Voltar"><i class="mi m-left" aria-hidden="true"></i></button><button class="ib" aria-label="Fechar"><i class="mi m-x" aria-hidden="true"></i></button><button class="ib" aria-label="Mais ações"><i class="mi m-more" aria-hidden="true"></i></button><button class="ib" aria-label="Filtros"><i class="mi m-funnel" aria-hidden="true"></i></button><button class="ib" aria-label="Filtros, 2 aplicados"><i class="mi m-funnel" aria-hidden="true"></i><span class="cnt">2</span></button><button class="ib" aria-label="Notificações, 3 não lidas"><i class="mi m-bell" aria-hidden="true"></i><span class="cnt idc">3</span></button></div>
+<h3>Busca e campo</h3>
+<div class="search" style="flex: none"><i class="mi s18 m-search" aria-hidden="true"></i>Buscar serviço</div>
+<label style="font-size: 13px; font-weight: 600; color: var(--ink2)">Nome</label>
+<div class="field">Ana Martínez</div>
+<h3>Chips de categoria (o atual em preto)</h3>
+<div class="line"><span class="chip on">Todas <span class="n">18</span></span><span class="chip">Lábios <span class="n">3</span></span><span class="chip">Faciais <span class="n">6</span></span></div>
+<h3>Período ou modo de ver</h3>
+<div class="rail"><span>Hoje</span><span>Semana</span><span class="on">Mês</span><span>Personalizado</span></div>
+<h3>Etiquetas (sem fundo colorido)</h3>
+<div class="line" style="gap: 16px"><span class="etq vip"><i class="mi s16 m-crown" aria-hidden="true"></i>VIP</span><span class="etq ret"><i class="mi s16 m-brush" aria-hidden="true"></i>Retoque pendente</span><span class="etq"><i class="mi s16 m-repeat" aria-hidden="true"></i>Recorrente</span><span class="money">Saldo +50 €</span></div>
+<h3>Liga e desliga, caixinha</h3>
+<div class="line" style="gap: 16px"><span class="sw on" style="margin: 0"></span><span class="sw" style="margin: 0"></span><span class="cb on"><i class="mi s16 m-check" aria-hidden="true"></i></span><span class="cb"></span></div>
+<h3>Lista de seções</h3>
+<div class="sec" style="margin: 0"><a href="#"><span class="ico"><i class="mi m-sparkles" aria-hidden="true"></i></span>Serviços<span class="sp"></span><span class="n">18</span><i class="mi s18 m-right go" aria-hidden="true"></i></a></div>
+<h3>Linha do tempo</h3>
+<div class="tl" style="padding: 0">
+<div class="ev"><span class="dot new"><i class="mi m-st-confirmado" aria-hidden="true"></i></span><div class="mid"><b>Confirmado</b><span>por Cliente · pelo link</span></div><time>10:12</time></div>
+<div class="ev last"><span class="dot"><i class="mi m-calendar" aria-hidden="true"></i></span><div class="mid"><b>Agendamento criado</b><span>por Marta Ruiz</span></div><time>ontem</time></div>
+</div>
+<h3>Aviso no celular (push): só o tipo, nunca o nome</h3>
+<div class="push"><span class="logo" style="width: 36px; height: 36px">A</span><div style="flex: 1; min-width: 0"><b>Estúdio Aurora</b><span>Novo agendamento para amanhã</span></div><time>agora</time></div>
+<h3>Aviso depois de uma ação</h3>
+<div class="toast" role="status"><i class="mi m-check" aria-hidden="true"></i>Serviço salvo</div>
+<h3>Estados da tela</h3>
+<div class="state"><span class="big"><i class="mi s24 m-sparkles" aria-hidden="true"></i></span><b>Ainda não há serviços</b><span>Cadastre o primeiro para poder agendar.</span><button class="b p" style="margin-top: 8px">Adicionar serviço</button></div>
+<div class="state"><span class="big"><i class="mi s24 m-search" aria-hidden="true"></i></span><b>Nada encontrado para "lifting"</b><span>Confira o nome ou limpe os filtros.</span><button class="b s" style="margin-top: 8px">Limpar busca e filtros</button></div>
+<div class="state" aria-busy="true" style="align-items: stretch; gap: 10px"><div class="skel" style="width: 60%"></div><div class="skel"></div><div class="skel" style="width: 80%"></div><span style="text-align: center">Carregando</span></div>
+<div class="state" role="alert"><span class="big" style="background: var(--dangerSoft); color: var(--danger)"><svg class="si s24" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg></span><b>Não foi possível carregar os serviços</b><span>Verifique a conexão e tente de novo.</span><button class="b s" style="margin-top: 8px">Tentar de novo</button></div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1760}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
