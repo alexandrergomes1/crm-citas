@@ -1,6 +1,7 @@
 # Arquitetura do crm-citas
 
-> **Rascunho para o dono aprovar (E6).** Escrito pelo Arquiteto de software e pelo Engenheiro de segurança.
+> **Aprovado pelo dono em 27/11/2026 (E6).** Escrito pelo Arquiteto de software e pelo Engenheiro de segurança.
+> Mudança só com nova aprovação do dono.
 > Normas seguidas: AWS Well-Architected (guia SaaS), OWASP ASVS 4.0.3, modelo C4 (desenho em camadas), Twelve-Factor App, WCAG 2.2.
 > Cada decisão aqui vem de uma resposta do dono (`docs/decisoes/2026-11-27-fundacao.md`) ou de uma norma acima.
 > Hoje nada disto está construído: cada parte entra por spec própria (`specs/`).
@@ -72,7 +73,9 @@ A **API pública** usa a mesma camada e abre só quando o marketplace ou um parc
 - **Painel admin** (E4·2): área separada, login próprio e dupla verificação. O dono pode entrar como o estúdio para
   suporte, sem aviso ao estúdio (E4·2). **Exceção declarada (ordem do dono, troca do E4·2b):** essa entrada não é
   registrada em lugar nenhum, embora a ASVS e o dever de prova do RGPD (art. 5(2)) peçam registro de acesso a dado
-  sensível. O alcance exato (só a entrada ou também as ações; ficha de saúde nesse modo) espera a resposta E6·1/E6·2.
+  sensível. Alcance (E6·1 e E6·2): nada fica registrado, nem a entrada nem o que o dono muda dentro do estúdio, e
+  ele pode abrir as fichas de saúde nesse modo. Risco aceito pelo dono: o estúdio pode atribuir a uma funcionária uma
+  mudança feita pelo suporte, e não há prova de acesso à ficha de saúde nesse modo.
 
 ## 7. Dados e privacidade
 - Todos os dados na União Europeia (E5·1); rever se o Brasil ficar lento. Cópias e fornecedores (cópia do banco,
