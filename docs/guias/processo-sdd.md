@@ -1,6 +1,6 @@
 # Guia do processo · Spec-Driven Development com o Spec Kit
 
-> **Rascunho para o dono aprovar (E11).** Escrito pelo Gerente de projeto e pelo Analista de requisitos.
+> **Aprovado pelo dono em 27/11/2026 (E11).** Escrito pelo Gerente de projeto e pelo Analista de requisitos.
 > Normas: Kanban (fluxo), IEEE 29148 (requisitos) e o método oficial do GitHub Spec Kit.
 > Regras de fundo: `AGENTS.md` §3 a §5, §8 e §9. Este guia diz o passo a passo.
 
