@@ -1,6 +1,6 @@
 # AGENTS.md · src/server (camada única de serviço)
 
-> Rascunho para o dono aprovar (E15). Escrito por: Arquiteto de software · Revisado por: Revisor de código · Norma: modelo C4, Clean Architecture, padrão agents.md, OWASP ASVS 4.0.3.
+> Aprovado pelo dono em 27/11/2026 (E15). Escrito por: Arquiteto de software · Revisado por: Revisor de código · Norma: modelo C4, Clean Architecture, padrão agents.md, OWASP ASVS 4.0.3.
 > Fonte: `AGENTS.md`, `ARCHITECTURE.md`, `SECURITY.md`, `docs/guias/processo-sdd.md`. Este arquivo não cria regra nova; deduções marcadas como tal.
 
 ## O que mora aqui

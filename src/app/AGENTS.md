@@ -1,6 +1,6 @@
 # AGENTS.md · src/app (telas)
 
-> Rascunho para o dono aprovar (E15). Escrito por: Arquiteto de software · Revisado por: Revisor de código · Norma: modelo C4, Clean Architecture, padrão agents.md, WCAG 2.2.
+> Aprovado pelo dono em 27/11/2026 (E15). Escrito por: Arquiteto de software · Revisado por: Revisor de código · Norma: modelo C4, Clean Architecture, padrão agents.md, WCAG 2.2.
 > Fonte: `AGENTS.md`, `ARCHITECTURE.md`, `DESIGN.md`, `docs/guias/processo-sdd.md`. Este arquivo não cria regra nova; deduções marcadas como tal.
 
 ## O que mora aqui

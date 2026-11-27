@@ -61,5 +61,4 @@ O QA dá o veredito em todos os tipos.
 - A constituição do Spec Kit só aponta para o `AGENTS.md`.
 
 ## 6. Lacuna
-As larguras de teste das telas (celular e computador) ainda não estão no `DESIGN.md`. Entram nele com aprovação do
-dono antes da primeira tela.
+As larguras de teste das telas foram definidas no `DESIGN.md` (E15·1): 390 px no celular e 1440 px no computador.

@@ -167,6 +167,8 @@ Os outros módulos seguem o mesmo molde, um por spec. O lugar de cada módulo e 
 
 Contraste AA; toque 44/40; foco visível (anel de 2 px); nada só por cor (estado e pendência com palavra ou nome no leitor); seletor com papel de abas; status e botões de ícone com nome; movimento reduzido respeitado.
 
+**Larguras de teste:** toda tela é testada em 390 px (celular) e 1440 px (computador) (E15·1).
+
 ## 10. Checklist de quem revisa uma tela (antes do dono ver)
 
 1. Só há **uma** peça preta de ação na tela (no celular, o Agendar da barra)? O "+ Adicionar" do celular está com contorno e com nome?
