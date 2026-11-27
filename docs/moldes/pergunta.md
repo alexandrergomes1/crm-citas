@@ -1,6 +1,6 @@
 # Molde de mensagem ao dono
 
-> **Rascunho para o dono aprovar (E9).** Regra: `AGENTS.md` §7. Vale para toda parada em que a IA espera o dono.
+> **Aprovado pelo dono em 27/11/2026 (E9).** Regra: `AGENTS.md` §7. Vale para toda parada em que a IA espera o dono.
 
 ## Regras de toda mensagem
 - **Uma mensagem por parada**, que se entende sozinha, sem ler a conversa, e cabe no celular.
