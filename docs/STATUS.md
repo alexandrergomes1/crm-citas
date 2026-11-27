@@ -33,6 +33,8 @@
 | E19·1 (troca) | apagar `chore/base-fundacao`; o repositório fica público |
 | E20 | item 1: ler o projeto antigo só para listar os módulos; nada se copia |
 | E21 | spec do item 1 e lista de módulos; nova ordem dos itens 6 a 10 (E21·1) |
+| E21·2 | a ficha de saúde fica dentro de Formulários |
+| E21·3 | cobrança à cliente e vale-presente entram depois do núcleo |
 
 ## Falta na base
 - Pendências: e-mail de segurança quando houver domínio (E14·1); gitleaks e Dependabot (E14·3); travas automáticas do projeto antigo (item 2 da fila).

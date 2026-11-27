@@ -5,7 +5,7 @@
 **Como usar:** o primeiro item livre é o que se faz (`AGENTS.md` §5). Só o Documentador muda este arquivo.
 Cada item entra por spec própria (`docs/guias/processo-sdd.md`).
 
-**Ordem aprovada pelo dono (E18 e E21·1).** A ordem dos itens 6 a 10 vem da E21·1, que substitui a da E4·3 e a da E18; a API pública entra só quando precisar. Fontes: pedidos anteriores ao E1, E3·2, E4·3, E8, E14·3, pedido de módulos de ajuda e IA
+**Ordem aprovada pelo dono (E18 e E21·1).** A ordem dos itens 6 a 10 vem da E21·1, que substitui a da E4·3 e a da E18; a API pública entra por último, depois do marketplace, e só quando precisar (E21·1, E4·1). Fontes: pedidos anteriores ao E1, E3·2, E4·3, E8, E14·3, pedido de módulos de ajuda e IA
 (`docs/decisoes/2026-11-27-fundacao.md`) e `ARCHITECTURE.md` §2.
 
 | # | Tarefa | Fonte | Situação |
