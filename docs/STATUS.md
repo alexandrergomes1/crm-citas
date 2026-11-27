@@ -3,8 +3,8 @@
 > Aprovado pelo dono em 27/11/2026 (E18). Escrito por: Documentador · Revisado por: Gerente de projeto
 
 ## Onde estamos
-- **Fase:** base de regras quase pronta. Ainda não há código.
-- **Branch:** `chore/base-fundacao`.
+- **Fase:** base de regras na `previas` (PR #1, E19); item 1 da fila (módulos em `docs/produto/`) em revisão. Ainda não há código.
+- **Branch:** `docs/produto-modulos`.
 - **Respostas do dono:** `docs/decisoes/2026-11-27-fundacao.md`.
 
 ## Já aprovado
@@ -29,24 +29,31 @@
 | E16 | as 4 skills e as regras de cópia, bloqueio e gravação das aprovações |
 | E17 | etapa 5b: o Gerente de projeto confere spec e plano antes do dono |
 | E18 | ordem da fila (`docs/BACKLOG.md`, itens 1 a 10); este estado e o `README.md` seguem como referência aprovada |
+| E19 | merge do PR #1 (base) na `previas` |
+| E19·1 (troca) | apagar `chore/base-fundacao`; o repositório fica público |
+| E20 | item 1: ler o projeto antigo só para listar os módulos; nada se copia |
+| E21 | spec do item 1 e lista de módulos; nova ordem dos itens 6 a 10 (E21·1) |
 
 ## Falta na base
-- `docs/produto/`: um arquivo por módulo (item 1 da fila).
 - Pendências: e-mail de segurança quando houver domínio (E14·1); gitleaks e Dependabot (E14·3); travas automáticas do projeto antigo (item 2 da fila).
+- Apagar a branch `chore/base-fundacao`: o acesso da IA foi recusado; o dono apaga no PR #1 (E19·1).
+- Corrigir `ARCHITECTURE.md` §2 (ordem, E21·1) e `SECURITY.md` §1 ("privado", E19·1 troca) no PR `docs/ordem-e21`.
+- E22 (núcleo de uma vez): resposta pendente; sem ela, segue a opção A (só specs).
 
 ## Como continuar numa conversa nova
 
 **Onde estão as coisas**
-- Repositório `alexandrergomes1/crm-citas`, branch `chore/base-fundacao` (a base). A branch `previas` foi criada vazia, a partir de `main`.
+- Repositório `alexandrergomes1/crm-citas`: a base está na `previas` (PR #1); o item 1 está na branch `docs/produto-modulos`.
 - Respostas do dono: `docs/decisoes/2026-11-27-fundacao.md`.
 - Histórico anterior ao projeto novo: repositório `crm-agenda`, branches `chore/reorganizacao-base` (pasta `docs/reorganizacao/`) e `feat/ds-premium` (spec do design). **Só se lê com autorização do dono, item por item** (`AGENTS.md` §3 regra 4; pedido (c) em `docs/decisoes/2026-11-27-fundacao.md`).
 
 **Próximo passo**
-1. O Engenheiro de DevOps abre o PR `chore/base-fundacao` → `previas`, e o Gerente de projeto pede o merge ao dono no molde (`docs/moldes/pergunta.md`).
-2. Item 1 da fila (`docs/BACKLOG.md`).
+1. Revisão do PR do item 1 (`docs/produto-modulos` → `previas`) e pedido de merge ao dono no molde (`docs/moldes/pergunta.md`).
+2. PR `docs/ordem-e21` (`ARCHITECTURE.md` §2 e `SECURITY.md` §1) e resposta do dono ao E22.
+3. Item 2 da fila (`docs/BACKLOG.md`).
 
 **Prompt pronto para o dono colar**
 
 ```
-Leia AGENTS.md do repositório alexandrergomes1/crm-citas (branch chore/base-fundacao). Estado: docs/STATUS.md. Decisões: docs/decisoes/2026-11-27-fundacao.md. Use os papéis de .claude/agents e as skills de .claude/skills em tudo, declarando papel e norma. Primeiro: abra o PR da base (chore/base-fundacao → previas), faça a revisão e me peça o merge no molde. Depois: item 1 da fila (docs/BACKLOG.md). Nada se constrói nem se copia do projeto antigo sem a minha autorização.
+Leia AGENTS.md do repositório alexandrergomes1/crm-citas (branch previas). Estado: docs/STATUS.md. Decisões: docs/decisoes/2026-11-27-fundacao.md. Use os papéis de .claude/agents e as skills de .claude/skills em tudo, declarando papel e norma. Primeiro: termine o PR do item 1 (docs/produto-modulos → previas) e me peça o merge no molde. Depois: primeiro item livre da fila (docs/BACKLOG.md). Nada se constrói nem se copia do projeto antigo sem a minha autorização.
 ```
