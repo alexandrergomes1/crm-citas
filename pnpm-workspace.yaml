@@ -1,5 +1,0 @@
-# Versões travadas no package.json; pacote publicado há menos de 1 dia não entra (minutos).
-minimumReleaseAge: 1440
-onlyBuiltDependencies:
-  - esbuild
-  - workerd

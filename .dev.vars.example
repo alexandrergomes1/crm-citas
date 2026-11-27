@@ -1,4 +1,0 @@
-# Copie para .dev.vars (não versionado) para rodar localmente. Nunca coloque valores reais aqui.
-SUPABASE_URL=http://127.0.0.1:54321
-SUPABASE_ANON_KEY=<chave-anon-ou-publishable>
-SUPABASE_SERVICE_ROLE_KEY=<segredo-service-role>

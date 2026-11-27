@@ -1,7 +1,0 @@
-/* Geist (única fonte do app) servida pelo próprio app via @fontsource-variable. Antes: geist/font/sans do Next,
-   que punha a variável --font-geist-sans no <html>; globals.css continua lendo a mesma variável. */
-@import '@fontsource-variable/geist';
-
-:root {
-  --font-geist-sans: 'Geist Variable';
-}
