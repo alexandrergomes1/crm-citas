@@ -65,9 +65,9 @@ Nada disto está construído; cada item entra por spec própria (`ARCHITECTURE.m
 - [ ] Cifra da ficha de saúde e cofre da chave, com troca planejada.
 - [ ] Consentimento, DPIA e contrato estúdio–plataforma para a ficha de saúde.
 - [ ] Fornecedores na UE ou com DPA.
-- [ ] Roteiro de incidente escrito, com o papel de operadora (avisar o estúdio sem demora) e os prazos de aviso às
-  pessoas afetadas.
-- [ ] Ligar o aviso privado de falha (Private vulnerability reporting) no GitHub.
+- [ ] Roteiro de incidente escrito, com o papel de operadora (avisar o estúdio sem demora, só em vazamento de
+  dados, E14·2) e os prazos de aviso às pessoas afetadas.
+- [ ] Criar o e-mail de segurança quando houver domínio (E14·1).
 - [ ] gitleaks e Dependabot (proposta E2b), confirmados com o dono na vez deles.
 - [ ] Cópia diária cifrada e restauração testada.
 - [ ] Exportar, cancelar e apagar dados; pedidos de "apagar os meus dados".
