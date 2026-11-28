@@ -278,7 +278,7 @@ ou C) · `CHANGELOG.md`.
 - **Tamanho.** São muitos arquivos de regra num PR só. O plano pode dividir em commits por tema (travas, molde,
   pastas, registros) para a revisão.
 
-- **Para a T-10 (cópia das revisões de conversa para o repositório):** cortar o identificador da linha 48 de
+- **Para a T-21 (cópia das revisões de conversa para o repositório, depois da conferência da T-20):** cortar o identificador da linha 48 de
   `sessao-9ep.md` e trocar o caminho interno da linha 7 de `sessao-958.md` por "transcrição local da sessão".
 
 ## 10. Não verificado
@@ -344,7 +344,7 @@ Vai ao dono só depois do plano, da conferência do Spec Kit (etapa 5) e da revi
    - **Como está:** hoje nada se apaga, e o sistema não guarda o endereço de internet de quem entra.
    - **Opções:** **A** · guardar data, hora e endereço de internet de cada entrada por 6 meses e o registro do que
      foi feito por 1 ano; depois apaga sozinho · **B** · tudo por 5 anos · **C** · decidir só antes de abrir a
-     estúdios reais.
+     empresas reais.
    - **Recomendo A.** No Brasil, a lei obriga a empresa que oferece um sistema pela internet a guardar por 6 meses a
      data, a hora e o endereço de internet de cada uso (Marco Civil, art. 15). Na Europa, a regra é guardar só pelo
      tempo necessário (RGPD art. 5). O prazo de 1 ano é escolha nossa, para investigar problemas, e não uma
@@ -356,19 +356,25 @@ Vai ao dono só depois do plano, da conferência do Spec Kit (etapa 5) e da revi
    - **O que é:** uma página aberta que diz se o sistema funciona ou caiu. Você disse "acho que ninguem fica
      avisando quedas nao".
    - **Opções:** **A** não fazer agora: só você recebe o aviso, e a ideia fica na fila · **B** fazer, grátis, antes de
-     abrir a estúdios reais.
+     abrir a empresas reais.
    - **Recomendo A.**
 4. **E66·3 · Páginas antigas do design com nomes de teste do sistema antigo.**
    - **O que é:** versões antigas do quadro de design, só histórico. O projeto é público.
    - **Opções:** **A** ficam como estão · **B** trocar por nomes inventados · **C** apagar as páginas antigas.
    - **Recomendo A:** você disse que os dados antigos são fictícios e pediu as versões guardadas.
 
+5. **Permissões na construção:** na construção, o Claude vai pedir 10 vezes permissão para gravar em `.claude/`
+   (lista no [plano §5](https://github.com/alexandrergomes1/crm-citas/blob/chore/processo-revisao/specs/20261128-180247-processo-revisao/plan.md));
+   aceite cada uma; recusou, aquele arquivo fica pendente.
+
 **Responda:** E66 sim + E66·1·A/B/C + E66·2·A/B + E66·3·A/B/C.
 **Como voltar atrás:** cada regra pode ser reaberta por você e muda num PR novo.
 
 **Só para informar**
-- **Sobre a pasta specs:** guardar esses arquivos não está errado, mas faltava a regra do que vai onde. Esta spec cria
-  essa regra e confere os arquivos que já existem.
+- **Sobre a pasta specs:** Não estava certo: a pasta de cada tarefa passa a guardar só spec, plano, tarefas, ficha e
+  as revisões dela; auditorias e revisões de conversa vão para [docs/auditorias](https://github.com/alexandrergomes1/crm-citas/tree/chore/processo-revisao/docs/auditorias),
+  e a regra fica em [docs/guias/pastas.md](https://github.com/alexandrergomes1/crm-citas/blob/chore/processo-revisao/docs/guias/pastas.md)
+  (plano: [plan.md §2](https://github.com/alexandrergomes1/crm-citas/blob/chore/processo-revisao/specs/20261128-180247-processo-revisao/plan.md)).
 - **O que o papel decidiu sozinho** ([§6 da spec](https://github.com/alexandrergomes1/crm-citas/blob/chore/processo-revisao/specs/20261128-180247-processo-revisao/spec.md); recuse pelo número): A1 os nomes dos blocos ("▶ PRECISA DE VOCÊ" é o
   nome escolhido para atender a sua ordem, não fala sua) · A2 "Desfaz-se assim" vira "Como voltar atrás" · A3 o
   Documentador confere que cada papel gravou · A4 o que é "decisão simples" do Designer · A5 ideias futuras na fila
