@@ -2,8 +2,8 @@
 
 - **Spec:** `specs/20261128-030000-entrar-servico/spec.md` (Draft; E39·1, E39·2 e E39·3 sem resposta)
 - **Escrito por:** Arquiteto de software · **Norma:** modelo C4 e ADR (mais OWASP ASVS 4.0.3 nível 2, Clean Architecture,
-  Twelve-Factor, boas práticas do Postgres e do Supabase) · **Revisão:** pendente (etapa 5 Analista de requisitos; 5b
-  Gerente de projeto)
+  Twelve-Factor, boas práticas do Postgres e do Supabase) · **Revisão:** 5b (Gerente de projeto) feita com
+  ajustes, 28/11; etapa 5 (Analista de requisitos) pendente
 - **Decisões técnicas:** `docs/adr/0018-entrar-sessao-e-camada-de-servico.md` (D1 a D15). **Decisões de banco:**
   `docs/adr/0019-...md`, escrito pelo Engenheiro de dados na tarefa B1 (não neste plano), dentro dos limites do §6.
 - **Bases lidas em 28/11/2026 (só leitura):** item 2 (esta branch: `package.json`, `vite.config.ts`, `eslint.config.mjs`,
@@ -184,7 +184,7 @@ Migrations por `pnpm exec supabase migration new <nome>`, depois das do item 3 (
 Nomes e peças fora do `DESIGN.md` (botão "Entrar", rótulos "E-mail" e "Senha", título "Escolher estúdio", mostrar e
 esconder senha, frases de erro, inicial da bolinha Sua conta) entram no `DESIGN.md` pela ficha (RF-31).
 
-## 8. Banco local e CI (Engenheiro de DevOps, com o Engenheiro de dados)
+## 8. Banco local e CI (scripts `db:*`: Engenheiro de dados · dependências e outros scripts: Engenheiro de software · CI: Engenheiro de DevOps)
 - `package.json`: `db:start` tira `gotrue`, `kong` e `postgrest` do `-x` (o resto continua desligado); scripts novos
   `test:integracao` (Vitest com `vitest.integracao.config.ts`) e `pacote:conferir` (CA-03). Dependências do D1.
 - `scripts/banco-local.mjs`: roda `supabase status -o json`, põe no ambiente do comando filho `SUPABASE_URL`,
@@ -229,7 +229,8 @@ Nenhum outro muda. `docs/decisoes/`, `docs/BACKLOG.md` e `docs/STATUS.md` só pe
 
 | Arquivo | Papel |
 |---|---|
-| `package.json`, `pnpm-lock.yaml`, `tsconfig.json`, `eslint.config.mjs`, `eslint.camadas.test.ts`, `vitest.integracao.config.ts` | Engenheiro de software |
+| `package.json`: scripts `db:*` · dependências e os outros scripts (`test:integracao`, `pacote:conferir`) | Engenheiro de dados · Engenheiro de software |
+| `pnpm-lock.yaml`, `tsconfig.json`, `eslint.config.mjs`, `eslint.camadas.test.ts`, `vitest.integracao.config.ts` | Engenheiro de software |
 | `src/server/portas/{acao,executar,tipos,erros,catalogo}.ts`, `src/server/portas/{executar,erros,molde}.test.ts` | Engenheiro de software |
 | `src/server/http/middleware.ts`, `src/server/sessao/{acoes,tentativas}.ts`, `src/server/sessao/acoes.test.ts` | Engenheiro de software |
 | `src/data/{ambiente,cliente,sessao,erros}.ts`, `src/data/{cliente,erros}.test.ts` | Engenheiro de software (consultas conferidas pelo Engenheiro de dados) |
@@ -237,7 +238,7 @@ Nenhum outro muda. `docs/decisoes/`, `docs/BACKLOG.md` e `docs/STATUS.md` só pe
 | `src/app/start.ts`, `src/app/routes/{__root,entrar,escolher-estudio,_app}.tsx`, `src/app/routes/_app/index.tsx`, `src/app/routes/index.tsx` (sai), `src/app/routeTree.gen.ts` | Engenheiro de software |
 | `src/app/paginas/{entrar,escolher-estudio,sua-conta}.tsx`, os `.css` e `.test.tsx` deles | Engenheiro de software |
 | `src/app/i18n/{pt,es,en,textos,formatar}.ts`, `src/app/i18n/i18n.test.ts` | Engenheiro de software |
-| `src/app/ui/campos.tsx`, `src/app/ui/campos.css`, `src/app/ui/icone.tsx` (só com a ficha aprovada) | Engenheiro de software |
+| `src/app/ui/campos.tsx`, `src/app/ui/campos.css`, `src/app/ui/icone.tsx` (como na ficha; o "sim" do dono vem com a aprovação da spec) | Engenheiro de software |
 | `supabase/migrations/<ts>_{registro,registro_funcoes,sessoes,tentativas_entrada,estudios_da_pessoa_e_pre_pedido}.sql` (nomes finais no ADR 0019) | Engenheiro de dados |
 | `supabase/tests/database/010_base_estrutura_test.sql` (só a lista de privilégios), `060_` a `100_` (5 novos), `supabase/moldes/registro_tabela_test.sql` | Engenheiro de dados |
 | `supabase/config.jsonc` (só `auth.enable_signup`) | Engenheiro de dados |
@@ -280,6 +281,7 @@ de rascunho (E22·B); nunca se junta nelas. Conflitos esperados: `package.json`,
 - **L-3 · E39:** o plano usa E39·3·B; A ou C mudam só os valores (§3.4). E39·1 e E39·2 não mudam o plano.
 - **L-4 · tela:** inicial da bolinha Sua conta sem nome guardado (proposta: primeira letra do e-mail da própria pessoa) e
   "Sair" (nome barrado no `DESIGN.md` §6 como sinônimo de Fechar, mas listado no §8b): o Designer leva à ficha.
+- **Registro (5b, 28/11):** Agenda e Agendamento ajustam os planos ao §4 (já pedido) e voltam à 5b quando esta spec ficar Approved.
 - **Efeito nos planos:** Agenda §5.3 (campo a mais passa a dar `entrada_invalida`; `estudioDaTela` no envelope) e
   Agendamento §5.1 e ADR 0010 D1 (gravação de várias tabelas vira função `security invoker`) voltam à 5b; Clientes R-7 e B-1
   ficam respondidos (Data API, ADR 0018 · D2).
