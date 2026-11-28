@@ -1,6 +1,6 @@
 # ADR 0006 · Agenda: dia do estúdio por Intl, tetos, "Desfazer" por recriação e acesso por chave e alcance
 
-- **Status:** Aceito · decisões técnicas (`AGENTS.md` §5) · 28/11/2026, com a spec
+- **Status:** Proposto, até a revisão de outro papel (E16·1) · decisões técnicas (`AGENTS.md` §5) · 28/11/2026, com a spec
   `specs/20261128-020000-agenda/spec.md` aprovada (commit `4e5b364`). Revisto em 28/11/2026 (tarefa MP1 de
   `specs/20261128-030000-entrar-servico/tasks.md`): D6 substituída; D7 a D13 novas. **Revisto de novo em 28/11/2026**
   (spec §16 e §17, commits `217a715` e `a0159f6`): D3 e D7 substituídas, D8 e D12 ajustadas, D14 a D16 novas.
@@ -46,8 +46,11 @@ de criar.
 ## Ponto aberto · grade da v1 (E59 do dono)
 Até a resposta vale **24 h com rolagem** (spec RN-01 e Assumption 1). **E59·A** (08:00 a 20:00, que se alarga para caber
 item fora): função pura `faixaVisivel` em `grade.ts` com teste, mudança da Assumption 1 pelo Analista; seletor de
-horários, banco, servidor e tetos não mudam. **E59·B** (24 h com rolagem): nada muda. Detalhe: `plan.md` §3.2. Se vier
-A, entra aqui uma D17 com a faixa.
+horários, banco, servidor e tetos não mudam. **E59·B** (24 h com rolagem): nada muda. Detalhe: `plan.md` §3.2.
+
+| # | Decisão (só vale com E59·A) | Motivo e norma |
+|---|---|---|
+| D17 | No dia de hoje, se a hora atual (fuso do estúdio) está fora da faixa 08:00–20:00, **a faixa se alarga até ela** (hora cheia anterior ou seguinte), como faz com item fora; a linha do "agora" em `--id` (ficha, decisão 4) aparece sempre que o dia é hoje. Em outro dia, o "agora" não conta | RF-14 manda a linha na coluna de hoje sem exceção; sumir tiraria a referência justo de quem atende cedo ou tarde (heurística de Nielsen 1, visibilidade do estado do sistema). Mesma regra pura do alargamento por item, com teste (CA-01) |
 
 ## Consequências
 - Texto novo de qualquer módulo entra nos três arquivos; a checagem de tipos falha se faltar um.

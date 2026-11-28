@@ -11,8 +11,8 @@
 - **Fora desta spec (E57·B, E58·A):** "Ocupado", chave de ocupação e RF-16 a RF-20. Nenhuma tarefa os constrói.
 
 ## Antes de construir (portão)
-- [ ] **T0** · Gerente de projeto: **E59 do dono** (grade 08:00–20:00 que se alarga, ou 24 h com rolagem; `plan.md`
-  §3.2). Sem resposta, vale 24 h; com "A", o Analista muda a Assumption 1 da spec antes da T9. Pessoa que deixou de ser
+- [ ] **T0** · Gerente de projeto: **a E59 vai na mensagem da ficha (T2)**, não em pergunta separada (grade
+  08:00–20:00 que se alarga, ou 24 h com rolagem; `plan.md` §3.2). Sem resposta, vale 24 h; com "A", o Analista muda a Assumption 1 da spec antes da T9. Pessoa que deixou de ser
   coluna: pendência da Equipe (spec §12).
 - [ ] **T1** · Engenheiro de DevOps: conferir que a `feat/agenda` está em dia com a `previas` e abrir o PR de rascunho
   com base na `previas`.
@@ -44,7 +44,8 @@
 - [ ] **T8** · `horarios.ts` + `horarios.test.ts` (RN-09, RN-10: opções em passos de 15 min nos dias de 23, 24 e 25 h,
   `estaNoPasso`, `fimSugerido` com 1 h, acompanhar e parar no fim do dia).
 - [ ] **T9** · `bloqueio.ts` + teste (RN-03, RN-04, passo; encostar; Cancelado e Ausência; alterar ignora o próprio).
-- [ ] **T10** · `grade.ts` + teste (RN-05, RN-06, RN-08, contador; `faixaVisivel` só se E59·A).
+- [ ] **T10** · `grade.ts` + teste (RN-05, RN-06, RN-08, contador; `faixaVisivel` só se E59·A, alargando até o
+  "agora" no dia de hoje, ADR 0006 · D17).
 - [ ] **T11** · `acesso.ts` + teste: `ehColuna`, `colunasVisiveis`, `podeGravarNa` (linha antiga e nova); só alcance e
   `usuarioId`, nunca papel.
 - [ ] **T12** · Apagar `src/domain/exemplo.ts` e `exemplo.test.ts`.

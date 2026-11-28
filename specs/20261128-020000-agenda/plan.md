@@ -7,7 +7,7 @@
 - **Revisão de 28/11/2026 (spec §16 e §17):** sai o "Ocupado" e toda leitura de "ocupados" (E58·A); saem RF-16 a RF-20
   (E57·B, só "em desenvolvimento"); entram RF-12 a RF-15, RF-21 e RF-22 (E54·1, ·2, ·3, ·4, E54·5 trocada, E55·1·A a
   E55·4); L-2 e L-4 resolvidas (E55·1·A, E55·2·A). **Ponto aberto:** grade da v1, E59 do dono (§3.2).
-- **Decisões técnicas deste plano:** `docs/adr/0006-agenda-tempo-idiomas-e-tetos.md` (D1 a D16). **Decisões de banco:**
+- **Decisões técnicas deste plano:** `docs/adr/0006-agenda-tempo-idiomas-e-tetos.md` (D1 a D16; D17 só com E59·A). **Decisões de banco:**
   `docs/adr/0007-agenda-tabelas-do-antigo.md`, do Engenheiro de dados na tarefa T3 (não neste plano).
 - **Lido no código da `previas` em 28/11/2026 (nada editado):** `src/server/portas/{acao,tipos,catalogo,executar,erros}.ts`
   e `molde.test.ts`; `src/domain/acesso/{chaves,matriz}.ts` e `matriz.test.ts`; `src/data/{cliente,erros,sessao}.ts`;
@@ -125,8 +125,8 @@ A spec (RN-01, Assumption 1) e este plano seguem com **24 h e rolagem** até o d
 | | E59·A · 08:00 a 20:00, que se alarga para caber item fora | E59·B · 24 h com rolagem |
 |---|---|---|
 | Spec | o Analista muda a Assumption 1 e acrescenta a regra da faixa (RN nova, com teste no CA-01) | nada muda |
-| Domínio | função nova `faixaVisivel(dia, itens)` em `grade.ts`: começa em `min(08:00, início do primeiro item, arredondado para baixo na hora)` e termina em `max(20:00, fim do último item, arredondado para cima)`, cortada no dia do estúdio (RN-01, 23 h e 25 h); teste a mais | nada a mais |
-| Tela | a grade desenha só a faixa; o menu do horário vazio (RF-13) só existe dentro dela; a linha do "agora" fora da faixa não aparece (ou alarga a faixa: escolha do Designer com o dono) | rolagem até a hora atual ou ao primeiro item |
+| Domínio | função nova `faixaVisivel(dia, itens, agora)` em `grade.ts`: começa em `min(08:00, início do primeiro item, agora se o dia é hoje; arredondado para baixo na hora)` e termina em `max(20:00, fim do último item, agora se o dia é hoje; arredondado para cima)`, cortada no dia do estúdio (RN-01, 23 h e 25 h); teste a mais | nada a mais |
+| Tela | a grade desenha só a faixa; o menu do horário vazio (RF-13) só existe dentro dela; **no dia de hoje, se a hora atual está fora da faixa, a faixa se alarga até ela** (hora cheia anterior ou seguinte), e a linha do "agora" em `--id` (ficha, decisão 4) sempre aparece (ADR 0006 · D17) | rolagem até a hora atual ou ao primeiro item |
 | Seletor de horários | **não muda**: continua o dia inteiro (RN-09), para poder bloquear fora da faixa | igual |
 | Banco, servidor, tetos | nada muda | nada muda |
 | Risco | 08–20 é fixo, não é o horário de funcionamento (que foi para a spec seguinte, E57·B); estúdio que abre às 07:00 vê a grade começar às 08:00 até ter item cedo | grade longa no celular; a rolagem até o "agora" esconde as horas vazias |
