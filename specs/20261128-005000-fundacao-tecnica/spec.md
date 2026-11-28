@@ -1,14 +1,11 @@
 # Spec · Fundação técnica (item 2 da fila)
 
 - **Status:** Approved
-- **Aprovação do dono:** "E37a, E23-2a, E23-3a, e38a," · 28/11/2026 ·
-  https://claude.ai/code/session_018cV8b9epaQJNqguG5c5Aqb · Gravado pelo Analista de requisitos (E16·3).
+- **Aprovação do dono:** "E37a, E23-2a, E23-3a, e38a," · 28/11/2026 · https://claude.ai/code/session_018cV8b9epaQJNqguG5c5Aqb · gravado pelo Analista de requisitos (E16·3).
   Significado: E37·A = spec aprovada, incluindo o R15 (textos do `AGENTS.md` §1 e do `docs/guias/processo-sdd.md` §5),
   e o PR #4 é juntado primeiro · E23·2·A = prévia na Cloudflare depois, em spec própria · E23·3·A = só o gratuito ·
   E38·A = travas do Claude ligadas em `.claude/` num PR próprio, depois do PR #4.
-- **Aprovação do merge:** "E37a" (E37·A: "eu junto o PR #4 primeiro") · 28/11/2026 ·
-  https://claude.ai/code/session_018cV8b9epaQJNqguG5c5Aqb · commit `d4aa972` (PR #4), CI verde nos 5 jobs.
-  Gravado pelo Engenheiro de DevOps.
+- **Aprovação do merge:** "E37a" (E37·A: "eu junto o PR #4 primeiro") · 28/11/2026 · https://claude.ai/code/session_018cV8b9epaQJNqguG5c5Aqb · commit `d4aa972` (PR #4), CI verde nos 5 jobs · gravado pelo Engenheiro de DevOps.
 - **Branch:** `chore/fundacao-tecnica` (a partir da `previas`)
 - **Escrito por:** Analista de requisitos · Norma: IEEE 29148 e BABOK · **Revisão:** pendente (etapa 5b, Gerente de projeto)
 - **Tipo de trabalho:** Código, Banco (só o banco local) e Segurança (gitleaks, Dependabot, CI). Revisores pelo
