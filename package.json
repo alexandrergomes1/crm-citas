@@ -13,7 +13,8 @@
     "lint": "eslint . --max-warnings 0",
     "test": "vitest run",
     "test:e2e": "playwright test",
-    "test:integracao": "vitest run --config vitest.integracao.config.ts",
+    "test:integracao": "node scripts/banco-local.mjs --com-admin vitest run --config vitest.integracao.config.ts",
+    "pacote:conferir": "node scripts/conferir-pacote.mjs",
     "db:start": "node -e \"require('node:fs').writeFileSync('supabase/signing_keys.json','[]',{mode:0o600})\" && supabase gen signing-key --append && supabase start -x realtime,storage-api,imgproxy,mailpit,postgres-meta,studio,edge-runtime,logflare,vector,supavisor",
     "db:stop": "supabase stop",
     "db:test": "vitest run --config supabase/matriz/vitest.config.ts && supabase test db"
