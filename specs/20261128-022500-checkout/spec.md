@@ -75,10 +75,10 @@ avançar de Revisar para Pagar; os nomes das formas de pagamento.
 | RF-02 | Os itens começam com os serviços do agendamento; pode-se tirar um item ou adicionar outro serviço **ativo** do Catálogo. Mudar itens do checkout não muda o agendamento. | candidata; Assumption 2 |
 | RF-03 | O preço de cada item é o do Catálogo no momento do pagamento e **não se edita nesta spec** (desconto e ajuste: spec seguinte, §12). O servidor busca o preço no Catálogo e ignora preço ou total vindos da tela. | divisão (§12); ASVS V11.1 (lógica de negócio no servidor) |
 | RF-04 | Cada item guarda cópia do nome e do preço do momento do pagamento; mudar o Catálogo depois não muda checkout pago. | princípio contábil do registro histórico |
-| RF-05 | **Total** = soma dos preços dos itens. Total zero e teto por conta seguem a **E31·3**. | E31·3 |
-| RF-06 | **Pagar:** uma ou mais linhas (até 5, limite de tela), cada uma com forma (lista da **E31·1**) e valor maior que zero; a soma das linhas é **igual** ao total, nem mais nem menos. | candidata; RN-03 |
+| RF-05 | **Total** = soma dos preços dos itens (cada preço de 0 a 100.000,00, pela spec do Catálogo, E30·2). Total zero e teto por conta seguem a **E31·3**. | E31·3; spec do Catálogo (E30·2) |
+| RF-06 | **Pagar:** com total maior que zero, uma ou mais linhas (até 5, limite de tela), cada uma com forma (lista da **E31·1**) e valor maior que zero, e a soma das linhas é **igual** ao total, nem mais nem menos. Com total zero (se a E31·3 permitir), a etapa Pagar não tem linhas: a conta fecha sem pagamento e o checkout fica **Sem valor**. | candidata; RN-03; E31·3 |
 | RF-07 | Nada é gravado antes de "Pagar <valor>". Ao pagar, itens, total e pagamentos são gravados **de uma vez** (tudo ou nada) e o checkout nasce **Pago**. | ASVS V11.1.6 (ação atômica); Assumption 3 |
-| RF-08 | **Um pago por agendamento**, exigido pelo banco (restrição única, não só pelo servidor): um segundo pedido é recusado com "agendamento já tem checkout". | ASVS V11.1.6; §7 |
+| RF-08 | **Um checkout fechado (Pago ou Sem valor) por agendamento**, exigido pelo banco (restrição única, não só pelo servidor): um segundo pedido é recusado com "agendamento já tem checkout". | ASVS V11.1.6; §7 |
 | RF-09 | **Mesmo estúdio, exigido pelo banco:** checkout, itens e pagamentos ligam-se ao agendamento e ao serviço por chave composta com `org_id`, de modo que o banco recusa agendamento ou serviço de outro estúdio, mesmo que o pedido traga o id dele. O estúdio vem da sessão. | `ARCHITECTURE.md` §4 e §5; item 3 RF-03 |
 | RF-10 | Checkout Pago, itens e pagamentos não se alteram nem se apagam, por ninguém e por nenhuma via, nesta spec. A correção entra pela spec seguinte (§12). | ASVS V11.1 |
 | RF-11 | **Caixa:** a ligação de cada pagamento com o caixa aberto segue a **E31·1**. | `docs/produto/caixa.md`; E31·1 |
@@ -87,16 +87,18 @@ avançar de Revisar para Pagar; os nomes das formas de pagamento.
 | RF-14 | **Exceção E6·1 (vale como está):** no modo "entrar como o estúdio", nada do que o dono faz fica registrado; o fechamento feito nesse modo não registra o dono no registro (porta 6) nem em "quem fechou". O plano diz como, sem contornar a exceção. | E6·1; `ARCHITECTURE.md` §6; `SECURITY.md` §5 |
 | RF-15 | Valores mostrados na moeda e no formato do estúdio; o checkout guarda a moeda (código ISO 4217) com que foi pago. | `ARCHITECTURE.md` §11; ISO 4217 |
 | RF-16 | **Plano B:** enquanto o Catálogo não tiver preço, ou o Caixa não existir, a parte que falta aparece "em desenvolvimento" (`DESIGN.md` §8) e os testes usam dados de exemplo locais, fictícios, escritos do zero (RG-07). | `DESIGN.md` §8; item 3 RG-07 |
+| RF-17 | **Agendamento com checkout fechado não se cancela** (nem vai para Ausência): o servidor e o banco recusam a troca para Cancelado ou Ausência enquanto houver checkout Pago ou Sem valor, com a mensagem "tem checkout; cancelar depende do estorno". Isso fecha o caminho Chegou → Cancelado da spec do Agendamento (RF-07 de lá) para agendamento já pago; liberar fica para a spec "Checkout · estorno e desconto" (§12). | ASVS V11.1 (fluxo de negócio); spec do Agendamento RF-07 |
+| RF-18 | **Ligação pagamento → caixa:** o Checkout é o dono da migration dessa ligação (coluna no pagamento, chave composta com `org_id` para o caixa do mesmo estúdio e a trava); a spec do Caixa só a usa (lê e confere), sem migration própria para ela. | §7; E31·1 |
 
 ### Regras de dinheiro (verificáveis, em `src/domain`)
 | ID | Regra |
 |---|---|
 | RN-01 | Todo valor é **número inteiro na menor unidade da moeda** (centavos), na tela, no servidor e no banco; nunca número com vírgula flutuante. Não há porcentagem nesta spec, logo não há arredondamento. |
 | RN-02 | Moedas de uso têm 2 casas (EUR, BRL, USD); moeda com outro número de casas é recusada nesta spec. |
-| RN-03 | Soma dos pagamentos ≠ total: recusado. Linha com valor ≤ 0: recusada. |
+| RN-03 | Total > 0: soma dos pagamentos ≠ total é recusada, e linha com valor ≤ 0 é recusada. Total = 0: qualquer linha de pagamento é recusada (zero linhas). |
 | RN-04 | Total zero e teto por conta: conforme a **E31·3**. |
 
-**Estados do checkout:** (não existe antes de pagar) → **Pago**. Outros estados entram pela spec seguinte (§12).
+**Estados do checkout:** (não existe antes de fechar) → **Pago** (total > 0) ou **Sem valor** (total = 0, se a E31·3 permitir; na tela "Concluído, sem valor"). Outros estados entram pela spec seguinte (§12).
 
 ## 6. Requisitos não funcionais
 | ID | Requisito | Fonte |
@@ -117,10 +119,13 @@ Lido só para entender (E22·B, nada copiado): `crm-agenda/supabase/migrations/`
 - `org_id` obrigatório, trava RLS pela função de checagem do item 3, índice por `org_id` e teste de isolamento em
   cada tabela (RG-04).
 - Chave composta com `org_id` em toda ligação: checkout → agendamento, item → checkout e serviço, pagamento →
-  checkout (e → caixa, se E31·1·A ou B) (RF-09).
-- Restrição única: um checkout Pago por agendamento (RF-08); chave de idempotência única por estúdio (RNF-02).
-- Valores em inteiro, com checagem no banco: valores > 0 (ou ≥ 0 conforme E31·3), total = soma dos itens, soma dos
-  pagamentos = total, teto conforme E31·3.
+  checkout (e → caixa, se E31·1·A ou B) (RF-09). A migration da ligação pagamento → caixa é **do Checkout** (RF-18);
+  o Caixa só a usa.
+- Restrição única: um checkout fechado (Pago ou Sem valor) por agendamento (RF-08); chave de idempotência única por estúdio (RNF-02).
+- Valores em inteiro, com checagem no banco: preço do item ≥ 0; valor de pagamento > 0; total = soma dos itens;
+  total > 0 exige soma dos pagamentos = total; total = 0 exige nenhum pagamento (e só se a E31·3 permitir); teto
+  conforme E31·3.
+- Troca do agendamento para Cancelado ou Ausência recusada com checkout fechado (RF-17).
 - Itens e pagamentos sem alteração nem exclusão depois de gravados (RF-10); gravação numa só transação com a sessão da
   pessoa, sem chave de serviço.
 
@@ -141,7 +146,8 @@ Lido só para entender (E22·B, nada copiado): `crm-agenda/supabase/migrations/`
 | ID | Critério | Prova |
 |---|---|---|
 | CA-01 | RN-01 a RN-04: total = soma dos itens, só inteiros, moeda de 2 casas, total zero e teto conforme E31·3. | unidade (`src/domain`) |
-| CA-02 | Soma dos pagamentos igual ao total aceita; 1 centavo a mais ou a menos recusado; até 5 linhas; linha com valor 0 recusada. | unidade e servidor |
+| CA-02 | Soma dos pagamentos igual ao total aceita; 1 centavo a mais ou a menos recusado; até 5 linhas; linha com valor 0 recusada; total zero com pagamento recusado e, se a E31·3 permitir, sem pagamento fecha "Sem valor". | unidade, servidor e banco |
+| CA-02b | Agendamento com checkout Pago ou Sem valor não vai para Cancelado nem Ausência (servidor e banco). | teste de servidor e de banco |
 | CA-03 | O servidor ignora preço e total vindos da tela e usa o Catálogo; preço do Catálogo mudado depois não muda checkout Pago. | teste de servidor |
 | CA-04 | Checkout aceito em Chegou, Iniciado, Concluído; recusado nos outros status. | unidade |
 | CA-05 | Segundo Pago para o mesmo agendamento recusado **pelo banco**; duas gravações simultâneas: só uma; mesma chave e mesmo conteúdo: mesmo resultado; mesma chave com outro conteúdo: recusada. | teste de banco na CI |
@@ -163,7 +169,9 @@ Lido só para entender (E22·B, nada copiado): `crm-agenda/supabase/migrations/`
 - **Agendamento:** status (RF-01), painel e botão "Checkout"; serviços do agendamento.
 - **Catálogo** (spec sendo escrita em paralelo): serviço ativo, **preço em centavos** e moeda do estúdio. Se o
   Catálogo guardar preço de outro jeito (faixa, "a partir de", preço por profissional), esta spec volta ao dono.
-- **Caixa** (spec própria): o caixa aberto, se E31·1·A ou B; sem ele, vale o plano B (RF-16).
+- **Caixa** (spec própria): o caixa aberto, se E31·1·A ou B; sem ele, vale o plano B (RF-16). A ligação pagamento →
+  caixa é migration do Checkout (RF-18); a do Caixa só a usa.
+- **Agendamento:** a spec de lá precisa citar o RF-17 (sem cancelar agendamento com checkout fechado).
 - **Clientes:** só o nome da cliente mostrado no resumo (lido de Clientes, não copiado).
 
 ## 10. Dúvidas ao dono (máx. 3; todas de dinheiro ou acesso)
@@ -184,12 +192,14 @@ Lido só para entender (E22·B, nada copiado): `crm-agenda/supabase/migrations/`
   Desfaz-se dando a permissão ao papel.
 
 **E31·3 · Valores da conta: total zero e teto** (dinheiro)
-- **E31·3·A:** total zero não é permitido; sem teto por conta.
-- **E31·3·B:** total zero não é permitido; teto fixo por conta (ex.: 10.000,00 na moeda do estúdio); acima, recusa.
-- **E31·3·C:** total zero permitido (cortesia, sem forma de pagamento); teto fixo por conta como em B.
-- **Recomendo B:** sem desconto nesta spec, total zero só viria de serviço sem preço, e o teto pega erro de
-  digitação de valor (ASVS V5.1.4, limites de entrada). Diga o valor do teto se quiser outro. Desfaz-se mudando o
-  número.
+- Pela spec do Catálogo (E30·2·A recomendada), cada serviço custa de 0,00 a 100.000,00; 0 é avaliação gratuita.
+- **E31·3·A:** total zero permitido quando vem só de serviços de preço 0: a conta fecha sem pagamento e fica
+  "Concluído, sem valor"; sem teto por conta, vale só o limite por serviço do Catálogo.
+- **E31·3·B:** como A, e um teto fixo por conta, nunca menor que 100.000,00 (o maior preço do Catálogo); acima, recusa.
+- **E31·3·C:** total zero não é permitido; avaliação gratuita não passa pelo Checkout; sem teto por conta.
+- **Recomendo A:** a avaliação gratuita fica registrada como atendida sem inventar pagamento, e o limite do Catálogo
+  já barra valor absurdo por serviço (ASVS V5.1.4, limites de entrada). Se o dono escolher E30·2·C (preço > 0), a
+  E31·3 perde o caso zero. Desfaz-se mudando a regra; nada gravado se perde.
 
 ## 11. Assumptions (decisões do papel, sem dinheiro nem acesso; recuse pelo número)
 1. Checkout só em Chegou, Iniciado ou Concluído; pagar não muda o status do agendamento nesta spec.
@@ -205,6 +215,8 @@ Lido só para entender (E22·B, nada copiado): `crm-agenda/supabase/migrations/`
     sem caixa aberto; estorno total e, talvez, parcial.
   - **Desconto:** em valor ou porcentagem (com a regra de arredondamento), teto do desconto e motivo obrigatório.
   - **Cobrar de novo** o mesmo agendamento depois de um estorno.
+  - **Cancelar agendamento já pago:** hoje proibido (RF-17); a spec seguinte diz como estorno e cancelamento andam
+    juntos.
   - **Achado da E6·1 no estorno:** no modo "entrar como o estúdio" o dono não é registrado (vale como está); um
     estorno feito nesse modo tira dinheiro sem registro de quem fez. Mostrar ao dono como risco, sem contornar a
     exceção.
