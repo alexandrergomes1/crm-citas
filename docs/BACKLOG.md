@@ -12,7 +12,7 @@ antes do núcleo (E36·A); a spec "Agenda · visões e horário de funcionamento
 | # | Tarefa | Fonte | Situação |
 |---|---|---|---|
 | 1 | Terminar a base: um arquivo por módulo em `docs/produto/`, com autorização do dono para ler o projeto antigo | E8 (item 8), pedido (b) anterior ao E1, E20, E21, E33 | feito (PR #2) |
-| 2 | Fundação técnica: ferramentas, app vazio, Spec Kit instalado, travas automáticas (gitleaks e Dependabot, E14·3) e CI; travas automáticas: trazer as do projeto antigo pela skill trazer-do-antigo, com autorização do dono item por item (pedido da mensagem 41) | `AGENTS.md` §1, E14·3, Pedido (travas) | feito (PR #4) |
+| 2 | Fundação técnica: ferramentas, app vazio, Spec Kit instalado, travas automáticas (gitleaks e Dependabot, E14·3) e CI; travas automáticas: trazer as do projeto antigo pela skill trazer-do-antigo, com autorização do dono item por item (pedido da mensagem 41) | `AGENTS.md` §1, E14·3, Pedido (travas) | feito (PR #4), menos as travas do Claude em `.claude/`: pendentes, entram depois do merge do Entrar, numa conversa nova, num PR só para elas (E38·A1) |
 | 3 | Ligar o banco existente, tabela por tabela, com autorização do dono item por item | pedido (a) anterior ao E1, `AGENTS.md` §3 regra 4 | na `previas` dentro do PR #7 (E49·A); aprovação do merge a gravar na spec (PR #5 segue aberto sem uso) |
 | 4 | Design system no código | `DESIGN.md` | na `previas` dentro do PR #7 (E49·A); aprovação do merge a gravar na spec (PR #6 segue aberto sem uso) |
 | 4a | Entrar e camada de serviço (login, sessão, 6 portas, auditoria, base de idiomas) | E36·A, E4·1, E3·1 | feito (PR #7) |
