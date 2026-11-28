@@ -11,12 +11,36 @@ import {
   bancoPronto,
   criarEstudio,
   criarPessoa,
+  ehBancoLocal,
   emailFicticio,
   sql,
   ultimoPedido,
   uuid,
   vincular,
 } from './preparo'
+
+// Revisão de segurança R2: `sql` só fala com o banco da própria máquina. Não precisa do banco de pé.
+describe('alvo das consultas diretas', () => {
+  it.each([
+    'postgresql://postgres:x@127.0.0.1:54322/postgres',
+    'postgresql://postgres:x@localhost:54322/postgres',
+    'postgres://postgres:x@[::1]:54322/postgres',
+  ])('aceita o banco local (%#)', (endereco) => {
+    expect(ehBancoLocal(endereco)).toBe(true)
+  })
+
+  it.each([
+    'postgresql://postgres:x@db.exemplo.supabase.co:5432/postgres',
+    'postgresql://postgres:x@127.0.0.1.exemplo.test:5432/postgres',
+    'postgresql://postgres:x@10.0.0.5:5432/postgres',
+    'https://127.0.0.1:54322/postgres',
+    'não é endereço',
+    undefined,
+    null,
+  ])('recusa o que não é local ou não se lê (%#)', (endereco) => {
+    expect(ehBancoLocal(endereco)).toBe(false)
+  })
+})
 
 const def = (nome: string) => acoesDoCatalogo().find((d) => d.nome === nome)!
 const SENHA = 'senha-ficticia-de-teste-4'

@@ -51,12 +51,50 @@ export function uuid(valor: string): string {
   return `'${valor}'::uuid`
 }
 
+/** Máquinas aceitas como banco local: só a própria máquina. */
+const MAQUINAS_LOCAIS = new Set(['127.0.0.1', 'localhost', '[::1]', '::1'])
+
+/**
+ * O endereço do banco aponta para a própria máquina? Endereço ilegível conta como não (falha fechada).
+ * Exportada para o teste; o endereço nunca é impresso (leva a senha local).
+ */
+export function ehBancoLocal(endereco: unknown): boolean {
+  if (typeof endereco !== 'string') return false
+  try {
+    const url = new URL(endereco)
+    return (url.protocol === 'postgresql:' || url.protocol === 'postgres:') && MAQUINAS_LOCAIS.has(url.hostname)
+  } catch {
+    return false
+  }
+}
+
+let alvoLocalConferido = false
+
+/**
+ * Antes da primeira consulta, confere pela própria CLI que o alvo é o banco local (`supabase status -o json`, campo
+ * DB_URL em 127.0.0.1 ou localhost); qualquer outra coisa recusa e nenhuma consulta sai (revisão de segurança R2;
+ * AGENTS.md §1: a IA nunca mexe no banco remoto). A saída tem chaves locais: fica só em memória, nunca impressa.
+ */
+function conferirAlvoLocal(): void {
+  if (alvoLocalConferido) return
+  const r = spawnSync(SUPABASE, ['status', '-o', 'json'], { cwd: RAIZ, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] })
+  let endereco: unknown
+  try {
+    endereco = r.status === 0 ? (JSON.parse(r.stdout) as { DB_URL?: unknown }).DB_URL : undefined
+  } catch {
+    endereco = undefined
+  }
+  if (!ehBancoLocal(endereco)) throw new Error('alvo do banco não é o local: consulta recusada')
+  alvoLocalConferido = true
+}
+
 /**
  * Uma instrução SQL no banco LOCAL, como `postgres`, pela CLI do projeto (`supabase db query`, alvo local por padrão;
- * nunca `--remote`; AGENTS.md §1). Só para ler o registro e empurrar o relógio da sessão para trás (CA-04, CA-09,
- * CA-15). Devolve as linhas; erro → exceção sem o texto do banco.
+ * nunca `--remote`; AGENTS.md §1), depois de conferido o alvo (`conferirAlvoLocal`). Só para ler o registro e empurrar
+ * o relógio da sessão para trás (CA-04, CA-09, CA-15). Devolve as linhas; erro → exceção sem o texto do banco.
  */
 export function sql<T = Record<string, unknown>>(consulta: string): T[] {
+  conferirAlvoLocal()
   const r = spawnSync(SUPABASE, ['db', 'query', '--output-format', 'json', consulta], {
     cwd: RAIZ,
     encoding: 'utf8',
