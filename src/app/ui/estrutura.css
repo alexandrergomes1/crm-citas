@@ -246,7 +246,8 @@
   background: var(--id);
 }
 
-.ds-barra-baixo__sem-icone {
+.ds-sem-icone {
+  flex: none;
   width: var(--ic-20);
   height: var(--ic-20);
 }

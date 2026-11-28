@@ -9,6 +9,7 @@ import { Seletor } from './seletor'
 import { EstadoVazio } from './estados'
 import { categoriaDaOrdem } from './bloco-lista'
 import { nomesIcones } from './icone'
+import { dataPorExtenso } from './campos'
 
 describe('Contador (RC-4)', () => {
   it('zero não desenha nada', () => {
@@ -117,5 +118,17 @@ describe('Sem texto fixo de módulo (RC-23)', () => {
 
   it('a quinta categoria volta à primeira (DESIGN.md §3)', () => {
     expect([1, 2, 3, 4, 5, 6].map(categoriaDaOrdem)).toEqual([1, 2, 3, 4, 1, 2])
+  })
+})
+
+describe('Campo de data (RC-7)', () => {
+  it('mostra a data por extenso no idioma do estúdio, como na imagem 06', () => {
+    expect(dataPorExtenso('2026-12-04', 'pt')).toBe('sex, 4 dez 2026')
+    expect(dataPorExtenso('2026-12-04', 'es-ES')).toBe('vie, 4 dic 2026')
+  })
+
+  it('data inválida ou vazia não mostra nada', () => {
+    expect(dataPorExtenso('', 'pt-PT')).toBe('')
+    expect(dataPorExtenso('04/12/2026', 'pt-PT')).toBe('')
   })
 })

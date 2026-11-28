@@ -241,9 +241,8 @@ export function Vitrine() {
           <Fila>
             <Contador total={11} />
             <Contador total={21} pendente={4} rotulo="21, 4 pendentes" />
-            <span className="vt-legenda">
-              Zero não aparece: [<Contador total={0} />]
-            </span>
+            <span className="vt-legenda">Zero não aparece.</span>
+            <Contador total={0} />
           </Fila>
           <p className="vt-subtexto">
             21 fichas · <span className="vt-pendentes">4 pendentes</span>
@@ -327,7 +326,7 @@ export function Vitrine() {
               ]}
             />
             <CampoMultilinha rotulo="Nota" placeholder="Escreva a nota…" />
-            <CampoData rotulo="Data" defaultValue="2026-12-04" />
+            <CampoData rotulo="Data" idioma="pt" valorInicial="2026-12-04" textoVazio="Escolha a data" />
             <CampoTexto rotulo="Código" disabled defaultValue="Gerado ao salvar" />
           </div>
         </Quadro>
@@ -398,7 +397,7 @@ export function Vitrine() {
         </Quadro>
 
         <Quadro titulo="RC-12 · Lista e tabela">
-          <CabecalhoGrupo titulo="Sobrancelhas" categoria={1} contador={{ total: 4 }} />
+          <CabecalhoGrupo titulo="Sobrancelhas" contador={{ total: 4 }} />
           <Lista nome="Serviços">
             {servicos.map((s) => (
               <LinhaLista
@@ -455,7 +454,7 @@ export function Vitrine() {
                 { id: 'ordem', rotulo: 'Ajustar ordem' },
               ]}
             />
-            <MenuAcoesLinha nome="Opções da linha" rotulos={acoesLinha} />
+            <MenuAcoesLinha nome="Opções da linha" rotulos={acoesLinha} alinhar="inicio" />
           </Fila>
           <Legenda>Opções e ⋮: branco com sombra; Editar · Duplicar · Arquivar · Excluir</Legenda>
         </Quadro>
@@ -530,6 +529,7 @@ export function Vitrine() {
                 <MenuAcoes
                   nome="Opções"
                   gatilho="botao"
+                  alinhar="fim"
                   itens={[
                     { id: 'importar', rotulo: 'Importar' },
                     { id: 'exportar', rotulo: 'Exportar' },
@@ -544,7 +544,7 @@ export function Vitrine() {
               topo={topo}
             />
             <div className="vt-estrutura">
-              <MenuPrincipal nome="Menu principal aberto" itens={menuPrincipal} atual="clientes" rotuloAbrir="Abrir o menu" rotuloRecolher="Recolher menu" />
+              <MenuPrincipal nome="Menu principal aberto" itens={menuPrincipal} atual="catalogo" rotuloAbrir="Abrir o menu" rotuloRecolher="Recolher menu" />
               <MenuPrincipal
                 nome="Menu principal recolhido"
                 itens={menuPrincipal}
@@ -584,14 +584,14 @@ export function Vitrine() {
                   <Botao variante="contorno" icone="plus">
                     Adicionar
                   </Botao>
-                  <MenuAcoes nome="Opções" gatilho="icone" itens={[{ id: 'exportar', rotulo: 'Exportar' }]} />
+                  <MenuAcoes nome="Opções" gatilho="icone" alinhar="fim" itens={[{ id: 'exportar', rotulo: 'Exportar' }]} />
                 </>
               }
             />
             <BarraBaixo
               nome="Navegação principal"
               itens={barraBaixo}
-              atual="clientes"
+              atual="mais"
               agendar={{ rotulo: 'Agendar' }}
             />
           </div>

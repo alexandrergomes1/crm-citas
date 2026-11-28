@@ -84,14 +84,12 @@ export function Lista({ nome, children }: Readonly<ListaProps>) {
 export interface CabecalhoGrupoProps {
   titulo: string
   contador?: ContadorProps
-  categoria?: Categoria
 }
 
-/** 14 forte + quantidade na pílula cinza (DESIGN.md §8b) */
-export function CabecalhoGrupo({ titulo, contador, categoria }: Readonly<CabecalhoGrupoProps>) {
+/** 14 forte + quantidade na pílula cinza (DESIGN.md §8b); a faixa de categoria fica só nas linhas (§3) */
+export function CabecalhoGrupo({ titulo, contador }: Readonly<CabecalhoGrupoProps>) {
   return (
-    <h4 className={categoria ? `ds-grupo ds-cat-${categoria}` : 'ds-grupo'}>
-      {categoria ? <span className="ds-grupo__faixa" aria-hidden="true" /> : null}
+    <h4 className="ds-grupo">
       {titulo}
       {contador ? <Contador {...contador} /> : null}
     </h4>

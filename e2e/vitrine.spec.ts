@@ -69,6 +69,7 @@ test('CA-3 · os 22 componentes e os tokens aparecem, cada um no seu quadro', as
   await expect(campos.getByText('Informe o telefone para enviar lembretes.')).toBeVisible()
   await expect(campos.getByRole('combobox', { name: 'Categoria' })).toBeVisible()
   await expect(campos.getByRole('textbox', { name: 'Código' })).toBeDisabled()
+  await expect(campos.getByRole('textbox', { name: 'Data' })).toHaveValue('sex, 4 dez 2026')
 
   await expect(quadro(page, 'RC-8 · Busca').getByRole('searchbox', { name: 'Buscar serviço' })).toBeVisible()
   await expect(quadro(page, 'RC-9 · Caixinha e interruptor').getByRole('checkbox', { name: 'Marcado', exact: true })).toBeChecked()
@@ -272,4 +273,33 @@ test('sem rolagem lateral e CA-7 · captura da vitrine inteira', async ({ page }
   expect(semRolagemLateral).toBe(true)
   await expect(page.locator('.ds-carregando[data-visivel="sim"]')).toBeAttached()
   await page.screenshot({ fullPage: true, path: testInfo.outputPath(`vitrine-${testInfo.project.name}.png`) })
+})
+
+test('CA-7 · capturas com cada camada aberta (janelinha, folha ou painel, menu)', async ({ page }, testInfo) => {
+  const projeto = testInfo.project.name
+  const capturar = async (nome: string) =>
+    page.screenshot({ path: testInfo.outputPath(`vitrine-${projeto}-${nome}.png`) })
+
+  await quadro(page, 'RC-14 · Janelinha de confirmação').getByRole('button', { name: 'Abrir janelinha' }).click()
+  await expect(page.getByRole('dialog')).toBeVisible()
+  await capturar('janelinha')
+  await page.keyboard.press('Escape')
+
+  const camada = ehCelular() ? 'folha' : 'painel'
+  await quadro(page, 'RC-16 · Folha e painel').getByRole('button', { name: ehCelular() ? 'Abrir folha' : 'Abrir painel' }).click()
+  await expect(page.getByRole('dialog', { name: 'Filtros' })).toBeVisible()
+  await capturar(camada)
+  await page.keyboard.press('Escape')
+
+  const menu = quadro(page, 'RC-13 · Menu aberto')
+  await menu.scrollIntoViewIfNeeded()
+  await menu.getByRole('button', { name: 'Opções da linha' }).click()
+  const aberto = page.getByRole('menu', { name: 'Opções da linha' })
+  await expect(aberto).toBeVisible()
+  // o menu cabe inteiro na tela
+  const c = await caixa(aberto)
+  const largura = page.viewportSize()?.width ?? 0
+  expect(c.x).toBeGreaterThanOrEqual(0)
+  expect(c.x + c.width).toBeLessThanOrEqual(largura)
+  await capturar('menu')
 })

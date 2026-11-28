@@ -105,12 +105,6 @@
   font-weight: var(--fw-forte);
 }
 
-.ds-grupo__faixa {
-  width: var(--w-faixa);
-  height: var(--sp-16);
-  border-radius: var(--w-faixa);
-  background: var(--cat);
-}
 
 .ds-tabela__rolagem {
   overflow-x: auto;

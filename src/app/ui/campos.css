@@ -40,7 +40,7 @@
 .ds-campo__controle--multi {
   padding: var(--sp-12) var(--sp-16);
   border-radius: var(--r-campo-multi);
-  resize: vertical;
+  resize: none;
   line-height: var(--lh-texto);
 }
 
@@ -49,17 +49,20 @@
 }
 
 .ds-campo__controle--data {
-  position: relative;
+  cursor: pointer;
 }
 
-/* O calendário do navegador fica por cima do ícone, invisível, para abrir ao toque */
-.ds-campo__controle--data::-webkit-calendar-picker-indicator {
+/* O calendário do navegador fica embaixo do campo, invisível: só ancora o seletor que abre */
+.ds-campo__nativo {
   position: absolute;
-  right: var(--sp-16);
-  width: var(--ic-18);
-  height: var(--ic-18);
+  bottom: 0;
+  left: var(--sp-16);
+  width: var(--borda);
+  height: var(--borda);
+  padding: 0;
+  border: 0;
   opacity: 0;
-  cursor: pointer;
+  pointer-events: none;
 }
 
 .ds-campo__icone-fim {

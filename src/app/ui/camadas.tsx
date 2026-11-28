@@ -18,9 +18,11 @@ export interface MenuAcoesProps {
   nome: string
   gatilho: 'botao' | 'icone'
   itens: readonly ItemMenu[]
+  /** lado do botão em que o menu se alinha: 'inicio' (botão à esquerda) ou 'fim' (⋮ no fim da linha, barra do topo) */
+  alinhar?: 'inicio' | 'fim'
 }
 
-export function MenuAcoes({ nome, gatilho, itens }: Readonly<MenuAcoesProps>) {
+export function MenuAcoes({ nome, gatilho, itens, alinhar = 'inicio' }: Readonly<MenuAcoesProps>) {
   const [aberto, setAberto] = useState(false)
   const idMenu = useId()
   const botao = useRef<HTMLButtonElement>(null)
@@ -91,7 +93,7 @@ export function MenuAcoes({ nome, gatilho, itens }: Readonly<MenuAcoesProps>) {
       ) : (
         <BotaoIcone {...comum} nome={nome} icone="ellipsis-vertical" />
       )}
-      <div id={idMenu} role="menu" aria-label={nome} className="ds-menu__lista" hidden={!aberto} onKeyDown={tecladoMenu}>
+      <div id={idMenu} role="menu" aria-label={nome} className={`ds-menu__lista ds-menu__lista--${alinhar}`} hidden={!aberto} onKeyDown={tecladoMenu}>
         {itens.map((item, indice) => (
           <button
             key={item.id}
@@ -127,10 +129,12 @@ export interface MenuAcoesLinhaProps {
   nome: string
   rotulos: RotulosAcoesLinha
   onSelecionar?: (acao: keyof RotulosAcoesLinha) => void
+  /** no fim da linha (padrão) o menu se alinha ao fim */
+  alinhar?: 'inicio' | 'fim'
 }
 
 /** ⋮ da linha: Editar · Duplicar · Arquivar · Excluir, nesta ordem; Excluir em vermelho (DESIGN.md §6) */
-export function MenuAcoesLinha({ nome, rotulos, onSelecionar }: Readonly<MenuAcoesLinhaProps>) {
+export function MenuAcoesLinha({ nome, rotulos, onSelecionar, alinhar = 'fim' }: Readonly<MenuAcoesLinhaProps>) {
   const ordem = ['editar', 'duplicar', 'arquivar', 'excluir'] as const
   const itens = ordem.map((acao) => ({
     id: acao,
@@ -138,7 +142,7 @@ export function MenuAcoesLinha({ nome, rotulos, onSelecionar }: Readonly<MenuAco
     perigo: acao === 'excluir',
     onSelecionar: () => onSelecionar?.(acao),
   }))
-  return <MenuAcoes nome={nome} gatilho="icone" itens={itens} />
+  return <MenuAcoes nome={nome} gatilho="icone" itens={itens} alinhar={alinhar} />
 }
 
 type TipoCamada = 'janelinha' | 'folha' | 'painel'

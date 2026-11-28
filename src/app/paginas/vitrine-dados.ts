@@ -55,15 +55,16 @@ export const secoesCatalogo: readonly ItemNavegacao[] = [
 /** Lista de seções do celular (Formulários, nível 1): ícones só dos nomeados no DESIGN.md */
 export const secoesFormularios: readonly ItemNavegacao[] = [
   { id: 'fichas', rotulo: 'Fichas', icone: 'clipboard-list', total: 21, pendente: 4, rotuloContador: '21, 4 pendentes' },
-  { id: 'modelos', rotulo: 'Modelos', icone: 'tag', total: 5 },
-  { id: 'termos', rotulo: 'Termos', icone: 'lock', total: 2 },
+  // PONTO A MUDAR: E25·4 · Modelos e Termos sem ícone nomeado no DESIGN.md ("um ícone por coisa", §5)
+  { id: 'modelos', rotulo: 'Modelos', total: 5 },
+  { id: 'termos', rotulo: 'Termos', total: 2 },
 ]
 
 export const barraBaixo = [
   { id: 'agenda', rotulo: 'Agenda', icone: 'calendar' },
   { id: 'clientes', rotulo: 'Clientes', icone: 'users' },
   { id: 'catalogo', rotulo: 'Catálogo', icone: 'tag' },
-  // PONTO A MUDAR: ícone do "Mais" não está no DESIGN.md (mapa L7Icones não aprovado)
+  // PONTO A MUDAR: E25·4 · ícone do "Mais" não está no DESIGN.md
   { id: 'mais', rotulo: 'Mais' },
 ] as const satisfies readonly ItemNavegacao[]
 

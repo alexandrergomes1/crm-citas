@@ -169,8 +169,8 @@ export function BarraBaixo({ nome, itens, atual, agendar }: Readonly<BarraBaixoP
   const item = (i: ItemNavegacao) => (
     <li key={i.id} className="ds-barra-baixo__celula">
       <button type="button" className="ds-barra-baixo__item" aria-current={i.id === atual ? 'page' : undefined}>
-        {/* PONTO A MUDAR: "Mais" ainda sem ícone; o DESIGN.md não o nomeia (mapa L7Icones não aprovado) */}
-        {i.icone ? <Icone nome={i.icone} /> : <span className="ds-barra-baixo__sem-icone" aria-hidden="true" />}
+        {/* PONTO A MUDAR: E25·4 · "Mais" ainda sem ícone; o DESIGN.md não o nomeia */}
+        {i.icone ? <Icone nome={i.icone} /> : <span className="ds-sem-icone" aria-hidden="true" />}
         <span>{i.rotulo}</span>
       </button>
     </li>
@@ -203,7 +203,8 @@ export function ListaSecoes({ nome, itens }: Readonly<ListaSecoesProps>) {
         {itens.map((i) => (
           <li key={i.id} className="ds-secao">
             <button type="button" className="ds-secao__botao">
-              {i.icone ? <Icone nome={i.icone} /> : null}
+              {/* sem ícone nomeado no DESIGN.md, o lugar fica (PONTO A MUDAR: E25·4) */}
+              {i.icone ? <Icone nome={i.icone} /> : <span className="ds-sem-icone" aria-hidden="true" />}
               <span className="ds-secao__nome">{i.rotulo}</span>
               {i.total ? <Contador total={i.total} pendente={i.pendente} rotulo={i.rotuloContador} /> : null}
               <Icone nome="chevron-right" tamanho="18" />

@@ -2,6 +2,9 @@
 // Rótulo acima; obrigatório com * cinza; erro com contorno vermelho e mensagem com ícone embaixo.
 import {
   useId,
+  useRef,
+  useState,
+  type KeyboardEvent,
   type InputHTMLAttributes,
   type ReactNode,
   type SelectHTMLAttributes,
@@ -131,23 +134,85 @@ export function CampoSelecao({ rotulo, obrigatorio, erro, opcoes, ...resto }: Re
   )
 }
 
-export interface CampoDataProps extends CampoBase, Omit<AtributosInput, 'type'> {}
+/**
+ * Data por extenso no idioma do estúdio, como na imagem 06 ("sex, 4 dez 2026"), pelo Intl.
+ * Recebe e devolve a data no formato ISO (AAAA-MM-DD); a conta é em UTC para não trocar o dia pelo fuso.
+ */
+export function dataPorExtenso(iso: string, idioma: string): string {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso)
+  if (!m) return ''
+  const data = new Date(Date.UTC(Number(m[1]), Number(m[2]) - 1, Number(m[3])))
+  // cada parte sozinha: junta, o Intl troca o mês por número em alguns idiomas (ex.: pt-PT)
+  const parte = (opcoes: Intl.DateTimeFormatOptions) =>
+    new Intl.DateTimeFormat(idioma, { ...opcoes, timeZone: 'UTC' }).format(data).replace(/\.$/, '')
+  return `${parte({ weekday: 'short' })}, ${parte({ day: 'numeric' })} ${parte({ month: 'short' })} ${parte({ year: 'numeric' })}`
+}
 
-export function CampoData({ rotulo, obrigatorio, erro, ...resto }: Readonly<CampoDataProps>) {
+export interface CampoDataProps extends CampoBase {
+  /** idioma do estúdio, ex.: "pt", "es-ES" (ARCHITECTURE.md §11) */
+  idioma: string
+  /** data inicial em ISO (AAAA-MM-DD) */
+  valorInicial?: string
+  /** texto quando vazio, recebido pronto (RC-23) */
+  textoVazio?: string
+  disabled?: boolean
+  onMudar?: (iso: string) => void
+}
+
+/** Campo de data em pílula com o calendário; o calendário do navegador abre ao tocar ou com Enter, Espaço ou ↓ */
+export function CampoData({ rotulo, obrigatorio, erro, idioma, valorInicial = '', textoVazio, disabled, onMudar }: Readonly<CampoDataProps>) {
   const { id, idErro, descrito } = useIdsDoCampo(erro)
+  const [valor, setValor] = useState(valorInicial)
+  const nativo = useRef<HTMLInputElement>(null)
+
+  function abrirCalendario() {
+    if (disabled) return
+    try {
+      nativo.current?.showPicker()
+    } catch {
+      nativo.current?.focus()
+    }
+  }
+
+  function teclado(evento: KeyboardEvent<HTMLInputElement>) {
+    if (evento.key === 'Enter' || evento.key === ' ' || evento.key === 'ArrowDown') {
+      evento.preventDefault()
+      abrirCalendario()
+    }
+  }
+
   return (
     <Moldura id={id} idErro={idErro} rotulo={rotulo} obrigatorio={obrigatorio} erro={erro}>
       <span className="ds-campo__caixa">
         <input
-          {...resto}
           id={id}
-          type="date"
+          type="text"
+          readOnly
+          value={dataPorExtenso(valor, idioma)}
+          placeholder={textoVazio}
+          disabled={disabled}
           required={obrigatorio}
           aria-invalid={erro ? true : undefined}
           aria-describedby={descrito}
           className="ds-campo__controle ds-campo__controle--com-icone ds-campo__controle--data"
+          onClick={abrirCalendario}
+          onKeyDown={teclado}
         />
         <Icone nome="calendar-days" tamanho="18" className="ds-campo__icone-fim" />
+        {/* calendário do navegador: só abre o seletor; fica fora da ordem de foco e do leitor */}
+        <input
+          ref={nativo}
+          type="date"
+          tabIndex={-1}
+          aria-hidden="true"
+          value={valor}
+          disabled={disabled}
+          className="ds-campo__nativo"
+          onChange={(e) => {
+            setValor(e.target.value)
+            onMudar?.(e.target.value)
+          }}
+        />
       </span>
     </Moldura>
   )
