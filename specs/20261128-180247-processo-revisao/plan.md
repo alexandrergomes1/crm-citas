@@ -111,7 +111,7 @@ linha do §3 da spec; nos três arquivos que ele mesmo escreveu, vale a revisão
 
 | # | Arquivo | O que muda | Requisito / linha §3 | Escreve | Revisa |
 |---|---|---|---|---|---|
-| 1 | `docs/BACKLOG.md` | cópia (§3.1); seção "Propostas e itens a decidir (sem ordem)" com a frase "a ordem é do dono"; linhas de fila, "a decidir" e "fora" | RF-06, RF-07, RF-09, RF-13, RF-22, RF-23; §3: 3, 7, 17, 20, 21, 23, 24, 25 (se E66·2·A), 26–29, 34, 36, 39 (item de construção, se A ou B), 40, 43, 46, 47, 51, 52 | Documentador | Gerente |
+| 1 | `docs/BACKLOG.md` | cópia (§3.1); seção "Propostas e itens a decidir (sem ordem)" com a frase "a ordem é do dono"; linhas de fila, "a decidir" e "fora" | RF-06, RF-07, RF-09, RF-13, RF-22, RF-23; §3: 3, 7, 17, 20, 21, 23, 24, 25 (se E66·2·A), 26–29, 34, 36, 39 (item de construção, se A ou B), 40, 43, 46, 47, 51, 52, 57 (guardar o IP de cada entrada, se E66·1·A: item com spec própria, mudança de banco; não é deste 4b) | Documentador | Gerente |
 | 2 | `docs/STATUS.md` | cópia; estado do 4b; links novos; 18, 41, 53 | RF-17, RF-23; §3: 18, 41, 53 | Documentador | Gerente |
 | 3 | `docs/decisoes/2026-11-27-fundacao.md` | linhas novas (§3.1); linha da aprovação desta spec, que libera a mudança do `AGENTS.md` (linha 9); link da E65; linhas novas: crítica E38, "me cabe julgar", 49, 50, 53, 54 (revisão das conversas feita), branch `chore/base-fundacao` apagada; respostas E66 | RF-11, RF-16, RF-17; §3: 5, 11, 18, 49, 50, 53, 54 | Documentador | Gerente |
 | 4 | `specs/20261128-010000-banco-ligacao/spec.md`, `specs/20261128-010500-design-system-codigo/spec.md` | só a cópia exata | §3: 17 | Engenheiro de DevOps | Gerente |
@@ -143,6 +143,12 @@ linha do §3 da spec; nos três arquivos que ele mesmo escreveu, vale a revisão
 | 30–39 | os 10 arquivos de `.claude/` do §5 | — | — | Arquiteto | ver §5 |
 
 Fora da lista, nada muda. `.claude/settings.json`, `.claude/hooks/` e `.github/` não mudam (spec §8).
+
+**Casamento com a lista provável da spec §7 (CA-07).** A spec diz que a lista final é a do plano. Esta lista tem a
+mais: `.claude/agents/gerente-projeto.md` (T4, linha 35), `docs/auditorias/` (linhas 5 e 6, regra das pastas), as
+duas specs copiadas (linha 4), esta spec, plano, tarefas e revisões (linhas 25 a 27) e `docs/design/canvas/` (linha
+29, só se E66·3·B ou C). Recomendo ao Analista acrescentar à spec §7 só os dois primeiros, que são arquivos de regra
+e de lugar novo; os outros são da própria tarefa ou já cobertos ("docs/design/README.md").
 
 ## 5. Arquivos de `.claude/` (E38·A: permissão do dono na hora)
 | # | Arquivo | O que muda | Requisito | Revisa |
@@ -222,4 +228,5 @@ Fora da lista, nada muda. `.claude/settings.json`, `.claude/hooks/` e `.github/`
   trechos; confere-se no passo 3 do §3.2).
 - Se um subagente consegue pedir a permissão de `.claude/` ao dono.
 - O conteúdo dos 7 itens de segurança de 27/11 e da resposta das 14:17 (dependem de reler a conversa).
-- As fontes legais da recomendação E66·1 (Engenheiro de segurança confere).
+- E66·1: o Engenheiro de segurança conferiu na fonte o Marco Civil (art. 15 e art. 5, VIII), a LGPD (art. 15 e 16) e a
+  regra da Espanha (spec, commit `54ffad0`). **Seguem não verificados na fonte:** Portugal e o RGPD.

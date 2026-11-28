@@ -59,7 +59,8 @@
 - [ ] **T-64 · Designer de produto [P]:** `docs/design/` só se E66·3 for B ou C.
 
 ## Commit 7 · Fecho (etapa 11)
-- [ ] **T-70 · Documentador:** fila (seção sem ordem, "a decidir", linhas "fora"; itens 2, 3, 4, 4b, 5), estado,
+- [ ] **T-70 · Documentador:** fila (seção sem ordem, "a decidir", linhas "fora"; itens 2, 3, 4, 4b, 5; item novo
+  "guardar o IP de cada entrada", com spec própria, se E66·1·A, linha 57 da spec), estado,
   decisões (linhas do plano §4 linha 3), `CHANGELOG.md`; confere que cada papel gravou (A3).
 - [ ] **T-71 · Arquiteto:** ADR 0022 "Aceito"; "Em dia com" do plano e das tarefas.
 
