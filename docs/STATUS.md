@@ -9,11 +9,11 @@
   do Entrar já tem a linha "Aprovação do dono" (esta branch); as outras 9 recebem a linha quando a branch de cada uma
   for trabalhada (esta sessão só envia à `feat/entrar-servico`). Respostas com ajuste ou pedido junto (E29·1, E31·1,
   E31·2, E32·1, E39·2, E39·3) entram no texto de cada spec pelo Analista de requisitos nessa hora.
-- **PR #7 (`feat/entrar-servico`), item 4a: pronto para o pedido de merge** (tarefa F3, Gerente de projeto).
+- **PR #7 (`feat/entrar-servico`), item 4a: em pedido de merge (PR #7)** (tarefa F3, Gerente de projeto).
   CI 5/5 verde no `13d6b9d`. Revisores (código, segurança, design, dados, auditor de risco): todos "Libera com
   ressalvas". QA: "Libera com ressalvas". **CA-22 depende do dono:** conferir as telas na prévia (E23·2·A).
   Depois do `13d6b9d` entraram `afc5198` (texto da spec) e `6b1f3a2` (teste de pedido forjado, RF-10) e este
-  registro; o pedido de merge cita o commit final, com a CI dele verde.
+  registro; o pedido de merge cita o último commit do PR, com a CI verde nele.
   [Spec](https://github.com/alexandrergomes1/crm-citas/tree/feat/entrar-servico/specs/20261128-030000-entrar-servico) ·
   [como rodar](https://github.com/alexandrergomes1/crm-citas/blob/feat/entrar-servico/CONTRIBUTING.md#9-como-rodar).
 - **Avaliação do antigo** (só leitura, nada copiado; E43·A autorizou as ideias): `docs/produto/avaliacao-crm-agenda/`
@@ -27,7 +27,8 @@
 1. **E38·A1:** travas em `.claude/` depois do merge do Entrar (PR #7), numa conversa nova, num PR só para elas.
    **D2:** PRs do Dependabot e a `main`.
 2. Apagar `chore/base-fundacao` (o dono, na página de branches).
-3. Pedido de merge do PR #7 (F3, Gerente de projeto) e conferência das telas na prévia (CA-22).
+3. Item 4a em pedido de merge (PR #7): autorização do merge (F3, Gerente de projeto) e conferência das telas na
+   prévia (CA-22).
 
 **Respondidas em 28/11 e ainda por aplicar nas specs (Analista, quando cada branch for trabalhada):** E29·1 (PIN),
 E29·3 (troca), E31·1 (caixa opcional), E32·1 (aviso de caixa aberto), E40·B, E45·A (Checkout e Caixa), E46·A
@@ -70,7 +71,7 @@ E29·3 (troca), E31·1 (caixa opcional), E32·1 (aviso de caixa aberto), E40·B,
 | E37·A | spec do item 2 (com o R15) e ordem de merge #4, #2, #3 |
 | E38·A | ligar as travas do Claude em `.claude/` num PR próprio (pendente da permissão na hora) |
 | E38·A1 | travas do Claude depois do merge do Entrar, conversa nova, PR próprio (troca o "pendente" da E38·A) |
-| E47·1·A, E47·2·A, E47·3·A | ajustes das telas do Entrar; termo neutro no lugar de "estúdio" (Designer decide) |
+| E47·1·A, E47·2·A, E47·3·A | ajustes das telas do Entrar; termo neutro no lugar de "estúdio": "empresa" (pt, es), "business" (en) |
 | E48·A | a IA pode enviar à `feat/entrar-servico` (PR #7) |
 | E24–E41 | respostas do relatório de 28/11 e aprovação das 10 specs (detalhe e falas em `docs/decisoes/`) |
 
