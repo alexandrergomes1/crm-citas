@@ -12,7 +12,27 @@ TypeScript, React com TanStack Start, Supabase (Postgres), Cloudflare Workers, p
 Versões e bibliotecas extras entram por spec (`ARCHITECTURE.md` §12).
 
 ## Como rodar
-Entra com a spec da fundação técnica. Ainda não há código.
+**Precisa ter:** Node 26.13.1 (arquivo `.nvmrc`; o `package.json` aceita `>=26.13.1 <27`), pnpm 12.23.0 (campo
+`packageManager`) e Docker (só para o banco local). Nenhuma senha ou chave é necessária.
+
+1. Instalar as dependências: `pnpm install`
+2. Rodar o app: `pnpm dev` e abrir `http://localhost:3000`
+
+**Comandos fixos** (scripts do `package.json`):
+
+| Comando | Para quê |
+|---|---|
+| `pnpm build` | gerar o app |
+| `pnpm typecheck` | checagem de tipos |
+| `pnpm lint` | lint, inclui as camadas |
+| `pnpm test` | testes de unidade |
+| `pnpm test:e2e` | telas em 390 e 1440 px (Chromium) |
+| `pnpm db:start` | ligar o banco local (só o Postgres, em Docker) |
+| `pnpm db:test` | testes do banco **local** |
+| `pnpm db:stop` | desligar o banco local |
+
+Antes de enviar: `pnpm typecheck`, `pnpm lint` e `pnpm test`; mais `pnpm test:e2e` se mexeu em tela e `pnpm db:test`
+se mexeu em `supabase/`. O banco remoto nunca muda daqui: só pela CI (`AGENTS.md` §1).
 
 ## Mapa
 
