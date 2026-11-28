@@ -1,6 +1,6 @@
 # Plano · Revisão do processo (item 4b da fila)
 
-- **Em dia com:** E65 (E66·1 a E66·3 em aberto, na aprovação da spec)
+- **Em dia com:** E67·A (28/11/2026; E66·1 a E66·3 em aberto, na aprovação da spec) · ajustes da 5b do Gerente aplicados
 - **Spec:** `specs/20261128-180247-processo-revisao/spec.md` (commit `1b9fe13`) · **Branch:** `chore/processo-revisao`
 - **Escrito por:** Arquiteto de software · **Norma:** modelo C4 e ADR · **Revisa:** Gerente de projeto (etapa 5b)
 - **Tipo:** texto e regras (`docs/guias/processo-sdd.md` §3). Prova: revisão de outro papel e CI verde.
@@ -61,11 +61,15 @@ de uma) → `docs/`.
 
 ### 2.4 Resposta ao dono (RF-20, uma linha, na mensagem de aprovação)
 "Não estava certo: a pasta de cada tarefa passa a guardar só spec, plano, tarefas, ficha e as revisões dela;
-auditorias e revisões de conversa vão para `docs/auditorias/`, e a regra fica em `docs/guias/pastas.md`."
+auditorias e revisões de conversa vão para [docs/auditorias](https://github.com/alexandrergomes1/crm-citas/tree/chore/processo-revisao/docs/auditorias),
+e a regra fica em [docs/guias/pastas.md](https://github.com/alexandrergomes1/crm-citas/blob/chore/processo-revisao/docs/guias/pastas.md)
+(plano: [plan.md §2](https://github.com/alexandrergomes1/crm-citas/blob/chore/processo-revisao/specs/20261128-180247-processo-revisao/plan.md))."
+Os links valem depois do commit 2 (pastas); antes dele, o link do plano é o único que abre. Depois do merge, o
+Documentador troca `chore/processo-revisao` por `previas` nos links que ficarem em arquivo.
 
 ## 3. Registros que estão só na `feat/agenda` (spec §9, ADR 0022)
 
-### 3.1 O que entra, como (primeiro commit, Engenheiro de DevOps)
+### 3.1 O que entra, como (primeiro commit: Documentador nos registros e na auditoria; Engenheiro de DevOps só nas duas specs)
 | Arquivo | Como | Confere |
 |---|---|---|
 | `docs/BACKLOG.md` | cópia exata do `85501a0` | `git diff 85501a0 -- docs/BACKLOG.md` vazio |
@@ -92,26 +96,32 @@ conflito (a conferir no passo 3 do §3.2).
    `feat/agenda`: apagar a auditoria velha, mover as ideias (§2.2), corrigir links, ficha T7 (RF-07).
 4. O PR das travas do Claude (E38·A1) não tem arquivo em comum com o 4b fora da fila e do estado; pode vir antes ou
    depois. A posição na fila é do dono; o técnico só pede que quem vier depois traga a `previas` antes do PR.
+   **Se a E38·A1 entrar antes**, o caminho da trava muda de
+   `specs/20261128-005000-fundacao-tecnica/travas-claude-propostas/decisao-com-prova.mjs` para
+   `.claude/hooks/decisao-com-prova.mjs` (destino escrito no próprio arquivo): os comandos do §3.1 e do §7 usam o novo,
+   e a exceção do §2.1 deixa de existir.
 5. As outras branches de módulo (`feat/agendamento` e as demais): trazem a `previas` antes de qualquer trabalho.
 
 ## 4. Arquivos permitidos (lista fechada, CA-07)
-Um papel por arquivo. "Revisa" é a etapa 9 (texto, outro papel que não escreveu). O Gerente de projeto não escreve
-nenhum arquivo de regra fora dos que já são dele (molde, guia, `AGENTS.md`), para poder revisar os outros; os dele
-são revistos pelo Analista de requisitos. Na etapa 10 o Analista confere cada RF e cada linha do §3 da spec.
+Um papel por arquivo. "Revisa" é a etapa 9 (texto, outro papel que não escreveu). O Gerente de projeto só tem
+Read, Grep e Glob (`.claude/agents/gerente-projeto.md`): não escreve nada; revisa. `AGENTS.md`, `processo-sdd.md` e
+o molde passam ao Analista de requisitos, e o Gerente revisa. Os relatórios de quem só lê (Gerente, Revisor de
+design) são gravados, com o texto literal deles, pelo Documentador. Na etapa 10 o Analista confere cada RF e cada
+linha do §3 da spec; nos três arquivos que ele mesmo escreveu, vale a revisão do Gerente (quem constrói não revisa).
 
 | # | Arquivo | O que muda | Requisito / linha §3 | Escreve | Revisa |
 |---|---|---|---|---|---|
-| 1 | `docs/BACKLOG.md` | cópia (§3.1); seção "Propostas e itens a decidir (sem ordem)" com a frase "a ordem é do dono"; linhas de fila, "a decidir" e "fora" | RF-06, RF-07, RF-09, RF-13, RF-22, RF-23; §3: 3, 7, 17, 20, 21, 23, 24, 25 (se E66·2·A), 26–29, 34, 36, 39 (item de construção, se A ou B), 40, 43, 46, 47, 51, 52 | Documentador (cópia: DevOps, só no 1º commit) | Gerente |
+| 1 | `docs/BACKLOG.md` | cópia (§3.1); seção "Propostas e itens a decidir (sem ordem)" com a frase "a ordem é do dono"; linhas de fila, "a decidir" e "fora" | RF-06, RF-07, RF-09, RF-13, RF-22, RF-23; §3: 3, 7, 17, 20, 21, 23, 24, 25 (se E66·2·A), 26–29, 34, 36, 39 (item de construção, se A ou B), 40, 43, 46, 47, 51, 52 | Documentador | Gerente |
 | 2 | `docs/STATUS.md` | cópia; estado do 4b; links novos; 18, 41, 53 | RF-17, RF-23; §3: 18, 41, 53 | Documentador | Gerente |
-| 3 | `docs/decisoes/2026-11-27-fundacao.md` | linhas novas (§3.1); link da E65; linhas novas: crítica E38, "me cabe julgar", 49, 50, 53, 54 (revisão das conversas feita), branch `chore/base-fundacao` apagada; respostas E66 | RF-11, RF-16, RF-17; §3: 5, 11, 18, 49, 50, 53, 54 | Documentador | Gerente |
+| 3 | `docs/decisoes/2026-11-27-fundacao.md` | linhas novas (§3.1); linha da aprovação desta spec, que libera a mudança do `AGENTS.md` (linha 9); link da E65; linhas novas: crítica E38, "me cabe julgar", 49, 50, 53, 54 (revisão das conversas feita), branch `chore/base-fundacao` apagada; respostas E66 | RF-11, RF-16, RF-17; §3: 5, 11, 18, 49, 50, 53, 54 | Documentador | Gerente |
 | 4 | `specs/20261128-010000-banco-ligacao/spec.md`, `specs/20261128-010500-design-system-codigo/spec.md` | só a cópia exata | §3: 17 | Engenheiro de DevOps | Gerente |
-| 5 | `docs/auditorias/2026-11-28-processo-agenda.md` | cópia exata | RF-19 | Documentador | Gerente |
+| 5 | `docs/auditorias/2026-11-28-processo-agenda.md` | cópia exata (1º commit) | RF-19 | Documentador | Gerente |
 | 6 | `docs/auditorias/conversas/2026-11-28-sessao-7Rj.md`, `-9ep.md`, `-8F1.md`, `-958.md` | cópia exata, depois da conferência | RF-17, RF-19 | Documentador (conferência antes: Engenheiro de segurança) | Gerente |
 | 7 | `docs/guias/pastas.md` (novo) | a regra do §2.1 | RF-18 | Arquiteto | Gerente |
 | 8 | `docs/adr/0022-...md` | este commit; Status muda para Aceito na aprovação | RF-18, spec §9 | Arquiteto | Gerente (5b) |
-| 9 | `AGENTS.md` | §4 T5; §5 RF-13; §6 T6; §7 RF-10 e RF-12; §10 mapa | RF-05, RF-06, RF-10, RF-12, RF-13, CA-04 | Gerente de projeto | Analista |
-| 10 | `docs/guias/processo-sdd.md` | etapa 3 (E44), etapa 6 (T2), etapa 7 (T5), linha 7b (T4); sai o §6 "Lacuna" | RF-02, RF-04, RF-05, RF-09; §3: 2, 14 | Gerente de projeto | Analista |
-| 11 | `docs/moldes/pergunta.md` | bloco "▶ PRECISA DE VOCÊ" / "▶ Nada para você" e "Só para informar"; "o que é" e "o que muda" antes das opções; link clicável; "Como voltar atrás" (A2); "Ficha visual": referências para agregar e "decisão simples"; "o dono decide pelo que vê"; "Proibido": mensagem só com códigos, caminho solto | RF-10, RF-11, RF-12, RF-15, RF-16; §3: 4, 5, 6, 10, 11, 13 | Gerente de projeto | Analista |
+| 9 | `AGENTS.md` | §4 T5; §5 RF-13; §6 T6; §7 RF-10 e RF-12; §10 mapa. **Só muda com a aprovação do dono registrada em `docs/decisoes/`** (cabeçalho do `AGENTS.md`): a "Aprovação do dono" desta spec ganha também uma linha nas decisões (Documentador, linha 3), antes deste arquivo mudar | RF-05, RF-06, RF-10, RF-12, RF-13, CA-04 | Analista de requisitos | Gerente |
+| 10 | `docs/guias/processo-sdd.md` | etapa 3 (E44), etapa 6 (T2), etapa 7 (T5), linha 7b (T4); sai o §6 "Lacuna" | RF-02, RF-04, RF-05, RF-09; §3: 2, 14 | Analista de requisitos | Gerente |
+| 11 | `docs/moldes/pergunta.md` | bloco "▶ PRECISA DE VOCÊ" / "▶ Nada para você" e "Só para informar"; "o que é" e "o que muda" antes das opções; link clicável; "Como voltar atrás" (A2); "Ficha visual": referências para agregar e "decisão simples"; "o dono decide pelo que vê"; "Proibido": mensagem só com códigos, caminho solto | RF-10, RF-11, RF-12, RF-15, RF-16; §3: 4, 5, 6, 10, 11, 13 | Analista de requisitos | Gerente |
 | 12 | `DESIGN.md` | §10 item 9 (T1), texto do Anexo A | RF-01; §3: 10 | Designer de produto | Revisor de design |
 | 13 | `ARCHITECTURE.md` | §11: tira "larguras que o `DESIGN.md` vai definir" e aponta 390 e 1440; §9 recuperação a qualquer momento como opção futura paga; §12 só gratuito (E23·3·A) e R2 para arquivos; módulo opcional por estúdio (E31·1); exceções E40·B e E39·3·i apontam para `SECURITY.md` §5; §11 página de status só se E66·2·B | RF-09, RF-21; §3: 2, 25, 27, 35, 42, 44, 45 | Arquiteto | Gerente |
 | 14 | `src/app/AGENTS.md` | linha 22: larguras 390 e 1440 px (E15·1), sem citar o §6 que sai | RF-09; §3: 2 | Arquiteto | Gerente |
@@ -127,7 +137,7 @@ são revistos pelo Analista de requisitos. Na etapa 10 o Analista confere cada R
 | 24 | `docs/produto/central-de-ajuda.md` | "como a da Cloudflare" | §3: 31 | Analista de requisitos | Gerente |
 | 25 | `specs/20261128-180247-processo-revisao/spec.md` | "Em dia com"; caminhos novos (§2.3); Status e "Aprovação do dono" na etapa 7; "Aprovação do merge" na 13 (DevOps) | RF-03, RF-19 | Analista de requisitos (merge: DevOps) | Gerente |
 | 26 | `specs/20261128-180247-processo-revisao/plan.md`, `tasks.md` | estes arquivos; "Em dia com" a cada resposta | RF-03 | Arquiteto | Gerente (5b) |
-| 27 | `specs/20261128-180247-processo-revisao/revisao-5b.md`, `revisao-texto.md`, `revisao-design.md` (novos) | relatórios gravados das revisões (regra §2.1) | CA-08 | quem revisa | — |
+| 27 | `specs/20261128-180247-processo-revisao/revisao-5b.md`, `revisao-texto.md`, `revisao-design.md` (novos) | relatórios gravados das revisões (regra §2.1), texto literal de quem revisou | CA-08 | Documentador (Gerente e Revisor de design só leem) | — |
 | 28 | `CHANGELOG.md` | uma linha do 4b | AGENTS.md §9 | Documentador | Gerente |
 | 29 | `docs/design/README.md` e `docs/design/canvas/*` | só se E66·3 for B (trocar nomes) ou C (apagar) | §3: 33 | Designer de produto | Revisor de design |
 | 30–39 | os 10 arquivos de `.claude/` do §5 | — | — | Arquiteto | ver §5 |
@@ -142,7 +152,7 @@ Fora da lista, nada muda. `.claude/settings.json`, `.claude/hooks/` e `.github/`
 | 32 | `.claude/agents/analista-requisitos.md` | "Faz": texto T8; ler a parte do antigo do módulo ao fazer a spec (E44) | RF-08; §3: 14 | Gerente |
 | 33 | `.claude/agents/documentador.md` | registrar toda proposta futura no mesmo turno; conferir, depois de cada resposta, que cada papel gravou (A3) | RF-13; §3: 9 | Gerente |
 | 34 | `.claude/agents/revisor-codigo.md` | divergência entre o escrito e o construído bloqueia | RF-14(2) | Gerente |
-| 35 | `.claude/agents/gerente-projeto.md` | "Quando": etapa 7b (portão). **Fora da lista provável da spec §7**: a T4 manda "o portão 7b do `gerente-projeto`" e o agente não tem a etapa | RF-04 | Analista |
+| 35 | `.claude/agents/gerente-projeto.md` | "Quando": etapa 7b (portão). **Fora da lista provável da spec §7**: a T4 manda "o portão 7b do `gerente-projeto`" e o agente não tem a etapa | RF-04 | Gerente (o arquivo é dele, mas quem escreve é o Arquiteto) |
 | 36 | `.claude/skills/falar-com-o-dono/SKILL.md` | passo 9 = T3; bloco do que precisa do dono; links clicáveis | RF-03, RF-10, RF-12 | Analista |
 | 37 | `.claude/skills/construir-tarefa/SKILL.md` | passo 0: frase da T4 | RF-04 | Gerente |
 | 38 | `.claude/skills/planejar-tarefa/SKILL.md` | ler a parte do antigo do módulo (E44), com autorização | §3: 14 | Gerente |
@@ -178,7 +188,8 @@ Fora da lista, nada muda. `.claude/settings.json`, `.claude/hooks/` e `.github/`
   acrescentar) e as linhas de aprovação das specs; os testes de gancho não mudam, porque nenhum gancho muda. O job
   `segredos` (gitleaks) varre as cópias em `docs/auditorias/`.
 - **Antes de enviar, na sessão:** `pnpm typecheck`, `pnpm lint`, `pnpm test` (`AGENTS.md` §1) e
-  `node specs/20261128-005000-fundacao-tecnica/travas-claude-propostas/decisao-com-prova.mjs origin/previas` com saída 0.
+  `node specs/20261128-005000-fundacao-tecnica/travas-claude-propostas/decisao-com-prova.mjs origin/previas` com saída 0
+  (se a E38·A1 entrar antes: `node .claude/hooks/decisao-com-prova.mjs origin/previas`, §3.2 passo 4).
 - **Conferência das cópias:** `git diff` vazio contra `85501a0` nos arquivos do §3.1 (menos a linha E26·1·B).
 
 ## 8. Riscos
@@ -188,6 +199,7 @@ Fora da lista, nada muda. `.claude/settings.json`, `.claude/hooks/` e `.github/`
 | Dono não está presente para a permissão de `.claude/` | os 10 arquivos ficam "pendentes" (§5); o resto segue |
 | Revisão de conversa com dado de terceiro | conferência do Engenheiro de segurança antes do commit; achou, o arquivo não entra |
 | PR grande | commits por tema (§6); revisão por commit |
+| A T1 diz que o Revisor de design "grava o relatório", mas o agente dele só lê | o Documentador grava o texto literal do relatório; muda o lugar, não o sentido (spec A6). Dar Write ao revisor seria mudança de regra: fica para o dono, se quiser |
 | Itens que pedem reler conversa (§3: 30, 49) | quem relê grava o que achar; o que não achar sai "não verificado", sem inventar (CA-06) |
 
 ## 9. Decisões técnicas deste plano (cada uma em uma linha)
@@ -200,7 +212,10 @@ Fora da lista, nada muda. `.claude/settings.json`, `.claude/hooks/` e `.github/`
    controle e faz as próprias mudanças de lugar.
 6. `gerente-projeto.md` entra na lista por causa da T4 (fora da lista provável da spec).
 7. Os 10 arquivos de `.claude/` num bloco só, na conversa principal, com o dono presente.
-8. O Gerente escreve só os arquivos que já são dele e revisa os outros; os dele, revisa o Analista.
+8. O Gerente só lê (Read, Grep, Glob): revisa tudo e não escreve; `AGENTS.md`, guia e molde são do Analista; os
+   relatórios de quem só lê, o Documentador grava (ajuste da 5b).
+9. Cópia dos registros e da auditoria: Documentador (`AGENTS.md` §2); Engenheiro de DevOps só nas duas specs.
+10. `AGENTS.md` só muda depois da linha de aprovação nas decisões (cabeçalho do `AGENTS.md`).
 
 ## 10. Não verificado
 - Que o merge `previas` → `feat/agenda` junte o `DESIGN.md` §10 sem conflito (só calculado pela distância dos

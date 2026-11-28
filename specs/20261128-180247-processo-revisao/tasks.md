@@ -1,6 +1,6 @@
 # Tarefas · Revisão do processo (item 4b da fila)
 
-- **Em dia com:** E65 (E66·1 a E66·3 em aberto, na aprovação da spec)
+- **Em dia com:** E67·A (28/11/2026; E66·1 a E66·3 em aberto, na aprovação da spec) · ajustes da 5b aplicados
 - **Spec:** `spec.md` · **Plano:** `plan.md` · **Escrito por:** Arquiteto de software · **Norma:** modelo C4 e ADR
 - **Regra (T6):** um arquivo, um agente por vez; cada tarefa faz commit do que é sua antes de devolver; proibido
   `git stash`, `git reset --hard` e `git checkout -- <arquivo>`. Tarefas marcadas **[P]** podem rodar juntas (os
@@ -8,16 +8,21 @@
 - **Nada começa antes** da spec com "Status: Approved" e da etapa 7b (portão do Gerente), já pela T4.
 
 ## Antes da construção (etapas 5 a 7)
-- [ ] **T-00 · Gerente de projeto (5b):** revisa spec, plano, tarefas e ADR 0022; grava em `revisao-5b.md`.
+- [ ] **T-00 · Gerente de projeto (5b):** revisa spec, plano, tarefas e ADR 0022 (só lê). **Documentador** grava o
+  relatório literal em `revisao-5b.md`.
 - [ ] **T-01 · Analista de requisitos (7):** mensagem de aprovação no molde (E66·1 a E66·3; linha RF-20 do plano §2.4;
-  aviso dos 10 pedidos de permissão de `.claude/`); grava "Aprovação do dono" e as respostas E66 na spec.
+  aviso dos 10 pedidos de permissão de `.claude/`); grava "Aprovação do dono" e as respostas E66 na spec. O
+  **Documentador** grava a mesma aprovação em `docs/decisoes/` (libera a mudança do `AGENTS.md`).
 - [ ] **T-02 · Gerente de projeto (7b):** spec, plano e tarefas com o mesmo "Em dia com"; 5b sem "pendente".
 
 ## Commit 1 · Registros trazidos da `feat/agenda` (plano §3.1)
-- [ ] **T-10 · Engenheiro de DevOps:** copia de `85501a0` `docs/BACKLOG.md`, `docs/STATUS.md`, as duas specs
-  (`banco-ligacao`, `design-system-codigo`) e as decisões, com a E26·1·B igual à da `previas` e a linha nova
-  "E26·1·B (substituída na Agenda e no Agendamento)"; copia a auditoria para `docs/auditorias/2026-11-28-processo-agenda.md`.
-  Confere: `git diff 85501a0` vazio nos arquivos exatos; trava `decisao-com-prova.mjs origin/previas` com saída 0.
+- [ ] **T-10 · Documentador:** copia de `85501a0` `docs/BACKLOG.md`, `docs/STATUS.md` e as decisões, com a E26·1·B
+  igual à da `previas` e a linha nova "E26·1·B (substituída na Agenda e no Agendamento)"; copia a auditoria para
+  `docs/auditorias/2026-11-28-processo-agenda.md`.
+- [ ] **T-11 · Engenheiro de DevOps [P com T-10]:** copia de `85501a0` as duas specs (`banco-ligacao`,
+  `design-system-codigo`).
+- Confere (T-10 e T-11): `git diff 85501a0` vazio nos arquivos exatos; trava `decisao-com-prova.mjs origin/previas`
+  com saída 0 (caminho do plano §7).
 
 ## Commit 2 · Pastas (RF-18 a RF-20)
 - [ ] **T-20 · Engenheiro de segurança:** confere as 4 revisões de conversa (dado de terceiro, segredo); veredito por
@@ -28,16 +33,16 @@
 
 ## Commit 3 · Travas fora de `.claude/` e linhas velhas (RF-01, 02, 04, 05, 06, 09)
 - [ ] **T-30 · Designer de produto:** `DESIGN.md` §10 item 9 (T1).
-- [ ] **T-31 · Gerente de projeto [P com T-30, T-32, T-33]:** `docs/guias/processo-sdd.md`: etapa 3 (E44), etapa 6
+- [ ] **T-31 · Analista de requisitos [P com T-30, T-32, T-33]:** `docs/guias/processo-sdd.md`: etapa 3 (E44), etapa 6
   (T2), etapa 7 (T5), linha 7b (T4), tira o §6.
 - [ ] **T-32 · Arquiteto [P]:** `ARCHITECTURE.md` §11 (larguras) e `src/app/AGENTS.md` linha 22.
 - [ ] **T-33 · Engenheiro de DevOps [P]:** `CONTRIBUTING.md` (cabeçalho, links para `previas`, §8 "não anexar o
   `crm-agenda` sem autorização", gitleaks na sessão).
-- [ ] **T-34 · Gerente de projeto (depois da T-31):** `AGENTS.md` §4 (T5), §6 (T6).
+- [ ] **T-34 · Analista de requisitos (depois da T-31 e da linha de aprovação nas decisões, T-01):** `AGENTS.md` §4 (T5), §6 (T6).
 
 ## Commit 4 · Molde e `AGENTS.md` (RF-10 a RF-13, RF-16; CA-02, CA-03, CA-04)
-- [ ] **T-40 · Gerente de projeto:** `docs/moldes/pergunta.md` (plano §4 linha 11).
-- [ ] **T-41 · Gerente de projeto (depois da T-40):** `AGENTS.md` §5 (RF-13), §7 (RF-10, RF-12), §10 (pastas e auditorias).
+- [ ] **T-40 · Analista de requisitos:** `docs/moldes/pergunta.md` (plano §4 linha 11).
+- [ ] **T-41 · Analista de requisitos (depois da T-40):** `AGENTS.md` §5 (RF-13), §7 (RF-10, RF-12), §10 (pastas e auditorias).
 
 ## Commit 5 · `.claude/` (E38·A: permissão do dono na hora; plano §5)
 - [ ] **T-C · Arquiteto, na conversa principal, com o dono presente:** os 10 arquivos do plano §5 (linhas 30 a 39),
@@ -60,7 +65,7 @@
 
 ## Revisão e merge (etapas 9 a 13)
 - [ ] **T-90 · Revisores (plano §4 e §5, coluna "Revisa"):** um relatório por papel; Revisor de design em
-  `revisao-design.md`, os outros em `revisao-texto.md`. Nenhum "Bloqueia".
+  `revisao-design.md`, os outros em `revisao-texto.md`; o Documentador grava o texto literal de quem só lê. Nenhum "Bloqueia".
 - [ ] **T-91 · QA:** veredito com a CI verde (5 jobs) e a trava de aprovações com saída 0.
 - [ ] **T-92 · Analista de requisitos (10):** RF-01 a RF-23 e cada linha do §3 da spec.
 - [ ] **T-93 · Gerente de projeto (12):** pedido de merge no molde novo, com a ordem de merge do plano §3.2.
