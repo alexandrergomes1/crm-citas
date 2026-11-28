@@ -1,6 +1,6 @@
-// Escolher estúdio e Trocar de estúdio no navegador (spec specs/20261128-030000-entrar-servico; plan.md §9; T3).
+// Escolher empresa e Trocar de empresa no navegador (spec specs/20261128-030000-entrar-servico; plan.md §9; T3).
 // CA-19 escolher, carregando, erro, trocar e sair · CA-20 idioma do estúdio depois de escolher (RF-35).
-// Pessoa fictícia com dois estúdios: "Estúdio Lírio" (pt) e "Estudio Nube" (es), criados pelo preparo global.
+// Pessoa fictícia com duas empresas: "Clínica Lírio" (pt) e "Estudio Nube" (es), criadas pelo preparo global.
 import { expect, test, type APIResponse, type Page, type Route } from '@playwright/test'
 import { capturar, conta, ehCelular, entrar, esperarPagina, violacoes } from './preparo-global'
 
@@ -41,10 +41,12 @@ test('escolher, carregando, erro, trocar e sair, com o idioma de cada estúdio (
   // Dois estúdios e nenhum escolhido: Entrar leva a Escolher estúdio (RF-11)
   await entrar(page, c, '/escolher-estudio')
   expect(new URL(page.url()).search).toBe('')
-  await expect(page.getByRole('heading', { name: 'Escolher estúdio' })).toBeVisible()
-  const lista = page.getByRole('list', { name: 'Escolher estúdio' })
+  await expect(page.getByRole('heading', { name: 'Escolher empresa' })).toBeVisible()
+  const lista = page.getByRole('list', { name: 'Escolher empresa' })
   await expect(lista.locator('.ds-linha__titulo')).toHaveText([lirio, nube])
-  await expect(page.getByText('2 estúdios')).toBeVisible()
+  await expect(page.getByText('2 empresas')).toBeVisible()
+  // A letra do quadrado pula a palavra genérica do começo (DESIGN.md §8b; E47·1·A): Clínica Lírio → L, Estudio Nube → N
+  await expect(lista.locator('.ds-inicial')).toHaveText(['L', 'N'])
   // A lista começa logo abaixo da linha do topo, sem o espaço de 16 do molde (revisão de design R3)
   const topo = await page.locator('.escolher__topo').boundingBox()
   const inicioDaLista = await lista.boundingBox()
@@ -52,7 +54,7 @@ test('escolher, carregando, erro, trocar e sair, com o idioma de cada estúdio (
   await capturar(page, info, 'escolher-estudio')
   expect(await violacoes(page)).toEqual([])
 
-  // Carregando: a lista demora; aparecem as linhas cinza e o anúncio "Carregando estúdios"
+  // Carregando: a lista demora; aparecem as linhas cinza e o anúncio "Carregando empresas"
   let liberar: () => void = () => {}
   const segurado = new Promise<void>((pronto) => (liberar = pronto))
   await naLista(page, lirio, async (rota, resposta, corpo) => {
@@ -61,7 +63,7 @@ test('escolher, carregando, erro, trocar e sair, com o idioma de cada estúdio (
   })
   await page.reload()
   await expect(page.locator('.ds-carregando[data-visivel="sim"]')).toBeVisible()
-  await expect(page.getByRole('status')).toHaveText('Carregando estúdios')
+  await expect(page.getByRole('status')).toHaveText('Carregando empresas')
   await capturar(page, info, 'escolher-estudio-carregando')
   expect(await violacoes(page)).toEqual([])
   liberar()
@@ -87,7 +89,7 @@ test('escolher, carregando, erro, trocar e sair, com o idioma de cada estúdio (
   // Com a lista de volta, o foco fica no título (o botão tocado sumiu), não perdido na página
   await page.keyboard.press('Enter')
   await expect(lista.locator('.ds-linha__titulo')).toHaveText([lirio, nube])
-  await expect(page.getByRole('heading', { name: 'Escolher estúdio' })).toBeFocused()
+  await expect(page.getByRole('heading', { name: 'Escolher empresa' })).toBeFocused()
   await page.keyboard.press('Tab')
   await expect(lista.getByRole('button', { name: lirio })).toBeFocused()
 
@@ -106,15 +108,15 @@ test('escolher, carregando, erro, trocar e sair, com o idioma de cada estúdio (
   await expect(page.locator('html')).toHaveAttribute('lang', 'es')
   await expect(page.locator('.ds-bolinha')).toHaveText(c.email[0]!.toUpperCase())
   const tuCuenta = await abrirConta(page, 'Tu cuenta', celular)
-  await expect(tuCuenta.getByText('Cambiar de estudio')).toBeVisible()
+  await expect(tuCuenta.getByText('Cambiar de empresa')).toBeVisible()
   await capturar(page, info, 'sua-conta-com-troca-es')
   expect(await violacoes(page)).toEqual([])
 
-  // Trocar de estúdio: volta à lista (ainda no idioma do estúdio atual) e escolhe o de português
-  await tuCuenta.getByText('Cambiar de estudio').click()
+  // Trocar de empresa: volta à lista (ainda no idioma do estúdio atual) e escolhe o de português
+  await tuCuenta.getByText('Cambiar de empresa').click()
   await page.waitForURL('**/escolher-estudio')
-  await expect(page.getByRole('heading', { name: 'Elegir estudio' })).toBeVisible()
-  const listaEs = page.getByRole('list', { name: 'Elegir estudio' })
+  await expect(page.getByRole('heading', { name: 'Elegir empresa' })).toBeVisible()
+  const listaEs = page.getByRole('list', { name: 'Elegir empresa' })
   await expect(listaEs.locator('.ds-linha__titulo')).toHaveText([lirio, nube])
   await capturar(page, info, 'trocar-estudio')
   expect(await violacoes(page)).toEqual([])
@@ -122,9 +124,9 @@ test('escolher, carregando, erro, trocar e sair, com o idioma de cada estúdio (
   await page.waitForURL((url) => url.pathname === '/')
   await expect(page.locator('html')).toHaveAttribute('lang', 'pt')
 
-  // Sua conta com mais de um estúdio: "Trocar de estúdio" aparece (RF-14)
+  // Sua conta com mais de uma empresa: "Trocar de empresa" aparece (RF-14)
   const suaConta = await abrirConta(page, 'Sua conta', celular)
-  await expect(suaConta.getByText('Trocar de estúdio')).toBeVisible()
+  await expect(suaConta.getByText('Trocar de empresa')).toBeVisible()
   await capturar(page, info, 'sua-conta-com-troca')
   expect(await violacoes(page)).toEqual([])
 

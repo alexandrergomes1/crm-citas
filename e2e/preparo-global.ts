@@ -81,7 +81,8 @@ export default function preparoGlobal(): void {
   const senhaLonga = () => `${randomBytes(48).toString('base64url')}-ficticia`.padEnd(70, 'x').slice(0, 70)
   const senha = () => `${randomBytes(12).toString('base64url')}-ficticia`
   const contasDe = (projeto: Projeto): Record<TipoDeConta, Conta> => ({
-    // A inicial da bolinha Sua conta é a primeira letra do e-mail: "U" e "D" (DESIGN.md §8b).
+    // A inicial da bolinha Sua conta é a primeira letra do e-mail: "U" e "D" (DESIGN.md §8b). Os nomes das empresas
+    // mostram letras diferentes no quadrado (palavra genérica pulada; E47·1·A): Aurora → A, Lírio → L, Nube → N.
     um: {
       email: `um.${projeto}.${rodada}@exemplo.test`,
       senha: senhaLonga(),
@@ -91,7 +92,7 @@ export default function preparoGlobal(): void {
       email: `dois.${projeto}.${rodada}@exemplo.test`,
       senha: senha(),
       estudios: [
-        { nome: `Estúdio Lírio ${rodada}`, idioma: 'pt', papel: 'dona' },
+        { nome: `Clínica Lírio ${rodada}`, idioma: 'pt', papel: 'dona' },
         { nome: `Estudio Nube ${rodada}`, idioma: 'es', papel: 'recepcao' },
       ],
     },

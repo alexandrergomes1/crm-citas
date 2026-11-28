@@ -63,15 +63,15 @@ describe('CA-20 · arquivos de idioma', () => {
       esconderSenha: 'Esconder senha',
       erro: 'Não foi possível entrar. Confira o e-mail e a senha e tente de novo.',
     })
-    expect(t.escolherEstudio.titulo).toBe('Escolher estúdio')
-    expect(t.escolherEstudio.carregando).toBe('Carregando estúdios')
+    expect(t.escolherEstudio.titulo).toBe('Escolher empresa')
+    expect(t.escolherEstudio.carregando).toBe('Carregando empresas')
     expect(t.escolherEstudio.erroTitulo).toBe('Não foi possível carregar')
     expect(t.suaConta).toEqual({
       nome: 'Sua conta',
       minhaConta: 'Minha conta',
       preferencias: 'Preferências',
       meuFaturamento: 'Meu faturamento',
-      trocarDeEstudio: 'Trocar de estúdio',
+      trocarDeEstudio: 'Trocar de empresa',
       sair: 'Sair',
     })
   })
@@ -83,12 +83,12 @@ describe('formatar', () => {
   })
 
   it.each([
-    ['pt', 1, '1 estúdio'],
-    ['pt', 2, '2 estúdios'],
-    ['es', 1, '1 estudio'],
-    ['es', 2, '2 estudios'],
-    ['en', 1, '1 studio'],
-    ['en', 2, '2 studios'],
+    ['pt', 1, '1 empresa'],
+    ['pt', 2, '2 empresas'],
+    ['es', 1, '1 empresa'],
+    ['es', 2, '2 empresas'],
+    ['en', 1, '1 business'],
+    ['en', 2, '2 businesses'],
   ] as const)('contar em %s: %d → %s', (idioma, n, esperado) => {
     expect(contar(idioma, textosDe(idioma).escolherEstudio.quantos, n)).toBe(esperado)
   })

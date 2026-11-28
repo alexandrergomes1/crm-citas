@@ -12,8 +12,8 @@ export const pt = {
   // Uma frase por código (spec RF-22). Nenhuma tela desta spec mostra estas frases: Entrar usa entrar.erro.
   erros: {
     sem_login: 'Sua sessão terminou. Entre de novo.',
-    estudio_trocado: 'O estúdio mudou em outro aparelho. A tela vai recarregar.',
-    sem_estudio: 'Escolha um estúdio para continuar.',
+    estudio_trocado: 'A empresa mudou em outro aparelho. A tela vai recarregar.',
+    sem_estudio: 'Escolha uma empresa para continuar.',
     sem_permissao: 'Você não tem permissão para fazer isso.',
     entrada_invalida: 'Confira os dados e tente de novo.',
     conflito: 'Isso já mudou. Recarregue e tente de novo.',
@@ -31,9 +31,9 @@ export const pt = {
     erro: 'Não foi possível entrar. Confira o e-mail e a senha e tente de novo.',
   },
   escolherEstudio: {
-    titulo: 'Escolher estúdio',
-    quantos: { one: '{n} estúdio', other: '{n} estúdios' },
-    carregando: 'Carregando estúdios',
+    titulo: 'Escolher empresa',
+    quantos: { one: '{n} empresa', other: '{n} empresas' },
+    carregando: 'Carregando empresas',
     erroTitulo: 'Não foi possível carregar',
   },
   suaConta: {
@@ -41,7 +41,7 @@ export const pt = {
     minhaConta: 'Minha conta',
     preferencias: 'Preferências',
     meuFaturamento: 'Meu faturamento',
-    trocarDeEstudio: 'Trocar de estúdio',
+    trocarDeEstudio: 'Trocar de empresa',
     sair: 'Sair',
   },
 }

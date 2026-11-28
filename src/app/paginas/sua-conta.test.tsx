@@ -8,21 +8,21 @@ const nada = () => {}
 const t = textosDe('pt')
 
 describe('Itens de Sua conta (DESIGN.md §8b)', () => {
-  it('com mais de um estúdio: a ordem do §8b, com "Trocar de estúdio"', () => {
+  it('com mais de uma empresa: a ordem do §8b, com "Trocar de empresa"', () => {
     expect(itensDaConta(t, 2).map((i) => i.rotulo)).toEqual([
       'Minha conta',
       'Preferências',
       'Meu faturamento',
-      'Trocar de estúdio',
+      'Trocar de empresa',
       'Sair',
     ])
   })
 
-  it('com um estúdio só: sem "Trocar de estúdio"', () => {
+  it('com uma empresa só: sem "Trocar de empresa"', () => {
     expect(itensDaConta(t, 1).map((i) => i.id)).toEqual(['minhaConta', 'preferencias', 'meuFaturamento', 'sair'])
   })
 
-  it('só Trocar de estúdio e Sair funcionam; o resto está em desenvolvimento', () => {
+  it('só Trocar de empresa e Sair funcionam; o resto está em desenvolvimento', () => {
     expect(itensDaConta(t, 2).filter((i) => !i.emDesenvolvimento).map((i) => i.id)).toEqual(['trocarDeEstudio', 'sair'])
   })
 })

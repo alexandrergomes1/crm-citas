@@ -89,9 +89,9 @@ test('entrar: carregando, sucesso, cookie só do servidor e nenhuma ida ao banco
   expect(await page.evaluate(() => document.cookie)).not.toContain('sessao')
   expect(await page.evaluate(() => [localStorage.length, sessionStorage.length])).toEqual([0, 0])
 
-  // Sua conta com um estúdio só: sem "Trocar de estúdio" (RF-14)
+  // Sua conta com uma empresa só: sem "Trocar de empresa" (RF-14)
   const caixa = await abrirSuaConta(page, ehCelular(info))
-  await expect(caixa.getByText('Trocar de estúdio')).toHaveCount(0)
+  await expect(caixa.getByText('Trocar de empresa')).toHaveCount(0)
   await expect(caixa.getByText('Sair', { exact: true })).toBeVisible()
   // Itens do menu aberto em pílula, mesmo os de duas linhas (DESIGN.md §4; revisão de design R6)
   if (!ehCelular(info)) {

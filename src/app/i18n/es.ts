@@ -10,8 +10,8 @@ export const es: Textos = {
   },
   erros: {
     sem_login: 'Tu sesión ha terminado. Vuelve a entrar.',
-    estudio_trocado: 'El estudio ha cambiado en otro dispositivo. La pantalla se va a recargar.',
-    sem_estudio: 'Elige un estudio para continuar.',
+    estudio_trocado: 'La empresa ha cambiado en otro dispositivo. La pantalla se va a recargar.',
+    sem_estudio: 'Elige una empresa para continuar.',
     sem_permissao: 'No tienes permiso para hacer esto.',
     entrada_invalida: 'Revisa los datos e inténtalo de nuevo.',
     conflito: 'Esto ya ha cambiado. Recarga e inténtalo de nuevo.',
@@ -29,9 +29,9 @@ export const es: Textos = {
     erro: 'No se ha podido entrar. Revisa el correo electrónico y la contraseña e inténtalo de nuevo.',
   },
   escolherEstudio: {
-    titulo: 'Elegir estudio',
-    quantos: { one: '{n} estudio', other: '{n} estudios' },
-    carregando: 'Cargando estudios',
+    titulo: 'Elegir empresa',
+    quantos: { one: '{n} empresa', other: '{n} empresas' },
+    carregando: 'Cargando empresas',
     erroTitulo: 'No se ha podido cargar',
   },
   suaConta: {
@@ -39,7 +39,7 @@ export const es: Textos = {
     minhaConta: 'Mi cuenta',
     preferencias: 'Preferencias',
     meuFaturamento: 'Mi facturación',
-    trocarDeEstudio: 'Cambiar de estudio',
+    trocarDeEstudio: 'Cambiar de empresa',
     sair: 'Salir',
   },
 }

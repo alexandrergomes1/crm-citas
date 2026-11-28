@@ -1,48 +1,116 @@
-// Tela Escolher estúdio (spec RF-11 a RF-14, RF-33, CA-20; ficha E41·4·A). renderToString, sem jsdom.
+// Tela Escolher empresa (spec RF-11 a RF-14, RF-33, CA-20; ficha E41·4·A). renderToString, sem jsdom.
 import { readFileSync, readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { renderToString } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { textosDe } from '@/app/i18n/textos'
-import { EscolherEstudioVista, type EstadoEscolher } from './escolher-estudio'
+import { EscolherEstudioVista, inicialDe, type EstadoEscolher } from './escolher-estudio'
 
 const nada = () => {}
 const estudios = [
   { orgId: '00000000-0000-4000-8000-000000000001', nome: 'Estúdio Aurora' },
-  { orgId: '00000000-0000-4000-8000-000000000002', nome: 'Estúdio Lírio' },
+  { orgId: '00000000-0000-4000-8000-000000000002', nome: 'Clínica Lírio' },
 ]
 const vista = (estado: EstadoEscolher, idioma: 'pt' | 'es' | 'en' = 'pt') =>
   renderToString(
     <EscolherEstudioVista textos={textosDe(idioma)} idioma={idioma} estado={estado} onEscolher={nada} onTentar={nada} onSair={nada} />,
   )
 
-describe('Escolher estúdio · lista', () => {
+describe('Escolher empresa · lista', () => {
   const html = vista({ tipo: 'lista', estudios })
 
   it('título, contador no subtítulo e "Sair" claro, sem botão preto (DESIGN.md §8b)', () => {
-    expect(html).toContain('>Escolher estúdio</h1>')
-    expect(html).toContain('>2 estúdios<')
+    expect(html).toContain('>Escolher empresa</h1>')
+    expect(html).toContain('>2 empresas<')
     expect(html).not.toContain('ds-botao--principal')
     expect(html).toMatch(/ds-botao--claro[^>]*>.*Sair/)
   })
 
-  it('cada linha é um botão com o nome do estúdio; quadrado e › são enfeite', () => {
+  it('cada linha é um botão com o nome da empresa; quadrado e › são enfeite', () => {
     expect(html.match(/<button type="button" class="ds-linha escolher__linha"/g)).toHaveLength(2)
     expect(html).toContain('<span aria-hidden="true" class="escolher__enfeite">')
     expect(html).toContain('>Estúdio Aurora<')
-    expect(html).toContain('>Estúdio Lírio<')
+    expect(html).toContain('>Clínica Lírio<')
   })
 
-  it('o identificador do estúdio não aparece na página (RF-33)', () => {
+  it('o identificador da empresa não aparece na página (RF-33)', () => {
     for (const { orgId } of estudios) expect(html).not.toContain(orgId)
   })
 
-  it('um estúdio: "1 estúdio"', () => {
-    expect(vista({ tipo: 'lista', estudios: estudios.slice(0, 1) })).toContain('>1 estúdio<')
+  it('uma empresa: "1 empresa"', () => {
+    expect(vista({ tipo: 'lista', estudios: estudios.slice(0, 1) })).toContain('>1 empresa<')
+  })
+
+  it('o quadrado mostra a letra do nome próprio, não a da palavra genérica (E47·1·A)', () => {
+    expect(html).toMatch(/aria-label="Estúdio Aurora"><span aria-hidden="true">A<\/span>/)
+    expect(html).toMatch(/aria-label="Clínica Lírio"><span aria-hidden="true">L<\/span>/)
   })
 })
 
-describe('Escolher estúdio · carregando e erro', () => {
+describe('Letra do quadrado da empresa (DESIGN.md §8b; E47·1·A)', () => {
+  it.each([
+    // exemplos do DESIGN.md §8b
+    ['Estúdio Aurora', 'A'],
+    ['Clínica Lírio', 'L'],
+    ['Salão Bela', 'B'],
+    ['Studio da Ana', 'A'],
+    ['Spa', 'S'],
+    ['Bela Pele', 'B'],
+    // passo 1: sem diferença de maiúscula e acento; todas as genéricas da lista
+    ['ESTUDIO aurora', 'A'],
+    ['estúdio Órbita', 'Ó'],
+    ['Salón Rosa', 'R'],
+    ['Barbería Toro', 'T'],
+    ['Barbearia Navalha', 'N'],
+    ['Barbershop Kings', 'K'],
+    ['Espaço Zen', 'Z'],
+    ['Espacio Luz', 'L'],
+    ['Centro Vida', 'V'],
+    ['Center Glow', 'G'],
+    ['Centre Belle', 'B'],
+    ['Instituto Pele', 'P'],
+    ['Institute Skin', 'S'],
+    ['Ateliê Unha', 'U'],
+    ['Atelier Marie', 'M'],
+    ['Clinic Derma', 'D'],
+    ['Salon Iris', 'I'],
+    // pula só a primeira palavra, uma vez
+    ['Estúdio Clínica Lírio', 'C'],
+    ['Spa Spa', 'S'],
+    // genérica fora do começo não é pulada
+    ['Aurora Estúdio', 'A'],
+    // passo 2: ligações depois da genérica, uma ou mais
+    ['Clínica do Lírio', 'L'],
+    ['Studio of the Sun', 'S'],
+    ['Centro de la Belleza', 'B'],
+    ['Salón del Mar', 'M'],
+    ['Espaço das Flores', 'F'],
+    ['Instituto dos Olhos', 'O'],
+    ['Studio el Toro', 'T'],
+    // ligação no começo, sem genérica antes: não é pulada
+    ['Da Vinci Estética', 'D'],
+    // passo 3: letra ou número, como está escrito, em maiúscula
+    ['Estúdio 24 Horas', '2'],
+    ['Estúdio "Íris"', 'Í'],
+    ['Espaço éclat', 'É'],
+    ['Estúdio Aná', 'A'],
+    ['Studio Élan', 'É'],
+    ['  Estúdio   Aurora  ', 'A'],
+    // passo 4: nada sobra → a primeira letra da palavra pulada; sem letra nem número → o primeiro caractere
+    ['Estúdio', 'E'],
+    ['Clínica da', 'C'],
+    ['Estúdio ★', 'E'],
+    ['★★', '★'],
+    ['', ''],
+    ['   ', ''],
+    // dedução do código: a palavra seguinte sem letra passa à próxima
+    ['Estúdio & Bela', 'B'],
+  ])('%j → %j', (nome, letra) => {
+    expect(inicialDe(nome)).toBe(letra)
+  })
+})
+
+describe('Escolher empresa · carregando e erro', () => {
   it('carregando é anunciado (role="status")', () => {
     expect(vista({ tipo: 'carregando' })).toContain('role="status"')
   })
@@ -73,7 +141,7 @@ describe('Escolher estúdio · carregando e erro', () => {
   })
 })
 
-describe('Escolher estúdio · idiomas (CA-20)', () => {
+describe('Escolher empresa · idiomas (CA-20)', () => {
   it.each(['es', 'en'] as const)('em %s', (idioma) => {
     const t = textosDe(idioma)
     const html = vista({ tipo: 'lista', estudios }, idioma)

@@ -33,9 +33,43 @@ export interface EscolherEstudioVistaProps {
   refTentar?: Ref<HTMLButtonElement>
 }
 
-/** Primeira letra do nome do estúdio, para o quadrado dourado (DESIGN.md §3 · --brand). */
-function inicialDe(nome: string): string {
-  return Array.from(nome.trim())[0]?.toLocaleUpperCase() ?? ''
+/** Palavras genéricas do começo do nome, já sem acento e em minúscula (DESIGN.md §8b, passo 1; E47·1·A). */
+const GENERICAS = new Set([
+  'estudio', 'studio', 'clinica', 'clinic', 'salao', 'salon', 'barbearia', 'barberia', 'barbershop', 'spa',
+  'espaco', 'espacio', 'centro', 'center', 'centre', 'instituto', 'institute', 'atelie', 'atelier',
+])
+/** Palavras de ligação puladas depois da genérica (DESIGN.md §8b, passo 2). */
+const LIGACOES = new Set(['de', 'da', 'do', 'das', 'dos', 'del', 'la', 'el', 'the', 'of'])
+/** Primeira letra ou número, com os acentos que vêm junto (como está escrito). */
+const LETRA = /[\p{L}\p{N}]\p{M}*/u
+
+/** Palavra para comparar com as listas: sem diferença de maiúscula e acento, só letras e números. */
+function comparavel(palavra: string): string {
+  return palavra
+    .normalize('NFD')
+    .replace(/\p{M}/gu, '')
+    .replace(/[^\p{L}\p{N}]/gu, '')
+    .toLowerCase()
+}
+
+/**
+ * Letra do quadrado dourado da empresa (DESIGN.md §8b "Quadrado da inicial da empresa"; §3 · --brand).
+ * 1. A primeira palavra, se genérica (lista acima), é pulada uma vez; 2. depois dela, as ligações também;
+ * 3. a letra é o primeiro caractere de letra ou número do que sobra, em maiúscula, como está escrito;
+ * 4. se nada sobra, a primeira letra da palavra pulada; nome sem letra nem número, o primeiro caractere.
+ * Dedução (o §8b não diz): palavra seguinte sem letra nem número ("Estúdio & Bela") passa à próxima ("B").
+ */
+export function inicialDe(nome: string): string {
+  const palavras = nome.trim().split(/\s+/u).filter(Boolean)
+  const primeira = palavras[0]
+  if (primeira === undefined) return ''
+  let resto = palavras
+  if (GENERICAS.has(comparavel(primeira))) {
+    resto = palavras.slice(1)
+    while (resto[0] !== undefined && LIGACOES.has(comparavel(resto[0]))) resto = resto.slice(1)
+  }
+  const letra = resto.join(' ').match(LETRA) ?? primeira.match(LETRA)
+  return (letra?.[0] ?? Array.from(nome.trim())[0] ?? '').toLocaleUpperCase()
 }
 
 /**
