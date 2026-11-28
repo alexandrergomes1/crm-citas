@@ -3,6 +3,16 @@
 
 ## Ainda não lançado
 
+### Em pedido de merge (PR #7) · item 4a da fila, Entrar e camada de serviço
+Spec [`specs/20261128-030000-entrar-servico/`](https://github.com/alexandrergomes1/crm-citas/tree/feat/entrar-servico/specs/20261128-030000-entrar-servico)
+aprovada pelo dono; o merge ainda espera a autorização dele.
+- Telas Entrar, Escolher empresa e Sua conta, em português, espanhol e inglês; tela inicial só com a barra do topo.
+- Sessão e camada única de serviço: as portas por onde o app fala com o banco, com a matriz de permissões
+  (ADR 0020) e registro de auditoria.
+- Proteção do Entrar: limite de tentativas e recusa de pedido forjado vindo de outro site.
+- Banco local: migrations novas com testes de isolamento por estúdio; nada aplicado em banco remoto.
+- Testes de integração e de telas (390 e 1440 px) rodando contra o banco local por `scripts/banco-local.mjs`.
+
 ### Em revisão (PR #5, rascunho) · item 3 da fila, ligar o banco
 Spec `specs/20261128-010000-banco-ligacao/` ainda sem aprovação do dono; nada foi juntado.
 - Fase A: migrations de estúdios, membros, trava por estúdio e políticas base (ADR 0005), com 77 testes de banco.

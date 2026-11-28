@@ -45,3 +45,24 @@ Regras: `AGENTS.md` §8 e `docs/guias/processo-sdd.md` §2 (etapas 12 e 13).
 - Pôr segredo, dado pessoal ou de saúde onde o `AGENTS.md` §6 proíbe.
 - Mexer fora dos arquivos que o plano permite, ou adivinhar biblioteca, API, esquema ou comando (`AGENTS.md` §6).
 - Enviar outra mudança depois do pedido de merge sem refazer a revisão e o pedido.
+
+## 9. Como rodar
+Os comandos são os scripts do [`package.json`](https://github.com/alexandrergomes1/crm-citas/blob/feat/entrar-servico/package.json)
+(lista no `AGENTS.md` §1). Só o banco **local**: nada aqui liga ao banco remoto.
+
+1. `pnpm install`.
+2. `pnpm typecheck`, `pnpm lint` e `pnpm test` (não precisam do banco).
+3. `pnpm db:start` sobe o banco local do Supabase (precisa de Docker) e grava uma chave de assinatura nova em
+   `supabase/signing_keys.json` a cada vez. `pnpm db:test` roda os testes do banco; `pnpm db:stop` desliga.
+4. Com o banco de pé:
+   - `pnpm test:integracao`: testes de `tests/integracao/`;
+   - `pnpm test:e2e`: telas em 390 e 1440 px. O servidor do app sobe sozinho e nunca reaproveita um já ligado.
+
+Os dois passam por [`scripts/banco-local.mjs`](https://github.com/alexandrergomes1/crm-citas/blob/feat/entrar-servico/scripts/banco-local.mjs):
+ele lê `supabase status`, recusa endereço que não seja `127.0.0.1`/`localhost`, gera chaves novas a cada execução
+(nunca impressas nem gravadas em arquivo) e as passa ao comando. A chave local de administração só vai para
+`tests/` e para o preparo do `e2e/` (opção `--com-admin`); o servidor do app roda sem ela. Se o banco estiver
+fora do ar, o script para e pede `pnpm db:start`.
+
+Chromium instalado fora do lugar padrão: ponha o caminho do executável em `PLAYWRIGHT_CHROMIUM`
+([`playwright.config.ts`](https://github.com/alexandrergomes1/crm-citas/blob/feat/entrar-servico/playwright.config.ts)).

@@ -2,19 +2,20 @@
 
 > Aprovado pelo dono em 27/11/2026 (E18). Escrito por: Documentador · Revisado por: Gerente de projeto
 
-## Onde estamos (28/11, tarde)
+## Onde estamos (28/11, noite)
 - **Na `previas`:** PRs #1 a #4. A branch `chore/base-fundacao` está toda na `previas`; o dono autorizou apagar, mas
   o acesso desta sessão recusou: **o dono apaga** em https://github.com/alexandrergomes1/crm-citas/branches (lixeira).
 - **Respostas do relatório gravadas** (`docs/decisoes/2026-11-27-fundacao.md`) e **as 10 specs aprovadas**. Só a spec
   do Entrar já tem a linha "Aprovação do dono" (esta branch); as outras 9 recebem a linha quando a branch de cada uma
   for trabalhada (esta sessão só envia à `feat/entrar-servico`). Respostas com ajuste ou pedido junto (E29·1, E31·1,
   E31·2, E32·1, E39·2, E39·3) entram no texto de cada spec pelo Analista de requisitos nessa hora.
-- **PR #7 rascunho** (`feat/entrar-servico`): spec Approved; P4 feita; matriz de permissões (ADR 0020, S7 e B7).
-  Revisões: código, segurança, design, dados e **auditor de risco: liberam com ressalvas**, ressalvas resolvidas
-  (último `d91ec4a`). Unidade: 398 verdes. Banco: 11 migrations e 12 arquivos pgTAP verdes (280) num Postgres 16
-  local com papéis e auth simulados (não é o Supabase oficial; a prova final é a CI). T1 e T2 feitas (`e61ad94`: telas
-  Entrar, Escolher estúdio, Sua conta; pt/es/en; 481 testes; build sem servidor em `dist/client`). Depois: T3, integração
-  e revisões das telas feitas (até `829bb85`); o que falta está nas pendências técnicas, item 1. Não verificado: integração e e2e (precisam do Supabase local).
+- **PR #7 (`feat/entrar-servico`), item 4a: pronto para o pedido de merge** (tarefa F3, Gerente de projeto).
+  CI 5/5 verde no `13d6b9d`. Revisores (código, segurança, design, dados, auditor de risco): todos "Libera com
+  ressalvas". QA: "Libera com ressalvas". **CA-22 depende do dono:** conferir as telas na prévia (E23·2·A).
+  Depois do `13d6b9d` entraram `afc5198` (texto da spec) e `6b1f3a2` (teste de pedido forjado, RF-10) e este
+  registro; o pedido de merge cita o commit final, com a CI dele verde.
+  [Spec](https://github.com/alexandrergomes1/crm-citas/tree/feat/entrar-servico/specs/20261128-030000-entrar-servico) ·
+  [como rodar](https://github.com/alexandrergomes1/crm-citas/blob/feat/entrar-servico/CONTRIBUTING.md#9-como-rodar).
 - **Avaliação do antigo** (só leitura, nada copiado; E43·A autorizou as ideias): `docs/produto/avaliacao-crm-agenda/`
   `regras-do-banco.md` (74 regras, 2 leituras), `seguranca-do-banco.md` (25) e `permissoes-e-pin.md`. Banco do antigo
   **esgotado** para o núcleo. As ideias entram em cada spec quando a branch dela for trabalhada.
@@ -26,6 +27,7 @@
 1. **E38·A1:** travas em `.claude/` depois do merge do Entrar (PR #7), numa conversa nova, num PR só para elas.
    **D2:** PRs do Dependabot e a `main`.
 2. Apagar `chore/base-fundacao` (o dono, na página de branches).
+3. Pedido de merge do PR #7 (F3, Gerente de projeto) e conferência das telas na prévia (CA-22).
 
 **Respondidas em 28/11 e ainda por aplicar nas specs (Analista, quando cada branch for trabalhada):** E29·1 (PIN),
 E29·3 (troca), E31·1 (caixa opcional), E32·1 (aviso de caixa aberto), E40·B, E45·A (Checkout e Caixa), E46·A
@@ -73,13 +75,15 @@ E29·3 (troca), E31·1 (caixa opcional), E32·1 (aviso de caixa aberto), E40·B,
 | E24–E41 | respostas do relatório de 28/11 e aprovação das 10 specs (detalhe e falas em `docs/decisoes/`) |
 
 ## Pendências técnicas para a próxima conversa
-1. **Entrar, antes do pedido de merge** (branch `feat/entrar-servico`, até `829bb85`; E48·A): (a) inicial da bolinha,
-   (b) parágrafo vazio de Escolher estúdio, (c) T3 em [`e2e/`](https://github.com/alexandrergomes1/crm-citas/tree/feat/entrar-servico/e2e)
-   e (d) [`tests/integracao/registro.test.ts`](https://github.com/alexandrergomes1/crm-citas/blob/feat/entrar-servico/tests/integracao/registro.test.ts)
-   **feitos**; (e) revisões feitas, ressalvas resolvidas. **Falta:** aplicar E47 (letra do nome próprio, termo neutro
-   no lugar de "estúdio" a definir pelo Designer, ícone `user` no
-   [`DESIGN.md`](https://github.com/alexandrergomes1/crm-citas/blob/feat/entrar-servico/DESIGN.md), tirar "crm-citas"
-   da tela inicial); segunda revisão; QA; CI do PR #7; prévia para o dono conferir as telas (E23·2·A: spec própria).
+1. **Ressalvas do Entrar, em dívida** (aceitas para o merge; o dono decide se viram item da fila):
+   (a) cópias de peças do design system em
+   [`src/app/paginas/`](https://github.com/alexandrergomes1/crm-citas/tree/feat/entrar-servico/src/app/paginas),
+   porque `src/app/ui` estava fora dos arquivos permitidos (plano §10); (b) seta para cima do menu;
+   (c) barra provisória N1/N2; (d) o endereço `/escolher-estudio` ainda mostra "estudio";
+   (e) **R-A: `cf-connecting-ip` a corrigir antes de qualquer publicação**; (f) relatório público do Playwright
+   na CI. **Para o Arquiteto registrar em ADR** (decisões técnicas do Engenheiro de software): servidor do e2e sem
+   a chave admin e `globalSetup` em processo filho; `reuseExistingServer: false`; `PLAYWRIGHT_CHROMIUM`; leitura
+   dos dois formatos da saída de `supabase db query` (mudam com as variáveis `AI_AGENT`/`CLAUDECODE`).
 2. Sem Docker aqui: o banco pode ser testado num Postgres 16 local com papéis e auth simulados (`/var/tmp/pgscratch`,
    porta 54329: stub de `anon`, `authenticated`, `service_role`, `auth.uid()`, `auth.jwt()`, `auth.users`, pgcrypto,
    btree_gist e pgtap no esquema `extensions`). Não substitui o `pnpm db:test`.

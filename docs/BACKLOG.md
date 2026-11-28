@@ -15,7 +15,7 @@ antes do núcleo (E36·A); leva "4a" para não mudar os números citados nas dec
 | 2 | Fundação técnica: ferramentas, app vazio, Spec Kit instalado, travas automáticas (gitleaks e Dependabot, E14·3) e CI; travas automáticas: trazer as do projeto antigo pela skill trazer-do-antigo, com autorização do dono item por item (pedido da mensagem 41) | `AGENTS.md` §1, E14·3, Pedido (travas) | feito (PR #4) |
 | 3 | Ligar o banco existente, tabela por tabela, com autorização do dono item por item | pedido (a) anterior ao E1, `AGENTS.md` §3 regra 4 | em revisão (PR #5, rascunho) |
 | 4 | Design system no código | `DESIGN.md` | em revisão (PR #6, rascunho) |
-| 4a | Entrar e camada de serviço (login, sessão, 6 portas, auditoria, base de idiomas) | E36·A, E4·1, E3·1 | spec em revisão (branch `feat/entrar-servico`) |
+| 4a | Entrar e camada de serviço (login, sessão, 6 portas, auditoria, base de idiomas) | E36·A, E4·1, E3·1 | em pedido de merge (PR #7) |
 | 5 | Núcleo, um módulo por spec: Agenda, Agendamento, Clientes, Formulários, Catálogo, Checkout, Caixa | E3·2, `ARCHITECTURE.md` §2 | livre |
 | 6 | Os outros módulos, um por vez, incluindo a central de ajuda e o assistente de IA | E3·2, pedido do dono (módulos), E21·1 | livre |
 | 6a | Perfis e permissões ajustáveis (por módulo e ação, por pessoa, papéis padrão personalizáveis); até lá só o dono usa, com acesso total | E42·A (ajustada) | livre |
