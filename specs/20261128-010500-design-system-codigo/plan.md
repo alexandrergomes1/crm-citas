@@ -39,7 +39,8 @@ Fora desta lista nada muda (`AGENTS.md` §6). Arquivo novo que uma ferramenta cr
 - `eslint.config.mjs` (só o bloco do §6.4) e `eslint.camadas.test.ts` (só os 2 casos do §6.4)
 
 **Estilos e componentes (Engenheiro de software)**
-- `src/app/estilos/app.css` · `tokens.css` · `base.css`
+- `src/app/estilos/app.css` · `tokens.css` · `base.css` (o `base.css` também leva o CSS do ícone, classes `ds-ic` e
+  `ds-ic--14` a `ds-ic--24`, só com os tokens `--ic-*`; registrado depois da revisão de código, 28/11)
 - `src/app/ui/icone.tsx` (o único que importa `lucide-react`)
 - `src/app/ui/` em pares `.tsx` + `.css`: `botao` (RC-1, RC-2, RC-3) · `contador` (RC-4) · `seletor` (RC-6) ·
   `campos` (RC-7, RC-8, RC-9) · `etiqueta-status` (RC-10) · `bloco-lista` (RC-11, RC-12, RC-22) · `camadas` (RC-13 a
@@ -82,9 +83,15 @@ Documentador.
 | RT-7 | `--h-controle` e `--toque` (44 celular, 40 computador) · `--h-campo: 44px` · `--h-linha-lista: 64px` · `--h-barra-baixo: 72px` · `--h-cabecalho: 64px` · `--h-linha-tabela: 40px` · `--h-cab-tabela: 36px` · `--h-barra-topo: 64px` · `--w-menu-aberto: 232px` · `--w-menu-recolhido: 84px` · `--w-submenu: 216px` · `--h-seletor: 44px` · `--h-seletor-item: 36px` · `--folga-seletor: 4px` · `--d-agendar: 52px` · `--h-status: 36px` · `--d-caixinha: 22px` · `--w-interruptor: 44px` · `--h-interruptor: 26px` · `--h-contador: 20px` · `--w-contador-min: 20px` · `--folga-contador: 7px` · `--folga-btn-ic-esq: 12px` · `--folga-btn-ic-dir: 10px` · `--espaco-ic: 6px` · `--w-titulo-barra: 280px` · `--w-busca-geral: 320px` · `--w-busca-tela: 280px` · `--w-menu-flutua: 240px` · `--w-janelinha: 340px` · `--w-painel: 480px` · `--d-bolinha: 40px` · `--d-bolinha-tabela: 24px` · `--d-bolinha-tempo: 36px` · `--d-ponto: 8px` · `--w-faixa: 4px` · `--w-linha-tempo: 2px` |
 | RT-8 | `--foco-cor: var(--ink3)` · `--foco-largura: 2px` · `--foco-afastado: 2px` · `--opac-desativado: .6` · `--atraso-carregando: 300ms` |
 | Ícone (só com E25·2) | `--ic-14` `--ic-16` `--ic-18` `--ic-20` `--ic-24` · `--ic-traco` |
+| Troca de desenho (criados na construção, registrados depois da revisão de código, 28/11) | `--fs-texto` (15 celular, 14 computador) · `--mostra-celular` (`flex` / `none`) · `--mostra-computador` (`none` / `flex`) · `--w-busca-tela-atual` (100 % celular, `--w-busca-tela` computador) |
+
+- **Motivo dos 4 tokens de troca:** o ponto de troca de 840 px (E25·3) só pode estar escrito no `tokens.css`
+  (RT-9 / CA-2 proíbem `px` fora dele, e propriedade CSS não funciona dentro de `@media`). Por isso o `@media` do
+  `tokens.css` troca o valor destes tokens, e os componentes só os leem, sem `@media` próprio.
 
 - **Celular × computador:** um só ponto de troca, `@media (min-width: <E25·3>)`, só no `tokens.css` (troca `--margem`,
-  `--h-controle`, `--toque` e a escala de texto 15 → 14) e nos componentes que mudam de desenho (RC-18 × RC-19). O
+  `--h-controle`, `--toque`, `--fs-texto`, `--mostra-*` e `--w-busca-tela-atual`); os componentes que mudam de desenho
+  (RC-18 × RC-19) só leem esses tokens. O
   número vem da resposta da E25·3. A vitrine e os testes usam 390 e 1440, longe de qualquer ponto de troca proposto.
 - **RT-9 / CA-2:** nenhum `#`, `rgb(`, `rgba(`, `hsl(` nem número com `px`, `rem` ou `em` fora do `tokens.css`; nenhum
   `style={...}` nos `.tsx` de `src/app/ui` e `src/app/paginas/vitrine.tsx`. Provado por teste (§7).
