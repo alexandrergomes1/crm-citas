@@ -40,16 +40,9 @@ Gravações (criar, alterar, excluir bloqueio) seguem o mesmo caminho por `src/s
 ## 2. Lacunas para o Analista de requisitos (a spec não cobre; não decido, `AGENTS.md` §4)
 Achadas ao planejar. Cada uma com recomendação; o plano abaixo funciona com a recomendação e diz o que muda na outra.
 
-- **L-1 · Login, sessão e registro (portas 1, 2 e 6) não têm spec.** O RF-09 e o CA-03 pedem as 6 portas e "sem login,
-  nada", mas não existe tela de entrar, leitura da sessão no servidor, ligação do app ao banco nem a tabela do
-  registro (o item 3, `plan.md` §8, deixa a auditoria para "spec própria, antes do primeiro módulo que grava").
-  Sem login o dono também não confere a Agenda na prévia (CA-12). Os 7 módulos do núcleo precisam da mesma peça.
-  - **L-1·A (recomendo):** spec própria "Entrar e camada de serviço" (portas 1 a 6 em `src/server/portas/`, cliente
-    do banco em `src/data/cliente.ts`, tabela do registro, tela Entrar), antes de construir qualquer módulo do núcleo.
-    É ordem da fila: vai ao dono pelo Gerente de projeto. A Agenda usa o contrato do §5.1.
-  - **L-1·B:** tudo isso entra nesta spec (arquivos extras no §9.B). Custo: a spec cresce, passa de 3 dúvidas de acesso
-    (tela de entrar e prazo de guarda do registro são decisões do dono) e o `AGENTS.md` §4 manda dividir; os outros
-    módulos esperam a Agenda.
+- **L-1 · Login, sessão e registro: resolvida pelo dono (E36·A, 28/11/2026).** Login, sessão, as 6 portas, a ligação
+  do app ao banco e a auditoria entram na spec própria "Entrar e camada de serviço" (branch `feat/entrar-servico`),
+  antes do núcleo. A Agenda não constrói nada disso: usa o contrato do §5.1.
 - **L-2 · Nome no cabeçalho da coluna.** `public.membros` não tem nome (ADR 0005 · T2 deixou "o nome da profissional"
   para esta spec). A spec não diz de onde vem o nome nem quem o grava (é dado pessoal da equipe). Recomendo: uma
   coluna de nome de exibição (só o que aparece na coluna), gravada por tarefa interna até existir a Equipe; em
@@ -58,8 +51,8 @@ Achadas ao planejar. Cada uma com recomendação; o plano abaixo funciona com a 
   grade, linha da hora atual, data em pílula com calendário e a escolha do "Equipe N de M". A spec (§4) manda parar e
   entrar no `DESIGN.md` com o dono primeiro: entram pela ficha visual (etapa 6, tarefa T2), nunca na construção.
 - **L-4 · Banco local para as telas.** O `db:start` do item 2 desliga Auth, API e gateway (`-x gotrue,...,kong,...`); um
-  app com login precisa deles nos testes de tela, e o job `telas` da CI hoje não sobe banco. Com L-1·A resolve-se lá;
-  com L-1·B, aqui (`package.json`, `.github/workflows/ci.yml`, Engenheiro de DevOps).
+  app com login precisa deles nos testes de tela, e o job `telas` da CI hoje não sobe banco. Resolve-se na spec
+  "Entrar e camada de serviço" (E36·A); a Agenda não muda `package.json` nem `.github/`.
 - **L-5 (só texto da spec):** o cabeçalho diz "Branch: `feat/agenda` (da `previas`)", mas a branch é empilhada sobre
   as bases (§10). Ajustar a linha.
 
@@ -132,15 +125,15 @@ valer também para `bloqueios`.
 
 ## 5. Código por camada (regra de dependência do `ARCHITECTURE.md` §3, já travada pelo lint do item 2)
 
-### 5.1 Contrato que a Agenda usa da camada de serviço (L-1)
-A Agenda **não** escreve as portas. Usa (de `src/server/portas/`, da spec da L-1·A) uma função que monta a ação:
+### 5.1 Contrato que a Agenda usa da spec "Entrar e camada de serviço" (E36·A, `feat/entrar-servico`)
+A Agenda **não** escreve as portas. Usa (de `src/server/portas/`, daquela spec) uma função que monta a ação:
 recebe a permissão pedida, o esquema da entrada e o trabalho; antes do trabalho resolve as portas 1 a 4 e entrega um
 contexto com `usuarioId`, `orgId` e `papel` (lidos da sessão; o `orgId` nunca vem da entrada), e o acesso ao banco
 com a sessão da pessoa (porta 5); depois grava o registro (porta 6) com nome do evento e identificadores, sem texto
 livre. Erros saem como **códigos** (ex.: `sem_login`, `sem_permissao`, `entrada_invalida`, `conflito`), nunca com dado.
-Se a spec da L-1·A der outro formato, só `ler-dia.ts` e `bloqueios.ts` se ajustam.
+O formato que vale é o do plano daquela spec; se for outro, só `ler-dia.ts` e `bloqueios.ts` se ajustam.
 
-**Recomendação para aquela spec (não decidida aqui, sem ADR):** ligar o servidor ao banco pelo `@supabase/supabase-js`
+**Sugestão para o plano daquela spec (decide quem a planejar; não decidido aqui, sem ADR):** ligar o servidor ao banco pelo `@supabase/supabase-js`
 2.119.2 com `@supabase/ssr` 0.12.7 (MIT; o `ssr` pede `supabase-js ^2.114.0`), com a sessão da pessoa em cookie que o
 navegador não lê e **nenhum cliente do banco no navegador**, para que a regra "o navegador nunca fala com o banco"
 (`ARCHITECTURE.md` §4) valha de fato; validação por `zod` 4.6.7 (MIT; Standard Schema, aceito pelo `.validator` do
@@ -220,7 +213,7 @@ Sem teste de unidade próprio (são consultas); a prova é o pgTAP (§4.4) e o e
 
 ## 7. Testes de tela (Playwright, projetos `celular` 390 e `computador` 1440 do item 2)
 Dados só fictícios, criados no banco **local** pelo preparo do teste (estúdios A e B, dona, recepção, duas profissionais,
-nomes inventados). A sessão de teste vem da camada de serviço (L-1).
+nomes inventados). A sessão de teste vem da spec "Entrar e camada de serviço" (E36·A).
 
 | Arquivo | Prova |
 |---|---|
@@ -246,7 +239,6 @@ nomes inventados). A sessão de teste vem da camada de serviço (L-1).
 ## 9. Arquivos (lista FECHADA)
 Fora desta lista nada muda (`AGENTS.md` §6). Arquivo que uma ferramenta crie fora daqui: parar e relatar.
 
-### 9.A Com L-1·A (recomendado)
 **Banco (Engenheiro de dados):** `supabase/migrations/<ts>_agenda_nome_exibicao.sql` (só se a T3 escolher a coluna) ·
 `supabase/migrations/<ts>_agenda_bloqueios.sql` · `supabase/tests/database/110_agenda_bloqueios_isolamento_test.sql` ·
 `120_agenda_bloqueios_regras_test.sql` · `130_agenda_bloqueios_papeis_test.sql` · `140_agenda_colunas_test.sql` (só com
@@ -276,22 +268,17 @@ lacunas) (Documentador).
 **Processo:** `specs/20261128-020000-agenda/{spec.md,plan.md,tasks.md}` · `docs/adr/0006-agenda-tempo-idiomas-e-tetos.md`.
 
 **Intactos:** `src/app/ui/**` e `src/app/estilos/**` (peça nova da L-3 que for componente geral pede ajuste deste
-plano), `src/server/portas/**` e `src/data/cliente.ts` (da L-1·A), `src/*/AGENTS.md`, `src/*/CLAUDE.md`,
+plano), `src/server/portas/**`, `src/data/cliente.ts`, a tabela do registro, a tela Entrar e a sessão de teste (todos da spec
+"Entrar e camada de serviço", E36·A), `src/*/AGENTS.md`, `src/*/CLAUDE.md`,
 `supabase/config.jsonc`, `supabase/seed.sql`, as migrations dos itens 2 e 3, `package.json`, `pnpm-lock.yaml`,
 `eslint.config.mjs`, `playwright.config.ts`, `.github/**`, `ARCHITECTURE.md`, `AGENTS.md`.
 
-### 9.B Arquivos a mais só se o dono escolher L-1·B (plano volta à 5b antes)
-`package.json` e `pnpm-lock.yaml` (`@supabase/supabase-js`, `@supabase/ssr`, `zod`, scripts do banco para as telas) ·
-`src/server/portas/*.ts` e testes · `src/data/cliente.ts` · migration e teste pgTAP da tabela do registro ·
-rota e página Entrar · `e2e/preparo/sessao.ts` · `playwright.config.ts` · `.github/workflows/ci.yml` (job `telas` com
-banco; Engenheiro de DevOps) · um ADR da camada de serviço.
-
 ## 10. Branch (decisão do Engenheiro de DevOps)
 - `feat/agenda` recebe, **por merge**, a `feat/banco-ligacao` e a `feat/design-system-codigo` (as duas já trazem a
-  `chore/fundacao-tecnica`); com L-1·A, também a branch da camada de serviço. PR de rascunho empilhado; nunca se junta
+  `chore/fundacao-tecnica`) e a `feat/entrar-servico` (E36·A). PR de rascunho empilhado; nunca se junta
   numa base. Quando as bases entrarem na `previas`, a base do PR passa à `previas`, antes do pedido de merge.
 - Conflito esperado só em `src/app/routeTree.gen.ts` (regenera-se, não se edita à mão). Antes de construir: conferir
-  que os arquivos das três bases do cabeçalho estão na branch.
+  que os arquivos das três bases do cabeçalho e os de `src/server/portas/` da `feat/entrar-servico` estão na branch.
 
 ## 11. Critério → prova
 | CA | Prova | Quem confere |
@@ -310,12 +297,13 @@ banco; Engenheiro de DevOps) · um ADR da camada de serviço.
 | Escopo | `git diff --name-only <base>...HEAD` comparado com o §9 | Revisor de código |
 
 ## 12. Riscos e não verificado
-- **L-1 é bloqueante para construir** (§2): sem a camada de serviço não há portas 1, 2 e 6, nem sessão no e2e.
+- **A construção espera a spec "Entrar e camada de serviço"** (E36·A, `feat/entrar-servico`): sem ela não há portas
+  1, 2 e 6, nem sessão no e2e. Se o contrato dela diferir do §5.1, este plano se ajusta (nova 5b).
 - Item 3 e item 4 não estão construídos: nomes de funções, tabelas e componentes vêm dos planos deles. Se mudarem, este
   plano se ajusta (nova 5b).
 - **Não verificado:** a extensão `btree_gist` no banco local do Supabase (sem ela, a exclusão do §4.3 vira gatilho);
   se `@supabase/ssr` 0.12.7 grava o cookie da sessão fora do alcance do JavaScript da página e se `supabase-js` roda
-  no Cloudflare Workers (spec da L-1); o comportamento do `Intl` do Node 26 e do Chromium do Playwright na meia-noite
+  no Cloudflare Workers (spec "Entrar e camada de serviço"); o comportamento do `Intl` do Node 26 e do Chromium do Playwright na meia-noite
   que não existe (o teste do CA-01 prova); se o Cloudflare Workers tem `Temporal` (por isso não se usa, ADR 0006 · D2);
   a documentação online do `createServerFn` (conferido só no `.d.ts` instalado: o nome é `.validator`).
 - Numeração dos ADRs: 0006 e 0007 podem colidir com as specs dos outros módulos do núcleo, escritas em paralelo; o

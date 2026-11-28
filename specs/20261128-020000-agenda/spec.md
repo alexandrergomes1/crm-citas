@@ -3,7 +3,8 @@
 - **Status:** Draft
 - **Aprovação do dono:** (pendente)
 - **Aprovação do merge:** (pendente)
-- **Pasta:** `specs/20261128-020000-agenda/` · **Branch:** `feat/agenda` (da `previas`); construção em PR de
+- **Pasta:** `specs/20261128-020000-agenda/` · **Branch:** `feat/agenda`, empilhada por merge sobre `feat/banco-ligacao`,
+  `feat/design-system-codigo` e `feat/entrar-servico` (decisão do Engenheiro de DevOps); construção em PR de
   rascunho, nada é juntado sem o dono (E22·B)
 - **Item da fila:** 5 de `docs/BACKLOG.md` (núcleo, um módulo por spec; primeiro da lista: Agenda, E3·2)
 - **Tipo:** Tela e Banco (`docs/guias/processo-sdd.md` §3 e §4): ficha visual, aprovação da spec, pedido de merge com
@@ -151,6 +152,8 @@ Analista; quem decide é o Engenheiro de dados no plano, com ADR e revisão de o
 - **Item 2** (fundação técnica): app, pnpm, Vitest, Playwright, CI, banco local, Spec Kit.
 - **Item 3** (banco): estúdio com fuso, membros, papéis, função de checagem, molde do teste de isolamento.
 - **Item 4** (design system no código): componentes do `DESIGN.md`.
+- **Spec "Entrar e camada de serviço"** (E36·A do dono, 28/11/2026: "E36a"; branch `feat/entrar-servico`, antes do
+  núcleo): login e as 6 portas que toda ação da Agenda usa.
 - **Spec do Agendamento:** tabela e status dos agendamentos, fluxo de marcar e painel. Sem ela, a grade mostra só
   bloqueios e os botões ficam "em desenvolvimento" (RF-08).
 - **E22·B:** construção em PR de rascunho; banco só local; nada juntado sem o dono.
