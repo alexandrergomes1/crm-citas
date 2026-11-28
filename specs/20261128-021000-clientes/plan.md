@@ -201,7 +201,7 @@ perfil mostram "Cliente removida" (texto do arquivo de idioma) quando `apagada_e
    → abre. O teste mensal de restauração prova o passo.
 4. Restos físicos: a linha antiga fica no arquivo do Postgres até o `VACUUM` e no histórico de recuperação até ele
    vencer; vale o mesmo prazo de guarda das cópias que a cliente é informada (DP-07).
-5. Prova já em Clientes: `clientes_140_apagar_test.sql` simula a restauração (devolve a linha antiga como `postgres`),
+5. Prova já em Clientes: `340_clientes_apagar_test.sql` simula a restauração (devolve a linha antiga como `postgres`),
    chama `reaplicar_apagamentos` e confere que nenhum campo pessoal volta, e que repetir não dá erro.
 Alternativa descartada: cifra por cliente com chave apagada ("crypto-shredding"): pede cofre de chaves e cifra de todos
 os campos, sem ganho para dado que não é de saúde na v1.
@@ -220,12 +220,12 @@ nenhum aparece em URL, registro, mensagem de erro ou aviso.
 ### 7.2 Banco (pgTAP, `supabase/tests/database/`, dados fictícios escritos do zero; CA-02, CA-03, CA-07, CA-07b, RNF-03)
 | Arquivo | Prova |
 |---|---|
-| `clientes_100_isolamento_test.sql` | cópia do molde do item 3 (`supabase/moldes/isolamento_tabela_test.sql`) para `clientes` e `clientes_apagamentos`: A não lê, cria, altera, arquiva nem apaga cliente de B; sem papel e sem login nada; `org_id` de B no insert recusado |
-| `clientes_110_papeis_test.sql` | matriz do §4.1 (E28·2·B, E28·3·A): profissional lê só o que `cliente_visivel` deixa, cria, edita as que vê, recebe `42501` em arquivar e apagar; recepção `42501` em apagar; dona tudo |
-| `clientes_120_telefone_test.sql` | mesmo telefone em B não dá sinal em A; em A, para a profissional que não vê a dona do número, só o sinal "existe, sem nome"; E28·1·A deixa gravar o repetido |
-| `clientes_130_regras_test.sql` | `check` do §3.1 (E.164, nome, e-mail minúsculo, nascimento, coerência ativa × apagada) |
-| `clientes_140_apagar_test.sql` | depois de apagar, nenhum campo pessoal se lê; diário com a linha; restauração simulada + `reaplicar_apagamentos` (§6.3); `authenticated` sem execução de `reaplicar_apagamentos` |
-| `clientes_150_volume_test.sql` | 50 000 clientes fictícias num estúdio, `analyze`; `explain` da busca por nome, por dígitos e das duas ordens sem `Seq Scan` em `clientes` (RNF-03) |
+| `300_clientes_isolamento_test.sql` | cópia do molde do item 3 (`supabase/moldes/isolamento_tabela_test.sql`) para `clientes` e `clientes_apagamentos`: A não lê, cria, altera, arquiva nem apaga cliente de B; sem papel e sem login nada; `org_id` de B no insert recusado |
+| `310_clientes_papeis_test.sql` | matriz do §4.1 (E28·2·B, E28·3·A): profissional lê só o que `cliente_visivel` deixa, cria, edita as que vê, recebe `42501` em arquivar e apagar; recepção `42501` em apagar; dona tudo |
+| `320_clientes_telefone_test.sql` | mesmo telefone em B não dá sinal em A; em A, para a profissional que não vê a dona do número, só o sinal "existe, sem nome"; E28·1·A deixa gravar o repetido |
+| `330_clientes_regras_test.sql` | `check` do §3.1 (E.164, nome, e-mail minúsculo, nascimento, coerência ativa × apagada) |
+| `340_clientes_apagar_test.sql` | depois de apagar, nenhum campo pessoal se lê; diário com a linha; restauração simulada + `reaplicar_apagamentos` (§6.3); `authenticated` sem execução de `reaplicar_apagamentos` |
+| `350_clientes_volume_test.sql` | 50 000 clientes fictícias num estúdio, `analyze`; `explain` da busca por nome, por dígitos e das duas ordens sem `Seq Scan` em `clientes` (RNF-03) |
 
 Prova de que o teste pega erro: numa cópia local descartável, tirar `S` ou `V` de uma política e ver `100` ou `110`
 ficar vermelho; desfazer (como a tarefa 8 do item 3).
@@ -254,7 +254,7 @@ Fora desta lista nada muda (`AGENTS.md` §6). Arquivo novo que uma ferramenta cr
 - `supabase/migrations/<ts>_estudios_pais.sql` (**só** se B-4 não vier do item 3)
 - `supabase/migrations/<ts>_extensoes_busca.sql`, `<ts>_clientes.sql`, `<ts>_clientes_apagamentos.sql`,
   `<ts>_clientes_funcoes.sql`, `<ts>_clientes_politicas.sql`
-- `supabase/tests/database/clientes_100_isolamento_test.sql` a `clientes_150_volume_test.sql` (6 arquivos, §7.2)
+- `supabase/tests/database/300_clientes_isolamento_test.sql` a `350_clientes_volume_test.sql` (6 arquivos, §7.2)
 - `docs/adr/0008-clientes-dados-busca-e-pedidos.md` (decisões por tabela §3.6 e técnicas §13; conferência preenchida
   na revisão)
 
@@ -312,9 +312,9 @@ merge. A pasta `src/app/i18n/` vem da `feat/entrar-servico` (R-9).
 ## 12. Se o dono responder diferente
 | Resposta | O que muda no plano |
 |---|---|
-| **E28·1·B** (repetido não salva) | índice único parcial `(org_id, telefone) where apagada_em is null`; `verificarTelefone` vira erro de campo; `clientes_120` testa a recusa (`23505`) e que a recusa não revela cliente de outro estúdio. Mais 0 arquivos |
+| **E28·1·B** (repetido não salva) | índice único parcial `(org_id, telefone) where apagada_em is null`; `verificarTelefone` vira erro de campo; `320_clientes` testa a recusa (`23505`) e que a recusa não revela cliente de outro estúdio. Mais 0 arquivos |
 | **E28·1·C** (mais documento, gênero, cidade) | 3 colunas em §3.1 e nos privilégios; validação de documento por país em `src/domain` (biblioteca a escolher, nova linha no ADR); exportação e idiomas crescem; DP-03 muda na spec. Mais 1 arquivo de regra e teste |
-| **E28·2·A** (vê todas) | `cliente_visivel` devolve `true` para os três papéis; o aviso de duplicado sempre com nome; `clientes_110` muda; o Agendamento não substitui a função. Exige E26·1·A |
+| **E28·2·A** (vê todas) | `cliente_visivel` devolve `true` para os três papéis; o aviso de duplicado sempre com nome; `310_clientes` muda; o Agendamento não substitui a função. Exige E26·1·A |
 | **E28·2·C** (igual à recepção) | como E28·2·A, e `arquivar_cliente` aceita a profissional |
 | **E28·3·B** (suporte faz à mão) | saem `exportar.ts`, `exportacao.ts`, `confirmar-excluir.tsx` e os passos de e2e; `apagar_cliente` perde o `grant` a `authenticated` e vira tarefa interna listada com chave de serviço (`SECURITY.md` §2); exportar à mão pede roteiro e uma spec do painel admin. Não recomendado: o suporte passaria a tocar dado de cliente |
 | **E28·3·C** (só excluir) | saem `exportar.ts`, `exportar.test.ts`, `exportacao.ts` e o passo de e2e do download |
@@ -347,7 +347,7 @@ merge. A pasta `src/app/i18n/` vem da `feat/entrar-servico` (R-9).
 - R-2 · `createServerFn`, rotas de servidor (`GET` para o arquivo) e rotas por pasta do TanStack Start: nomes e moldes
   **não verificados** nesta etapa; lidos na doc oficial na tarefa 1, antes de escrever.
 - R-3 · Busca com 2 letras não usa o índice de trigramas (precisa de 3); com estúdio grande, pode varrer. Medir no
-  `clientes_150`; se passar do teto, subir o mínimo para 3 letras, o que muda a Assumption 2 (volta ao Analista).
+  `350_clientes`; se passar do teto, subir o mínimo para 3 letras, o que muda a Assumption 2 (volta ao Analista).
 - R-4 · Disponibilidade e esquema do `pg_trgm` na imagem local do Supabase CLI 3.4.0: **não verificado**.
 - R-5 · `db:start` do item 2 desliga Auth e PostgREST; o e2e com login depende de B-1 (pode mudar o `package.json`
   lá, não aqui).

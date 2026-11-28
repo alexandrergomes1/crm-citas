@@ -34,7 +34,7 @@
 | 9 | M3 `clientes_apagamentos` (§3.2) | Engenheiro de dados | aplica sem erro |
 | 10 | M4 `clientes_funcoes` (§3.3): 5 funções `security definer`, `search_path = ''`, `revoke`/`grant`; `reaplicar_apagamentos` sem `grant` a `authenticated` | Engenheiro de dados | aplica sem erro |
 | 11 | M5 `clientes_politicas` (§3.4): políticas `to authenticated` e privilégios por coluna | Engenheiro de dados | aplica sem erro |
-| 12 | Testes `clientes_100` a `clientes_150` (§7.2), com o molde do item 3 e dados fictícios escritos do zero | Engenheiro de dados | `pnpm db:test` verde, inclusive os testes dos itens 2 e 3 |
+| 12 | Testes `300_clientes` a `350_clientes` (§7.2), com o molde do item 3 e dados fictícios escritos do zero | Engenheiro de dados | `pnpm db:test` verde, inclusive os testes dos itens 2 e 3 |
 | 13 | Prova de que o teste pega erro: tirar `S` ou `V` de uma política numa cópia descartável, ver vermelho, desfazer | Engenheiro de dados | vermelho visto e desfeito; nada no commit |
 
 ## Fase B · Regras e telas (depois do item 4 juntado e da ficha conferida, tarefa 6)
