@@ -3,6 +3,7 @@
 - **Pasta:** `specs/20261128-180247-processo-revisao/` · **Branch:** `chore/processo-revisao` (a partir da `previas`)
 - **Tipo:** texto e regras (`docs/guias/processo-sdd.md` §3) · **Escrita por:** Analista de requisitos ·
   **Norma:** IEEE 29148 e BABOK
+- **Em dia com:** E67·A (28/11/2026)
 - **Status:** Draft
 - **Aprovação do dono:** (pendente)
 - **Aprovação do merge:** (pendente)
@@ -203,24 +204,40 @@ como item ou ideia, sem decidir) · **dúvida** (§5) · **fora** (outra branch,
   confere cada RF e cada linha do §3.
 
 ## 5. Dúvidas (3, juntas, para a aprovação)
-- **E66·1 · Quanto tempo se guardam o registro de auditoria e as sessões (dado de cliente).** Hoje nada se apaga
-  (ADR 0018 e 0019; `SECURITY.md` §7). Opções: **A** sessões e tentativas de entrar por 6 meses e registro de
-  auditoria por 1 ano, depois apaga sozinho · **B** tudo por 5 anos · **C** decidir só antes da produção.
-  **Recomendo A:** é o mínimo que a lei brasileira pede para registro de acesso (Marco Civil da Internet, art. 15:
-  6 meses) e segue a regra de guardar só o necessário (RGPD art. 5(1)(e); LGPD art. 15 e 16). As fontes são
-  conferidas pelo Engenheiro de segurança antes de gravar (não verificado nesta sessão).
-- **E66·2 · Página de status e aviso de queda.** Em 27/11 a lista do "que falta" trazia uma página pública que mostra
-  se o sistema está no ar, e o dono comentou "acho que ninguem fica avisando quedas nao". Opções: **A** sem página
-  de status agora: o monitoramento avisa só o dono, e a ideia fica na fila para rever antes de abrir a estúdios
-  reais · **B** página de status pública, grátis, antes da produção. **Recomendo A:** segue a fala do dono e não
-  cria trabalho agora (E23·3·A, só grátis). Desfaz-se tirando a ideia da fila.
-- **E66·3 · Páginas antigas do canvas com nomes de teste do projeto antigo.** São só histórico (`docs/design/`) e o
-  repositório é público. Opções: **A** ficam como estão · **B** trocar os nomes por nomes fictícios novos · **C**
-  apagar as páginas antigas. **Recomendo A:** o dono disse que os dados do antigo são fictícios (E22·B) e pediu o
-  canvas com as versões (E10·1). A opção C muda a E10·1.
+- **E66·1 · Por quanto tempo o sistema guarda quem entrou e o que cada pessoa mudou (dado de cliente).**
+  - **O que é:** o "registro de auditoria" é a lista que o sistema guarda de quem entrou e do que cada pessoa mudou.
+    As "sessões" são as entradas no sistema (cada vez que alguém entra e até sair).
+  - **Como está:** nada disso se apaga hoje (ADR 0018 e 0019; `SECURITY.md` §7).
+  - **Opções:** **A** as entradas (sessões e tentativas de entrar) ficam 6 meses, o registro de auditoria fica 1 ano,
+    e depois o sistema apaga sozinho · **B** tudo fica 5 anos · **C** decidir só antes de abrir a estúdios reais.
+  - **O que muda:** o prazo escolhido entra no `SECURITY.md` §7 e vira tarefa antes da produção. Nada se apaga
+    nesta tarefa.
+  - **Recomendo A:** guarda só o necessário. As bases legais (Marco Civil da Internet art. 15; RGPD art. 5(1)(e);
+    LGPD art. 15 e 16) estão **a conferir pelo Engenheiro de segurança**, que pode mudar a recomendação antes do envio.
+  - **Como voltar atrás:** o dono troca o prazo por nova decisão, antes da produção sem custo nenhum.
+- **E66·2 · Página pública que mostra se o sistema está no ar (página de status).**
+  - **O que é:** uma página aberta a todos que diz se o sistema está funcionando ou fora do ar.
+  - **Como está:** em 27/11 ela veio na lista do "que falta", e o dono comentou "acho que ninguem fica avisando
+    quedas nao". Não está registrada em lugar nenhum.
+  - **Opções:** **A** não fazer agora: o monitoramento avisa só o dono, e a ideia fica na fila para rever antes de
+    abrir a estúdios reais · **B** fazer, grátis, antes da produção.
+  - **O que muda:** A = uma linha na fila. B = um item novo na fila antes da produção.
+  - **Recomendo A:** segue a fala do dono e não cria trabalho agora (E23·3·A, só grátis).
+  - **Como voltar atrás:** a ideia sai da fila ou vira item com ordem, quando o dono quiser.
+- **E66·3 · Páginas antigas do design com nomes de teste do sistema antigo.**
+  - **O que é:** o canvas (o quadro de desenho do design) guarda as versões antigas, que usam nomes de pessoas de
+    teste do `crm-agenda`. São só histórico (`docs/design/`), e o repositório é público.
+  - **Opções:** **A** ficam como estão · **B** trocar os nomes por nomes inventados · **C** apagar as páginas
+    antigas.
+  - **O que muda:** A = nada. B = os arquivos do canvas mudam. C = só fica a página aprovada, e a E10·1 muda.
+  - **Recomendo A:** o dono disse que os dados do antigo são fictícios (E22·B) e pediu o canvas com as versões
+    (E10·1).
+  - **Como voltar atrás:** B e C podem ser feitas depois a qualquer hora. C apagada volta pelo histórico do git.
 
 ## 6. Assumptions (o papel decidiu; recuse pelo número)
-- **A1.** Rótulos do bloco: "▶ PRECISA DE VOCÊ" (ou "▶ Nada para você") e, depois, "Só para informar".
+- **A1.** Rótulos do bloco: "▶ PRECISA DE VOCÊ" (ou "▶ Nada para você") e, depois, "Só para informar". Não são
+  fala literal do dono: são os nomes escolhidos pelo papel para atender a ordem dele ("separe tbm onde começa sua
+  resposta que eu preciso ler"). O dono pode trocá-los.
 - **A2.** O rótulo "Desfaz-se assim" passa a "Como voltar atrás", com uma linha que explica.
 - **A3.** A T3 manda cada papel gravar no seu arquivo. A crítica do dono ("o documentador achei que fosse pra
   isso") vira o papel do Documentador de **conferir**, depois de cada resposta, que todos gravaram, e registrar o
@@ -261,7 +278,7 @@ ou C) · `CHANGELOG.md`.
 - As conversas inteiras: só as 4 tabelas do Documentador, que também deixam trechos "não verificado" (linha 56).
 - A resposta dada ao dono às 14:17 (linha 49) e os 7 itens de segurança de 27/11 (linha 30).
 - Que o material da Fresha foi visto (linha 20): é informação da conversa principal, sem registro no repositório.
-- As fontes legais da recomendação E66·1.
+- As fontes legais da recomendação E66·1: a conferir pelo Engenheiro de segurança.
 
 ## Anexo A · Texto exato das travas (auditoria-processo.md §4, `feat/agenda` em `85501a0`)
 
@@ -300,3 +317,48 @@ ou C) · `CHANGELOG.md`.
 **T8 · O Analista confere a palavra do dono no `DESIGN.md`**
 - `.claude/agents/analista-requisitos.md`, em "Faz", acrescentar: "Fala do dono que cita nome de botão, peça ou cor: confira no `DESIGN.md` antes de gravar. Se diverge, grave a intenção (ex.: 'botão de criar com opções') e passe ao Designer, que mostra como recomendada a opção que segue o `DESIGN.md`."
 
+## 11. Mensagem de aprovação ao dono (formato novo)
+Vai ao dono só depois do plano, da conferência do Spec Kit (etapa 5) e da revisão 5b, com o "Revisado por" preenchido.
+
+---
+**E66 · Aprovar a spec: revisão do processo** (fala o Analista de requisitos · norma IEEE 29148)
+
+**▶ PRECISA DE VOCÊ**
+1. **E66 · Aprovar a spec.**
+   - **O que é:** a lista do que muda nas regras do projeto para fechar as falhas de 28/11. Entram as 8 travas que
+     você aprovou (E65), o bloco do que precisa de você no começo de toda mensagem, links clicáveis, o registro de
+     toda ideia para o futuro, uma regra do que fica em cada pasta e a correção de 40 registros que faltavam ou
+     estavam no lugar errado.
+   - **Atenção:** muda o `AGENTS.md`, a constituição do projeto, ou seja as regras que toda IA segue.
+   - [Abrir a spec](https://github.com/alexandrergomes1/crm-citas/blob/chore/processo-revisao/specs/20261128-180247-processo-revisao/spec.md)
+2. **E66·1 · Por quanto tempo guardar quem entrou e o que cada pessoa mudou (dado de cliente).**
+   - **O que é:** o "registro de auditoria" é a lista que o sistema guarda de quem entrou e do que cada pessoa mudou.
+     As "sessões" são as entradas no sistema. Hoje nada se apaga.
+   - **Opções:** **A** 6 meses para as entradas e 1 ano para o registro, depois apaga sozinho · **B** 5 anos ·
+     **C** decidir só antes de abrir a estúdios reais.
+   - **Recomendo A:** guarda só o necessário. As bases legais estão a conferir pelo Engenheiro de segurança.
+3. **E66·2 · Página pública que mostra se o sistema está no ar.**
+   - **O que é:** uma página aberta que diz se o sistema funciona ou caiu. Você disse "acho que ninguem fica
+     avisando quedas nao".
+   - **Opções:** **A** não fazer agora: só você recebe o aviso, e a ideia fica na fila · **B** fazer, grátis, antes de
+     abrir a estúdios reais.
+   - **Recomendo A.**
+4. **E66·3 · Páginas antigas do design com nomes de teste do sistema antigo.**
+   - **O que é:** versões antigas do quadro de design, só histórico. O projeto é público.
+   - **Opções:** **A** ficam como estão · **B** trocar por nomes inventados · **C** apagar as páginas antigas.
+   - **Recomendo A:** você disse que os dados antigos são fictícios e pediu as versões guardadas.
+
+**Responda:** E66 sim + E66·1·A/B/C + E66·2·A/B + E66·3·A/B/C.
+**Como voltar atrás:** cada regra pode ser reaberta por você e muda num PR novo.
+
+**Só para informar**
+- **Sobre a pasta specs:** guardar esses arquivos não está errado, mas faltava a regra do que vai onde. Esta spec cria
+  essa regra e confere os arquivos que já existem.
+- **O que o papel decidiu sozinho** ([§6 da spec](https://github.com/alexandrergomes1/crm-citas/blob/chore/processo-revisao/specs/20261128-180247-processo-revisao/spec.md); recuse pelo número): A1 os nomes dos blocos ("▶ PRECISA DE VOCÊ" é o
+  nome escolhido para atender a sua ordem, não fala sua) · A2 "Desfaz-se assim" vira "Como voltar atrás" · A3 o
+  Documentador confere que cada papel gravou · A4 o que é "decisão simples" do Designer · A5 ideias futuras na fila
+  sem número de ordem · A6 o texto das travas não muda, só o lugar.
+- **Revisado por:** Gerente de projeto (5b) [preencher].
+- **Sem você, e fora deste PR:** a ficha de tela da trava T7 é uma parada própria quando a Agenda voltar, e a trava
+  automática do `git stash` entra no PR das travas do Claude (E38·A1).
+---
