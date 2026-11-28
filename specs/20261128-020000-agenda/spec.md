@@ -106,6 +106,8 @@ nunca "estúdio" nem "clínica" (E47·1·A, `DESIGN.md` §6). Nesta spec, "estú
   com o botão do meio **só com ícone, sem nome** (E60·2, §18), Agenda atual em azul. Filtros em folha de baixo. Duas
   colunas à vista e as outras rolando para o lado (E55·3·A). A forma do botão do meio e a do "Adicionar" do topo nas
   telas do celular (com nome ou só "+"), a partir das imagens do dono, o Designer avalia e mostra na ficha (§18).
+  **A Agenda no celular não tem "+ Adicionar" no topo:** quem cria é o botão do meio da barra (E60·2; ficha v4 e
+  `DESIGN.md` §5, "Adicionar no celular"). O ícone do botão Equipe espera a resposta do dono à E63 (`DESIGN.md` §5).
 - **Topo de cada coluna:** o **nome de exibição** da pessoa e as iniciais (E55·1·A, RF-21).
 - **Grade:** faixa de **08:00 a 20:00** que se alarga quando há item fora dela e, no dia de hoje, até a hora atual
   (E59·A, RN-11, §18; ADR 0006 · D17), com rolagem (Assumption 1). Grade no horário de funcionamento: spec seguinte
@@ -121,8 +123,11 @@ nunca "estúdio" nem "clínica" (E47·1·A, `DESIGN.md` §6). Nesta spec, "estú
   "Bloquear horário" e o toque num horário vazio (E54·1, RF-13); sem botão próprio de bloqueio (E60·1·A, §18). Com alcance "próprios", o campo profissional fica só com a própria
   pessoa.
 
-**Estados (`DESIGN.md` §8):** carregando (linhas cinza só depois de 0,3 s, anunciado ao leitor de tela) · vazio (dia
-sem agendamento nem bloqueio: grade à vista, "Ainda não há agendamentos neste dia" e a ação do Agendamento) · sem
+**Estados (`DESIGN.md` §8):** carregando (linhas cinza só depois de 0,3 s, anunciado ao leitor de tela) · vazio na v1
+(sem o Agendamento construído; dia sem bloqueio: grade à vista, "Ainda não há bloqueios neste dia", "Bloqueie um
+horário quando alguém não puder atender." e "Bloquear horário" com contorno; ficha v4 e `DESIGN.md` §7b) · vazio com o
+Agendamento (dia sem agendamento nem bloqueio: grade à vista, "Ainda não há agendamentos neste dia" e "Novo
+agendamento" com contorno) · sem
 resultado (filtro esconde tudo: o que foi filtrado e "Limpar filtros") · sem profissional (estúdio sem ninguém que
 seja coluna pela E26·3·A, o que só acontece sem dona ativa: frase e caminho para a Equipe, "em desenvolvimento" até o
 módulo existir) · erro (o que houve e "Tentar de
@@ -195,7 +200,7 @@ Analista; quem decide é o Engenheiro de dados no plano, com ADR e revisão de o
 | CA-02 | O estúdio A não lê, cria, altera nem apaga bloqueio do estúdio B; bloqueio com profissional de outro estúdio é recusado. | isolamento, CI verde |
 | CA-03 | Sem login e sem papel no estúdio: nada é lido nem gravado; cada papel lê e grava só o que a §3 permite (ordem de 28/11 no lugar da E26·1·B, E26·2·A, E26·3·A), pela chave e pelo alcance, iguais no servidor e no banco (ADR 0020 · D7 e D8). | teste de banco e do servidor, CI verde |
 | CA-04 | Pedido que traz estúdio é recusado (`estudio_trocado`, contrato da camada de serviço, spec Entrar RF-15/CA-05), sem ler nem gravar nada. | teste do servidor |
-| CA-05 | Em 390 e 1440: `/` abre a Agenda em hoje; troca de dia e Hoje; Equipe N de M com o ícone de pessoas, e a profissional sem esse botão; filtros e "Limpar filtros"; "+ Adicionar ▾" com as duas opções e nenhum botão com o nome "Novo"; botão do meio da barra do celular só com ícone e nome acessível; grade de 08:00 a 20:00 e alargada (RN-11); linha da hora atual em azul; menu do horário vazio por toque e por teclado; criar (só por seletor, nascendo com 1 h, atalho de motivo), alterar, conflito recusado e excluir bloqueio com "Desfazer"; nome de exibição no topo das colunas. | e2e, CI verde |
+| CA-05 | Em 390 e 1440: `/` abre a Agenda em hoje; troca de dia e Hoje; Equipe N de M com o ícone de pessoas, e a profissional sem esse botão; filtros e "Limpar filtros"; "+ Adicionar ▾" com as duas opções e nenhum botão com o nome "Novo"; botão do meio da barra do celular só com ícone e nome acessível, e a Agenda do celular sem "+ Adicionar" no topo; grade de 08:00 a 20:00 e alargada (RN-11); linha da hora atual em azul; menu do horário vazio por toque e por teclado; criar (só por seletor, nascendo com 1 h, atalho de motivo), alterar, conflito recusado e excluir bloqueio com "Desfazer"; nome de exibição no topo das colunas. | e2e, CI verde |
 | CA-06 | Em 390 e 1440: estados carregando, vazio, sem resultado, sem profissional e erro aparecem como na §4. | e2e |
 | CA-07 | Uma só peça preta de ação por tela; nenhuma peça, cor ou nome fora do `DESIGN.md`. | checklist §10 do `DESIGN.md`, Revisor de design |
 | CA-08 | Checagem automática de acessibilidade sem falha nas duas larguras e status com nome acessível. | e2e |
@@ -422,3 +427,13 @@ celular, a partir das imagens 1 e 2; ícone de pessoas no "Equipe"; fundo dos bo
 a profissional sem o "Equipe" (Assumption 6).
 **Para o Arquiteto (`plan.md`, `tasks.md` e ADR não foram tocados):** RN-11 é a regra do ADR 0006 · D17 e do
 alargamento por item, agora na spec; CA-01 a cobre.
+
+## 19. Ajustes 5 (28/11/2026, auditoria do Gerente de projeto)
+Escrito pelo Analista de requisitos (IEEE 29148 e BABOK). Nenhum requisito novo: a spec passa a dizer o que a ficha v4
+e o `DESIGN.md` já gravam.
+
+| Onde | O que mudou | Fonte |
+|---|---|---|
+| §4, Estados | vazio da v1: "Ainda não há bloqueios neste dia" com "Bloquear horário"; o vazio com "Novo agendamento" fica para quando o Agendamento existir | ficha v4; `DESIGN.md` §7b e §8 |
+| §4, Celular; CA-05 | a Agenda no celular não tem "+ Adicionar" no topo; cria pelo botão do meio da barra | E60·2; ficha v4; `DESIGN.md` §5 |
+| §4, Celular | o ícone do botão Equipe espera a E63 | `DESIGN.md` §5 e §7b |

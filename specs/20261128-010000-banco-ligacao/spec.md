@@ -1,7 +1,8 @@
 # Spec · Ligar o banco existente: base da trava por estúdio e regras para trazer as tabelas
 
-- **Status:** Draft
-- **Aprovação do dono:** (pendente)
+- **Status:** Approved
+- **Aprovação do dono:** "Aprovo as specs: Entrar e camada de serviço, Trava por estúdio no banco, Design system no código, Agenda, Agendamento, Clientes, Formulários, Catálogo, Checkout, Caixa." · 28/11/2026 · https://claude.ai/code/session_018cV8b8F1poNHjA4eEd3VyN
+  (`docs/decisoes/2026-11-27-fundacao.md`, linha "Aprovação das specs") · gravado pelo Analista de requisitos (E16·3)
 - **Aprovação do merge:** (pendente)
 - **Item da fila:** 3 (`docs/BACKLOG.md`), em paralelo aos itens 1 e 2 por ordem do dono (E22·B, §1)
 - **Branch:** `feat/banco-ligacao`, única do item 3 (spec, plano, construção e registros), já com a `chore/fundacao-tecnica`

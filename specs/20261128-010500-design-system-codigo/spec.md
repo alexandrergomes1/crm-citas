@@ -5,8 +5,9 @@
   do Engenheiro de DevOps)
 - **Item da fila:** 4 de `docs/BACKLOG.md` ("Design system no código", fonte `DESIGN.md`)
 - **Tipo:** Tela (`docs/guias/processo-sdd.md` §3 e §4: ficha visual, aprovação da spec, pedido de merge com prévia)
-- **Status:** Draft
-- **Aprovação do dono:** (pendente)
+- **Status:** Approved
+- **Aprovação do dono:** "Aprovo as specs: Entrar e camada de serviço, Trava por estúdio no banco, Design system no código, Agenda, Agendamento, Clientes, Formulários, Catálogo, Checkout, Caixa." · 28/11/2026 · https://claude.ai/code/session_018cV8b8F1poNHjA4eEd3VyN
+  (`docs/decisoes/2026-11-27-fundacao.md`, linha "Aprovação das specs") · gravado pelo Analista de requisitos (E16·3)
 - **Escrito por:** Analista de requisitos · **Norma:** IEEE 29148, BABOK · **Revisa:** Gerente de projeto (etapa 5b)
 - **Fontes lidas:** `AGENTS.md`, `ARCHITECTURE.md` §3, §11, §12, `DESIGN.md` (inteiro), `docs/design/README.md`,
   `docs/design/imagens/` (01 a 06 e provas 1 a 4), `src/app/AGENTS.md`, `docs/guias/processo-sdd.md`,
