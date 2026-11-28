@@ -4,7 +4,7 @@
 - **Escrito por:** Arquiteto de software · **Norma:** modelo C4 e ADR (mais OWASP ASVS 4.0.3 nível 2, Clean Architecture,
   Twelve-Factor, boas práticas do Postgres e do Supabase) · **Revisão:** 5b (Gerente de projeto) feita com
   ajustes, 28/11; etapa 5 (Analista de requisitos) pendente
-- **Decisões técnicas:** `docs/adr/0018-entrar-sessao-e-camada-de-servico.md` (D1 a D15). **Decisões de banco:**
+- **Decisões técnicas:** `docs/adr/0018-entrar-sessao-e-camada-de-servico.md` (D1 a D18; D5 e D18 mudados em 28/11). **Decisões de banco:**
   `docs/adr/0019-...md`, escrito pelo Engenheiro de dados na tarefa B1 (não neste plano), dentro dos limites do §6.
 - **Bases lidas em 28/11/2026 (só leitura):** item 2 (esta branch: `package.json`, `vite.config.ts`, `eslint.config.mjs`,
   `ci.yml`, `supabase/config.jsonc`, `src/`); item 3 (`/home/user/wt-banco`: ADR 0005, `plan.md` R-1 a R-7, as 4
@@ -47,7 +47,12 @@ só o servidor fala com a Data API, por chave guardada como hash (D16) · chave 
 
 ### 3.1 Entrar (ação `sessao.entrar`, modo `nenhuma`)
 1. Mede o início. Se o pedido já traz cookie de sessão: encerra essa sessão primeiro (3.4), para nascer uma nova (RF-05).
-2. Porta 4: `{ email, senha }` estrito; e-mail até 254, senha de 1 a 1024 caracteres, **sem cortar nem alterar** (RF-32).
+2. Porta 4: `{ email, senha }` estrito; e-mail até 254, senha de **1 a 128 caracteres**, **sem cortar nem alterar** (RF-32;
+   ASVS V2.1.2: aceitar ao menos 64 e no máximo 128). Acima de 128 → `entrada_invalida`, sem ir ao Auth. Nota (28/11): o
+   Supabase Auth limita a senha a **72 bytes** (`supabase/auth`, ramo master, `internal/api/password.go:13-14,32`,
+   `MaxPasswordLength = 72`, conta bytes, não caracteres); como Entrar só confere a senha (não a cria), o limite de bytes é
+   assunto da spec de cadastro e convite, que leva a pergunta ao dono (senha com acento ou emoji passa de 72 bytes antes de
+   72 caracteres). Aqui não se corta nem se converte nada.
 3. Limite (D8): `public.conferir_tentativa(chave_ip, chave_conta)` (executável por `anon`). Passou → `limite`.
 4. `signInWithPassword` pelo cliente do servidor. Falhou → `public.registrar_tentativa_falha(pedido)` (`anon`; só
    evento, resultado, quando, pedido).
@@ -74,6 +79,9 @@ Todo pedido do servidor à Data API leva `x-chave-servidor` (ADR 0018 · D16); s
 6. **Porta 5:** `trabalho(ctx, dados)`; `ctx.banco` manda os cabeçalhos `x-chave-servidor`, `x-pedido`, `x-acao` (o
    nome da ação) e `x-estudio-esperado` em todo pedido; em pedido que grava, o pré-pedido recusa `x-pedido` fora do formato
    `uuid` e `x-acao` fora de `app.acoes_que_gravam`; `grava: false` com gravação, ou segunda gravação → `erro_interno`.
+   **Exceção (28/11):** `x-estudio-esperado` vai em todo pedido **menos** `registrar_recusa`: a recusa `estudio_trocado`
+   precisa ser registrada, e com o cabeçalho o pré-pedido a recusaria de novo e a linha nunca seria gravada (RF-24,
+   ASVS V7.1.3). `registrar_recusa` grava só para a própria pessoa e com o estúdio da sessão ou vazio (ADR 0019 · D6).
 7. **Porta 6:** gravou → as linhas saem do gatilho, na mesma transação. Recusa nas etapas 2 a 6 →
    `public.registrar_recusa(acao, codigo, pedido)` (melhor esforço; se falhar, a resposta não muda).
 8. Resposta `{ ok: true, valor }` ou `{ ok: false, codigo }`; sempre `Cache-Control: no-store`.
@@ -93,10 +101,15 @@ Modo `pessoa` (lista de estúdios, escolher, trocar, sair): passos 1, 3 (sem cab
   `org_id` da sessão ou vazio) → `signOut({ scope: 'local' })`, que roda **mesmo se** a marcação for recusada ou falhar →
   apaga os cookies → vai a Entrar. O token antigo, mesmo com assinatura válida,
   é recusado pelo pré-pedido no pedido seguinte (CA-13).
-- **Tempo (E39·3·B, aprovada com 1 h parado):** 12 h desde `entrou_em` e 1 h desde `ultimo_uso` (atualizado no passo 3 de 3.2,
-  no máximo uma vez por minuto). Vencida → a linha é marcada encerrada e nunca volta (o mesmo `session_id` é recusado
-  por `iniciar_sessao`) → `sem_login` → o servidor chama `signOut({ scope: 'local' })` → Entrar; nada gravado se perde (RF-07). Com E39·3·A: só 12 h.
-  Com E39·3·C: 30 dias, sem corte por parada.
+- **Tempo (E39·3·B, aprovada com 1 h parado; exceção em `SECURITY.md` §5):** 12 h desde `entrou_em` e 1 h desde
+  `ultimo_uso` (atualizado no passo 3 de 3.2, no máximo uma vez por minuto). Vencida ou parada → `sem_login` → o servidor
+  chama `public.encerrar_sessao(p_pedido)` em **melhor esforço** (marca `tempo` ou `parada`; se falhar, a resposta não
+  muda) e **depois** `signOut({ scope: 'local' })`, apaga o cookie → Entrar. A linha nunca volta (o mesmo `session_id` é
+  recusado por `iniciar_sessao`); nada gravado se perde (RF-07). ADR 0018 · D5.
+- **Nenhuma consulta automática renova a sessão (regra para T1 a T3):** `contexto_da_sessao` atualiza `ultimo_uso`, então
+  nenhuma tela chama ação por recarga periódica, foco da janela, reconexão ou consulta em segundo plano (no TanStack
+  Router/Query: sem `refetchInterval`, `refetchOnWindowFocus` e semelhantes que chamem ação). Só ação da pessoa ou carga
+  de página pedida por ela conta como uso. Senão a 1 h parada nunca venceria (ASVS V3.3.2).
 
 ## 4. Contrato da camada de serviço (fixo; os módulos dependem dele)
 `src/server/portas/acao.ts` (único arquivo que importa `createServerFn`):
@@ -115,7 +128,7 @@ type ContextoEstudio = {
 
 acao<E extends z.ZodType, S>(def: {
   nome: `${string}.${string}`          // ex.: 'agenda.bloqueio.criar'; único no catálogo
-  metodo: 'GET' | 'POST'               // POST quando grava
+  metodo: 'GET' | 'POST'               // 'estudio' e 'nenhuma': sempre POST; GET só em 'opcional'/'pessoa' com entrada vazia
   sessao: 'estudio'                    // 'pessoa' | 'opcional' | 'nenhuma' só na lista fechada de src/server/sessao
   permissao: readonly Papel[] | ((papel: Papel) => boolean)   // regra pura de src/domain/<modulo>/acesso.ts
   entrada: E                           // z.strictObject(...); sem campo de estúdio
@@ -123,6 +136,27 @@ acao<E extends z.ZodType, S>(def: {
   trabalho: (ctx: ContextoEstudio, dados: z.output<E>) => Promise<S>
 }): ServerFn<{ estudioDaTela: string; dados: z.input<E> }, Resultado<S>>
 ```
+- **Método (ADR 0018 · D18):** modo `estudio` é sempre `POST`, porque o TanStack Start põe a entrada do `GET` na URL
+  (`?payload=`; `@tanstack/start-client-core` 1.170.39, `client-rpc/serverFnFetcher.js:78-82`; ASVS V8.3.1, RF-33). `GET`
+  só em `opcional` e `pessoa` com `entrada: z.strictObject({})`. `conferirDefinicao` (`src/server/portas/catalogo.ts`) recusa o resto ao montar a ação.
+- **Leitura por função do banco** dentro de ação `grava: false`: `rpc(nome, args, { get: true })` no cliente, para a
+  transação do PostgREST ser só leitura e não contar como gravação (as funções de sessão seguem `POST`). Molde:
+
+```ts
+export const listarBloqueios = acaoPost.handler(acao({
+  nome: 'agenda.bloqueio.listar', metodo: 'POST', sessao: 'estudio', permissao: ['dona', 'recepcao'],
+  entrada: z.strictObject({ dia: z.iso.date() }), grava: false,
+  trabalho: (ctx, d) => lerBloqueiosDoDia(ctx.banco, d.dia),
+}))
+// src/data/agenda.ts (só aqui há @supabase): cliente.rpc('agenda_bloqueios_do_dia', { p_dia }, { get: true })
+```
+  (nomes do exemplo ilustrativos; `Banco` é opaco fora de `src/data`, como em `src/data/cliente.ts`.)
+- **Divergência do contrato acima (28/11, aceita):** cada ação é `export const x = acaoPost.handler(acao({...}))` (ou
+  `acaoGet`), e não `acao(...)` devolvendo a função pronta, porque o TanStack Start exige `createServerFn(...)` atribuído a
+  uma variável no **nível do módulo** para o compilador separar servidor e navegador. Efeito: a entrada fica `unknown` na
+  chamada pela tela (a porta 4 continua no servidor). **Pendente para a T2:** (a) devolver o tipo da entrada à tela com um
+  tipo auxiliar exportado de `acao.ts` (ex.: `EntradaDe<typeof x>`), sem mudar a validação; (b) provar com uma **rota
+  real** e `pnpm build` que o `trabalho` e `@supabase/*` não vão ao `dist/client` (CA-03; R-10).
 - Conflito do banco (ex.: exclusão `23P01`, chave `23505`) vira `conflito` no mapa de `src/data/erros.ts`; o resto,
   `erro_interno`. Nenhum texto do banco sai.
 - A tela manda `estudioDaTela` (o `orgId` que ela recebeu); recebeu `estudio_trocado` → recarrega (RF-15).
@@ -157,7 +191,7 @@ Migrations por `pnpm exec supabase migration new <nome>`, depois das do item 3 (
 |---|---|---|
 | M1 | `registro` | `app.registro` (fora da API): `quando` (UTC), `evento` (só `[a-z_.]`, até 64), `resultado` (lista fechada: `ok` e os códigos de RF-22), `usuario_id`, `org_id`, `objetos uuid[]` (até 10), `pedido_id`; RLS ligada e forçada, sem política, `revoke all`; gatilho que recusa `update`, `delete` e `truncate`; `check`: linha `sessao.entrar` que não é `ok` sem `usuario_id`, `org_id` e objetos. Nada de texto livre |
 | M2 | `registro_funcoes` | `app.registrar_mudanca()` (gatilho genérico `after insert or update or delete for each row`: evento de `x-acao`, objetos das colunas `uuid` nomeadas nos argumentos do gatilho, `org_id` da linha igual ao da sessão); `app.registrar_recusa` e a passagem `public.registrar_recusa` (só para a própria pessoa, código da lista, teto por pessoa); `public.registrar_tentativa_falha(p_pedido)` para `anon`, teto global por minuto; acima dele grava uma só linha de resumo por minuto com resultado `limite` (o teto não esconde falhas) e não dá erro; o gatilho recusa gravação sem `x-acao` válido |
-| M3 | `sessoes` | `app.sessoes` (`session_id` chave, `user_id`, `entrou_em`, `ultimo_uso`, `encerrada_em`), fora da API, RLS forçada; **nenhuma linha é apagada** (encerrar, vencer e parar só marcam `encerrada_em`; gatilho recusa `delete`); `public.iniciar_sessao` (recusa `session_id` já existente e `amr` de senha com mais de 60 s), `public.encerrar_sessao`, `public.contexto_da_sessao` (passagens `security invoker` para funções `app.*` `security definer` com `search_path = ''`); limites 12 h, 30 min e 60 s numa só função |
+| M3 | `sessoes` | `app.sessoes` (`session_id` chave, `user_id`, `entrou_em`, `ultimo_uso`, `encerrada_em`), fora da API, RLS forçada; **nenhuma linha é apagada** (encerrar, vencer e parar só marcam `encerrada_em`; gatilho recusa `delete`); `public.iniciar_sessao` (recusa `session_id` já existente e `amr` de senha com mais de 60 s), `public.encerrar_sessao`, `public.contexto_da_sessao` (passagens `security invoker` para funções `app.*` `security definer` com `search_path = ''`); limites 12 h, 1 h parada e 60 s numa só função |
 | M4 | `tentativas_entrada` | `app.tentativas_entrada` (chave `bytea` do HMAC, janela, contagem), fora do registro e fora da API; `public.conferir_tentativa(p_chave_ip, p_chave_conta)` para `anon`: apaga vencidas, conta e soma; 10 por conta e 30 por IP em 15 min; teto global de linhas (acima dele, `limite`) |
 | M5 | `estudios_da_pessoa_e_pre_pedido` | `public.meus_estudios()` e `public.escolher_estudio(p_org_id, p_pedido)` (`security invoker`, RF-12); `public.antes_do_pedido()` registrada com `alter role authenticator set pgrst.db_pre_request` e `notify pgrst, 'reload config'` (guia oficial): para **todo** pedido, recusa sem `x-chave-servidor` cujo SHA-256 esteja em `app.chaves_servidor` (D16); para `authenticated`, recusa sessão sem linha viva (menos em `rpc/iniciar_sessao`, que faz a própria conferência de D4), `x-estudio-esperado` diferente e, em pedido que grava, `x-pedido` e `x-acao` fora da regra (D6), com `raise sqlstate 'PGRST'` e os códigos `sem_login`, `estudio_trocado` e `erro_interno`. Mais `app.chaves_servidor` (só hash) e `app.acoes_que_gravam` (lista fechada; cada módulo acrescenta as suas na própria migration) |
 
@@ -179,11 +213,11 @@ Migrations por `pnpm exec supabase migration new <nome>`, depois das do item 3 (
 
 | Arquivo | O que tem |
 |---|---|
-| `src/app/start.ts` | `createStart` com `requestMiddleware: [createCsrfMiddleware({ filter: serverFn }), semCache]` |
+| `src/app/start.ts` | `createStart` com `requestMiddleware: [protecaoCsrf, semCache]` (de `src/server/http/middleware.ts`; `protecaoCsrf` = `createCsrfMiddleware` com filtro `serverFn`): CSRF por origem só nas server functions, depois `no-store`. **Escrito antes da T2** (28/11, junto da camada de serviço); a T2 só o confere e não muda a ordem |
 | `src/app/routes/__root.tsx` | `lang` do idioma de `sessao.ler`; o resto do item 2 e do item 4 fica |
 | `src/app/routes/entrar.tsx`, `escolher-estudio.tsx` | telas; nada na URL além do caminho (RF-33) |
 | `src/app/routes/_app.tsx`, `_app/index.tsx` | área com sessão: `beforeLoad` chama `sessao.ler`; sem sessão → `/entrar`; sem estúdio → `/escolher-estudio`. O `index.tsx` do item 2 passa para `_app/index.tsx`. A trava real é a porta 1 em cada ação (guia SSR do Supabase: `beforeLoad` só protege o desenho) |
-| `src/app/paginas/entrar.tsx` (+ `.css`, `.test.tsx`) | E-mail e Senha (campos do item 4, Senha com mostrar e esconder, sem `maxlength` abaixo de 1024, colar permitido), uma ação preta, estados carregando, erro e sucesso |
+| `src/app/paginas/entrar.tsx` (+ `.css`, `.test.tsx`) | E-mail e Senha (campos do item 4, Senha com mostrar e esconder, **sem `maxlength`** (o navegador cortaria o que se cola, RF-32; o teto de 128 é do servidor), colar permitido), uma ação preta, estados carregando, erro e sucesso |
 | `src/app/paginas/escolher-estudio.tsx` (+ `.css`, `.test.tsx`) | lista de nomes, carregando, erro com "Tentar de novo" |
 | `src/app/paginas/sua-conta.tsx` (+ `.test.tsx`) | menu (1440) e folha (390) do item 4: Trocar de estúdio (só com mais de um), Sair, e os outros itens "em desenvolvimento" |
 | `src/app/i18n/pt.ts`, `es.ts`, `en.ts`, `textos.ts`, `formatar.ts`, `i18n.test.ts` | ADR 0006 · D1: chaves do `pt.ts` como tipo das outras; blocos `comum`, `erros` (uma frase por código), `entrar`, `escolherEstudio`, `suaConta`; os módulos só acrescentam blocos |
@@ -225,7 +259,7 @@ esconder senha, frases de erro, inicial da bolinha Sua conta) entram no `DESIGN.
 | CA-15 | `ultimo_uso` e `entrou_em` empurrados para trás no banco local → `sem_login` | `070_`; integração |
 | CA-16 | conta nova pelo Auth recusada; `enable_signup` falso no `config.jsonc` | integração; leitura |
 | CA-17 | `security invoker`; sem execução para `anon` e `public`; nenhuma chave secreta em `src/` | `080_`; `molde.test.ts` |
-| CA-18, CA-18a | só estúdios ativos; senha de 64 e de 200 caracteres chega igual ao servidor | integração; e2e; `entrar.test.tsx` |
+| CA-18, CA-18a | só estúdios ativos; senha de 64 e de 128 caracteres chega igual ao servidor; 129 → `entrada_invalida` sem ir ao Auth | integração; e2e; `entrar.test.tsx` |
 | CA-19 | entrar, erro, carregando, escolher, trocar, sair em 390 e 1440, com `AxeBuilder` (`wcag2a`, `wcag2aa`, `wcag21aa`, `wcag22aa`) | `e2e/entrar.spec.ts`, `e2e/escolher-estudio.spec.ts` |
 | CA-20 | mesmas chaves, nada vazio, mesmos marcadores; idioma do estúdio depois de escolher | `i18n.test.ts`; e2e |
 | CA-21 | `createServerFn` fora de `acao.ts` dá erro de lint; ação fora do catálogo ou modo sem estúdio fora da lista falha | `eslint.camadas.test.ts`; `molde.test.ts` |
@@ -328,6 +362,9 @@ de rascunho (E22·B); nunca se junta nelas. Conflitos esperados: `package.json`,
   já foi apagado e, com D16, só o servidor o usaria. Aceito, com a linha marcada assim que o banco voltar.
 - **Fora de escopo, registrado:** prazo de guarda do registro e de `app.sessoes` é dado de cliente e decisão do dono
   (spec da vida do estúdio, `SECURITY.md` §7); até lá nada se apaga.
+- **R-17** (28/11) · Lido só no código instalado, **não verificado** com o app rodando: `GET` põe a entrada em
+  `?payload=` (D18) e `rpc(..., { get: true })` abre transação só leitura no PostgREST local. O limite de 72 bytes do Auth
+  foi lido no ramo master do `supabase/auth`, não na versão do Auth local: **não verificado** nela.
 - **R-12** · Medida de tempo do CA-01 pode oscilar na CI; tolerância de 100 ms e 10 amostras.
 
 ## 15. Fontes lidas (28/11/2026)
