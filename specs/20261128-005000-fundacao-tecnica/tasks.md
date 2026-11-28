@@ -34,7 +34,7 @@
 | 14 | Revisar o banco local (migration, teste, scripts sem remoto) | Engenheiro de dados que **não** fez o passo 7, e Auditor de risco | relatório sem "Bloqueia" |
 | 15 | Revisar CI e segredos: permissões, gatilhos, ações por commit, `--redact`, Dependabot, `allowBuilds` (se houver), skills de terceiros do Spec Kit em `.claude/skills/speckit-*`; as travas trazidas e o `.claude/settings.json` | Engenheiro de segurança e Auditor de risco | relatórios sem "Bloqueia" |
 | 15b | Conferir as decisões do ADR 0003, trava por trava (E16·1: outro papel confere) | Auditor de risco | conferência registrada no ADR 0003 |
-| 15c | Revisar o ADR 0002 (D1 a D4, D9 a D11 pelo Revisor de código; D5 a D8 pelo Auditor de risco) e o ADR 0003 (Revisor de código no código das travas; Auditor de risco nas decisões) | Revisor de código e Auditor de risco | "Revisão" preenchida nos dois ADR, sem "Bloqueia" |
+| 15c | Revisar o ADR 0002 (D5 a D8, segurança, pelo Engenheiro de segurança e o Auditor de risco; D1 a D4 e D9 a D11 pelo Revisor de código) e o ADR 0003 (Revisor de código no código das travas; Auditor de risco nas decisões) | Engenheiro de segurança, Auditor de risco e Revisor de código | "Revisão" preenchida nos dois ADR, sem "Bloqueia" |
 | 16 | Prova do CA8 em branch descartável com token falso; apagar a branch | QA com o Engenheiro de segurança | job `segredos` vermelho, achado mascarado; branch apagada |
 | 17 | Veredito de CA1 a CA13 pelo `plan.md` §11, incluindo a prova manual do CA4 e o CA9 na aba do Dependabot | Analista de qualidade (QA) | veredito com links |
 | 18 | Revisar o texto do passo 11, incluindo o `README.md` (CA13) | Analista de requisitos | igual aos scripts |

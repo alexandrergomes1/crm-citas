@@ -2,8 +2,8 @@
 
 - **Status:** Proposto · decisões técnicas (`AGENTS.md` §5) · 27/11/2026. Vale quando a spec
   `specs/20261128-005000-fundacao-tecnica/spec.md` for aprovada pelo dono.
-- **Autor:** Arquiteto de software · **Revisão:** pendente (outro papel: Engenheiro de segurança para D5 a D8; Revisor de
-  código para D1 a D4 e D9)
+- **Autor:** Arquiteto de software · **Revisão:** pendente (outro papel: Engenheiro de segurança e Auditor de risco para D5 a D8,
+  segurança; Revisor de código para D1 a D4 e D9 a D11)
 - **Aviso ao dono:** em uma linha, junto do pedido de aprovação da spec (`AGENTS.md` §3 item 3).
 - **Detalhe e fontes:** `specs/20261128-005000-fundacao-tecnica/plan.md` §2 a §9.
 
