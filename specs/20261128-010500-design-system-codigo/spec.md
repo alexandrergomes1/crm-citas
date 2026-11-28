@@ -141,9 +141,15 @@ pelo Designer de produto e conferida pelo Revisor de design antes do dono.
 - **E25·2 · Medidas que o `DESIGN.md` não fixa: peso "forte", altura de linha e ícones.** A: usar as do canvas
   aprovado (`docs/design/canvas/v6.css` e `K3Controles.dc.html`): forte = 600; altura de linha 1,2 nos títulos e
   1,4 no texto; ícones Lucide com traço 1,75 e tamanhos 14, 16, 18, 20 (padrão) e 24; e os nomes Lucide dos ícones
-  de função (✕, ‹, ›, ▾, ⋮, +, funil, sininho, ajuda, painel, lupa, calendário, Ordenar) como no canvas; tudo gravado
-  no `DESIGN.md`. B: o Designer de produto propõe outros valores na ficha. Desfaz: troca de um token ou de um nome.
-  **Recomendo A** (é o que está nas imagens aprovadas; sem isso os botões de função não podem ser construídos).
+  de função (✕, ‹, ›, ▾, ⋮, +, funil, sininho, ajuda, painel, lupa, calendário, Ordenar) como no canvas; os ícones
+  que o `DESIGN.md` não nomeia, tirados da imagem 03 e do canvas aprovado (ficha visual): Categoria `shapes`, Mais
+  `layout-grid`, Equipe `briefcase`, Modelo e seção Modelos `layout-template`, Termos `file-text`, Lista de espera
+  `list-ordered`, menu ⋮ Editar `pencil`, Duplicar `copy`, Arquivar `archive`; fundo escurecido da camada aberta
+  `rgba(22,24,29,.40)`; quadrado da inicial do estúdio 32 com canto 10; tudo gravado no `DESIGN.md`. B: o Designer
+  de produto propõe outros valores (nos ícones sem nome: tirar o ícone até o mapa `L7Icones` ser aprovado).
+  Desfaz: troca de um token ou de um nome. **Recomendo A** (é o que está nas imagens aprovadas; §5 pede ícone e nome
+  nesses botões; sem isso os botões de função não podem ser construídos). Juntado aqui, e não numa E25·4, porque
+  `AGENTS.md` §4 limita a 3 dúvidas por spec e é a mesma natureza (medida e nome que o `DESIGN.md` não fixa).
 - **E25·3 · Largura em que a tela vira a de computador** (o `DESIGN.md` testa 390 e 1440, mas não diz onde troca;
   ex.: tablet). A: a partir de 840 px, classe "expanded" do Material Design 3 (norma já seguida pelo `DESIGN.md`).
   B: outra largura escolhida pelo dono. Desfaz: troca de um token. **Recomendo A.**
