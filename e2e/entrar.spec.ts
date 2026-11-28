@@ -154,6 +154,72 @@ test('sair: volta a Entrar, o cookie some e voltar no navegador não mostra dado
   await expect(page.getByRole('button', { name: 'Sua conta' })).toHaveCount(0)
 })
 
+test('antes da página ficar interativa: Entrar não envia, nada vai ao endereço e o digitado fica (revisões R1, R-B)', async ({
+  page,
+  context,
+}, info) => {
+  const c = conta(info, 'um')
+  const { pedidos } = observar(page)
+  // Segura todo o JavaScript da página: o HTML do servidor fica na tela, sem React (antes da hidratação)
+  let liberar: () => void = () => {}
+  const segurado = new Promise<void>((pronto) => (liberar = pronto))
+  await page.route('**/*', async (rota) => {
+    if (rota.request().resourceType() === 'script') await segurado
+    await rota.fallback()
+  })
+  // Módulos seguram o DOMContentLoaded: espera só a resposta e o título desenhado pelo servidor
+  await page.goto('/entrar', { waitUntil: 'commit' })
+  await expect(page.getByRole('heading', { name: 'Entrar' })).toBeVisible()
+
+  const botao = page.getByRole('button', { name: 'Entrar' })
+  const email = page.getByLabel('E-mail')
+  const senha = page.getByLabel('Senha', { exact: true })
+  await expect(botao).toBeDisabled()
+  await expect(page.locator('form')).toHaveAttribute('method', 'post')
+  await email.fill(c.email)
+  await senha.fill(c.senha)
+  // Enter no campo (envio implícito do HTML) e toque no botão: com o botão desativado, nenhum envio nativo
+  await senha.press('Enter')
+  await botao.click({ force: true })
+  await page.waitForTimeout(500)
+  expect(pedidos.filter((p) => p.resourceType() === 'document' && p.method() === 'POST').map((p) => p.url())).toEqual([])
+  expect(pedidos.map((p) => p.url()).filter((u) => u.includes(c.senha) || u.includes(encodeURIComponent(c.senha)))).toEqual([])
+  expect(new URL(page.url()).pathname).toBe('/entrar')
+  expect(new URL(page.url()).search).toBe('')
+  await expect(email).toHaveValue(c.email)
+  await expect(senha).toHaveValue(c.senha)
+
+  // Página interativa: o botão acorda, o digitado continua e a entrada vai pela ação do servidor
+  liberar()
+  await expect(botao).toBeEnabled()
+  await expect(email).toHaveValue(c.email)
+  await expect(senha).toHaveValue(c.senha)
+  await page.unroute('**/*')
+  await botao.click()
+  await page.waitForURL((url) => url.pathname === '/')
+  expect(pedidos.filter((p) => p.resourceType() === 'document' && p.method() === 'POST')).toEqual([])
+  expect((await context.cookies()).some((k) => k.name.startsWith('__Host-sessao'))).toBe(true)
+})
+
+test('POST nativo em /entrar (se o botão fosse forçado): a página volta como está, sem a senha e sem sessão (revisões R1, R-B)', async ({
+  page,
+  context,
+}, info) => {
+  const c = conta(info, 'um')
+  // O mesmo pedido que o navegador faria com o formulário sem React: corpo de formulário, nada no endereço
+  const resposta = await page.request.post('/entrar', { form: { email: c.email, senha: c.senha } })
+  expect(resposta.status()).toBe(200)
+  expect(new URL(resposta.url()).search).toBe('')
+  expect(resposta.headers()['cache-control']).toContain('no-store')
+  const corpo = await resposta.text()
+  expect(corpo).toContain('Entrar')
+  expect(corpo).not.toContain(c.senha)
+  expect(corpo).not.toContain(c.email)
+  expect(corpo).not.toContain(encodeURIComponent(c.email))
+  // O corpo é ignorado: ninguém entra por esse caminho
+  expect((await context.cookies()).filter((k) => k.name.startsWith('__Host-sessao'))).toEqual([])
+})
+
 // CA-20: antes de escolher o estúdio, vale o idioma do navegador (spec RF-34)
 for (const [locale, idioma, titulo, rotulo] of [
   ['es-ES', 'es', 'Entrar', 'Correo electrónico'],

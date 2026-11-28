@@ -11,16 +11,23 @@ export type EstadoEntrar = 'pronto' | 'enviando' | 'erro'
 export interface EntrarVistaProps {
   textos: Textos
   estado: EstadoEntrar
+  /**
+   * Página interativa (React hidratado)? Antes disso o botão fica `disabled`: o envio nativo do formulário (POST na
+   * própria página) não acontece, nem por toque nem por Enter (envio implícito do HTML). Revisões R1 e R-B.
+   */
+  interativa: boolean
   email: string
   senha: string
   onEmail: (valor: string) => void
   onSenha: (valor: string) => void
   onEnviar: () => void
   refSenha?: Ref<HTMLInputElement>
+  /** o formulário, para ler o que foi digitado antes da hidratação */
+  refFormulario?: Ref<HTMLFormElement>
 }
 
 /** O desenho da tela, sem estado próprio (testado por renderToString). */
-export function EntrarVista({ textos, estado, email, senha, onEmail, onSenha, onEnviar, refSenha }: Readonly<EntrarVistaProps>) {
+export function EntrarVista({ textos, estado, interativa, email, senha, onEmail, onSenha, onEnviar, refSenha, refFormulario }: Readonly<EntrarVistaProps>) {
   const t = textos.entrar
   const enviando = estado === 'enviando'
 
@@ -35,7 +42,7 @@ export function EntrarVista({ textos, estado, email, senha, onEmail, onSenha, on
         <Bloco>
           <h1 className="tela-sem-menu__titulo">{t.titulo}</h1>
           {/* noValidate: o servidor confere (porta 4); o balão do navegador não segue o DESIGN.md */}
-          <form className="entrar__formulario" method="post" noValidate onSubmit={enviar}>
+          <form ref={refFormulario} className="entrar__formulario" method="post" noValidate onSubmit={enviar}>
             <CampoTexto
               rotulo={t.email}
               type="email"
@@ -63,6 +70,7 @@ export function EntrarVista({ textos, estado, email, senha, onEmail, onSenha, on
               variante="principal"
               type="submit"
               cheio
+              disabled={interativa ? undefined : true}
               aria-disabled={enviando ? true : undefined}
               aria-busy={enviando ? true : undefined}
             >
@@ -98,7 +106,25 @@ export function Entrar({ textos, entrar, aoEntrar }: Readonly<EntrarProps>) {
   const [email, setEmail] = useState('')
   const [senha, setSenha] = useState('')
   const [erros, setErros] = useState(0)
+  const [interativa, setInterativa] = useState(false)
   const refSenha = useRef<HTMLInputElement>(null)
+  const refFormulario = useRef<HTMLFormElement>(null)
+
+  // Só roda no navegador, depois da hidratação: daí em diante o envio é pela ação do servidor (RF-33).
+  // O que a pessoa digitou antes da hidratação está só nos campos (o React não sobrescreve ao hidratar, mas o
+  // próximo desenho apagaria): passa para o estado no mesmo desenho que acorda o botão.
+  useEffect(() => {
+    const campos = refFormulario.current?.elements
+    const digitado = (nome: string) => {
+      const campo = campos?.namedItem(nome)
+      return campo instanceof HTMLInputElement ? campo.value : ''
+    }
+    const emailDigitado = digitado('email')
+    const senhaDigitada = digitado('senha')
+    if (emailDigitado) setEmail(emailDigitado)
+    if (senhaDigitada) setSenha(senhaDigitada)
+    setInterativa(true)
+  }, [])
 
   useEffect(() => {
     if (erros > 0) refSenha.current?.focus()
@@ -125,12 +151,14 @@ export function Entrar({ textos, entrar, aoEntrar }: Readonly<EntrarProps>) {
     <EntrarVista
       textos={textos}
       estado={estado}
+      interativa={interativa}
       email={email}
       senha={senha}
       onEmail={setEmail}
       onSenha={setSenha}
       onEnviar={() => void enviar()}
       refSenha={refSenha}
+      refFormulario={refFormulario}
     />
   )
 }

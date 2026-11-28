@@ -3,12 +3,12 @@ import { renderToString } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { textosDe } from '@/app/i18n/textos'
 import { CampoSenha, ErroFormulario } from '@/app/ui/campos'
-import { EntrarVista, type EstadoEntrar } from './entrar'
+import { Entrar, EntrarVista, type EstadoEntrar } from './entrar'
 
 const nada = () => {}
-const vista = (estado: EstadoEntrar, email = '', idioma: 'pt' | 'es' | 'en' = 'pt') =>
+const vista = (estado: EstadoEntrar, email = '', idioma: 'pt' | 'es' | 'en' = 'pt', interativa = true) =>
   renderToString(
-    <EntrarVista textos={textosDe(idioma)} estado={estado} email={email} senha="" onEmail={nada} onSenha={nada} onEnviar={nada} />,
+    <EntrarVista textos={textosDe(idioma)} estado={estado} interativa={interativa} email={email} senha="" onEmail={nada} onSenha={nada} onEnviar={nada} />,
   )
 
 describe('Entrar · vazio', () => {
@@ -42,6 +42,20 @@ describe('Entrar · vazio', () => {
     expect(html).not.toContain('role="alert"')
     expect(html).not.toContain('aria-busy')
     expect(html).not.toContain('readOnly')
+  })
+})
+
+describe('Entrar · antes da hidratação (revisões R1 e R-B)', () => {
+  it('o componente com estado desenha Entrar com disabled (o servidor manda a página assim)', () => {
+    const html = renderToString(<Entrar textos={textosDe('pt')} entrar={async () => ({ ok: false })} aoEntrar={nada} />)
+    expect(html).toMatch(/<button disabled=""[^>]*type="submit"/)
+    // o envio continua por POST (nada no endereço, mesmo se o envio nativo acontecesse; RF-33)
+    expect(html).toMatch(/<form[^>]*method="post"/)
+  })
+
+  it('a vista não interativa trava o botão; a interativa não', () => {
+    expect(vista('pronto', '', 'pt', false)).toMatch(/<button disabled=""[^>]*type="submit"/)
+    expect(vista('pronto')).not.toMatch(/\sdisabled=""/)
   })
 })
 
