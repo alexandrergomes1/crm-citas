@@ -85,6 +85,15 @@ const esperadoRaiz: Record<string, string> = {
   '--atraso-carregando': '300ms',
 }
 
+/** Os 5 tokens fora do plan.md §4, aceitos e registrados no fim do tokens.css */
+const aceitosForaDoPlano: Record<string, string> = {
+  '--fs-texto': 'var(--fs-15)',
+  '--mostra-celular': 'flex',
+  '--mostra-computador': 'none',
+  '--w-busca-tela-atual': '100%',
+  '--dur-interruptor': '150ms',
+}
+
 /** Computador (DESIGN.md §4): margem 24, controle e toque 40, texto 14 */
 const esperadoComputador: Record<string, string> = {
   '--fs-texto': 'var(--fs-14)',
@@ -113,6 +122,16 @@ describe('CA-1 · tokens iguais ao DESIGN.md', () => {
 
   it.each(Object.entries(esperadoComputador))('computador %s = %s', (nome, valor) => {
     expect(computador.get(nome)).toBe(valor)
+  })
+
+  it.each(Object.entries(aceitosForaDoPlano))('fora do plano, aceito %s = %s', (nome, valor) => {
+    expect(raizTokens.get(nome)).toBe(valor)
+  })
+
+  it('nenhum token não previsto (RT-1 do DESIGN.md, plan.md §4 ou os 5 aceitos)', () => {
+    const previstos = new Set([...cores.map(([n]) => n), ...Object.keys(esperadoRaiz), ...Object.keys(aceitosForaDoPlano)])
+    const naoPrevistos = [...raizTokens.keys(), ...computador.keys()].filter((n) => !previstos.has(n))
+    expect(naoPrevistos).toEqual([])
   })
 
   it('ponto de troca celular → computador em 840 px (PONTO A MUDAR: E25·3, recomendação A)', () => {

@@ -229,7 +229,7 @@
 
 @media (prefers-reduced-motion: no-preference) {
   .ds-interruptor::after {
-    transition: transform .15s ease-out;
+    transition: transform var(--dur-interruptor) ease-out;
   }
 }
 

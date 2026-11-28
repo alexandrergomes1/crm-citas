@@ -158,6 +158,11 @@ function Camada({ tipo, aberta, onFechar, titulo, nomeFechar, children, rodape }
   const dialogo = useRef<HTMLDialogElement>(null)
   const anterior = useRef<HTMLElement | null>(null)
   const idTitulo = useId()
+  // quem chama já fechou (Cancelar, Confirmar)? então o evento "close" não chama onFechar de novo
+  const abertaAgora = useRef(aberta)
+  useEffect(() => {
+    abertaAgora.current = aberta
+  }, [aberta])
 
   useEffect(() => {
     const el = dialogo.current
@@ -171,7 +176,8 @@ function Camada({ tipo, aberta, onFechar, titulo, nomeFechar, children, rodape }
   }, [aberta])
 
   function aoFechar() {
-    onFechar()
+    // Esc ou ✕: o navegador fechou e a prop ainda diz aberta
+    if (abertaAgora.current) onFechar()
     anterior.current?.focus()
   }
 

@@ -133,6 +133,7 @@
   --foco-afastado: 2px;
   --opac-desativado: .6;
   --atraso-carregando: 300ms;
+  --dur-interruptor: 150ms;
 
   /* Desenho de celular × computador: os componentes que mudam de desenho (RC-18 × RC-19) leem estes dois. */
   --mostra-celular: flex;
@@ -155,3 +156,12 @@
     --w-busca-tela-atual: var(--w-busca-tela);
   }
 }
+
+/*
+ * Tokens fora da lista do plan.md §4 (registro no plano e no ADR 0004 pedido ao Arquiteto; revisão de código do item 4).
+ * Só estes 5; o tokens.test.ts reprova qualquer outro não previsto.
+ * - --fs-texto: texto corrido, 15 no celular e 14 no computador (DESIGN.md §4).
+ * - --mostra-celular / --mostra-computador: trocam o desenho (RC-18 × RC-19) sem escrever a largura fora daqui.
+ * - --w-busca-tela-atual: busca da tela cheia no celular e 280 no computador (DESIGN.md §8b).
+ * - --dur-interruptor: duração do movimento do interruptor; só vale sem "movimento reduzido" (RA-6).
+ */
