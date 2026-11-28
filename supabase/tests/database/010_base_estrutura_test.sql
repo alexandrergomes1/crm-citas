@@ -2,7 +2,8 @@
 -- Molde oficial: https://supabase.com/docs/guides/local-development/testing/overview
 -- Login simulado: set_config('request.jwt.claims') + set local role authenticated (é o que auth.uid() lê).
 -- Lista de privilégios atualizada pela spec 20261128-030000-entrar-servico (plan.md §6; ADR 0019 · D17 substitui
--- a linha D9 do ADR 0005): anon só as funções de entrar e o pré-pedido; authenticated só as da sessão e da trava.
+-- a linha D9 do ADR 0005): anon só as funções de entrar e o pré-pedido; authenticated só as da sessão e da trava,
+-- mais app.pode, a função da matriz de permissões (ADR 0020 · D7; ADR 0019 · D21).
 begin;
 select plan(24);
 
@@ -105,11 +106,11 @@ select is(
       and pg_catalog.has_function_privilege('authenticated', p.oid, 'execute')),
   array['app.antes_do_pedido()', 'app.contexto_da_sessao()', 'app.eh_dona()', 'app.encerrar_sessao(uuid)',
         'app.escolher_estudio(uuid)', 'app.escolher_estudio_da_sessao(uuid,uuid)', 'app.estudio_da_sessao()',
-        'app.iniciar_sessao(uuid)', 'app.meus_estudios()', 'app.papel_da_sessao()',
+        'app.iniciar_sessao(uuid)', 'app.meus_estudios()', 'app.papel_da_sessao()', 'app.pode(text,text)',
         'app.registrar_recusa(text,text,uuid)',
         'contexto_da_sessao()', 'encerrar_sessao(uuid)', 'escolher_estudio(uuid,uuid)', 'iniciar_sessao(uuid)',
         'meus_estudios()', 'registrar_recusa(text,text,uuid)'],
-  'authenticated executa só as funções da trava, da sessão e o pré-pedido');
+  'authenticated executa só as funções da trava, da sessão, da matriz e o pré-pedido');
 select is(
   (select coalesce(array_agg(p.oid::regprocedure::text order by p.oid::regprocedure::text collate "C"), array[]::text[])
      from pg_catalog.pg_proc p
