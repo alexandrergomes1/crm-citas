@@ -4,7 +4,9 @@
 - **Aprovação do dono:** (pendente)
 - **Aprovação do merge:** (pendente)
 - **Item da fila:** 5 (`docs/BACKLOG.md`), módulo Caixa do núcleo (E3·2), em paralelo por ordem do dono (E22·B)
-- **Branch:** `feat/caixa` (a partir da `previas`), construção em PR de rascunho; nada é juntado sem o dono (E22·B)
+- **Branch:** `feat/caixa` (a partir da `previas`), empilhada por merge sobre as bases `feat/banco-ligacao`,
+  `feat/design-system-codigo` e `feat/entrar-servico` (decisão do Engenheiro de DevOps); construção em PR de rascunho;
+  nada é juntado sem o dono (E22·B)
 - **Tipo:** Tela, com Banco e Código, e **dinheiro** (`docs/guias/processo-sdd.md` §3) · **Revisores:** Revisor de
   design, Engenheiro de dados (quem não fez), Auditor de risco e Engenheiro de segurança (dinheiro e acesso),
   Revisor de código e QA
@@ -143,11 +145,11 @@ estorno.
 | CA-01 | RN-01 a RN-07: esperado com todos os tipos de movimento, diferença Confere/Sobra/Falta, valor inicial 0 conforme E32·1, negativo recusado, acima do limite técnico do tipo recusado, fração de centavo recusada, moeda de 3 casas recusada. | unidade (`src/domain`) |
 | CA-02 | Abrir com caixa já Aberto recusado (E32·1), pela restrição única do banco; duas aberturas simultâneas: só uma; mesma chave e mesmo conteúdo: mesmo resultado; mesma chave com outro conteúdo: recusada. | teste de banco na CI |
 | CA-03 | Sangria maior que o esperado em dinheiro recusada; sangria e suprimento sem caixa Aberto recusados; repetidos gravam um. | unidade e banco |
-| CA-04 | Pagamento do Checkout ligado ao caixa Aberto conforme E31·1 (dinheiro sem caixa aberto: recusado; cartão ou Pix sem caixa aberto: gravado sem caixa e fora de todo fechamento; com caixa aberto: entra nele). O servidor ignora caixa vindo da tela; ligação a caixa de outro estúdio recusada pela chave composta. | teste de servidor e de banco |
+| CA-04 | Pagamento do Checkout ligado ao caixa Aberto conforme E31·1 (dinheiro sem caixa aberto: recusado; cartão ou Pix sem caixa aberto: gravado sem caixa e fora de todo fechamento; com caixa aberto: entra nele). O servidor ignora caixa vindo da tela; ligação a caixa de outro estúdio recusada pela chave composta. | teste de servidor e de banco; **fecha no PR do Checkout** (o QA do Caixa marca "fecha no Checkout") |
 | CA-05 | Fechar grava esperado, contado e diferença; diferença ≠ 0 sem motivo recusada; fechar duas vezes: um só fechamento. | unidade e banco |
-| CA-06 | Pagamento gravado entre a contagem e a confirmação: fechamento recusado; pagamento e fechamento simultâneos: o pagamento fica no caixa antes de fechar ou é recusado, nunca em caixa fechado. | teste de banco na CI |
+| CA-06 | Pagamento gravado entre a contagem e a confirmação: fechamento recusado; pagamento e fechamento simultâneos: o pagamento fica no caixa antes de fechar ou é recusado, nunca em caixa fechado. | teste de banco na CI; **fecha no PR do Checkout** (o QA do Caixa marca "fecha no Checkout") |
 | CA-07 | Caixa Fechado e seus movimentos não se alteram nem se apagam (nem com a sessão da dona); nada entra nele. | teste de banco na CI |
-| CA-08 | Contagem conforme E32·2 (cega: a resposta do servidor não traz o esperado antes de receber o contado; só o total em dinheiro é contado); aviso ao fechar conta só atendimento sem checkout, não conta "Concluído, sem valor", e não impede fechar. | teste de servidor |
+| CA-08 | Contagem conforme E32·2 (cega: a resposta do servidor não traz o esperado antes de receber o contado; só o total em dinheiro é contado); a parte do aviso **fecha no PR do Checkout** (o QA do Caixa a marca "fecha no Checkout"): o aviso ao fechar conta só atendimento sem checkout, não conta "Concluído, sem valor", e não impede fechar. | teste de servidor |
 | CA-09 | O estúdio A não lê, cria, altera nem apaga caixa ou movimento do estúdio B; sem login ou sem papel, nada. | teste de isolamento na CI (molde do item 3) |
 | CA-10 | Permissão por papel conforme E32·3 (cada papel × abrir, sangria/suprimento, fechar, ver aberto, ver histórico). | teste de servidor e de banco |
 | CA-11 | Abrir, movimentar e fechar geram registro (porta 6) com valores, sem dado pessoal nem motivo em texto livre; URL só com id; no modo "entrar como o estúdio", nada registrado e sem autor (E6·1). | teste automático e revisão do Engenheiro de segurança |
@@ -158,6 +160,9 @@ estorno.
 | CA-16 | Revisores do tipo (incluindo Auditor de risco e Engenheiro de segurança) sem "Bloqueia", veredito do QA e conferência do dono na prévia. | relatórios no PR |
 
 ## 9. Dependências
+- **E36·A · Entrar e camada de serviço** (`specs/20261128-030000-entrar-servico/spec.md`, branch
+  `feat/entrar-servico`): login, sessão, as 6 portas e o registro (porta 6), de que dependem o RF-12, o RNF-02,
+  o CA-10 e o CA-11.
 - **Item 2** (CI, app vazio) · **item 3** (estúdio, moeda e fuso do estúdio, papéis, função de checagem, molde do
   teste) · **item 4** (design system no código e idiomas).
 - **Checkout** (spec em paralelo): pagamentos com forma e valor em centavos (RF-11 do Checkout; a migration do Checkout cria a ligação com o caixa), a resposta da

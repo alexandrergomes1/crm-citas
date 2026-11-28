@@ -5,13 +5,14 @@
 - Só os arquivos do `plan.md` §8. Quem constrói não revisa. Antes de enviar: `pnpm typecheck`, `pnpm lint`, `pnpm test`,
   `pnpm db:test` (banco **local**). A IA nunca aplica no banco remoto nem publica.
 - Construção em PR de rascunho pode começar antes da aprovação (E22·B); o pedido de merge só com "Status: Approved" e as
-  respostas E32·1 a E32·3 (e E31·1, E31·3) gravadas.
+  respostas E32·1 a E32·3, E31·1, E31·3 e **E24·3** gravadas (até a E24·3, vale a recusa provisória, mostrada ao dono no pedido).
 
 ## Preparo
 | # | Tarefa | Papel | Pronto quando |
 |---|---|---|---|
-| T0 | Conferir respostas E32·1–E32·3, E31·1, E31·3 e a E24·3; se outra que não a recomendação, aplicar o §11 do plano (ou parar e voltar à 5b onde ele manda) | Gerente de projeto | respostas citadas no PR |
-| T1 | Branch empilhada: merge de `feat/banco-ligacao`, `feat/design-system-codigo`, `feat/entrar-servico`, `feat/catalogo` (e `feat/agenda` se `navegacao.ts` só nascer lá); PR de rascunho | Engenheiro de DevOps | CI roda na pilha; nada juntado numa base |
+| T0a | Conferir que as respostas E32·1–E32·3, E31·1, E31·3 e E24·3 estão gravadas (só confere) | Gerente de projeto | respostas citadas no PR |
+| T0b | Resposta diferente da recomendação: aplicar o §11 do plano, ou parar e voltar à 5b onde ele manda | Arquiteto de software | plano ajustado, ou parada relatada |
+| T1 | Branch empilhada: merge de `feat/banco-ligacao`, `feat/design-system-codigo`, `feat/entrar-servico`, `feat/catalogo` (`navegacao.ts` vem da `feat/entrar-servico`); PR de rascunho | Engenheiro de DevOps | CI roda na pilha; nada juntado numa base |
 | T2 | **Ficha visual antes das telas** (etapa 6): Caixa atual fechado e aberto, Abrir, Sangria/Suprimento, Fechar (2 passos), Histórico, Ver, em 390 e 1440; nomes e peças que faltam no `DESIGN.md` (spec §4) | Designer de produto; confere o Revisor de design; aprova o dono | ficha aprovada; linhas do `DESIGN.md` gravadas |
 
 ## Banco (Engenheiro de dados)

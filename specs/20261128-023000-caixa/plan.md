@@ -9,7 +9,8 @@
   mora nesta branch). **Decisões por tabela do antigo:** `docs/adr/0016-caixa-tabelas-do-antigo.md`, escrito pelo
   Engenheiro de dados na T3 (não aqui).
 - **Portão:** a construção em PR de rascunho pode começar antes da aprovação (E22·B); o pedido de merge só com a spec
-  "Status: Approved" e as respostas E32 (e E31·1, E31·3) gravadas.
+  "Status: Approved" e as respostas E32, E31·1, E31·3 e **E24·3** (moeda do estúdio, item 3) gravadas. Até a resposta
+  da E24·3 vale a **recusa provisória** (falha fechada, L-2), e o pedido de merge a mostra ao dono.
 - **Dependência fixada pelo dono (E36·A):** login, sessão, as 6 portas, a transação por ação e o registro (porta 6) vêm
   da spec "Entrar e camada de serviço" (`feat/entrar-servico`, spec lida). O Caixa **usa**, não constrói.
 - **Bases lidas em 28/11/2026 (só leitura, nada editado lá):** item 3 (`/home/user/wt-banco`: ADR 0005, migrations
@@ -44,14 +45,14 @@ Checkout (migration dele, feat/checkout) ──► trava e soma na linha de publ
 - **L-1 · E32·1, E32·2, E32·3 sem resposta** (e E31·1, E31·3 do Checkout). O plano usa as recomendações (A, A, A; E31·1·A;
   E31·3·A) e mostra no §11 o que muda. Construção em rascunho pode andar; o merge, não.
 - **L-2 · Moeda do estúdio muda com caixa aberto (E24·3 em aberto no item 3; dinheiro).** O item 3 deixa a dona alterar
-  `estudios.moeda`. O caixa guarda a moeda da abertura (RF-13). **Recomendo:** enquanto a E24·3 não for respondida, o
-  banco recusa pagamento, sangria e suprimento em moeda diferente da do caixa (falha fechada); quem decide é o dono, pela
-  E24·3 (o mesmo ponto da L-3 do Catálogo).
+  `estudios.moeda`. O caixa guarda a moeda da abertura (RF-13). A E24·3 é **portão do pedido de merge**. Até a
+  resposta vale a **recusa provisória** (falha fechada): o banco recusa pagamento, sangria e suprimento em moeda
+  diferente da do caixa; o pedido de merge mostra isso ao dono, que decide pela E24·3 (o mesmo ponto da L-3 do Catálogo).
 - **L-3 · Recepção depois de fechar (E32·3·A).** Pela recomendação, a recepção vê só o caixa aberto e o histórico só a
   dona. Ao confirmar o fechamento, a recepção vê o resultado (esperado, contado, diferença) uma vez, na resposta da
   ação, e depois não vê mais. **Recomendo** deixar assim (é o que a E32·3·A diz); confirmar no texto da E32·3.
-- **L-4 · Limite técnico (RN-03).** O teto técnico fica **9 007 199 254 740 991 centavos** (ADR 0017 · D5), não o
-  máximo do `bigint`. Só ajuste de texto no RN-03 e no CA-01.
+- **L-4 · (fechada pela 5b):** o teto técnico de **9 007 199 254 740 991 centavos** é decisão técnica (ASVS V11.1.4),
+  no ADR 0017 · D5; só ajuste de texto no RN-03 e no CA-01.
 - **L-5 (só texto):** o cabeçalho diz "Branch: `feat/caixa` (a partir da `previas`)"; a branch é empilhada (§9).
 
 ## 3. Dúvidas em aberto: o plano usa a recomendação
@@ -288,8 +289,8 @@ módulos (inclusive `010_base_estrutura_test.sql`), `supabase/config.jsonc`, `su
 ## 9. Branch (decisão do Engenheiro de DevOps)
 `feat/caixa` recebe, **por merge**, nesta ordem: `feat/banco-ligacao` e `feat/design-system-codigo` (já com a
 `chore/fundacao-tecnica`), `feat/entrar-servico` (E36·A) e `feat/catalogo` (reuso do `preco.ts`); de novo sempre que
-elas ganharem commit. **Não** recebe Checkout nem Agendamento. Se `src/app/navegacao.ts` só nascer na `feat/agenda`,
-recebe também a `feat/agenda` (decisão de fila: Gerente de projeto). PR de rascunho empilhado; nunca se junta numa
+elas ganharem commit. **Não** recebe Checkout nem Agendamento. `src/app/navegacao.ts` nasce na `feat/entrar-servico`
+(decisão já tomada); o Caixa só acrescenta a linha dele. PR de rascunho empilhado; nunca se junta numa
 base. A `feat/checkout` fica **em cima** desta (ADR 0017 · D1). Quando as bases entrarem na `previas`, a base do PR
 passa à `previas`, antes do pedido de merge. Conflitos esperados: `routeTree.gen.ts` (regenera), `navegacao.ts` e os
 arquivos de idioma (soma de linhas), carimbo das migrations (o Engenheiro de dados regenera, sempre antes das do Checkout).
