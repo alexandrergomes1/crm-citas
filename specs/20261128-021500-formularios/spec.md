@@ -70,7 +70,7 @@ Seções do módulo (`DESIGN.md` §7): Visão geral · Fichas · Modelos · Term
 
 | Tela | Computador (1440) | Celular (390) |
 |---|---|---|
-| **Fichas** (lista) | barra do topo com "Adicionar" preto; barra da lista: "Buscar ficha" · "Modelo: Todos" · "Filtros ▾" (situação, data) · "Ordenar: …"; linha: bolinha da cliente, nome, modelo, situação (ícone + palavra), data; ⋮ da linha: "Ver ficha" · "Copiar link" (só pendente) · "Excluir" (só pendente, com janelinha) | "+ Adicionar" com contorno no topo; seletor de modelo; funil |
+| **Fichas** (lista) | barra do topo com "Adicionar" preto; barra da lista: "Buscar ficha" · "Modelo: Todos" · "Filtros ▾" (situação, data) · "Ordenar: …"; linha: bolinha da cliente, nome, modelo, situação (ícone + palavra), data; ⋮ da linha: "Ver ficha" · "Copiar link" (só pendente; gera um link novo e o anterior deixa de valer, com aviso, RF-06) · "Substituir" (só concluída, se E29·3·A, RF-09) · "Excluir" (só pendente, com janelinha) | "+ Adicionar" com contorno no topo; seletor de modelo; funil |
 | **Adicionar ficha** | painel à direita (480 px): cliente ("Buscar cliente", só com as clientes que a pessoa pode ver, RF-05), modelo; "Salvar" cria a ficha "Aguardando a cliente" e mostra o próximo passo da E29·1 | folha de baixo, mesmo conteúdo |
 | **Ver ficha** | painel à direita: situação, modelo e versão, data; respostas e termo aceito **só para quem pode ver** (§3); para os outros, só a situação | tela de nível 2 com ‹ |
 | **Modelos** (lista) | "Adicionar" preto; linha: título, versão, nº de perguntas, ativo ou arquivado; ⋮: Editar · Duplicar · Arquivar · Excluir (`DESIGN.md` §6) | "+ Adicionar" com contorno |
@@ -88,7 +88,7 @@ disponível; fale com o estúdio"), para não revelar se a ficha existe; depois 
 respostas.
 
 **Nomes e peças que faltam no `DESIGN.md`** (vão à ficha visual, etapa 6, e entram no `DESIGN.md` antes de construir):
-"Copiar link"; o botão de enviar da página da cliente (o `DESIGN.md` §6 proíbe "Enviar formulário"); a peça de
+"Copiar link" e o aviso de que o link anterior deixa de valer; "Substituir" e a situação "Substituída" (ícone e cor); o botão de enviar da página da cliente (o `DESIGN.md` §6 proíbe "Enviar formulário"); a peça de
 assinatura (E29·3); o editor de perguntas; a ordem padrão de "Ordenar" (o `DESIGN.md` diz "Atendimento", mas a ficha
 só se liga ao atendimento depois: proposta "Data", mais nova primeiro) e o filtro "profissional" (pelo mesmo motivo,
 fica para depois).
@@ -101,10 +101,10 @@ fica para depois).
 | RF-03 | **Versão do modelo:** toda edição que muda título, perguntas ou termo cria uma nova versão; versões anteriores não mudam nunca. Cada ficha fica presa à versão com que foi criada e é mostrada sempre com as perguntas e o termo daquela versão. | candidata; RGPD art. 7(1) (provar o que a cliente aceitou) |
 | RF-04 | Modelo arquivado não serve para ficha nova; as fichas já feitas continuam. Excluir modelo só se nunca foi usado. | Assumption 3 |
 | RF-05 | Criar ficha: escolher uma cliente (de Clientes) e um modelo ativo; a ficha nasce "Aguardando a cliente". Em "Buscar cliente", cada papel acha só as clientes que pode ver em Clientes: a profissional, só as que a E28·2 lhe permite (filtro feito no servidor e no banco, não só na tela). | candidata |
-| RF-06 | A cliente preenche e assina pelo meio da E29·1. Se E29·1·A: link individual, que só abre aquela ficha e vale 7 dias **até a assinatura** (antes de assinar, a cliente pode abrir de novo dentro do prazo; assinada, o link deixa de valer); "Copiar link" o entrega à equipe; o link pode ser renovado (o anterior deixa de valer). | E29·1 |
+| RF-06 | A cliente preenche e assina pelo meio da E29·1. Se E29·1·A: link individual, que só abre aquela ficha e vale 7 dias **até a assinatura** (antes de assinar, a cliente pode abrir de novo dentro do prazo; assinada, o link deixa de valer); o link aparece à equipe ao "Salvar" a ficha; como o sistema não guarda o link (só o resumo, RNF-04), "Copiar link" depois disso **gera um link novo** (a renovação), o anterior deixa de valer na hora e a tela avisa isso. | E29·1; RNF-04 |
 | RF-07 | Ao assinar, o servidor confere: respostas obrigatórias preenchidas, tipos e tamanhos válidos, caixinha do termo marcada pela cliente (nunca marcada de início) e a assinatura da E29·3; falhando algo, nada se grava. | RGPD art. 7 e art. 9(2)(a); ASVS V5.1 |
 | RF-08 | **Prova do consentimento:** grava-se a versão do modelo e do termo aceito, a data e a hora do servidor e o meio (link ou estúdio). Endereço IP e dados do aparelho **não** se gravam. | RGPD art. 7(1) e art. 5(1)(c) |
-| RF-09 | Assinada, a ficha passa a "Concluída" e as respostas, o termo e a assinatura **não mudam e não se apagam** pelo app; erro se trata como manda a E29·3, sempre guardando a original. | integridade (RGPD art. 5(1)(d) e art. 16); E29·3 |
+| RF-09 | Assinada, a ficha passa a "Concluída" e as respostas, o termo e a assinatura **não mudam e não se apagam** pelo app; erro se trata como manda a E29·3, sempre guardando a original. Se E29·3·A: "Substituir" no ⋮ da ficha concluída cria uma ficha nova, pendente, do mesmo modelo e cliente, ligada à antiga; no histórico da cliente (lista Fichas), a antiga aparece como "Substituída", com link para a nova, e continua legível para quem pode ver respostas. | integridade (RGPD art. 5(1)(d) e art. 16); E29·3 |
 | RF-10 | Ficha "Aguardando a cliente" pode ser excluída, com janelinha de confirmação; o link deixa de valer na hora. | `DESIGN.md` §6 e §8 |
 | RF-11 | Quem vê o quê (modelos, fichas, respostas) segue a E29·2; quem não pode ver as respostas recebe só a situação, também do banco (não só escondido na tela). | E29·2; ASVS V4.1.3; RGPD art. 9 |
 | RF-12 | **Registro de acesso (porta 6):** cada abertura das respostas de uma ficha, criação, exclusão, renovação de link e assinatura fica no registro com quem, qual ficha (pelo id) e quando, **sem** resposta, nome ou termo no texto. Exceção E6·1 e E6·2 como está: o dono no modo suporte não é registrado. | ASVS V8.3.5; RGPD art. 5(2); `ARCHITECTURE.md` §4 e §6 |
@@ -115,7 +115,7 @@ fica para depois).
 | ID | Requisito | Fonte |
 |---|---|---|
 | RNF-01 | **Cifra:** as respostas e a assinatura de toda ficha (inclusive o nome digitado na assinatura) ficam cifradas no banco e em toda cópia dele; quem lê o banco direto (ou uma cópia) sem a chave não lê nenhuma resposta. Cifra com verificação de integridade (dado alterado no banco é recusado ao abrir). **Como cifrar é do plano**, decidido pelo Engenheiro de segurança e pelo Engenheiro de dados, com ADR. | E5·2; ASVS V6.1.2 e V6.2.7 (nível 3) |
-| RNF-02 | **Chave:** fora do banco, num cofre externo de chaves (KMS) que **cifra e decifra ele mesmo**; o aplicativo nunca recebe nem segura a chave; nunca no repositório, no chat ou em registro; troca planejada, e fichas antigas continuam legíveis depois da troca. (Cofre que mora dentro do próprio banco não cumpre "fora do banco".) Se o plano não puder cumprir isso, a diferença e o motivo vão a ADR (CA-13), conferido pelo Auditor de risco. | `ARCHITECTURE.md` §7; `SECURITY.md` §2; ASVS V6.4.1 e V6.4.2 |
+| RNF-02 | **Chave:** fora do banco, num cofre externo de chaves (KMS) que **cifra e decifra ele mesmo**; o aplicativo nunca recebe nem segura a chave; nunca no repositório, no chat ou em registro; troca planejada, e fichas antigas continuam legíveis depois da troca. (Cofre que mora dentro do próprio banco não cumpre "fora do banco".) Se o plano não puder cumprir isso, a diferença e o motivo vão a ADR (CA-13), conferido pelo Auditor de risco. | `ARCHITECTURE.md` §7; `SECURITY.md` §2; ASVS V6.4.1 e V6.4.2; qual cofre: depende da pergunta E40 ao dono (custo, E23·3·A) |
 | RNF-03 | Resposta de ficha nunca em endereço (URL), registro de erro, monitoramento, notificação ou armazenamento do navegador; páginas com resposta não ficam em cache. | `ARCHITECTURE.md` §7; ASVS V8.2.1, V8.2.2 e V8.3.1 |
 | RNF-04 | Página da cliente (E29·1·A): (a) token com pelo menos 128 bits de fonte aleatória segura; no banco só o resumo (hash), nunca o token; (b) o token não fica no endereço que o servidor registra: vai depois do `#` ou é trocado na primeira requisição por cookie HttpOnly, Secure e SameSite, com redirecionamento para endereço limpo (o plano escolhe um dos dois, com ADR); (c) a página manda Referrer-Policy: no-referrer e Cache-Control: no-store e não carrega nenhum script de terceiros; (d) o token aparece mascarado em todo registro, inclusive de erro e de monitoramento. | ASVS V6.3.1, V8.2.1 e V8.3.1; `ARCHITECTURE.md` §7 |
 | RNF-04b | Limite de tentativas na página da cliente, por endereço e por estúdio. | ASVS V11.1.4; `ARCHITECTURE.md` §5 |
@@ -167,10 +167,13 @@ Engenheiro de dados decide, com ADR.
 ## 9. Dependências
 - **Item 2** (CI, app vazio, Spec Kit) · **item 3** (estúdio, membros, papéis, função de checagem, molde do teste de
   isolamento) · **item 4** (design system no código).
+- **Spec "Entrar e camada de serviço"** (E36·A do dono, 28/11/2026: "E36a"; branch `feat/entrar-servico`, antes do
+  núcleo): login e as 6 portas; desta spec usa também a ação pública sem login (B-3) e o registro sem login (B-4) para
+  a página da cliente (E29·1·A, RF-14, RF-12).
 - **Clientes:** a tabela, a busca da cliente e a regra da E28·2 (RF-05). **Agendamento:** só se E29·2·A (a profissional
   vê as fichas das clientes que já atendeu ou tem marcadas com ela).
-- **Cofre de segredo** para a chave da cifra, fora do banco (RNF-02): escolhido no plano, confirmado com o dono se for
-  ferramenta nova (`ARCHITECTURE.md` §12).
+- **Cofre de chaves** para a cifra, fora do banco (RNF-02): qual, depende da pergunta à parte **E40** ao dono (custo,
+  E23·3·A); sem resposta, a cifra (RNF-01 e RNF-02) não se constrói.
 - **E22·B:** leitura do antigo e ADR por tabela. A página da cliente (E29·1·A) é uma página só, não o Portal público
   (`ARCHITECTURE.md` §2).
 

@@ -1,9 +1,9 @@
 # Plano · Formulários (núcleo): modelos, preencher pelo link e ficha de saúde cifrada
 
-- **Spec:** `specs/20261128-021500-formularios/spec.md` (Draft; 5b e revisão de segurança feitas)
+- **Spec:** `specs/20261128-021500-formularios/spec.md` (Draft; 5b e revisão de segurança da spec feitas)
 - **Escrito por:** Arquiteto de software · **Norma:** modelo C4 e ADR (mais Clean Architecture; OWASP ASVS 4.0.3 V4,
   V5, V6, V7, V8, V11, nível 3 neste módulo; RGPD art. 5, 7, 9, 25; boas práticas Postgres e Supabase) · **Revisão:**
-  etapa 5 (Analista de requisitos) e 5b (Gerente de projeto) pendentes; segurança: Engenheiro de segurança e Auditor de risco
+  5b (Gerente de projeto) feita com ajustes, 28/11; etapa 5 (Analista de requisitos) pendente; segurança: Engenheiro de segurança e Auditor de risco
 - **Funciona com as recomendações:** E29·1·A (link), E29·2·A (com E26·1·B e E28·2·B), E29·3·A (caixinha + nome
   digitado). O que muda com outra resposta: §13.
 - **Decisões técnicas:** `docs/adr/0014-formularios-cifra-link-e-imutabilidade.md` (Arquiteto, escrito nesta etapa,
@@ -30,15 +30,31 @@ diz "só o gratuito; achou custo, para e pergunta; nenhum cartão cadastrado". L
 | Supabase Vault | mora dentro do banco | **não** (a spec exclui) | sim |
 
 **Conclusão:** não há opção que cumpra a RNF-02 e seja gratuita. O plano **para neste ponto** (fase D, §10) e o
-Gerente de projeto leva ao dono uma pergunta no molde (`docs/moldes/pergunta.md`). Rascunho das opções, para o Gerente:
-- **A:** pagar um cofre de mercado na UE (Google Cloud KMS, chave SOFTWARE, ~US$ 0,06/mês por versão + uso; ou AWS KMS,
-  US$ 1/mês por chave). Cumpre RNF-02 e ASVS V6.4.2. Cartão cadastrado. Desfaz-se trocando o adaptador (§4.3).
-- **B:** chave como segredo do Worker (Cloudflare), gratuito; o app segura a chave na memória. Não cumpre RNF-02 nem
-  ASVS V6.4.2 (nível 2): vira **exceção declarada** do dono no `ARCHITECTURE.md`, conferida pelo Auditor de risco (CA-13).
-- **C:** OpenBao num servidor próprio na UE: cumpre, mas custa hospedagem e manutenção.
-- **Recomendação do Arquiteto: A (Google Cloud KMS)**, o menor custo que cumpre a norma; troca de chave sem reescrever
-  fichas (cada cifra guarda a versão da chave). Região na UE e contrato (DPA): **não verificados**, conferidos pelo
-  Engenheiro de segurança antes da construção da fase D.
+Gerente de projeto leva ao dono, no relatório, a pergunta E40 (texto do Gerente, 5b):
+
+> **E40 · Cofre da chave das fichas de saúde** — A: Google Cloud KMS na Europa, centavos de dólar por mês, cartão
+> cadastrado (cumpre a norma); B: chave no próprio app, grátis (cumpre a cifra exigida no nível 2, ASVS V6.1.2, mas não
+> a V6.4.2, de nível 3, que o SECURITY.md adota para a ficha; exceção do dono no ARCHITECTURE.md); C: cofre em servidor
+> próprio na Europa (cumpre; custa hospedagem e manutenção). Recomendo A (ASVS V6.4.2 nível 3; RGPD art. 32, medidas
+> adequadas ao risco).
+
+Texto da E40 com as correções do Engenheiro de segurança (28/11): V6.4.2 é de nível 3; B cumpre V6.1.2 (nível 2).
+
+**Fase D com E40·A (Google Cloud KMS), como fica:**
+- **Envelope, não cifra direta.** A doc oficial limita cada pedido de cifrar a **64 KiB** de texto em chave SOFTWARE
+  (8 KiB em HSM; https://cloud.google.com/kms/docs/reference/rest/v1/projects.locations.keyRings.cryptoKeys/encrypt) e
+  diz que o KMS foi feito para cifrar chaves (https://cloud.google.com/kms/docs/envelope-encryption). Uma ficha pode
+  passar de 200 KB (100 perguntas × 2 000 caracteres), então o app gera uma chave por ficha, cifra a ficha com ela e
+  manda ao KMS **só essa chave** (32 bytes) para embrulhar. A chave mestra nunca sai do KMS; a chave da ficha fica na
+  memória do app só durante o pedido. Isso fica fora da V6.4.2 ao pé da letra e está registrado no ADR 0014 D1, para o
+  Auditor de risco (CA-13).
+- **Permissão do Worker:** a conta do Worker só pode cifrar e decifrar **com uma chave** (o papel do IAM dado na própria
+  chave, não no projeto); sem criar, trocar, destruir nem ler outras chaves. Nome exato do papel lido na doc na tarefa 23.
+- **Registro de uso do KMS:** Cifrar e Decifrar geram registro "Data Access" (https://cloud.google.com/kms/docs/audit-logging),
+  que precisa ser ligado (se vem ligado e se tem custo no Cloud Logging: não verificado). O registro mostra só a conta do
+  Worker, nunca a pessoa: o app não manda ao KMS nada que identifique quem pediu, então o modo suporte do dono continua
+  sem registro (E6·1, como está). A prova de quem abriu a ficha é o registro da porta 6 (RF-12).
+- Região na UE e contrato (DPA): **não verificados**, conferidos pelo Engenheiro de segurança antes da fase D (tarefa 23).
 
 Tudo o mais deste plano não depende da resposta: o app fala com o cofre por uma porta (`CofreDeChaves`, §4.3) e os
 testes usam um cofre local falso, só para teste, com dado fictício (E22·B).
@@ -65,13 +81,14 @@ src/app/paginas/ficha-link/*  ──►  src/server/formularios/link.ts  │    
 ## 2. Pré-requisitos e bloqueios (para o Gerente de projeto)
 | # | Falta | Bloqueia | Recomendação |
 |---|---|---|---|
-| B-1 | **Cofre de chaves** (§0) | fase D (cofre real) e o pedido de merge | pergunta ao dono; até lá, só o cofre local de teste |
+| B-1 | **Cofre de chaves** (§0, E40) | fase D (cofre real) e o pedido de merge | pergunta E40 ao dono; até lá, só o cofre local de teste |
 | B-2 | Login, molde das 6 portas, `zod`, auditoria e limite de tentativas por endereço (E36·A, `feat/entrar-servico`, ainda sem plano) | fase C | Formulários só usa |
 | B-3 | **Ação pública** no molde da E36·A: o RF-21 dela barra ação fora do molde, e o link não tem login. É preciso uma variante declarada "pública por link" (porta 1 = token; porta 2 = estúdio da ficha, dado pela função do banco; porta 3 = ler perguntas e assinar; portas 4 a 6 iguais) | página da cliente | pedir ao plano da E36·A; se não vier, o trabalho da página para e o Gerente decide (não se cria um segundo molde aqui) |
 | B-4 | **Registro sem login**: o registro da E36·A aceita linhas de quem tem sessão (RF-26 dela); a assinatura pelo link grava linha sem `usuario_id`, com o `org_id` da ficha | RF-12 (assinar) | o plano da E36·A define o meio; Formulários grava a linha de dentro de `ficha_link.assinar` usando esse meio |
 | B-5 | **Teste 010 do item 3** conta as funções que `anon` e `authenticated` executam (lista fixa). Formulários dá a `anon` exatamente 2 funções (`public.ficha_link_abrir`, `public.ficha_link_assinar`) e a `authenticated` as funções do §3.6. Clientes e a E36·A também acrescentam funções | `pnpm db:test` | o Engenheiro de dados do item 3 (ou da E36·A) torna a lista extensível; senão Formulários **só acrescenta seus nomes** à lista do 010, conferido pelo Auditor de risco (linha condicional da lista fechada) |
 | B-6 | Clientes (`feat/clientes`): `public.clientes` com `unique (org_id, id)`, `app.cliente_visivel()` e `nome_busca` | fase A (chave estrangeira), RF-05, RF-13 | Formulários usa; não altera |
 | B-7 | Itens 3 e 4 com construção na branch | fases A e B | esperar e juntar (§11) |
+| B-8 | **Agendamento** (`feat/agendamento`): amplia `app.cliente_visivel()` para "atendeu ou tem marcada" (E28·2·B), de que a E29·2·A depende | só o alcance da profissional (CA-06); não bloqueia construção nem merge | até ele entrar, vale a regra de Clientes (L-1 de Clientes: as que ela cadastrou); `420` testa a função como estiver e o Agendamento repete a prova no teste dele |
 
 ## 3. Banco (Fase A, Engenheiro de dados) · sugestão a decidir no ADR 0013
 Migrations criadas com `pnpm exec supabase migration new <nome>`, uma por tabela (Assumption 4), mais funções, link e
@@ -231,8 +248,9 @@ banco + 1 ao cofre; gravações 3.
 - `src/server/cofre/cofre-local.ts`: cofre falso **só para teste e banco local**, chave gerada na memória do processo,
   nunca no repositório; recusa iniciar se o ambiente não for de teste/local. Simula a troca de versão (CA-04).
 - `src/server/cofre/cofre-kms.ts`: **fase D, só depois da resposta do dono (§0)**.
-- Envelope (a chave da ficha passa pela memória do app durante o pedido): é o modo padrão de KMS para dado maior que o
-  limite do cofre; a chave mestra não sai. Leitura da RNF-02 a conferir pelo Auditor de risco (ADR 0014 D1, CA-13).
+- Envelope (a chave da ficha passa pela memória do app durante o pedido): o KMS aceita até 64 KiB por pedido (§0) e a
+  ficha pode passar de 200 KB; a chave mestra não sai. Fora da V6.4.2 ao pé da letra; registrado no ADR 0014 D1 para o
+  Auditor de risco (CA-13).
 
 ### 4.4 Regras puras (`src/domain/formularios/`)
 | Arquivo | Regra | Requisito |
@@ -298,7 +316,7 @@ idioma do estúdio). pt sai do `DESIGN.md` e da spec; es e en pelo Designer de p
 
 ## 7. Requisitos de nível 3 (RNF-05)
 O Engenheiro de segurança lista no PR, antes da fase C, os requisitos ASVS nível 3 deste módulo, cada um com a prova
-(tarefa 6). Já previstos aqui: V6.1.2/V6.2.7 (§4.3), V6.4.1/V6.4.2 (§0), V8.2.1/V8.3.1 (§4.5), V8.3.5 (§4.1), V6.3.1 (§3.7).
+(tarefa 6). Já previstos aqui: V6.1.2/V6.2.7 (§4.3), V6.4.1/V6.4.2 nível 3 (§0), V8.2.1/V8.3.1 (§4.5), V8.3.5 (§4.1), V6.3.1 (§3.7).
 
 ## 8. Lista FECHADA de arquivos
 Fora desta lista nada muda (`AGENTS.md` §6). Arquivo novo que uma ferramenta crie fora daqui: parar e relatar.
@@ -318,8 +336,15 @@ e um `.test.ts` para cada.
 **Servidor e dados (Engenheiro de software; fase C)**: `src/server/formularios/{acoes,esquemas,link,cifra,mascarar}.ts`,
 `acoes.test.ts`, `link.test.ts`, `cifra.test.ts`, `mascarar.test.ts`, `cifra.integracao.test.ts`;
 `src/server/cofre/{cofre,cofre-local}.ts` e `cofre-local.test.ts`; `src/data/formularios/{repositorio,link,exemplo-local}.ts`
-e `repositorio.test.ts`. **Fase D (só após o dono, §0):** `src/server/cofre/cofre-kms.ts`, `cofre-kms.test.ts`, e
-`package.json`/`pnpm-lock.yaml` se o cofre pedir biblioteca (ADR novo).
+e `repositorio.test.ts`.
+
+**Fase D (só após a resposta E40, §0), linhas condicionais:**
+- Se **E40·A** (ou **C**): `src/server/cofre/cofre-kms.ts` e `cofre-kms.test.ts`; `package.json`/`pnpm-lock.yaml` só se
+  o cofre pedir biblioteca (lida na doc oficial, linha no ADR do cofre).
+- Se **E40·B**: `src/server/cofre/cofre-segredo.ts` e `cofre-segredo.test.ts` (chave lida do segredo do Worker); e
+  `ARCHITECTURE.md` §7, **só** a linha da exceção declarada, escrita pelo Documentador com a fala literal do dono
+  (o Arquiteto não a escreve; `AGENTS.md` §6).
+- Em qualquer opção: `docs/adr/<próximo número livre>-formularios-cofre.md` (Arquiteto; substitui a linha D6 do ADR 0014).
 
 **Telas (Engenheiro de software, pela ficha aprovada)**
 - `src/app/routes/formularios/{index,fichas,modelos}.tsx`, `src/app/routes/f.tsx`, `src/app/routeTree.gen.ts` (gerado)
@@ -334,13 +359,13 @@ e `repositorio.test.ts`. **Fase D (só após o dono, §0):** `src/server/cofre/c
 no `DESIGN.md` (spec §4: "Copiar link", botão de envio da página, peça de assinatura, editor de perguntas, Ordenar
 "Data"). **Texto (Designer, só com o dono):** `DESIGN.md`, só as linhas aprovadas na ficha.
 
-**Decisão técnica (Arquiteto):** `docs/adr/0014-formularios-cifra-link-e-imutabilidade.md`.
+**Decisão técnica (Arquiteto):** `docs/adr/0014-formularios-cifra-link-e-imutabilidade.md`; o ADR do cofre na fase D (acima).
 **Processo:** `specs/20261128-021500-formularios/{spec,plan,tasks}.md` · `docs/STATUS.md`, `docs/BACKLOG.md`,
 `CHANGELOG.md`, `docs/decisoes/` (respostas E29 e a do cofre), pelo Documentador.
 
 **Intactos:** `src/*/AGENTS.md`, `src/*/CLAUDE.md`, `src/app/ui/**`, `src/app/estilos/**`, `src/server/portas/**`
 (E36·A), a base de `src/app/i18n/`, as migrations de Clientes e dos itens 2 e 3, `supabase/config.jsonc`,
-`eslint.config.mjs`, `ARCHITECTURE.md`, `SECURITY.md`, `.github/**`.
+`eslint.config.mjs`, `ARCHITECTURE.md` (salvo a linha condicional de E40·B), `SECURITY.md`, `.github/**`.
 
 ## 9. Papéis
 | Etapa | Papel |
@@ -385,11 +410,12 @@ empilhado; nunca se junta nelas. Quando todas estiverem na `previas`, a base do 
 | E29·2·C | dá `true` a todos; não recomendado (dado de saúde à recepção) |
 | E29·3·B | `cifra` também leva a imagem do traço (limite de tamanho sobe; peça de desenho na ficha) |
 | E29·3·C | entra `formularios_respostas_correcoes` (cifrada, só inclusão, com motivo) e a ação "Corrigir" |
-| Cofre §0·B | sai a fase D; `cofre-segredo.ts` lê a chave do segredo do Worker; ADR 0014 D6 muda e a exceção entra no `ARCHITECTURE.md` pelo dono |
+| E40·B | a fase D usa `cofre-segredo.ts` (chave no segredo do Worker) em vez de `cofre-kms.ts`; ADR do cofre substitui D6; a exceção entra no `ARCHITECTURE.md` §7 com a fala do dono (linhas condicionais do §8) |
+| E40·C | como E40·A, com o OpenBao (motor transit) no lugar do KMS; hospedagem na UE entra como ferramenta nova, confirmada com o dono |
 
 ## 14. Riscos e não verificado
 - R-1 · Nada construído nem rodado; bases dos itens 3, 4, E36·A e Clientes ainda em construção.
-- R-2 · Sem cofre (B-1), a construção chega até o cofre local; **sem resposta do dono, não há merge**.
+- R-2 · Sem resposta E40 (B-1), a construção chega até o cofre local; **sem resposta do dono, não há merge**.
 - R-3 · Como o TanStack Start declara ação sem login, põe cabeçalhos por rota e lê o corpo por POST: **não verificado**.
 - R-4 · Se a passagem em `public` for chamada pela API REST com a chave pública, qualquer um na internet também a chama
   sem passar pelo servidor (a chave pública é pública). As duas funções aceitam isso por desenho (só agem com token

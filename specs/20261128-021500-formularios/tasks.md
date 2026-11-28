@@ -2,9 +2,9 @@
 
 - **Spec:** `spec.md` · **Plano:** `plan.md` · **ADR:** 0013 (Engenheiro de dados, tabelas do antigo) e
   `docs/adr/0014-formularios-cifra-link-e-imutabilidade.md` (Arquiteto)
-- **Escrito por:** Arquiteto de software · Norma: modelo C4 e ADR · **Revisão:** etapa 5 e 5b pendentes
+- **Escrito por:** Arquiteto de software · Norma: modelo C4 e ADR · **Revisão:** 5b feita com ajustes, 28/11; etapa 5 pendente
 - Com as recomendações E29·1·A, E29·2·A (com E26·1·B e E28·2·B) e E29·3·A; outra resposta muda pelo `plan.md` §13.
-- **Parada aberta:** cofre de chaves sem opção gratuita (`plan.md` §0). A fase D e o merge esperam o dono.
+- **Parada aberta:** cofre de chaves sem opção gratuita (`plan.md` §0, pergunta E40). A fase D e o merge esperam o dono.
 - Construir em PR de rascunho pode (E22·B); juntar só depois do portão (tarefa 22) e da autorização do merge gravada.
   Só os arquivos do `plan.md` §8. Banco só local; a IA nunca aplica nada no banco remoto. Falhou: refaz e confere; o
   mesmo erro duas vezes, para e relata. Commits pequenos, Conventional Commits, citando a spec.
@@ -12,7 +12,7 @@
 ## Preparo
 | # | Passo | Papel | Feito quando |
 |---|---|---|---|
-| 1 | Levar ao dono a pergunta do cofre (`plan.md` §0), no molde, junto ou antes da aprovação da spec | Gerente de projeto | resposta gravada em `docs/decisoes/` pelo Documentador |
+| 1 | Levar ao dono a pergunta E40 (`plan.md` §0), no relatório, junto ou antes da aprovação da spec | Gerente de projeto | resposta gravada em `docs/decisoes/` pelo Documentador |
 | 2 | Juntar por merge: `feat/banco-ligacao`, `feat/design-system-codigo`, `feat/entrar-servico`, `feat/clientes` (`plan.md` §11), cada uma quando a fase que a usa for começar | Engenheiro de DevOps | merge sem conflito; árvore limpa |
 | 3 | ADR 0013: decisão por tabela do antigo (`plan.md` §3.8), lendo só as migrations da spec §7 | Engenheiro de dados | saída, motivo e norma por linha; conferência em branco |
 | 4 | Confirmar com os donos das bases: B-3 (ação pública), B-4 (registro sem login), B-5 (lista do teste 010) | Gerente de projeto | resposta anotada no PR; o que faltar fica como bloqueio |
@@ -55,12 +55,12 @@
 |---|---|---|---|
 | 22 | Spec "Approved" com "Aprovação do dono" e respostas E29 e do cofre gravadas; resposta diferente da recomendada: ajustar pelo §13 antes de seguir | Analista de requisitos grava; Gerente confere | linhas presentes |
 
-## Fase D · Cofre real (só depois da resposta do dono, `plan.md` §0)
+## Fase D · Cofre real (só depois da resposta E40, `plan.md` §0)
 | # | Passo | Papel | Feito quando |
 |---|---|---|---|
-| 23 | Confirmar região na UE e contrato (DPA) do cofre escolhido; ler a doc oficial da API (ou, se §0·B, a do segredo do Worker) | Engenheiro de segurança | fontes no PR |
-| 24 | ADR novo do cofre (substitui a linha D6 do ADR 0014): onde fica a chave, como se troca, quem cifra e decifra | Arquiteto de software | ADR escrito; conferido na tarefa 29 |
-| 25 | `cofre-kms.ts` e teste (com dublê da API; nenhuma credencial no repositório nem na CI); credencial só no cofre da Cloudflare, posta pelo dono | Engenheiro de software | testes verdes; nenhum segredo no diff (gitleaks) |
+| 23 | Confirmar região na UE e contrato (DPA) do cofre escolhido; ler a doc oficial da API (ou, se E40·B, a do segredo do Worker) | Engenheiro de segurança | fontes no PR |
+| 24 | `docs/adr/<próximo número livre>-formularios-cofre.md` (substitui a linha D6 do ADR 0014; na lista fechada do `plan.md` §8): onde fica a chave, como se troca, quem cifra e decifra | Arquiteto de software | ADR escrito; conferido na tarefa 29 |
+| 25 | Se E40·A ou C: `cofre-kms.ts` e teste; se E40·B: `cofre-segredo.ts` e teste, e o Documentador grava a exceção no `ARCHITECTURE.md` §7 com a fala do dono (com dublê da API; nenhuma credencial no repositório nem na CI); credencial só no cofre da Cloudflare, posta pelo dono | Engenheiro de software | testes verdes; nenhum segredo no diff (gitleaks) |
 | 26 | `pnpm db:stop`; `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm test:e2e`, `pnpm db:test` | Engenheiro de software | tudo verde; CI verde |
 
 ## Revisão (etapa 9)
