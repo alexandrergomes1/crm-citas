@@ -2,16 +2,16 @@
 
 - **Spec:** `spec.md` · **Plano:** `plan.md` · **ADR:** 0006 (Arquiteto), 0007 (Engenheiro de dados, na T3)
 - **Escrito por:** Arquiteto de software · **Norma:** modelo C4 e ADR · **Revisão:** pendente (etapa 5 e 5b)
-- Só os arquivos do `plan.md` §9.A. Cada tarefa termina com `pnpm typecheck`, `pnpm lint` e `pnpm test`; mais
+- Só os arquivos do `plan.md` §9. Cada tarefa termina com `pnpm typecheck`, `pnpm lint` e `pnpm test`; mais
   `pnpm db:test` se mexeu em `supabase/` e `pnpm test:e2e` se mexeu em tela. Commits pequenos, Conventional Commits,
   citando a spec. Nada no banco remoto (`AGENTS.md` §1).
 
 ## Antes de construir (portão)
-- [ ] **T0** · Gerente de projeto e Analista de requisitos: E26·1, E26·2, E26·3 respondidas e gravadas; L-1 a L-5 do
-  `plan.md` §2 resolvidas (L-1 vai ao dono como ordem da fila); spec "Approved" com a linha "Aprovação do dono".
-  Se L-1·B: o plano ganha o §9.B e volta à 5b. Se E26·3·C: o plano para e é refeito.
-- [ ] **T1** · Engenheiro de DevOps: merge de `feat/banco-ligacao` e `feat/design-system-codigo` (e da branch da
-  camada de serviço, com L-1·A) na `feat/agenda`; regenerar `src/app/routeTree.gen.ts` se houver conflito; conferir os
+- [ ] **T0** · Gerente de projeto e Analista de requisitos: E26·1, E26·2, E26·3 respondidas e gravadas; L-2 a L-5 do
+  `plan.md` §2 resolvidas (L-1 já resolvida pelo dono, E36·A); spec "Approved" com a linha "Aprovação do dono"; spec
+  "Entrar e camada de serviço" (`feat/entrar-servico`) construída. Se E26·3·C: o plano para e é refeito.
+- [ ] **T1** · Engenheiro de DevOps: merge de `feat/banco-ligacao`, `feat/design-system-codigo` e `feat/entrar-servico`
+  (E36·A) na `feat/agenda`; regenerar `src/app/routeTree.gen.ts` se houver conflito; conferir os
   arquivos das bases do cabeçalho do plano; PR de rascunho empilhado.
 
 ## Fase 1 · Ficha visual (etapa 6, antes da aprovação do dono)
@@ -48,7 +48,7 @@
 - [ ] **T16** · `src/app/paginas/agenda/*` + `agenda.test.tsx`, só com componentes do item 4 e as peças aprovadas na T2.
 - [ ] **T17** · `e2e/preparo/agenda-dados.ts`, `e2e/agenda.spec.ts` (CA-05, CA-09), `e2e/agenda-estados.spec.ts`
   (CA-06), `e2e/agenda-acessibilidade.spec.ts` (CA-08); verdes em 390 e 1440.
-- [ ] **T18** · Conferir o escopo: `git diff --name-only <base>...HEAD` contra o `plan.md` §9.A; todos os comandos verdes;
+- [ ] **T18** · Conferir o escopo: `git diff --name-only <base>...HEAD` contra o `plan.md` §9; todos os comandos verdes;
   CI verde no PR de rascunho.
 
 ## Fase 6 · Revisão (etapa 9; quem construiu não revisa)

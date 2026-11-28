@@ -38,7 +38,8 @@ grade, acesso)                                                     (RLS: org_id 
 Gravações (criar, alterar, excluir bloqueio) seguem o mesmo caminho por `src/server/agenda/bloqueios.ts`.
 
 ## 2. Lacunas para o Analista de requisitos (a spec não cobre; não decido, `AGENTS.md` §4)
-Achadas ao planejar. Cada uma com recomendação; o plano abaixo funciona com a recomendação e diz o que muda na outra.
+Achadas ao planejar. Cada uma com recomendação; o plano abaixo funciona com a recomendação. A L-1 já foi resolvida
+pelo dono (E36·A).
 
 - **L-1 · Login, sessão e registro: resolvida pelo dono (E36·A, 28/11/2026).** Login, sessão, as 6 portas, a ligação
   do app ao banco e a auditoria entram na spec própria "Entrar e camada de serviço" (branch `feat/entrar-servico`),
