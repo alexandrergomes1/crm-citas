@@ -40,7 +40,8 @@ Bibliotecas (D1) · Data API com token da pessoa, não ligação direta (D2) · 
 porta 1 por `getClaims` + sessão no banco, sem `getUser` a cada pedido (D4) · tempo pelo banco (D5) · `estudio_trocado`
 no pré-pedido (D6) · registro por gatilho e funções limitadas (D7) · limite de tentativas com HMAC e tempo mínimo (D8) ·
 cookie `__Host-`, HttpOnly, Secure, Lax, variáveis sem `VITE_` (D9) · CSRF e no-store (D10) · erros como valor (D11) ·
-molde único e catálogo (D12) · zod estrito depois das portas 1 a 3 (D13) · banco local com Auth (D14) · idiomas (D15).
+molde único e catálogo (D12) · zod estrito depois das portas 1 a 3 (D13) · banco local com Auth (D14) · idiomas (D15) ·
+só o servidor fala com a Data API, por chave guardada como hash (D16) · chave de assinatura assimétrica (D17).
 
 ## 3. Fluxos
 
@@ -50,8 +51,8 @@ molde único e catálogo (D12) · zod estrito depois das portas 1 a 3 (D13) · b
 3. Limite (D8): `public.conferir_tentativa(chave_ip, chave_conta)` (executável por `anon`). Passou → `limite`.
 4. `signInWithPassword` pelo cliente do servidor. Falhou → `public.registrar_tentativa_falha(pedido)` (`anon`; só
    evento, resultado, quando, pedido).
-5. Deu certo → com o token novo, `public.iniciar_sessao(pedido)`: cria a linha da sessão (D4) só se a pessoa tem ao
-   menos um estúdio ativo, grava `sessao.entrar` com `usuario_id` e `org_id` vazio, devolve o número de estúdios ativos.
+5. Deu certo → com o token novo, `public.iniciar_sessao(pedido)`: recusa `session_id` já visto e entrada por senha com
+   mais de 60 s (`amr` do token); cria a linha da sessão (D4) só se a pessoa tem ao menos um estúdio ativo, grava `sessao.entrar` com `usuario_id` e `org_id` vazio, devolve o número de estúdios ativos.
    Zero → `signOut({ scope: 'local' })`, apaga cookie e trata como falha (mesma mensagem, RF-11).
 6. Um estúdio → escolhe sozinho (3.3). Mais de um → já escolhido e ativo segue nele; senão vai a Escolher estúdio.
 7. Completa até **700 ms** desde o passo 1, em todo resultado (RF-02). Resposta: só `ok`, `limite` ou
@@ -59,7 +60,8 @@ molde único e catálogo (D12) · zod estrito depois das portas 1 a 3 (D13) · b
    esse mesmo código).
 
 ### 3.2 Cada pedido de uma ação (modo `estudio`)
-Ordem fixa (RF-17), a primeira recusa para tudo:
+Todo pedido do servidor à Data API leva `x-chave-servidor` (ADR 0018 · D16); sem ela, o pré-pedido recusa tudo, de
+`anon` ou de `authenticated`. Ordem fixa (RF-17), a primeira recusa para tudo:
 1. **Porta 1:** `getClaims()`; sem token válido → `sem_login` (nada no banco, RF-28).
 2. Envelope `{ estudioDaTela, dados }`: `estudioDaTela` é `uuid` obrigatório neste modo; forma errada → `entrada_invalida`.
 3. **Portas 1 e 2 no banco:** `public.contexto_da_sessao()` (POST, com `x-estudio-esperado`). O pré-pedido recusa sessão
@@ -69,8 +71,9 @@ Ordem fixa (RF-17), a primeira recusa para tudo:
 4. **Porta 3:** `permissao(papel)` → `sem_permissao`.
 5. **Porta 4:** `entrada.safeParse(dados)` com `z.strictObject` → `entrada_invalida`, sem trabalho e sem banco de dados
    do módulo (ver L-2).
-6. **Porta 5:** `trabalho(ctx, dados)`; `ctx.banco` manda os cabeçalhos `x-pedido`, `x-acao` (o nome da ação) e
-   `x-estudio-esperado` em todo pedido; `grava: false` com gravação, ou segunda gravação → `erro_interno`.
+6. **Porta 5:** `trabalho(ctx, dados)`; `ctx.banco` manda os cabeçalhos `x-chave-servidor`, `x-pedido`, `x-acao` (o
+   nome da ação) e `x-estudio-esperado` em todo pedido; em pedido que grava, o pré-pedido recusa `x-pedido` fora do formato
+   `uuid` e `x-acao` fora de `app.acoes_que_gravam`; `grava: false` com gravação, ou segunda gravação → `erro_interno`.
 7. **Porta 6:** gravou → as linhas saem do gatilho, na mesma transação. Recusa nas etapas 2 a 6 →
    `public.registrar_recusa(acao, codigo, pedido)` (melhor esforço; se falhar, a resposta não muda).
 8. Resposta `{ ok: true, valor }` ou `{ ok: false, codigo }`; sempre `Cache-Control: no-store`.
@@ -86,11 +89,13 @@ Modo `pessoa` (lista de estúdios, escolher, trocar, sair): passos 1, 3 (sem cab
   ativo → `sem_permissao`, nada muda (CA-05).
 
 ### 3.4 Sair e tempo
-- **Sair:** `public.encerrar_sessao(p_pedido)` (apaga a linha da sessão; grava `sessao.sair` com o `org_id` da sessão ou
-  vazio) → `signOut({ scope: 'local' })` → apaga os cookies → vai a Entrar. O token antigo, mesmo com assinatura válida,
+- **Sair:** `public.encerrar_sessao(p_pedido)` (marca a linha como encerrada, **sem apagar**; grava `sessao.sair` com o
+  `org_id` da sessão ou vazio) → `signOut({ scope: 'local' })`, que roda **mesmo se** a marcação for recusada ou falhar →
+  apaga os cookies → vai a Entrar. O token antigo, mesmo com assinatura válida,
   é recusado pelo pré-pedido no pedido seguinte (CA-13).
 - **Tempo (E39·3·B, se aprovada):** 12 h desde `entrou_em` e 30 min desde `ultimo_uso` (atualizado no passo 3 de 3.2,
-  no máximo uma vez por minuto). Vencida → `sem_login` → Entrar; nada gravado se perde (RF-07). Com E39·3·A: só 12 h.
+  no máximo uma vez por minuto). Vencida → a linha é marcada encerrada e nunca volta (o mesmo `session_id` é recusado
+  por `iniciar_sessao`) → `sem_login` → o servidor chama `signOut({ scope: 'local' })` → Entrar; nada gravado se perde (RF-07). Com E39·3·A: só 12 h.
   Com E39·3·C: 30 dias, sem corte por parada.
 
 ## 4. Contrato da camada de serviço (fixo; os módulos dependem dele)
@@ -136,8 +141,8 @@ acao<E extends z.ZodType, S>(def: {
 | `src/server/sessao/acoes.ts` | `sessao.entrar`, `sessao.ler`, `sessao.sair`, `estudio.listar`, `estudio.escolher` (fluxos do §3) |
 | `src/server/sessao/tentativas.ts` | chaves HMAC-SHA-256 (WebCrypto) de IP e e-mail normalizado; IP de `cf-connecting-ip`, ou do pedido no Node local |
 | `src/server/portas/executar.test.ts`, `erros.test.ts`, `molde.test.ts`, `src/server/sessao/acoes.test.ts` | unidade, com Auth e banco falsos (§9) |
-| `src/data/ambiente.ts` | lê e valida por pedido `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SEGREDO_TENTATIVAS`; faltou → `erro_interno` (falha fechada) |
-| `src/data/cliente.ts` | `createServerClient` com `cookies.getAll/setAll` (aplica também os cabeçalhos de cache que o `setAll` entrega) e `cookieOptions` `{ name: '__Host-sessao', httpOnly: true, secure: true, sameSite: 'lax', path: '/' }`; tipo `Banco` (sem expor o tipo do Supabase a `src/server`); `global.headers` com os cabeçalhos do pedido; `global.fetch` que conta gravações |
+| `src/data/ambiente.ts` | lê e valida por pedido `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SEGREDO_TENTATIVAS`, `CHAVE_SERVIDOR_BANCO`; faltou → `erro_interno` (falha fechada) |
+| `src/data/cliente.ts` | `createServerClient` com `cookies.getAll/setAll` (aplica também os cabeçalhos de cache que o `setAll` entrega) e `cookieOptions` `{ name: '__Host-sessao', httpOnly: true, secure: true, sameSite: 'lax', path: '/' }`; tipo `Banco` (sem expor o tipo do Supabase a `src/server`); `global.headers` com `x-chave-servidor` e os cabeçalhos do pedido; `global.fetch` que conta gravações |
 | `src/data/sessao.ts` | chamadas às funções do §6 (contexto, iniciar, encerrar, tentativas, meus estúdios, escolher, recusa) |
 | `src/data/erros.ts` | erro do PostgREST ou do Auth → código de RF-22; nada do texto original segue |
 | `src/data/cliente.test.ts`, `src/data/erros.test.ts` | opções do cookie; contagem de gravações; mapa de erros |
@@ -151,20 +156,24 @@ Migrations por `pnpm exec supabase migration new <nome>`, depois das do item 3 (
 | # | Nome | Precisa ter |
 |---|---|---|
 | M1 | `registro` | `app.registro` (fora da API): `quando` (UTC), `evento` (só `[a-z_.]`, até 64), `resultado` (lista fechada: `ok` e os códigos de RF-22), `usuario_id`, `org_id`, `objetos uuid[]` (até 10), `pedido_id`; RLS ligada e forçada, sem política, `revoke all`; gatilho que recusa `update`, `delete` e `truncate`; `check`: linha `sessao.entrar` que não é `ok` sem `usuario_id`, `org_id` e objetos. Nada de texto livre |
-| M2 | `registro_funcoes` | `app.registrar_mudanca()` (gatilho genérico `after insert or update or delete for each row`: evento de `x-acao`, objetos das colunas `uuid` nomeadas nos argumentos do gatilho, `org_id` da linha igual ao da sessão); `app.registrar_recusa` e a passagem `public.registrar_recusa` (só para a própria pessoa, código da lista, teto por pessoa); `public.registrar_tentativa_falha(p_pedido)` para `anon`, teto global por minuto, acima dele não grava e não dá erro |
-| M3 | `sessoes` | `app.sessoes` (`session_id` chave, `user_id`, `entrou_em`, `ultimo_uso`), fora da API, RLS forçada; `public.iniciar_sessao`, `public.encerrar_sessao`, `public.contexto_da_sessao` (passagens `security invoker` para funções `app.*` `security definer` com `search_path = ''`); limites 12 h e 30 min numa só função; linhas vencidas apagadas ao iniciar |
-| M4 | `tentativas_entrada` | `app.tentativas_entrada` (chave `bytea` do HMAC, janela, contagem), fora do registro e fora da API; `public.conferir_tentativa(p_chave_ip, p_chave_conta)` para `anon`: apaga vencidas, conta e soma; 10 por conta e 30 por IP em 15 min |
-| M5 | `estudios_da_pessoa_e_pre_pedido` | `public.meus_estudios()` e `public.escolher_estudio(p_org_id, p_pedido)` (`security invoker`, RF-12); `public.antes_do_pedido()` registrada com `alter role authenticator set pgrst.db_pre_request` e `notify pgrst, 'reload config'` (guia oficial): para `authenticated`, recusa sessão sem linha viva (menos em `rpc/iniciar_sessao`) e `x-estudio-esperado` diferente, com `raise sqlstate 'PGRST'` e os códigos `sem_login` e `estudio_trocado`; para `anon`, nada |
+| M2 | `registro_funcoes` | `app.registrar_mudanca()` (gatilho genérico `after insert or update or delete for each row`: evento de `x-acao`, objetos das colunas `uuid` nomeadas nos argumentos do gatilho, `org_id` da linha igual ao da sessão); `app.registrar_recusa` e a passagem `public.registrar_recusa` (só para a própria pessoa, código da lista, teto por pessoa); `public.registrar_tentativa_falha(p_pedido)` para `anon`, teto global por minuto; acima dele grava uma só linha de resumo por minuto com resultado `limite` (o teto não esconde falhas) e não dá erro; o gatilho recusa gravação sem `x-acao` válido |
+| M3 | `sessoes` | `app.sessoes` (`session_id` chave, `user_id`, `entrou_em`, `ultimo_uso`, `encerrada_em`), fora da API, RLS forçada; **nenhuma linha é apagada** (encerrar, vencer e parar só marcam `encerrada_em`; gatilho recusa `delete`); `public.iniciar_sessao` (recusa `session_id` já existente e `amr` de senha com mais de 60 s), `public.encerrar_sessao`, `public.contexto_da_sessao` (passagens `security invoker` para funções `app.*` `security definer` com `search_path = ''`); limites 12 h, 30 min e 60 s numa só função |
+| M4 | `tentativas_entrada` | `app.tentativas_entrada` (chave `bytea` do HMAC, janela, contagem), fora do registro e fora da API; `public.conferir_tentativa(p_chave_ip, p_chave_conta)` para `anon`: apaga vencidas, conta e soma; 10 por conta e 30 por IP em 15 min; teto global de linhas (acima dele, `limite`) |
+| M5 | `estudios_da_pessoa_e_pre_pedido` | `public.meus_estudios()` e `public.escolher_estudio(p_org_id, p_pedido)` (`security invoker`, RF-12); `public.antes_do_pedido()` registrada com `alter role authenticator set pgrst.db_pre_request` e `notify pgrst, 'reload config'` (guia oficial): para **todo** pedido, recusa sem `x-chave-servidor` cujo SHA-256 esteja em `app.chaves_servidor` (D16); para `authenticated`, recusa sessão sem linha viva (menos em `rpc/iniciar_sessao`, que faz a própria conferência de D4), `x-estudio-esperado` diferente e, em pedido que grava, `x-pedido` e `x-acao` fora da regra (D6), com `raise sqlstate 'PGRST'` e os códigos `sem_login`, `estudio_trocado` e `erro_interno`. Mais `app.chaves_servidor` (só hash) e `app.acoes_que_gravam` (lista fechada; cada módulo acrescenta as suas na própria migration) |
 
 - Privilégios: `anon` executa **só** `conferir_tentativa` e `registrar_tentativa_falha`; `authenticated`, só as funções
   `public` acima e as 4 do item 3. O teste `010_` do item 3 ganha essa lista (ADR 0019 substitui a linha D9 do ADR 0005).
-- `supabase/config.jsonc`: `auth.enable_signup: false` (RF-09, CA-16). `auth.sessions` **não** se liga (é do Pro; o
-  local ficaria diferente do remoto). O resto fica.
+- `supabase/config.jsonc`: `auth.enable_signup: false` (RF-09, CA-16) e `auth.signing_keys_path` para chave assimétrica
+  gerada a cada execução, num arquivo fora do repositório (`.gitignore`; ADR 0018 · D17). `auth.sessions` **não** se liga
+  (é do Pro; o local ficaria diferente do remoto). Realtime e Storage continuam desligados no local; nenhuma tabela entra
+  na publicação `supabase_realtime` e nenhum balde de Storage é criado (o teste `010_` confere a publicação).
 - Testes pgTAP novos: `060_registro_test.sql` (CA-10, CA-11 com tabela temporária e gatilho, RF-26), `070_sessoes_test.sql`
-  (iniciar, encerrar, 12 h, 30 min, CA-15), `080_passagem_test.sql` (CA-17: `security invoker`, sem execução para
+  (iniciar, encerrar, 12 h, 30 min, CA-15; **não ressuscita**: `session_id` encerrado, vencido ou parado recusado por
+  `iniciar_sessao`, `amr` antigo recusado, `delete` recusado), `080_passagem_test.sql` (CA-17: `security invoker`, sem execução para
   `public` e `anon`), `090_tentativas_test.sql` (limites, vencimento, forma da linha de falha, teto global, CA-14 no banco),
-  `100_pre_pedido_test.sql` (`estudio_trocado`, sessão morta, com `request.headers` e `request.jwt.claims` postos no
-  teste). Molde novo `supabase/moldes/registro_tabela_test.sql` para cada módulo provar o gatilho.
+  `100_pre_pedido_test.sql` (`estudio_trocado`; sessão morta; sem chave do servidor, com chave errada e com chave certa, para
+  `anon` e `authenticated`; gravação sem `x-pedido`, com `x-acao` ausente ou fora da lista; `rpc/iniciar_sessao` sem linha
+  viva só passa pela conferência de D4; com `request.headers` e `request.jwt.claims` postos no teste). Molde novo `supabase/moldes/registro_tabela_test.sql` para cada módulo provar o gatilho.
 
 ## 7. `src/app` (Engenheiro de software; desenho do Designer de produto na ficha)
 
@@ -188,7 +197,8 @@ esconder senha, frases de erro, inicial da bolinha Sua conta) entram no `DESIGN.
 - `package.json`: `db:start` tira `gotrue`, `kong` e `postgrest` do `-x` (o resto continua desligado); scripts novos
   `test:integracao` (Vitest com `vitest.integracao.config.ts`) e `pacote:conferir` (CA-03). Dependências do D1.
 - `scripts/banco-local.mjs`: roda `supabase status -o json`, põe no ambiente do comando filho `SUPABASE_URL`,
-  `SUPABASE_PUBLISHABLE_KEY`, um `SEGREDO_TENTATIVAS` aleatório da execução e, **só para `tests/` e `e2e/`**, a chave
+  `SUPABASE_PUBLISHABLE_KEY`, um `SEGREDO_TENTATIVAS` e uma `CHAVE_SERVIDOR_BANCO` aleatórios da execução (grava o hash da chave no banco local como
+  `postgres`), gera a chave de assinatura local (D17) e, **só para `tests/` e `e2e/`**, a chave
   local de administração; nada é impresso nem gravado em arquivo.
 - `playwright.config.ts`: `webServer` por `scripts/banco-local.mjs`; `globalSetup` cria as contas fictícias.
 - `ci.yml`: job `banco` → `db:start` → `db:test` → `test:integracao` → `db:stop`; job `telas` → telemetria desligada →
@@ -210,7 +220,7 @@ esconder senha, frases de erro, inicial da bolinha Sua conta) entram no `DESIGN.
 | CA-09, CA-09a | linhas com os campos de RF-24 e RF-24a; busca dos e-mails e textos do teste no registro acha zero; contador fora do registro e vencido apagado | `tests/integracao/registro.test.ts`; `090_` |
 | CA-10, CA-11 | ninguém altera ou apaga; `anon` sem privilégio; registro que falha desfaz a gravação | `060_` |
 | CA-12 | respostas só com códigos; erro do banco simulado não vaza texto | `erros.test.ts`; integração |
-| CA-13 | token guardado antes de Sair → recusado depois; `no-store` em toda resposta; voltar no navegador não mostra dado | integração; e2e |
+| CA-13 | token guardado antes de Sair → recusado depois, e o cookie antigo não cria sessão nova (renovar + `iniciar_sessao` → recusado); chamada direta à Data API com token e chave pública, sem `x-chave-servidor` → recusada; `no-store` em toda resposta; voltar no navegador não mostra dado | integração; e2e |
 | CA-14 | 11ª tentativa da mesma conta → `limite` com a frase genérica | integração |
 | CA-15 | `ultimo_uso` e `entrou_em` empurrados para trás no banco local → `sem_login` | `070_`; integração |
 | CA-16 | conta nova pelo Auth recusada; `enable_signup` falso no `config.jsonc` | integração; leitura |
@@ -241,7 +251,7 @@ Nenhum outro muda. `docs/decisoes/`, `docs/BACKLOG.md` e `docs/STATUS.md` só pe
 | `src/app/ui/campos.tsx`, `src/app/ui/campos.css`, `src/app/ui/icone.tsx` (como na ficha; o "sim" do dono vem com a aprovação da spec) | Engenheiro de software |
 | `supabase/migrations/<ts>_{registro,registro_funcoes,sessoes,tentativas_entrada,estudios_da_pessoa_e_pre_pedido}.sql` (nomes finais no ADR 0019) | Engenheiro de dados |
 | `supabase/tests/database/010_base_estrutura_test.sql` (só a lista de privilégios), `060_` a `100_` (5 novos), `supabase/moldes/registro_tabela_test.sql` | Engenheiro de dados |
-| `supabase/config.jsonc` (só `auth.enable_signup`) | Engenheiro de dados |
+| `supabase/config.jsonc` (só `auth.enable_signup` e `auth.signing_keys_path`), `.gitignore` (arquivo da chave local) | Engenheiro de dados |
 | `tests/integracao/{preparo,entrar,portas,registro,sessao}.test.ts` (o `preparo` sem `.test`) | Engenheiro de software |
 | `e2e/preparo-global.ts`, `e2e/entrar.spec.ts`, `e2e/escolher-estudio.spec.ts`, `e2e/inicio.spec.ts` (passa a entrar antes), `playwright.config.ts` | Engenheiro de software |
 | `scripts/banco-local.mjs`, `scripts/conferir-pacote.mjs`, `.github/workflows/ci.yml` | Engenheiro de DevOps |
@@ -290,6 +300,9 @@ de rascunho (E22·B); nunca se junta nelas. Conflitos esperados: `package.json`,
 - **R-1** · Registrar o pré-pedido por migration (`alter role authenticator`) no banco local e no remoto: guia oficial
   manda rodar como SQL; permissão do papel `postgres` para isso numa migration **não verificada** (tarefa B2 prova no local).
 - **R-2** · Forma exata de `request.path` para liberar `rpc/iniciar_sessao` no pré-pedido: **não verificada** (teste `100_`).
+- **R-2a** · Que o `amr` de senha guarda a hora da entrada também depois de renovar o token: **não verificado** no Auth
+  local (integração prova; se não guardar, `iniciar_sessao` usa só "`session_id` nunca visto", que com D16 já fecha o
+  caminho, e o Auditor de risco reconfere).
 - **R-3** · Projeto remoto: entrar e renovar de todos os estúdios saem do mesmo servidor e dividem o balde do Auth
   (150/5 min por IP). Subir esse limite é configuração de produção: vai ao dono, com passo a passo, no pedido de merge.
 - **R-4** · `supabase start` sem `mailpit`: o Auth sobe sem ele? **Não verificado**; se não subir, `mailpit` sai do `-x`.
@@ -303,9 +316,18 @@ de rascunho (E22·B); nunca se junta nelas. Conflitos esperados: `package.json`,
 - **R-9** · Cloudflare Workers: `supabase-js`, WebCrypto e `cf-connecting-ip` **não verificados** lá (não há publicação
   nesta spec; o Node local é o que roda).
 - **R-10** · Pasta do pacote do navegador para o CA-03 (`dist/client` ou outra): **não verificada** (lida no `build`).
-- **R-11** · Quem tem o próprio token pode chamar a Data API sem o app (só o que a trava, o pré-pedido e o gatilho deixam,
-  e fica registrado). Fechar de vez pede uma chave do servidor no pré-pedido (padrão "additional API keys" do guia): fica
-  para o Engenheiro de segurança decidir, fora desta spec.
+- **R-11** · (fechado por D16) chamar a Data API direto com o próprio token: recusado sem a chave do servidor. Resta:
+  quem roubar a chave do servidor e um token passa pelo pré-pedido; a chave só vive no cofre e troca-se com 2 hashes ativos.
+- **R-13** · O Auth (`/auth/v1`) não passa pelo pré-pedido: com a chave pública (que nunca sai do servidor, mas o Supabase a
+  trata como pública), alguém pode tentar senha direto no Auth, sem o nosso limite por conta; vale só o limite por IP do
+  Auth. Fechar pede recurso do Auth que não foi verificado no plano gratuito: vai ao dono no pedido de merge, com o risco.
+- **R-14** · Remoto com chave de assinatura simétrica: `getClaims` chamaria o Auth a cada pedido (guias SSR e de chaves) e
+  cairia no limite de 30/5 min por IP. Trocar para chave assimétrica é configuração de produção: vai ao dono (D17).
+- **R-15** · `supabase gen signing-key` e `auth.signing_keys_path` na CLI 3.4.0: **não verificados** (tarefa B2).
+- **R-16** · Se `signOut({ scope: 'local' })` também falhar ao sair, o token de acesso vale até vencer (até 1 h); o cookie
+  já foi apagado e, com D16, só o servidor o usaria. Aceito, com a linha marcada assim que o banco voltar.
+- **Fora de escopo, registrado:** prazo de guarda do registro e de `app.sessoes` é dado de cliente e decisão do dono
+  (spec da vida do estúdio, `SECURITY.md` §7); até lá nada se apaga.
 - **R-12** · Medida de tempo do CA-01 pode oscilar na CI; tolerância de 100 ms e 10 amostras.
 
 ## 15. Fontes lidas (28/11/2026)

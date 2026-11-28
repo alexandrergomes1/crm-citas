@@ -28,12 +28,12 @@
 | # | Passo | Feito quando |
 |---|---|---|
 | B1 | Escrever o ADR 0019 (desenho de M1 a M5, privilégios, troca da linha D9 do ADR 0005, como os nomes de estúdio chegam à tela Escolher estúdio) dentro do `plan.md` §6 | ADR com motivo e norma em cada linha |
-| B2 | Mudar o `db:start` (`plan.md` §8) e `auth.enable_signup: false`; conferir que o Auth sobe sem `mailpit` (R-4) e que uma migration consegue `alter role authenticator set pgrst.db_pre_request` (R-1). Se R-1 falhar: parar e relatar | `pnpm db:start` com Auth e Data API respondendo; R-1 e R-4 anotados no PR |
+| B2 | Mudar o `db:start` (`plan.md` §8), `auth.enable_signup: false` e `auth.signing_keys_path` (ler `supabase gen signing-key` na CLI 3.4.0, R-15); conferir que o Auth sobe sem `mailpit` (R-4) e que uma migration consegue `alter role authenticator set pgrst.db_pre_request` (R-1). Se R-1 falhar: parar e relatar | `pnpm db:start` com Auth e Data API respondendo; R-1 e R-4 anotados no PR |
 | B3 | M1 `registro` e M2 `registro_funcoes` | aplica sem erro |
-| B4 | M3 `sessoes` e M4 `tentativas_entrada` | aplica sem erro |
-| B5 | M5 `estudios_da_pessoa_e_pre_pedido`; conferir a forma de `request.path` (R-2) | aplica sem erro; R-2 anotado |
+| B4 | M3 `sessoes` (linha nunca apagada; `iniciar_sessao` recusa `session_id` já visto e `amr` antigo) e M4 `tentativas_entrada` (teto global) | aplica sem erro |
+| B5 | M5 `estudios_da_pessoa_e_pre_pedido` com a chave do servidor (D16), `app.acoes_que_gravam` e a regra de `x-pedido` e `x-acao`; conferir a forma de `request.path` (R-2) | aplica sem erro; R-2 anotado |
 | B6 | Testes `060_` a `100_`, a lista nova do `010_` e o molde `registro_tabela_test.sql` | `pnpm db:test` verde, inclusive os do item 3 |
-| B7 | Prova de que pega erro: numa cópia local, tirar o pré-pedido e o gatilho e ver `100_` e `060_` vermelhos; desfazer | vermelho visto e desfeito; nada no commit |
+| B7 | Prova de que pega erro: numa cópia local, tirar o pré-pedido, a conferência da chave do servidor, a recusa de `session_id` já visto e o gatilho, e ver `100_`, `070_` e `060_` vermelhos; desfazer | vermelho visto e desfeito; nada no commit |
 
 ## Construção · Servidor, dados e regras (Engenheiro de software)
 
@@ -46,7 +46,7 @@
 | S5 | `src/server/portas/*` e `src/server/http/middleware.ts` (contrato do `plan.md` §4); testes CA-07, CA-08, CA-12, CA-21 | verde |
 | S6 | `src/server/sessao/*` (fluxos do `plan.md` §3.1 a §3.4), com teste de unidade | verde |
 | S7 | `scripts/banco-local.mjs` precisa existir (tarefa D1) antes de S8 | — |
-| S8 | `tests/integracao/*` e `vitest.integracao.config.ts`: CA-01, CA-04, CA-05, CA-06, CA-09, CA-09a, CA-13, CA-14, CA-15, CA-16, CA-18 | `pnpm test:integracao` verde com o banco local |
+| S8 | `tests/integracao/*` e `vitest.integracao.config.ts`: CA-01, CA-04, CA-05, CA-06, CA-09, CA-09a, CA-13 (inclusive cookie antigo não ressuscita e chamada direta sem chave do servidor recusada; `amr` depois de renovar, R-2a), CA-14, CA-15, CA-16, CA-18; Sair com `encerrar_sessao` falhando ainda chama `signOut` | `pnpm test:integracao` verde com o banco local |
 
 ## Construção · Telas (Engenheiro de software) · só depois de P3 e P4
 
@@ -60,7 +60,7 @@
 
 | # | Passo | Feito quando |
 |---|---|---|
-| D1 | Ler `supabase status -o json` da CLI 3.4.0 (R-5) e escrever `scripts/banco-local.mjs` (nada impresso nem gravado em arquivo) | `pnpm test:integracao` acha o banco; nenhum valor no log |
+| D1 | Ler `supabase status -o json` da CLI 3.4.0 (R-5) e escrever `scripts/banco-local.mjs`: chave do servidor e segredo de tentativas aleatórios por execução, hash gravado no banco local, chave de assinatura local (D17); nada impresso nem gravado no repositório | `pnpm test:integracao` acha o banco; nenhum valor no log |
 | D2 | `scripts/conferir-pacote.mjs` depois de ler a pasta de saída do `build` (R-10) | falha se achar `supabase`, o endereço ou a chave no pacote do navegador |
 | D3 | `ci.yml` (`plan.md` §8): jobs `banco`, `telas` e `verificar` ajustados; nomes, permissões e ações fixadas iguais | os 5 jobs verdes no PR |
 
@@ -70,8 +70,8 @@
 |---|---|---|---|
 | R1 | Código, molde e contrato (ADR 0018 · D11 a D15; lista do §10) | Revisor de código | sem "Bloqueia" |
 | R2 | Migrations e testes; ADR 0019 conferido item por item | Engenheiro de dados que **não** construiu | sem "Bloqueia"; conferência preenchida |
-| R3 | Sessão, cookie, CSRF, limite, registro, privilégios de `anon`, chave secreta fora de `src/` (ADR 0018 · D2 a D10) | Engenheiro de segurança | sem "Bloqueia" |
-| R4 | Riscos R-1 a R-12, funções `security definer`, pré-pedido, R-3 | Auditor de risco | sem "Bloqueia" |
+| R3 | Sessão, cookie, CSRF, limite, registro, privilégios de `anon`, chave secreta fora de `src/`, chave do servidor e não ressuscitar sessão (ADR 0018 · D2 a D10, D16, D17) | Engenheiro de segurança | sem "Bloqueia" |
+| R4 | Riscos R-1 a R-16, funções `security definer`, pré-pedido, R-3 | Auditor de risco | sem "Bloqueia" |
 | R5 | Telas pelo `DESIGN.md` §10, nas capturas do e2e | Revisor de design | sem "Bloqueia" |
 | R6 | Veredito de CA-01 a CA-22 pelo `plan.md` §9 | Analista de qualidade (QA) | veredito com links |
 
@@ -81,5 +81,5 @@
 |---|---|---|---|
 | F1 | Conferir o pedido item por item (RF-01 a RF-35, RNF-01 a RNF-05) e as lacunas L-1 a L-4 | Analista de requisitos | tudo cumprido ou relatado |
 | F2 | `CHANGELOG.md`, `CONTRIBUTING.md`, `docs/STATUS.md`, `docs/BACKLOG.md` e respostas do dono no mesmo PR | Documentador | no PR |
-| F3 | Pedido de merge no molde, com o commit, a CI verde, o link da prévia e o passo a passo para o dono no painel do Supabase (cadastro aberto desligado; limite do Auth, R-3) | Gerente de projeto | mensagem enviada e aviso no celular |
+| F3 | Pedido de merge no molde, com o commit, a CI verde, o link da prévia e o passo a passo para o dono no painel do Supabase (cadastro aberto desligado; limite do Auth, R-3; gravar o hash da chave do servidor e pôr a chave no cofre, D16; chave de assinatura assimétrica, R-14; risco do Auth direto, R-13) | Gerente de projeto | mensagem enviada e aviso no celular |
 | F4 | Gravar "Aprovação do merge" e juntar só esse commit | Engenheiro de DevOps | merge feito |
