@@ -201,18 +201,12 @@ https://claude.ai/code/session_018cV8b8F1poNHjA4eEd3VyN), e valem também para o
   só nos próprios.
 - **E26·3 · Quem aparece como coluna:** "E26·3·A": quem tem papel profissional, mais a dona; a recepção não.
 
-**Nova, depois da aprovação** (a spec não cobre; `AGENTS.md` §4): até a resposta, a construção segue no resto e esta
-parte para.
-
-**E50·1 · Quem deixou de ser coluna e ainda tem horário marcado** (tela, acesso). Quando uma pessoa perde o papel
-profissional ou é desativada, os bloqueios (e, depois, os agendamentos) dela nos dias seguintes continuam no banco, mas
-a RF-03 não mostra mais a coluna: somem da tela sem aviso.
-- **A:** nos dias em que ela tem algo, a coluna aparece marcada como fora da equipe; dona e recepção alteram ou
-  excluem; nada novo entra nela.
-- **B:** a coluna some; a tela avisa "há horários de pessoas fora da equipe" e leva à lista deles.
-- **C:** ao tirar o papel, os bloqueios futuros dela são apagados (os agendamentos ficam para a spec do Agendamento).
-- **Recomendo A:** nada some calado (como a RN-08) e a recepção consegue limpar ou remarcar (ISO 31000: risco de
-  atendimento perdido). O texto da marca entra no `DESIGN.md` com o dono, na ficha visual.
+**Pendência para a spec da Equipe (não é dúvida da Agenda):** quando uma pessoa deixar de ser coluna (perder o papel
+profissional ou ser desativada) e ainda tiver bloqueios ou agendamentos marcados, eles não podem sumir da Agenda sem
+aviso. Na v1 isso não acontece pelo produto: não há tela nem ação do servidor que mude papel ou `ativo` (só o módulo
+Equipe, fora de escopo, §11), e durante o desenvolvimento só o dono usa (E42·A). O banco já deixa a dona mudar
+`papel` e `ativo` (`supabase/migrations/20261128002045_politicas_base.sql`, política `membros_alterar`), mas nenhum
+caminho do app usa isso. A pergunta vai ao dono na spec da Equipe; a Agenda não para.
 
 ## 13. Assumptions (técnicas e de formato, à vista na aprovação)
 1. Grade de 24 h com rolagem até a hora atual (ou ao primeiro item do dia); passos de 15 min na escolha de hora.
@@ -223,7 +217,7 @@ a RF-03 não mostra mais a coluna: somem da tela sem aviso.
 5. ADRs na numeração de `docs/adr/`; uma migration por tabela.
 
 ## 14. Ajustes (28/11/2026, depois da aprovação)
-Aplicação de respostas já registradas do dono; nenhum requisito novo (só a E50·1, que espera resposta). Escrito pelo
+Aplicação de respostas já registradas do dono; nenhum requisito novo. Escrito pelo
 Analista de requisitos (IEEE 29148 e BABOK).
 
 | Onde | O que mudou | Por quê |
@@ -239,7 +233,7 @@ Analista de requisitos (IEEE 29148 e BABOK).
 | §7 | `staff_members`: descartar | E26·3·A |
 | §9 | CA-03 com chave e alcance; CA-13 ("Ocupado"); CA-14 (regra testada ao criar e ao alterar) | E26, ADR 0020 · D7 e D8; E43·A (`regras-do-banco.md` #54) |
 | §10 | itens 3, 4 e o Entrar já na `previas` | PR #7 |
-| §12 | E26 respondidas; nova E50·1 | `AGENTS.md` §4 |
+| §12 | E26 respondidas; pendência para a spec da Equipe (pessoa que deixa de ser coluna) | `AGENTS.md` §4; revisão 5b do Gerente de projeto: não acontece na v1 |
 | §15 | ideias do antigo, fora dos requisitos | E44 |
 
 **Sem mudança na Agenda v1:** E30·3·B (quem faz cada serviço) é do Catálogo e do Agendamento; as colunas seguem a
@@ -250,5 +244,5 @@ Agendamento, Formulários, Checkout, Caixa).
 sem motivo nas colunas das outras (§3) e trata as E26 como em aberto; precisa seguir a §3 acima, a RF-10 e a CA-13.
 
 ## 15. Ideias do projeto antigo (E44)
-Lista em [`ideias-do-antigo.md`](ideias-do-antigo.md): 8 ideias (E50·I1 a E50·I8) e as descartadas, cada uma com o
+Lista em [`ideias-do-antigo.md`](ideias-do-antigo.md): 8 ideias (E54·1 a E54·8; A = aprovar, B = não aprovar) e as descartadas, cada uma com o
 risco de vício. **Não são requisitos:** só entram com a autorização do dono, item por item (`AGENTS.md` §3 regra 4).
