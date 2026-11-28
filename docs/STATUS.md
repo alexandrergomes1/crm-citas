@@ -24,13 +24,12 @@
   for trabalhada.
 
 ## Esperando o dono
-1. **E64:** será reapresentada no molde, dizendo o que se decide (a primeira mensagem não disse; crítica do dono de 28/11).
-2. **E38·A1:** travas em `.claude/` agora que o Entrar entrou, numa conversa nova, num PR só para elas.
+1. **E38·A1:** travas em `.claude/` agora que o Entrar entrou, numa conversa nova, num PR só para elas.
    **D2:** PRs do Dependabot e a `main`.
-3. Apagar `chore/base-fundacao` (o dono, na página de branches). Fechar ou não os PRs #5 e #6 (abertos sem uso).
+2. Apagar `chore/base-fundacao` (o dono, na página de branches). Fechar ou não os PRs #5 e #6 (abertos sem uso).
 
 **Respondidas em 28/11 e ainda por aplicar nas specs (Analista, quando cada branch for trabalhada):** E29·1 (PIN),
-E29·3 (troca), E31·1 (caixa opcional), E32·1 (aviso de caixa aberto), E40·B, E45·A (Checkout e Caixa), E46·A
+E29·3 (troca), E64·A (Agendamento: a profissional vê e abre só os dela; spec na branch `feat/agendamento`), E31·1 (caixa opcional), E32·1 (aviso de caixa aberto), E40·B, E45·A (Checkout e Caixa), E46·A
 (Catálogo), E44 (ler a parte do antigo de cada módulo ao fazer a spec), ideias E43·A de cada módulo.
 
 ## Já aprovado

@@ -19,7 +19,7 @@ antes do núcleo (E36·A); o item 4b (revisão do processo) entra antes da Agend
 | 4b | Revisão do processo (pedido do dono de 28/11): travas E65, molde de mensagem com o bloco do que precisa do dono, registro de toda proposta futura, revisão das conversas anteriores, organização da pasta specs | E65 (sim), ordens do dono de 28/11 (`docs/decisoes/2026-11-27-fundacao.md`) | em curso |
 | 5 | Núcleo, um módulo por spec: Agenda, Agenda · visões e horário de funcionamento (formatos em cards, grade no horário de funcionamento, lupa no celular, resumo da coluna, dias marcados), Agendamento, Clientes, Formulários, Catálogo, Checkout, Caixa | E3·2, `ARCHITECTURE.md` §2, E57·B | Agenda: parada até o item 4b (ordem do dono de rever o processo antes; plano e ficha na `feat/agenda`); os outros: livre |
 | 6 | Os outros módulos, um por vez, incluindo a central de ajuda e o assistente de IA | E3·2, pedido do dono (módulos), E21·1 | livre |
-| 6a | Perfis e permissões ajustáveis (por módulo e ação, por pessoa, papéis padrão personalizáveis); até lá só o dono usa, com acesso total | E42·A (ajustada) | livre |
+| 6a | Perfis e permissões ajustáveis (por módulo e ação, por pessoa, papéis padrão personalizáveis); inclui liberar, por perfil, ver as colunas das colegas ou só a ocupação, na Agenda e no Agendamento (E58·A, E64·A); até lá só o dono usa, com acesso total | E42·A (ajustada), E58·A, E64·A | livre |
 | 7 | Painel admin básico | E4·2, E4·3, E21·1 | livre |
 | 8 | Cadastro de estúdio e cobrança da assinatura | E4·3, E21·1 | livre |
 | 9 | Portal público do estúdio (reserva online) | E4·3, E21·1 | livre |
