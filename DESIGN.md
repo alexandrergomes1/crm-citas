@@ -89,7 +89,7 @@ Contraste conferido: todo texto ≥ 4,5:1 sobre fundo, superfície e trilho; con
 **Status do agendamento (ícones Lucide):** Reservado `clock` · Confirmado `thumbs-up` · Chegou `door-open` · Iniciado `play` · Concluído `circle-check` · Ausência `user-x` · Cancelado `circle-x` · Bloqueio de horário `lock`.
 **Situação de formulário:** Aguardando a cliente `hourglass` (âmbar) · Bloqueia o checkout `shield-alert` (vermelho) · Concluída `circle-check` (verde).
 **Etiquetas:** 1ª visita `user-plus` · VIP `crown` · Recorrente `repeat` · Retoque pendente `brush` (âmbar) · Alergia `circle-alert`.
-**Equipe (botão "Equipe N de M" da Agenda):** `users` (E60·4, ordem do dono; é também o ícone de Clientes, exceção ao "um ícone por coisa" decidida pelo dono). **Agenda:** Modo de ver `menu` (☰ do celular) · Lista de espera `list-ordered` · Dia `calendar-range` · horário escolhido na lista `check` · botão do meio `calendar-plus` (E55·3·A, E60·2).
+**Equipe (botão "Equipe N de M" da Agenda e ícone do estado "sem profissional"):** ícone de pessoas (E60·4: "icone deve ser dos bonequinhos"); hoje `users`, **escolha do Designer, a confirmar pelo dono (E63)**, porque `users` já é Clientes e o "um ícone por coisa" pede outro (recomendado `user-group`). **Agenda:** Modo de ver `menu` (☰ do celular) · Lista de espera `list-ordered` · Dia `calendar-range` · horário escolhido na lista `check` · botão do meio `calendar-plus` (E55·3·A, E60·2).
 **Senha:** Mostrar `eye` · Esconder `eye-off`. **Sua conta sem e-mail:** `user` (na bolinha, no lugar da inicial; E47·2·A). **Um ícone por coisa em todo o app**; o mapa de ícones entra aqui com aprovação do dono.
 
 ## 6. Nomes dos botões
@@ -157,7 +157,7 @@ Os outros módulos seguem o mesmo molde, um por spec. O lugar de cada módulo e 
 4. **Cartão do agendamento e do bloqueio:** `--btn`, canto 10, três conteúdos por duração (1 h ou mais: nome, "início–fim · serviço" e status com ícone e palavra; 45 min: nome e ícone, hora e serviço; menos: "hora + nome" e ícone); bloqueio com `lock` e "Bloqueio · <motivo>" (E55·3·A).
 5. **Altura mínima** 44 (celular) e 40 (computador); itens que se cruzam lado a lado, no máximo 3; com 4 ou mais, o 3º lugar vira o cartão "+N" (E55·3·A).
 6. **Celular:** data como botão ▾ abaixo do título; faixa colada ao cabeçalho com ‹ Hoje › · Equipe N de M · ⋮ (Opções); duas colunas de 160 à vista e as outras rolam para o lado, com esmaecido na ponta (E55·3·A).
-7. **Equipe N de M:** menu (computador) e folha (celular) com caixinhas (E55·3·A); ícone `users` (E60·4).
+7. **Equipe N de M:** menu (computador) e folha (celular) com caixinhas (E55·3·A); ícone de pessoas (E60·4), qual deles a confirmar pelo dono (E63).
 8. **Linha de aviso do teto** acima da grade, com `circle-alert` (E55·3·A).
 9. **Campo só leitura:** fundo `--page`, sem contorno, com a frase de motivo embaixo (E55·3·A).
 10. **Valor "6 de 7"** à direita na linha que abre, na folha e no painel de Filtros (E55·3·A).

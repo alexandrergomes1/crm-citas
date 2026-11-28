@@ -20,7 +20,7 @@
 - **E60·1·A:** bloqueio dentro do botão de criar e no toque do horário vazio; fora de Opções.
 - **E60·2:** botão do meio da barra do celular só com o ícone `calendar-plus`, sem nome escrito; nome no leitor "Adicionar"; abre as mesmas opções; vale para a barra de todo o app.
 - **E60·3·A:** linha do agora em azul ardósia (`--id`).
-- **E60·4:** botão Equipe com o ícone `users`; a profissional não vê o botão.
+- **E60·4:** botão Equipe com ícone de pessoas ("bonequinhos"; qual deles, E63); a profissional não vê o botão (Assumption abaixo).
 - **E60·5:** o nome é "Adicionar" (`DESIGN.md` §6 "Adicionar ▾"): "+ Adicionar ▾" abre Novo agendamento · Bloquear horário; "Novo" sozinho sai de tudo (botão, folha, barra).
 
 ## Decisões do Designer (v4)
@@ -29,7 +29,7 @@
 - **Botão do meio só ícone:** círculo 52 preto, alvo ≥ 44 (WCAG 2.5.8), `aria-label="Adicionar"`, `aria-haspopup="dialog"` e `aria-expanded` (WCAG 4.1.2); o círculo fica centrado na barra de 72.
 - **Botões claros nos estados (imagem 6 do dono):** "Limpar filtros", "Tentar de novo" e "Ver equipe" em botão claro `--btn` (camada Controle sobre superfície, §2; é o que a imagem 06 aprovada mostra); a v3 tinha "Limpar filtros" e "Ver equipe" só com contorno, sobre branco. "Bloquear horário" e "Novo agendamento" dos vazios seguem com contorno, como o §8 manda para "Adicionar <coisa>" no vazio; trocar esse contorno por cinza muda regra aprovada e não foi feito.
 - **Grade alargada até a hora atual:** se agora é 21:40, a grade vai até 22:00 e abre rolada com a hora atual à vista; sem rolar além do fim da grade.
-- **Ícone `users` no Equipe (ordem do dono, E60·4), com risco anotado:** é o mesmo ícone de Clientes na barra e no menu, e o módulo Equipe usa `briefcase` ("um ícone por coisa", §5; Nielsen 4). Aplicado como mandado; o estado "sem profissional" mantém `briefcase`, porque o botão dele leva ao módulo Equipe.
+- **Ícone de pessoas no Equipe (E60·4), escolha do Designer, a confirmar pelo dono (E63):** o dono pediu "bonequinhos", mas não decidiu a exceção ao "um ícone por coisa" (§5): `users` já é Clientes. As imagens principais estão com `users` até a resposta; o estado "sem profissional" usa o mesmo ícone do botão.
 
 ---
 
@@ -95,7 +95,7 @@ própria coluna, e a frase "Os filtros valem só para a sua coluna." deixou de t
    estou", e a linha diz onde se está no tempo; vermelho é erro, preto é ação (`DESIGN.md` §3). Contraste: branco sobre
    `--id` 7,0:1; linha sobre branco 7,0:1 (≥ 3:1, WCAG 1.4.11). Uso do `--id` gravado no §3 (E60·3·A).
 5. **Profissional (E58·A, E60·4): sem "Equipe".** Com uma coluna só, o botão não teria o que escolher; some, como manda a
-   RF-11 (esconder o que não se usa). Para dona e recepção, o botão "Equipe N de M" usa o ícone `users`. A coluna ocupa a largura toda nas duas larguras. Filtros continuam.
+   RF-11 (esconder o que não se usa). Para dona e recepção, o botão "Equipe N de M" usa o ícone de pessoas (E60·4; qual deles, E63). A coluna ocupa a largura toda nas duas larguras. Filtros continuam.
 6. **Toque no horário vazio (E54·1):** o toque cai no quarto de hora tocado (arredonda para baixo) e marca **1 h** a
    partir dali, no desenho do escolhido do seletor (`--btn` com o anel `--selRing`), porque o bloqueio nasce com 1 h
    (E54·4) e a pessoa vê antes o que vai criar. Abre um menu (computador) ou uma folha (celular) com a hora e a pessoa
@@ -185,7 +185,7 @@ própria coluna, e a frase "Os filtros valem só para a sua coluna." deixou de t
 17. **Atalhos de motivo:** botões claros em pílula de 36 (toque 44), texto 13 (decisão 9).
 18. **Lupa esmaecida tocável** com aviso "em desenvolvimento" no celular (decisão 11).
 19. **Grade de 08:00 a 20:00 que se alarga** com item fora e até a hora atual (E59·A).
-20. **Ícone `users` no botão Equipe** (E60·4), no lugar de `briefcase`.
+20. **Ícone de pessoas no botão Equipe** (E60·4), no lugar de `briefcase`; qual deles, E63.
 
 **Nomes novos:** Adicionar (botão ▾, título da folha e nome no leitor do botão do meio) · Novo agendamento (item do menu) · Bloquear horário (item do menu) ·
 "13:00 · Bruna Reis" (cabeçalho do menu do horário vazio; hora · nome de exibição) · Agora (leitor) · Almoço · Folga ·
@@ -199,10 +199,15 @@ no celular (se a E60·2·A for aceita). Nenhum texto diz "estúdio" (E47).
 ## Gravado no `DESIGN.md` nesta versão (ordem do dono: "toda decisao vai pros arquivos correspondentes")
 §3 `--id` (linha do agora, E60·3·A) · §5 Ação principal ("+ Adicionar ▾" da Agenda, botão do meio só ícone, "+"
 redondo no "Nunca"; E60·1·A, E60·2, E60·5, decisão do Designer) · §5 Adicionar no celular (a Agenda não tem) · §5
-ícone sozinho no botão do meio · §5 barra de baixo · §5 ícones (`users` no Equipe, E60·4; ícones da Agenda, E55·3·A) ·
+ícone sozinho no botão do meio · §5 barra de baixo · §5 ícones (pessoas no Equipe, E60·4, a confirmar na E63; ícones da Agenda, E55·3·A) ·
 §6 "Adicionar ▾", "Novo agendamento · Bloquear horário" e Equipe · §7 Agenda · **§7b novo: peças e nomes da Agenda**
 (E55·3·A, E58·A, E59·A, E60·1 a E60·5) · §8 botões claros `--btn` nos estados (decisão do Designer) · §8b botão do meio
 · §10 item 1.
+
+## E63 · Ícone do botão Equipe (pergunta ao dono)
+- **A** `users`, o mesmo de Clientes na barra: ![](ficha/alternativa-e63-a-users-390.png)
+- **B** `user-group` (três pessoas, uma à frente): continua "bonequinhos" e não se confunde com Clientes: ![](ficha/alternativa-e63-b-user-group-390.png)
+- **Recomendo B:** um ícone por coisa (`DESIGN.md` §5; Nielsen 4, consistência); com A, "Equipe 3 de 3" e "Clientes" ficam com o mesmo desenho na mesma tela. Descartados: `users-round` (quase igual a `users`), `contact-round` e `square-user-round` (parecem ficha de cliente). Desfaz-se trocando uma linha do `DESIGN.md` §5.
 
 ## Assumption à vista (confirmar no pedido de merge)
 - **A profissional não vê o botão "Equipe N de M"** (Assumption 6 da spec; leitura da E60·4): ela só tem a própria
@@ -219,7 +224,7 @@ redondo no "Nunca"; E60·1·A, E60·2, E60·5, decisão do Designer) · §5 Adic
 
 ## Não verificado
 - **Revisor de design:** a v4 e as mudanças no `DESIGN.md` não foram revistas; as 3 correções da 3ª rodada também não foram reconferidas por ele.
-- **Ícone `users` no Equipe:** o risco de confusão com Clientes não foi testado com quem usa.
+- **Ícone do Equipe (E63):** nenhuma das duas opções foi testada com quem usa.
 - **Botão só ícone da barra:** não testado se quem usa entende que abre "Adicionar" sem o nome escrito.
 - **Acessibilidade:** o axe (wcag2a, wcag2aa, wcag21a, wcag21aa, wcag22aa) deu 0 violações nas 57 capturas da v4 do
   protótipo; não vale para o app real. Não testei com leitor de tela, nem a ordem do Tab, nem o ponto "horário vazio"
