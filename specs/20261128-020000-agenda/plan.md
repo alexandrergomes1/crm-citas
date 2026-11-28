@@ -1,90 +1,177 @@
 # Plano · Agenda (primeira versão, item 5 da fila)
 
-- **Spec:** `specs/20261128-020000-agenda/spec.md` (Draft; revisão 5b feita)
+- **Spec:** `specs/20261128-020000-agenda/spec.md` (Approved, commit `4e5b364`, ajustes da §14)
 - **Escrito por:** Arquiteto de software · **Norma:** modelo C4 e ADR (mais Clean Architecture, Twelve-Factor, WCAG 2.2,
   OWASP ASVS 4.0.3 V4 e boas práticas do Postgres e do Supabase) · **Revisão:** pendente (etapa 5 Analista de
-  requisitos; 5b Gerente de projeto)
-- **Decisões técnicas deste plano:** `docs/adr/0006-agenda-tempo-idiomas-e-tetos.md`. **Decisões de banco:**
-  `docs/adr/0007-agenda-tabelas-do-antigo.md`, escrito pelo Engenheiro de dados na tarefa T3 (não neste plano).
-- **Bases lidas em 28/11/2026 (só leitura, nada editado lá):**
-  - item 2 (`chore/fundacao-tecnica`): `plan.md`, ADR 0002, `package.json`, `eslint.config.mjs`, `src/`;
-  - item 3 (`feat/banco-ligacao`): `plan.md` §3 a §5 e ADR 0005 (`public.estudios`, `public.membros`,
-    `app.estudio_da_sessao()`, `app.papel_da_sessao()`, `app.eh_dona()`, molde `supabase/moldes/isolamento_tabela_test.sql`).
-    As migrations de lá existem só como arquivos vazios (em construção): **os nomes vêm do plano, não do código**;
-  - item 4 (`feat/design-system-codigo`): `plan.md` e ADR 0004 (tokens em `src/app/estilos/tokens.css`, componentes
-    `src/app/ui/*`, ícones só por `src/app/ui/icone.tsx`, `@axe-core/playwright`);
-  - spec do Agendamento (`feat/agendamento`, Draft), só para alinhar a regra de conflito (RF-04 de lá).
-- **Conferido no código instalado** (item 2, `node_modules`): `createServerFn` com `.validator(...)` e `.middleware(...)`
-  em `@tanstack/start-client-core@1.170.39`; o validador aceita Standard Schema (`router-core` `validators.d.ts`);
-  `getCookie`, `setCookie`, `getRequest` em `@tanstack/start-server-core@1.169.45`. Node 26.13.1 tem `Intl` e `Temporal`.
+  requisitos; 5b Gerente de projeto), refeita por causa desta revisão (MP1)
+- **Revisão de 28/11/2026 (tarefa MP1 de `specs/20261128-030000-entrar-servico/tasks.md`):** porta 3 por chave e
+  alcance (ADR 0020), sem "função do papel"; "Ocupado" da spec §3; E26 respondidas; contrato lido no código da
+  `previas` (PR #7); branch sai da `previas`.
+- **Decisões técnicas deste plano:** `docs/adr/0006-agenda-tempo-idiomas-e-tetos.md` (D1 a D13). **Decisões de banco:**
+  `docs/adr/0007-agenda-tabelas-do-antigo.md`, do Engenheiro de dados na tarefa T3 (não neste plano).
+- **Lido no código da `previas` em 28/11/2026 (nada editado):** `src/server/portas/{acao,tipos,catalogo,executar,erros}.ts`
+  e `molde.test.ts`; `src/domain/acesso/{chaves,matriz}.ts` e `matriz.test.ts`; `src/data/{cliente,erros,sessao}.ts`;
+  `src/server/sessao/acoes.ts`; `src/app/routes/{__root,_app}.tsx`, `src/app/routes/_app/index.tsx`,
+  `src/app/i18n/textos.ts`, `src/app/ui/*` (exportações), `src/app/estilos/app.css`; `supabase/migrations/*` (membros,
+  trava, políticas base, registro e funções, pré-pedido, matriz); `supabase/moldes/*`;
+  `supabase/tests/database/010_` e `110_`; `supabase/matriz/matriz.test.ts`; `e2e/preparo-global.ts`;
+  `playwright.config.ts`; `package.json`; `eslint.config.mjs`; ADR 0004, 0018 (D18, D24), 0019 (pelos comentários das
+  migrations) e 0020.
 
 ## 1. Resumo (C4)
 **Contexto:** dona, recepção e profissional usam a tela Agenda; nenhum sistema externo novo.
-**Contêiner:** o app do item 2 (TanStack Start) e o banco do item 3. A Agenda é o **primeiro módulo que liga
-`src/data` ao banco** (item 3, `plan.md` §8).
-**Componentes (fluxo de uma leitura do dia):**
+**Contêiner:** o app (TanStack Start) e o banco local do Supabase, já ligados pelo Entrar (PR #7).
+**Componentes (uma leitura do dia):**
 
 ```
-/agenda?dia=AAAA-MM-DD  (src/app/routes/agenda.tsx, só a data na URL: RNF-04)
-   │ loader chama
+/agenda?dia=AAAA-MM-DD   (src/app/routes/_app/agenda.tsx; só a data na URL da tela: RNF-04)
+   │ loader → lerDia({ data: { estudioDaTela, dados: { dia } } })   (POST: ADR 0018 · D18)
    ▼
-src/server/agenda/ler-dia.ts ── 6 portas (quem é · estúdio da sessão · papel · esquema · banco com trava · registro)
-   │ usa regras puras                        │ lê com a sessão da pessoa
-   ▼                                         ▼
-src/domain/agenda/* (dia, bloqueio,       src/data/agenda/* ──► public.bloqueios + public.membros + public.estudios
-grade, acesso)                                                     (RLS: org_id = app.estudio_da_sessao())
+src/server/agenda/ler-dia.ts = acaoPost.handler(acao({ permissao: 'agenda.ver', grava: false, ... }))
+   │ 6 portas de src/server/portas/executar.ts → ctx { usuarioId, orgId, alcance, alcances, idioma, fuso, ... }
+   │ regras puras                               │ leitura com o token da pessoa (ctx.banco)
+   ▼                                            ▼
+src/domain/agenda/*                    src/data/agenda/* ──► public.membros · public.bloqueios · "ocupados" do banco
+(dia, bloqueio, grade, acesso)                                (RLS por estúdio + app.pode(chave, alcance))
 ```
 
 Gravações (criar, alterar, excluir bloqueio) seguem o mesmo caminho por `src/server/agenda/bloqueios.ts`.
 
-## 2. Lacunas para o Analista de requisitos (a spec não cobre; não decido, `AGENTS.md` §4)
-Achadas ao planejar. Cada uma com recomendação; o plano abaixo funciona com a recomendação. A L-1 já foi resolvida
-pelo dono (E36·A).
+## 2. Acesso (spec §3, RF-09 a RF-11, CA-13, CA-14; ADR 0020)
 
-- **L-1 · Login, sessão e registro: resolvida pelo dono (E36·A, 28/11/2026).** Login, sessão, as 6 portas, a ligação
-  do app ao banco e a auditoria entram na spec própria "Entrar e camada de serviço" (branch `feat/entrar-servico`),
-  antes do núcleo. A Agenda não constrói nada disso: usa o contrato do §5.1.
-- **L-2 · Nome no cabeçalho da coluna.** `public.membros` não tem nome (ADR 0005 · T2 deixou "o nome da profissional"
-  para esta spec). A spec não diz de onde vem o nome nem quem o grava (é dado pessoal da equipe). Recomendo: uma
-  coluna de nome de exibição (só o que aparece na coluna), gravada por tarefa interna até existir a Equipe; em
-  desenvolvimento, só nomes fictícios. Forma exata no banco: Engenheiro de dados, tarefa T3.
-- **L-3 · Peças que o `DESIGN.md` não tem.** Grade de horas, cabeçalho da coluna, cartão do agendamento, bloqueio na
-  grade, linha da hora atual, data em pílula com calendário e a escolha do "Equipe N de M". A spec (§4) manda parar e
-  entrar no `DESIGN.md` com o dono primeiro: entram pela ficha visual (etapa 6, tarefa T2), nunca na construção.
-- **L-4 · Banco local para as telas.** O `db:start` do item 2 desliga Auth, API e gateway (`-x gotrue,...,kong,...`); um
-  app com login precisa deles nos testes de tela, e o job `telas` da CI hoje não sobe banco. Resolve-se na spec
-  "Entrar e camada de serviço" (E36·A); a Agenda não muda `package.json` nem `.github/`.
-- **L-5 (só texto da spec):** o cabeçalho diz "Branch: `feat/agenda` (da `previas`)", mas a branch é empilhada sobre
-  as bases (§10). Ajustar a linha.
+### 2.1 Chaves e linhas da matriz que a Agenda acrescenta
+Em `src/domain/acesso/chaves.ts`: `MODULOS.agenda = ['ver', 'criar', 'editar', 'remover']`. Em
+`src/domain/acesso/matriz.ts`, `MATRIZ_PADRAO` ganha 8 linhas, com a resposta citada ao lado de cada uma:
 
-## 3. Dúvidas E26 em aberto: o plano usa a recomendação; o que muda em cada outra
-A resposta vira **uma constante** em `src/domain/agenda/acesso.ts` e **uma** versão das políticas; não se constroem as
-três variantes nem chave de liga e desliga.
+| Chave | Recepção | Profissional | Resposta |
+|---|---|---|---|
+| `agenda.ver` | `todos` | `proprios` | E26·1·B |
+| `agenda.criar`, `agenda.editar`, `agenda.remover` | `todos` | `proprios` | E26·2·A |
 
-| Dúvida | Com a recomendação (base deste plano) | Se o dono escolher outra |
+A dona tem tudo por regra fixa (ADR 0020 · D4): não tem linha. A cópia no banco é a migration M2 (§4.2), e a linha do
+`110_matriz_permissoes_test.sql` entre os marcadores passa a ser o `JSON.stringify(exportarMatriz())` novo; o
+`supabase/matriz/matriz.test.ts` (já existente) e o pgTAP `110_` travam a diferença (ADR 0020 · D7, D8).
+
+### 2.2 Ações e chaves (nomes do catálogo; ADR 0020 · D1: o módulo da chave é o primeiro trecho do nome)
+| Ação (`nome`) | `permissao` | `metodo` / `grava` | O que faz |
+|---|---|---|---|
+| `agenda.dia.ler` | `agenda.ver` | `POST` / `false` | lê colunas e itens de um dia |
+| `agenda.bloqueio.criar` | `agenda.criar` | `POST` / `true` | cria bloqueio (e o "Desfazer" do excluir) |
+| `agenda.bloqueio.alterar` | `agenda.editar` | `POST` / `true` | altera bloqueio |
+| `agenda.bloqueio.excluir` | `agenda.remover` | `POST` / `true` | exclui bloqueio |
+
+`POST` também na leitura: o molde recusa `GET` no modo `estudio` (`conferirDefinicao`; ADR 0018 · D18), porque a
+entrada iria para a URL. As três que gravam entram em `app.acoes_que_gravam` pela M2 (sem isso o pré-pedido e o gatilho
+de registro recusam).
+
+### 2.3 O que "próprios" quer dizer na Agenda (regra do módulo; ADR 0020 · D3)
+`src/domain/agenda/acesso.ts` recebe **alcance e `usuarioId`, nunca papel** (o `ContextoEstudio` não tem papel; ADR
+0020 · D5):
+- `veCompleta(alcanceVer, usuarioId, colunaId)`: `todos` → toda coluna; `proprios` → só `colunaId === usuarioId`.
+- `podeGravarNa(alcanceDaChave, usuarioId, profissionalId)`: `todos` → qualquer coluna; `proprios` → só a própria.
+  Ao alterar, vale para a linha antiga **e** para a nova (não se move bloqueio de outra para si nem o contrário).
+- Recepção não é coluna: com `proprios` (só possível no item 6a) ela não teria coluna própria e veria tudo como
+  "Ocupado"; nada a fazer agora.
+
+### 2.4 "Ocupado" (E26·1·B; spec §3, RF-10, CA-13) · ADR 0006 · D7
+- Nas colunas que a pessoa não vê completas, cada bloqueio (e, quando o Agendamento existir, cada agendamento que
+  ocupa horário, RN-04) sai do servidor só como `{ tipo: 'ocupado', colunaId, inicio, fim }`: sem `id`, cliente,
+  serviço, status nem motivo. A tela não abre, não mostra ⋮ e os filtros não agem nessas colunas (`grade.ts` só filtra
+  itens `bloqueio`/`agendamento`, nunca `ocupado`).
+- **Duas camadas:** (1) o banco não entrega a linha completa de outra coluna a quem tem `agenda.ver` só `proprios`
+  (política de leitura de `bloqueios` com `app.pode('agenda.ver', 'todos') or (app.pode('agenda.ver', 'proprios') and
+  profissional_id = auth.uid())`); os horários das outras colunas vêm de uma leitura do banco que devolve só
+  `profissional_id, inicio, fim` (§4.3); (2) o servidor monta a resposta pelo `acesso.ts` e o teste do servidor confere
+  que nenhum campo a mais sai (CA-13). A forma exata da leitura de "ocupados" é do Engenheiro de dados (ADR 0007).
+
+### 2.5 Colunas pelo papel das colegas × ADR 0020 · D5 (dúvida do Analista) · ADR 0006 · D8
+**Decisão: compatível, com quatro condições.** A D5 proíbe o módulo de decidir **o que a pessoa da sessão pode** pelo
+papel dela (o `if (papel === ...)` que sobreviveria ao item 6a). Ler o papel das **colegas** para saber quem é coluna
+não decide acesso: aplica um dado do estúdio a uma regra de negócio que o dono fixou (E26·3·A, "quem tem papel
+profissional, mais a dona"). Condições:
+1. O papel da pessoa da sessão continua fora do trabalho; só o alcance decide o que ela vê e grava.
+2. A regra "é coluna" mora num lugar só de cada lado: `ehColuna(membro)` em `src/domain/agenda/acesso.ts` (ativo e
+   papel `dona` ou `profissional`) e uma só condição no banco (na política de gravação ou numa função, à escolha do
+   Engenheiro de dados), usada para recusar bloqueio de quem não é coluna (RN-07).
+3. O servidor não manda o papel das colegas à tela: só `id`, nome de exibição (L-2) e se a coluna está completa
+   (minimização, RGPD art. 5(1)(c)). Ler `membros.papel` já é permitido a todo membro do estúdio (`membros_ler`, item 3):
+   nada novo fica exposto.
+4. Se o item 6a separar "atende clientes" do papel (perfis personalizados), o critério passa a ser um atributo próprio
+   e a pergunta volta ao dono na spec do 6a; só `ehColuna` e a condição do banco mudam.
+
+### 2.6 O que a tela recebe para esconder botões (RF-11; ADR 0020 · D9) · ADR 0006 · D11
+O trabalho hoje só recebe o alcance **da chave da ação** (`ctx.alcance`). Para a tela esconder o ⋮ e a entrada de
+bloqueio, a leitura do dia precisa do alcance de `agenda.criar`, `.editar` e `.remover`. Decisão: o `ContextoEstudio`
+ganha `alcances` (só leitura), com o alcance de cada chave **do módulo da ação**, calculado pela mesma fonte da porta 3
+(`infra.alcanceDe`; falha fechada: ausente = não pode). `agenda.dia.ler` devolve esses alcances à tela. Esconder não
+protege: quem decide é a porta 3 e o banco. Mudança pequena em `src/server/portas/{tipos,executar}.ts` e no teste;
+conferem o Revisor de código e o Engenheiro de segurança.
+
+### 2.7 Estúdio da tela · ADR 0006 · D10
+O modo `estudio` exige `estudioDaTela` (uuid) no envelope (`executar.ts`), mas `sessao.ler` hoje só devolve
+`comEstudio`. Decisão: `SessaoLida` ganha `orgId: string | null` (identificador, sem dado pessoal; vai no contexto da
+rota, nunca na URL). Mudam `src/server/sessao/acoes.ts`, o teste dele, `tests/integracao/entrar.test.ts` (forma
+esperada) e o `SEM_SESSAO` de `src/app/routes/__root.tsx`. Recebeu `estudio_trocado` → a tela recarrega (RF-15 do
+Entrar).
+
+## 3. Lacunas e o que espera o dono
+
+### 3.1 Para o Analista de requisitos (a spec não cobre; não decido, `AGENTS.md` §4)
+- **L-2 · Nome no cabeçalho da coluna (dado pessoal da equipe).** `public.membros` não tem nome. Recomendo: uma coluna
+  de nome de exibição (só o que aparece na coluna), gravada só pela dona até existir a Equipe; em desenvolvimento, só
+  nomes fictícios. Até a resposta, a T3 decide tudo menos a M1 e o teste `160_`.
+- **L-3 · Peças que o `DESIGN.md` não tem** (grade de horas, cabeçalho de coluna, cartão do agendamento, cartão
+  "Ocupado", bloqueio na grade, data em pílula com calendário, escolha do "Equipe N de M", campo de hora): entram pela
+  ficha visual (T2), com o dono, antes da construção da tela.
+- **L-4 · Tela inicial.** O `DESIGN.md` §8b diz que a tela inicial vale "até a Agenda existir". Recomendo: com a
+  Agenda, `/` leva a `/agenda`. É tela: vai à ficha visual (T2), e só com o "sim" mudam `src/app/routes/_app/index.tsx`,
+  `src/app/paginas/inicio.tsx`, o teste dele e `e2e/inicio.spec.ts`.
+
+Resolvidas desde a versão anterior: login e portas (Entrar, PR #7); banco local com Auth nas telas (Entrar mudou o
+`db:start`); linha "Branch" da spec; CA-04 (`estudio_trocado`, spec §9).
+
+### 3.2 À espera do dono · E50·1 (pessoa que deixou de ser coluna e tem horários)
+O núcleo é construído sem ela: as colunas seguem a RF-03 e a leitura do dia pede só os itens das colunas à vista.
+**Para até a resposta:** qualquer código que trate bloqueio de quem não é coluna. Defesa provisória do banco: a ligação
+`bloqueios → membros` sem apagar em cascata (nada some calado; ADR 0007 decide a forma). Onde entra cada opção:
+
+| Opção | Onde entra |
+|---|---|
+| A (coluna marcada "fora da equipe" nos dias com itens) | `acesso.ts` (`ehColuna` ganha "fora da equipe com itens no dia"), `src/data/agenda/colunas.ts` (mesma ida ao banco), política de gravação (alterar e excluir sim, criar não), peça nova no `DESIGN.md` pela ficha, e2e |
+| B (coluna some, aviso com a lista) | ação nova `agenda.fora.ler` (`agenda.ver`), uma ida a mais (teto do ADR 0006 · D3 sobe), peça de aviso pela ficha |
+| C (apagar os bloqueios futuros ao tirar o papel) | gatilho em `public.membros` (item 3) ou no módulo Equipe, com registro; ADR do Engenheiro de dados; nada na tela da Agenda |
+
+### 3.3 À espera do dono · ideias do antigo E50·I1 a I8 (`ideias-do-antigo.md`; nada entra sem "sim", item por item)
+Nenhuma está no plano. Se aprovada, entra assim (o Analista põe na spec, o plano volta à 5b):
+
+| Ideia | Onde entraria | Efeito no teto e no banco |
 |---|---|---|
-| E26·1 · o que a profissional vê | **B:** lê todas as linhas do estúdio; nas colunas das outras, o servidor tira o motivo do bloqueio e manda só "Bloqueio" (e, quando o Agendamento existir, só "ocupado"). A máscara é regra de `acesso.ts`, aplicada em `ler-dia.ts` antes de a resposta sair | **A:** sem máscara (menos código, teste 130 lê tudo). **C:** a política de leitura de `bloqueios` passa a `S and (papel <> 'profissional' or profissional_id = auth.uid())`; a profissional vê só a própria coluna ("Equipe 1 de 1"); mudam `acesso.ts`, a migration M2, os testes 130 e 140 e o e2e da profissional |
-| E26·2 · quem cria, altera e exclui bloqueio | **A:** dona e recepção em qualquer profissional do estúdio; profissional só com `profissional_id = auth.uid()` (políticas de insert, update e delete com essa condição; o servidor confere antes, porta 3) | **B:** políticas de escrita só para `dona` e `recepcao`; a profissional não vê a entrada de criar bloqueio nem o ⋮. **C:** escrita para qualquer papel do estúdio. Mudam só `acesso.ts`, M2, o teste 130 e o e2e da profissional |
-| E26·3 · quem é coluna | **A:** membros ativos com papel `dona` ou `profissional` | **B:** só `profissional` (muda uma condição em `colunas.ts`, `acesso.ts`, na conferência de profissional do bloqueio e no teste 140). **C:** **para o plano**: nasce a tabela de profissionais (o `staff_members` passa de "descartar" a "reescrever"), a ligação do bloqueio muda de `membros` para ela e depende da Equipe; plano refeito e nova 5b |
+| I1 menu no horário vazio | `grade.tsx` e a peça de grade em `src/app/ui/`; abre também pelo teclado; escondido pela RF-11 | nenhum |
+| I2 linha do "agora" | `dia.ts` (posição do agora no fuso) e a peça de grade; cor pelo `DESIGN.md` | nenhum |
+| I3 atalhos de motivo | bloco `agenda` dos 3 arquivos de idioma e `bloqueio-painel.tsx` | nenhum (só texto) |
+| I4 1 h e fim que acompanha | `bloqueio.ts` (função pura com teste) e `bloqueio-painel.tsx` | nenhum |
+| I5 hora sem dois-pontos | `src/domain/agenda/hora.ts` (por idioma, com teste) e o campo de hora em `src/app/ui/campos.tsx` | nenhum |
+| I6 resumo por coluna | `grade.ts` (soma) e a resposta de `agenda.dia.ler`; só na coluna completa | nenhum |
+| I7 dias marcados no calendário | ação nova `agenda.mes.ler` (`agenda.ver`), leitura nova em `src/data/agenda/`; "próprios" só os dias dela | uma ida por mês aberto (ADR novo) |
+| I8 modo Lista no celular | visão nova no "Dia ▾", `src/domain/agenda/lista.ts`, página nova; "livre" depende do expediente (Equipe) | nenhum |
 
 ## 4. Banco (tipo Banco; quem decide é o Engenheiro de dados)
 
-### 4.1 Decisão por tabela do antigo · **Engenheiro de dados decide no passo T3** (ADR 0007, conferido por outra instância)
-Sugestões do Arquiteto, por cima das do Analista (spec §7). Nada se copia: "reescrever" é mesma intenção, código novo.
-
+### 4.1 Decisão por tabela do antigo · Engenheiro de dados decide na T3 (ADR 0007, conferido por outra instância)
 | Tabela (antigo) | Sugestão | Motivo |
 |---|---|---|
-| `time_blocks` | **reescrever** como `public.bloqueios` | ficam estúdio, profissional, início, fim, motivo e autor; saem `resource_id`, `location_id`, `repeat_rule` (fora da v1) e qualquer tipo ou cor; ligação composta com o estúdio (RN-07) |
-| `staff_members` | **descartar** (E26·3·A ou B) | as colunas saem de `public.membros` (item 3); e-mail, telefone, cor e comissão não são da Agenda (RGPD art. 5(1)(c)). Com E26·3·C, **reescrever** (§3) |
+| `time_blocks` | **reescrever** como `public.bloqueios` | ficam estúdio, profissional, início, fim, motivo e autor; saem `resource_id`, `location_id`, `repeat_rule`, tipo e cor |
+| `staff_members` | **descartar** (E26·3·A; spec §7) | as colunas saem de `public.membros`; e-mail, telefone, cor e comissão não são da Agenda (RGPD art. 5(1)(c)) |
 | `staff_shifts`, `time_block_types`, `resources`, `agenda_waitlist` | **adiada** | fora da v1 (spec §2.1 e §7) |
 | `appointments` | **na spec do Agendamento** | a Agenda só lê, quando a tabela existir |
-| (novo) nome de exibição (L-2) | **coluna nova em `public.membros`** por migration própria, ou tabela à parte ligada por `(org_id, user_id)` | o Engenheiro de dados escolhe; a sugestão é a coluna (menos uma ida ao banco por tela) |
+| (novo) nome de exibição (L-2) | **espera a L-2**; sugestão: coluna em `public.membros` | uma ida a menos por tela |
 
-### 4.2 Migrations (criadas com `pnpm exec supabase migration new <nome>`, formato do item 2)
+### 4.2 Migrations (`pnpm exec supabase migration new <nome>`; data e hora depois de `20261128035000`)
 | # | Nome | Conteúdo (sugestão; forma final do Engenheiro de dados) |
 |---|---|---|
-| M1 | `agenda_nome_exibicao` | só se a T3 escolher a coluna: `nome_exibicao text` em `public.membros`, com tamanho máximo; grava só a dona do estúdio (privilégio por coluna) ou tarefa interna |
-| M2 | `agenda_bloqueios` | tabela, RLS ligada, `revoke all` de `anon` e `authenticated`, `grant` por coluna, políticas, índices e restrições do §4.3, e o gatilho genérico de registro (molde do ADR 0019, da `feat/entrar-servico`) |
+| M1 | `agenda_nome_exibicao` | só com a L-2 respondida: `nome_exibicao` em `public.membros`, tamanho máximo, privilégio por coluna |
+| M2 | `agenda_permissoes` | `insert` em `app.chaves_permissao` (4 chaves `agenda.*`) e em `app.matriz_permissoes` (8 linhas do §2.1), no molde da migration `20261128035000_matriz_permissoes.sql`; `insert` em `app.acoes_que_gravam` das 3 ações que gravam |
+| M3 | `agenda_bloqueios` | tabela, RLS ligada e forçada, `revoke all` de `anon` e `authenticated`, `grant` por coluna, políticas por `app.pode(...)`, índices, restrições, a leitura de "ocupados" (§2.4) e o gatilho `create trigger bloqueios_registro after insert or update or delete on public.bloqueios for each row execute function app.registrar_mudanca('id')` (molde do comentário de `20261128013147_registro_funcoes.sql`) |
 
 ### 4.3 `public.bloqueios` (sugestão)
 | Coluna | Tipo e regra |
@@ -94,164 +181,193 @@ Sugestões do Arquiteto, por cima das do Analista (spec §7). Nada se copia: "re
 | `profissional_id` | `uuid not null` |
 | `inicio`, `fim` | `timestamptz not null`; `check (fim > inicio)`; `check (fim - inicio >= interval '5 minutes')` (RN-03) |
 | `motivo` | `text null`, `check (char_length(motivo) <= 200)` (RN-03) |
-| `criado_por` | `uuid not null default auth.uid()` (quem gravou; não é registro de auditoria) |
+| `criado_por` | `uuid not null default auth.uid()` |
 | `criado_em` | `timestamptz not null default now()` |
 
-- **Ligação composta (RN-07):** `foreign key (org_id, profissional_id) references public.membros (org_id, user_id)`: a
-  chave primária `(org_id, user_id)` do item 3 serve de alvo; um bloqueio nunca aponta para pessoa de outro estúdio.
-- **Mesmo dia do estúdio (RN-03):** a regra é de `src/domain` (com teste); no banco, defesa por gatilho que lê
-  `public.estudios.fuso_horario` (o Engenheiro de dados decide se entra).
-- **Sem sobreposição entre bloqueios (RN-04), defesa no banco:** restrição de exclusão
-  `exclude using gist (org_id with =, profissional_id with =, tstzrange(inicio, fim, '[)') with &&)` (encostar não
-  conflita); pede a extensão `btree_gist` (não verificado no banco local, §12). Conflito **bloqueio × agendamento** só
-  pode ser conferido no banco quando a tabela do Agendamento existir: fica com a spec do Agendamento (RF-04 de lá), nas
-  duas direções; até lá, a Agenda confere no servidor com a mesma regra pura.
-- **Índices:** `(org_id, profissional_id, inicio)` (consulta do dia e conflito); o índice da exclusão.
-- **Políticas** (`to authenticated`; `S` = `org_id = (select app.estudio_da_sessao())`; `P` = `(select app.papel_da_sessao())`):
-  ler `S`; criar, alterar e apagar `S and (P in ('dona','recepcao') or (P = 'profissional' and profissional_id = (select auth.uid())))`
-  (E26·2·A); alterar com `using` e `with check` iguais; ninguém grava `org_id` nem `criado_por` de outro (privilégio por
-  coluna: `update (profissional_id, inicio, fim, motivo)`). A profissional do bloqueio tem de ser coluna (E26·3·A:
-  papel `dona` ou `profissional`, ativa): conferência no `with check` ou no gatilho, à escolha do Engenheiro de dados.
+- **Ligação composta (RN-07):** `foreign key (org_id, profissional_id) references public.membros (org_id, user_id)`,
+  **sem** `on delete cascade` até a E50·1 (§3.2). Atenção: apagar em cascata dispararia o gatilho de registro sem
+  `x-acao` da lista, que recusa e desfaz a gravação inteira.
+- **Profissional é coluna (RN-07, E26·3·A):** uma condição só (§2.5 item 2), conferida ao criar **e** ao alterar
+  (CA-14).
+- **Mesmo dia do estúdio (RN-03):** regra de `src/domain` (com teste); defesa no banco por gatilho que lê
+  `public.estudios.fuso_horario`, se o Engenheiro de dados decidir.
+- **Sem sobreposição entre bloqueios (RN-04):** `exclude using gist (org_id with =, profissional_id with =,
+  tstzrange(inicio, fim, '[)') with &&)` (encostar não conflita); pede `btree_gist` (não verificado no banco local, §12).
+  O código `23P01` já vira `conflito` em `src/data/erros.ts`. Bloqueio × agendamento: na spec do Agendamento, nas duas
+  direções; até lá a Agenda confere no servidor com a mesma regra pura.
+- **Índices:** `(org_id, profissional_id, inicio)` e o da exclusão (o `010_` exige índice que comece por `org_id`).
+- **Políticas** (`to authenticated`; `S` = `org_id = (select app.estudio_da_sessao())`; `pode(c, a)` =
+  `(select app.pode(c, a))`; `eu` = `profissional_id = (select auth.uid())`):
+  - ler: `S and (pode('agenda.ver','todos') or (pode('agenda.ver','proprios') and eu))`;
+  - criar: `with check S and coluna and (pode('agenda.criar','todos') or (pode('agenda.criar','proprios') and eu))`;
+  - alterar: `using` e `with check` com `agenda.editar` (linha antiga e nova), `coluna` no `with check`;
+  - apagar: `using S and (pode('agenda.remover','todos') or (pode('agenda.remover','proprios') and eu))`;
+  - `grant update (profissional_id, inicio, fim, motivo)`: ninguém grava `org_id` nem `criado_por`.
+- **"Ocupados" das outras colunas (§2.4):** leitura que devolve só `profissional_id, inicio, fim` das colunas do estúdio
+  no intervalo pedido, para quem tem ao menos `pode('agenda.ver','proprios')`. Sugestão: função em `app`
+  (`security definer`, `search_path` vazio, estúdio da sessão, sem parâmetro de estúdio, com teto de linhas) e passagem
+  `public.agenda_ocupados(p_inicio, p_fim)` `security invoker`, no molde de `public.registrar_recusa`; chamada com
+  `rpc(..., { get: true })` (ADR 0018 · D18). Se nascer função `security definer`, a lista do `010_` muda junto.
 
-### 4.4 Testes pgTAP (`supabase/tests/database/`, banco local, `pnpm db:test`)
+### 4.4 Testes pgTAP (`supabase/tests/database/`, `pnpm db:test`; `110_` já é da matriz)
 | Arquivo | Prova |
 |---|---|
-| `110_agenda_bloqueios_isolamento_test.sql` | cópia do molde do item 3 para `bloqueios`: A não lê, cria, altera nem apaga de B; sem papel e sem login, nada (CA-02, CA-03) |
-| `120_agenda_bloqueios_regras_test.sql` | profissional de outro estúdio recusada (ligação composta); fim ≤ início, menos de 5 min e motivo de 201 caracteres recusados; sobreposição recusada; encostar aceito; dois dias recusado se o gatilho entrar (CA-02, RN-03, RN-04) |
-| `130_agenda_bloqueios_papeis_test.sql` | E26·2·A: dona e recepção gravam em qualquer coluna; profissional só na própria; recepção não vira coluna (CA-03) |
-| `140_agenda_colunas_test.sql` | só se M1 entrar: nome de exibição isolado por estúdio; só a dona grava; `anon` nada |
+| `110_matriz_permissoes_test.sql` | **só** a linha entre os marcadores (e o `plan(...)` se o Engenheiro de dados acrescentar casos `agenda.*`) |
+| `120_agenda_bloqueios_isolamento_test.sql` | cópia do molde `supabase/moldes/isolamento_tabela_test.sql`: A não lê, cria, altera nem apaga de B; sem papel e sem login, nada (CA-02, CA-03) |
+| `130_agenda_bloqueios_regras_test.sql` | RN-03, RN-04 e RN-07 **ao criar e ao alterar** (CA-14): outro estúdio, recepção como profissional, fim ≤ início, < 5 min, 201 caracteres, sobreposição, encostar aceito, dois dias (se o gatilho entrar) |
+| `140_agenda_bloqueios_permissoes_test.sql` | chave e alcance (CA-03, CA-13, CA-14): dona e recepção em qualquer coluna; profissional só na própria, ao criar, alterar (linha antiga e nova) e apagar; profissional não lê linha nem motivo de outra; "ocupados" só com início e fim; chave apagada da matriz → nada |
+| `150_registro_bloqueios_test.sql` | cópia do molde `supabase/moldes/registro_tabela_test.sql` para `bloqueios` (porta 6; motivo nunca no registro, RF-09) |
+| `160_agenda_colunas_test.sql` | só com M1: nome isolado por estúdio; só a dona grava; `anon` nada |
+| `010_base_estrutura_test.sql` | só se a T3 criar função `security definer` ou se a lista de privilégios por tabela pedir `bloqueios` |
 
-O teste `010_base_estrutura_test.sql` do item 3 já confere que toda tabela de `public` tem `org_id` e RLS: passa a
-valer também para `bloqueios`.
+## 5. Código por camada (regra de dependência do `ARCHITECTURE.md` §3, travada pelo lint)
 
-## 5. Código por camada (regra de dependência do `ARCHITECTURE.md` §3, já travada pelo lint do item 2)
-
-### 5.1 Contrato da camada de serviço (fixo: `feat/entrar-servico`, `plan.md` §4 de lá e ADR 0018)
-A Agenda **não** escreve as portas. Toda ação dela é declarada só por `acao(...)` de `src/server/portas/acao.ts`:
-`acao({ nome, metodo, sessao, permissao, entrada, grava, trabalho })` → `{ ok: true, valor } | { ok: false, codigo }`.
-- `nome`: `agenda.dia.ler`, `agenda.bloqueio.criar`, `agenda.bloqueio.alterar`, `agenda.bloqueio.excluir` (catálogo
-  único); `metodo`: `GET` para ler, `POST` para gravar; `sessao: 'estudio'` em todas.
-- `permissao`: a regra pura de `src/domain/agenda/acesso.ts` (E26·2), passada como função do papel.
-- `entrada`: `z.strictObject(...)`, sem campo de estúdio; campo a mais → `entrada_invalida` (ADR 0018 · D13). A porta 4
-  roda no molde, depois das portas 1 a 3; não se usa o `.validator` do TanStack Start.
-- `trabalho(ctx, dados)`: `ctx` traz `usuarioId`, `orgId`, `papel`, `idioma`, `fuso`, `moeda` e `banco` (token da pessoa;
-  trava RLS e pré-pedido da sessão e do estúdio valem em cada pedido). `src/domain` recebe só valores, nunca `ctx.banco`.
-- **Uma transação por ação** (ADR 0018 · D3): no máximo **um pedido de gravação** à Data API por ação; o `banco` recusa o
-  segundo. Cada gravação da Agenda toca uma tabela só (`bloqueios`), então **não precisa de função `security invoker`**;
-  se uma gravação futura tocar mais de uma tabela, ela vira uma função `public.agenda_<acao>(...)`, `security invoker`.
-- **Registro (porta 6):** o gatilho genérico de registro do ADR 0018 · D7 (molde do ADR 0019), ligado em `bloqueios`
-  pela migration M2, grava na mesma transação, com o `nome` da ação e só identificadores; o código da Agenda não grava
-  registro.
-- **Erros:** só os códigos da lista fechada; a exclusão do banco (`23P01`) vira `conflito` pelo mapa de `src/data/erros.ts`
-  (de lá). A tela manda `estudioDaTela`; recebeu `estudio_trocado` → recarrega.
+### 5.1 Contrato da camada de serviço (lido em `src/server/portas/`; não se muda além do §2.6)
+- Cada ação: `export const x = acaoPost.handler(acao({ nome, metodo: 'POST', sessao: 'estudio', permissao: '<chave>',
+  entrada: z.strictObject({...}), grava, trabalho }))` (molde do comentário de `acao.ts`).
+- A tela chama `x({ data: { estudioDaTela, dados } })` e tipa com `ChamadaDaTela<typeof x, typeof entrada>`; recebe
+  `{ ok: true, valor } | { ok: false, codigo }` (`erros.ts`, lista fechada).
+- `trabalho(ctx, dados)`: `ctx` = `ContextoEstudio` (`pedidoId`, `usuarioId`, `orgId`, `alcance`, `alcances` do §2.6,
+  `idioma`, `fuso`, `moeda`, `banco`). `src/domain` recebe só valores, nunca `ctx.banco`.
+- Regra do módulo recusa com `throw new Recusa('entrada_invalida' | 'conflito' | 'sem_permissao')` (`erros.ts`); erro
+  do banco vem como `ErroDoBanco` de `src/data` e vira código por `codigoDoErro`.
+- No máximo **uma** gravação por ação (`src/data/cliente.ts` conta; a segunda nem sai e vira `erro_interno`). Cada
+  gravação da Agenda toca só `bloqueios`: sem função de gravação no banco.
+- Registro (porta 6): gatilho na M3; recusas, `registrarRecusa` do molde. O código da Agenda não grava registro.
 
 ### 5.2 `src/domain/agenda/` (TypeScript puro, com teste; Engenheiro de software)
 | Arquivo | O que tem | Regras |
 |---|---|---|
-| `tipos.ts` | `Instante` (milissegundos UTC), `Intervalo`, `DiaDoEstudio` (`AAAA-MM-DD` + fuso), `ItemDaGrade` (bloqueio ou agendamento), `Coluna`, `Papel` | — |
-| `dia.ts` | limites do dia no fuso (`inicioDoDia`, `fimDoDia`), hoje no fuso, dia anterior e seguinte, corte do item na borda do dia | RN-01, RN-02, RF-01, RF-02 |
-| `bloqueio.ts` | validar bloqueio (fim > início, ≥ 5 min, mesmo dia, motivo ≤ 200) e achar conflito com uma lista de ocupados `[início, fim)` da mesma profissional, ignorando Cancelado e Ausência e o próprio item ao alterar | RN-03, RN-04 |
-| `grade.ts` | distribuir itens sobrepostos lado a lado (faixas por coluna, sem esconder nenhum); aplicar filtros (status, bloqueio; Cancelado escondido por padrão); contar filtros ligados; conferir o teto de itens | RN-05, RN-06, RN-08, RF-06 |
-| `acesso.ts` | quem é coluna (E26·3), o que cada papel pode gravar (E26·2), o que sai mascarado para cada papel (E26·1) | RN-07, §3 |
+| `tipos.ts` | `Instante`, `Intervalo`, `DiaDoEstudio`, `ItemDaGrade` (`bloqueio`, `agendamento`, `ocupado`), `Coluna`, `MembroDaEquipe` | — |
+| `dia.ts` | limites do dia no fuso, hoje no fuso, dia anterior e seguinte, corte do item na borda | RN-01, RN-02, RF-01, RF-02 |
+| `bloqueio.ts` | validar (fim > início, ≥ 5 min, mesmo dia, motivo ≤ 200) e achar conflito `[início, fim)` na mesma coluna, ignorando Cancelado, Ausência e o próprio item ao alterar | RN-03, RN-04 |
+| `grade.ts` | itens sobrepostos lado a lado; filtros (status, bloqueio; Cancelado escondido por padrão; `ocupado` nunca filtrado); contador; teto | RN-05, RN-06, RN-08, RF-06, CA-13 |
+| `acesso.ts` | `ehColuna` (E26·3·A), `veCompleta`, `podeGravarNa`, `paraResposta` (monta o item completo ou "Ocupado") — só por alcance e `usuarioId` | RN-07, RF-10, §2.3 a §2.5 |
 
-- Fuso e "agora" chegam por parâmetro (`src/domain/AGENTS.md`). Cálculo do dia só com `Intl.DateTimeFormat` (ADR 0006 · D2).
-- Testes obrigatórios (CA-01): `Europe/Lisbon` e `America/New_York` em dia de 23 h e de 25 h; fuso em que a meia-noite
-  não existe no dia da troca (`America/Santiago`, e `America/Sao_Paulo` em 04/11/2018, quando o Brasil ainda trocava
-  à meia-noite): o dia começa no primeiro instante que tem aquela data; item que cruza a meia-noite nos dois dias;
-  encostar não é conflito; Cancelado e Ausência não conflitam; teto passado gera aviso.
-- `src/domain/exemplo.ts` e `exemplo.test.ts` **saem** (o item 2 os marcou "sai quando entrar a primeira regra real").
+- Fuso e "agora" por parâmetro. Cálculo do dia só com `Intl.DateTimeFormat` (ADR 0006 · D2).
+- Testes (CA-01): `Europe/Lisbon` e `America/New_York` em dia de 23 h e de 25 h; meia-noite que não existe
+  (`America/Santiago`; `America/Sao_Paulo` em 04/11/2018); cruzar a meia-noite; encostar; Cancelado e Ausência; teto.
+  `acesso.test.ts`: `todos`/`proprios` × própria coluna/outra, ao criar e ao alterar (linha antiga e nova).
+- `src/domain/exemplo.ts` e `exemplo.test.ts` **saem** (marcados pelo item 2 para sair na primeira regra real).
 
 ### 5.3 `src/server/agenda/` (Engenheiro de software)
 | Arquivo | O que tem |
 |---|---|
-| `esquemas.ts` | `z.strictObject` de cada ação: `dia` (`AAAA-MM-DD`); bloqueio (profissional `uuid`, data, início, fim em passos do dia, motivo opcional ≤ 200); `id` do bloqueio. **Sem campo de estúdio**: um estúdio no pedido é recusado (`entrada_invalida`) e nunca usado (CA-04; ver nota abaixo) |
-| `ler-dia.ts` | `acao({ nome: 'agenda.dia.ler', metodo: 'GET', grava: false, ... })`: fuso e idioma vêm do `ctx` → limites do dia (`dia.ts`) → colunas → bloqueios do dia com teto (`limit` teto + 1) → máscara de `acesso.ts` → `valor`. **No máximo 2 pedidos de leitura** (ADR 0006 · D3) |
-| `bloqueios.ts` | três `acao(...)` com `metodo: 'POST'`, `grava: true`: lê os ocupados da profissional naquele dia (1 leitura) → regras de `bloqueio.ts` (falhou: `entrada_invalida` ou `conflito`, sem gravar) → **um** pedido de gravação (insert, update ou delete por `id`). Corrida entre duas pessoas: a exclusão do banco recusa e volta `conflito` |
-| `ler-dia.test.ts`, `bloqueios.test.ts` | testam o `trabalho` e a `permissao` com `ctx` falso (o molde e as portas são testados na spec Entrar): estúdio no pedido recusado pelo esquema (CA-04); profissional não grava na coluna de outra (E26·2·A); motivo mascarado nas outras colunas (E26·1·B); motivo nunca no `valor` de erro (CA-09); ≤ 2 leituras no dia e ≤ 1 leitura + 1 gravação por ação (RNF-02, ADR 0018 · D3) |
+| `esquemas.ts` | `z.strictObject` de cada ação: `{ dia }` (`AAAA-MM-DD`); bloqueio `{ profissionalId (uuid), dia, inicio, fim (HH:MM em passos de 15 min), motivo? (≤ 200) }`; alterar = o mesmo + `id`; excluir `{ id }`. Sem campo de estúdio: campo a mais → `entrada_invalida` |
+| `ler-dia.ts` | `agenda.dia.ler`: limites do dia (`dia.ts`, `ctx.fuso`) → colunas (1 ida) → bloqueios completos que a RLS deixa (1 ida, `limit` teto + 1) → só com `ctx.alcance === 'proprios'`: "ocupados" das outras (1 ida) → `acesso.paraResposta` → `{ dia, colunas: [{ id, nome, completa }], itens, passouDoTeto, alcances }` |
+| `bloqueios.ts` | três ações que gravam: `podeGravarNa` pelo `ctx.alcance` (falhou: `sem_permissao`, sem ir ao banco) → 1 leitura (a linha antiga, ao alterar e excluir, e os ocupados da coluna no dia, num pedido só) → `bloqueio.ts` (falhou: `entrada_invalida` ou `conflito`) → 1 gravação. Corrida: a exclusão do banco recusa (`conflito`) |
+| `ler-dia.test.ts`, `bloqueios.test.ts` | `trabalho` com `ctx` falso (o molde e as portas são testados no Entrar): campo de estúdio em `dados` → `entrada_invalida` (CA-04); profissional não grava na coluna de outra, nem move bloqueio entre colunas (E26·2·A); resposta com `proprios` sem `id`, motivo, cliente, serviço nem status nas outras colunas (CA-13); motivo nunca em erro (CA-09); ≤ 3 leituras no dia, ≤ 1 leitura + 1 gravação por ação (RNF-02) |
 
-**Nota para o Analista (CA-04):** a spec diz "estúdio vindo no pedido é **ignorado**"; pelo contrato fixo ele é
-**recusado** (`entrada_invalida`). A intenção (o estúdio nunca vem do pedido) fica igual e mais forte; ajustar a palavra.
-"Sem login e sem papel, nada" (CA-03) é provado pelo teste do catálogo da spec Entrar (todas as ações) e pelo pgTAP 110.
+O teste do molde (`molde.test.ts`) já percorre todo arquivo de `src/` com `acao({` e confere método, chave do catálogo
+e mesmo módulo: as ações da Agenda entram nele sem mudar o teste.
 
 ### 5.4 `src/data/agenda/` (Engenheiro de software; consultas conferidas pelo Engenheiro de dados)
 | Arquivo | O que tem |
 |---|---|
-| `colunas.ts` | membros ativos que são coluna (E26·3·A), com o nome de exibição (L-2), ordenados por nome (uma ida) |
-| `bloqueios.ts` | por `ctx.banco`: bloqueios que cruzam `[inicioDoDia, fimDoDia)` das colunas pedidas, com `limit`; ocupados de uma profissional num dia; criar, alterar, apagar por `id` (um pedido cada; a trava faz o resto). Nenhum filtro por `org_id` vindo de fora: a RLS decide. Fuso, idioma e moeda não se leem aqui: vêm do `ctx` |
+| `colunas.ts` | membros ativos que são coluna, com o nome de exibição (L-2), por `clienteDoBanco(ctx.banco)`; devolve `MembroDaEquipe` (o papel só para `ehColuna`, não sai do servidor) |
+| `bloqueios.ts` | bloqueios que cruzam `[inicioDoDia, fimDoDia)` das colunas pedidas, com `limit`; "ocupados" por `rpc(..., { get: true })`; linha antiga + ocupados de uma coluna num pedido; criar, alterar, apagar por `id`. Nenhum filtro por `org_id` vindo de fora: a RLS decide |
 
-Sem teste de unidade próprio (são consultas); a prova é o pgTAP (§4.4) e o e2e (§7).
+Sem teste de unidade próprio (consultas); a prova é o pgTAP (§4.4), `tests/integracao/agenda.test.ts` e o e2e.
 
-### 5.5 `src/app/` (Engenheiro de software; desenho do Designer de produto na ficha)
-- **Rota** `src/app/routes/agenda.tsx`: `validateSearch` aceita só `dia` (`AAAA-MM-DD`); sem `dia`, hoje no fuso do
-  estúdio (RF-01). O `loader` chama `ler-dia`. Nada além da data na URL (RNF-04).
-- **Navegação** `src/app/navegacao.ts`: o mapa único do `DESIGN.md` §7, com a Agenda ligada e os outros módulos "em
-  desenvolvimento", para o menu da estrutura do item 4 (RC-18, RC-19).
-- **Tela** em `src/app/paginas/agenda/`, só com componentes do item 4 (`botao`, `contador`, `seletor`, `campos`,
-  `etiqueta-status`, `camadas`, `estados`, `estrutura`, `icone`) e as peças novas que o dono aprovar na ficha (L-3):
+### 5.5 `tests/integracao/agenda.test.ts` (Engenheiro de software; banco local, `pnpm test:integracao`)
+Pelas 6 portas reais (harness de `tests/integracao/preparo.ts`): sem login e sem papel, nada (CA-03); `estudioDaTela`
+de outro estúdio → `estudio_trocado`, nada lido nem gravado (CA-04); profissional recebe "Ocupado" sem detalhes nas
+outras colunas (CA-13); recepção grava em qualquer coluna, profissional só na própria (CA-03).
+
+### 5.6 `src/app/` (Engenheiro de software; desenho do Designer de produto na ficha)
+- **Rota** `src/app/routes/_app/agenda.tsx` (dentro da área com sessão do `_app.tsx`): `validateSearch` só `dia`
+  (`AAAA-MM-DD`); sem `dia`, hoje no fuso, calculado no servidor. `loader` chama `lerDia` com
+  `estudioDaTela = context.sessao.orgId` (§2.7). Folha `agenda.css` pelo `head` com `?url`, como `entrar.css`.
+- **Estrutura** `src/app/routes/_app.tsx` e `src/app/navegacao.ts`: menu principal (1440) e barra de baixo (390) pelo
+  mapa único do `DESIGN.md` §7, Agenda ligada e os outros "em desenvolvimento". Sua conta segue em `BarraSuaConta`; se a
+  ficha a puser dentro da barra do topo, mudam `src/app/paginas/sua-conta.tsx` e `.css`.
+- **Peças novas do `DESIGN.md` (L-3) ficam em `src/app/ui/`**, não em `src/app/paginas/` (ADR 0006 · D12; lição do
+  ADR 0018 · D24): `src/app/ui/grade-agenda.tsx` e `.css` (grade, cabeçalho de coluna, cartões do agendamento, de
+  bloqueio e "Ocupado"), `src/app/ui/seletor-data.tsx` e `.css` (Hoje, setas, data em pílula com calendário), campo de
+  hora em `src/app/ui/campos.tsx` (se a ficha não usar `CampoSelecao`), com `componentes.test.tsx`, o `@import` em
+  `src/app/estilos/app.css` e a vitrine (`src/app/paginas/vitrine.tsx`, `vitrine-dados.ts`, `e2e/vitrine.spec.ts`).
+  Ajustes em peça existente, só se a ficha pedir: `estrutura.tsx` (barra da grade no `BarraTopo`), `camadas.tsx`
+  (`MenuAcoesLinha`, `Painel`, `Folha`, `Janelinha`, `Aviso`), `estados.tsx`, `icone.tsx` (ícone do "Ocupado"), com o
+  `.css` de cada uma; token novo só com o `DESIGN.md` (`tokens.css`, `tokens.test.ts`).
+- **Tela** em `src/app/paginas/agenda/`:
 
 | Arquivo | O que tem |
 |---|---|
-| `agenda.tsx` | composição: barra do topo (1440) ou cabeçalho e barra de baixo (390), barra da grade, grade, estados (§4 da spec) |
-| `barra.tsx` | Hoje, setas, data em pílula com calendário, Dia ▾ (só Dia; os outros "em desenvolvimento"), Equipe N de M, Filtros ▾ com contador, Lista de espera e Opções "em desenvolvimento" |
-| `grade.tsx` | grade de 24 h por coluna, rolagem até a hora atual ou ao primeiro item; navegação por teclado (RNF-03) |
-| `cartao.tsx` | cartão do agendamento (hora, cliente, serviço, status; só o ícone no cartão pequeno, nome para o leitor) e bloqueio (`lock` + "Bloqueio" + motivo, se a pessoa pode ver) |
-| `bloqueio-painel.tsx` | criar e alterar: painel 480 à direita (1440) ou folha de baixo (390); Excluir no ⋮ com janelinha e aviso com "Desfazer" |
-| `filtros.tsx` | painel (1440) e folha (390): status e bloqueio; "Limpar filtros"; "Mostrar N <itens>" |
-| `equipe.tsx`, `equipe-guardada.ts` | escolha de colunas; guarda no aparelho só os identificadores escondidos, por estúdio (spec Assumption 2) |
-| `agenda.css` | só `var(--...)` do `tokens.css` (regra RT-9 do item 4) |
-| `agenda.test.tsx` | `renderToString`: uma só ação preta; status com nome acessível; nenhum texto fixo fora do arquivo de idioma |
+| `agenda.tsx` | composição: barra do topo (1440) ou cabeçalho e barra de baixo (390), barra da grade, grade, estados (spec §4) |
+| `barra.tsx` | Hoje, setas, data, Dia ▾ (só Dia; os outros "em desenvolvimento"), Equipe N de M, Filtros ▾ com contador, Lista de espera e Opções "em desenvolvimento" |
+| `grade.tsx` | grade de 24 h pela peça `grade-agenda`, rolagem até a hora atual ou ao primeiro item; teclado (RNF-03); ⋮ e entrada de bloqueio escondidos pelos `alcances` (RF-11); "Ocupado" sem toque nem ⋮ |
+| `bloqueio-painel.tsx` | criar e alterar: `Painel` (1440) ou `Folha` (390); com `proprios`, profissional só a própria pessoa; Excluir no ⋮ com `Janelinha` e `Aviso` com "Desfazer" |
+| `filtros.tsx` | `Painel`/`Folha`: status e bloqueio; "Limpar filtros"; só sobre colunas completas |
+| `equipe.tsx`, `equipe-guardada.ts` | escolha de colunas; guarda no aparelho só os identificadores escondidos, por estúdio (ADR 0006 · D5) |
+| `agenda.css` | só `var(--...)` (teste `tokens.test.ts`, RT-9) |
+| `agenda.test.tsx` | `renderToString`: uma só ação preta; status com nome acessível; "Ocupado" sem ⋮; nenhum texto fixo fora do arquivo de idioma |
 
-- **Idiomas (RNF-05):** a base de `src/app/i18n/` (`pt.ts`, `es.ts`, `en.ts`, `textos.ts`, `formatar.ts`,
-  `i18n.test.ts`, no formato do ADR 0006 · D1) nasce na `feat/entrar-servico`. A Agenda só **acrescenta o bloco
-  `agenda`** nos três arquivos de idioma (textos da tela e dos códigos de erro dela); o teste da base já confere as
-  mesmas chaves, nenhuma vazia e os mesmos marcadores.
+- **Idiomas (RNF-05):** a Agenda acrescenta o bloco `agenda` (textos da tela, frases dos códigos de erro dela,
+  "empresa"/"business" pela E47·1·A) em `src/app/i18n/{pt,es,en}.ts`; `textos.ts`, `formatar.ts` e `i18n.test.ts`
+  ficam intactos (o teste já confere mesmas chaves, nenhuma vazia, mesmos marcadores).
 - **Agendamento ainda não construído (RF-08):** "Novo agendamento", "Agendar" e o toque no cartão ficam "em
-  desenvolvimento"; a grade mostra só bloqueios. Quando a spec do Agendamento entrar, ela acrescenta a leitura dos
-  agendamentos em `src/data` e a terceira ida ao banco vira quarta (teto passa a 4, no ADR dela).
+  desenvolvimento"; a grade mostra só bloqueios. A spec do Agendamento acrescenta a leitura dos agendamentos (o teto
+  sobe no ADR dela).
 
-## 6. Desfazer, tetos e estados (decisões técnicas, ADR 0006)
-- **Desfazer a exclusão:** o aviso guarda na memória da tela os dados do bloqueio excluído; "Desfazer" chama
-  a ação `agenda.bloqueio.criar` com eles (mesmas portas, mesmo conflito; novo `id`; registro de criação pelo gatilho). Se outro item ocupou o
-  horário no meio, a tela diz o conflito. Nada fica guardado no banco depois de excluído (D4).
-- **Teto de itens por dia:** 500 itens na consulta do dia (todas as colunas à vista); passou, a tela avisa e sugere
-  esconder colunas (RN-08) (D3).
-- **Teto de idas ao banco por tela:** 2 pedidos na leitura do dia (colunas, bloqueios) e, numa gravação, 1 leitura
-  (ocupados da profissional) + 1 pedido de gravação, que já leva o registro pelo gatilho; além do que a camada de
-  serviço fizer para a sessão (D3; ADR 0018 · D3).
-- **Estado de erro:** "Tentar de novo" refaz o `loader`. Carregando: o componente de estados do item 4 (atraso de 0,3 s).
+## 6. Desfazer, tetos e estados (ADR 0006)
+- **Desfazer a exclusão (D4):** o aviso guarda na memória da tela os dados do bloqueio excluído; "Desfazer" chama
+  `agenda.bloqueio.criar` com eles (mesmas portas, mesmo conflito, novo `id`). Se o horário foi ocupado, diz o conflito.
+- **Teto de itens (D3):** 500 por dia (todas as colunas à vista), lidos com `limit 501`; passou, a tela avisa (RN-08).
+- **Teto de idas ao banco no trabalho (D3):** leitura do dia ≤ 3 (colunas, bloqueios, "ocupados" só com `proprios`);
+  gravação 1 leitura + 1 gravação. Fora isso, só o que as portas fazem para a sessão.
+- **Erro:** "Tentar de novo" refaz o `loader`. **Carregando:** `Carregando` de `src/app/ui/estados.tsx` (0,3 s).
 
-## 7. Testes de tela (Playwright, projetos `celular` 390 e `computador` 1440 do item 2)
-Dados só fictícios, criados no banco **local** pelo preparo do teste (estúdios A e B, dona, recepção, duas profissionais,
-nomes inventados). A sessão de teste vem da spec "Entrar e camada de serviço" (E36·A).
+## 7. Testes de tela (Playwright, projetos `celular` 390 e `computador` 1440)
+Dados só fictícios, no banco **local**. As contas (dona, recepção, duas profissionais, estúdios A e B) entram no
+`e2e/preparo-global.ts` (único lugar com a chave local de administração, ADR 0018); os **bloqueios** são criados pelos
+próprios testes, pela tela ou pela ação com a sessão da dona, porque o gatilho de registro recusa gravação sem pessoa e
+sem `x-acao` (ADR 0006 · D13).
 
 | Arquivo | Prova |
 |---|---|
-| `e2e/preparo/agenda-dados.ts` | cria e apaga os dados fictícios do teste no banco local |
-| `e2e/agenda.spec.ts` | CA-05: abre em hoje; anterior, seguinte, calendário e Hoje; Equipe N de M; filtros, contador e "Limpar filtros"; criar, alterar, conflito recusado, excluir com janelinha e "Desfazer"; profissional sem ⋮ nas colunas das outras e sem motivo delas (E26·1·B, E26·2·A). CA-09: a URL só tem `dia`; o motivo e os nomes não aparecem em URL nem no console |
-| `e2e/agenda-estados.spec.ts` | CA-06: carregando (resposta atrasada por `page.route`), vazio, sem resultado, sem profissional, erro (resposta 500 por `page.route`) |
-| `e2e/agenda-acessibilidade.spec.ts` | CA-08: `AxeBuilder` com `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`, `wcag22aa` (o mesmo do item 4) com a tela fechada e com painel, folha e janelinha abertos; grade percorrida por teclado; status com nome acessível |
+| `e2e/agenda.spec.ts` | CA-05: abre em hoje; anterior, seguinte, calendário e Hoje; Equipe N de M; filtros, contador e "Limpar filtros"; criar, alterar, conflito recusado, excluir com janelinha e "Desfazer". CA-13: como profissional, outras colunas só "Ocupado", sem ⋮, filtros sem efeito nelas. CA-09: a URL só tem `dia`; motivo e nomes fora da URL e do console |
+| `e2e/agenda-estados.spec.ts` | CA-06: carregando (resposta atrasada por `page.route`), vazio, sem resultado, sem profissional, erro |
+| `e2e/agenda-acessibilidade.spec.ts` | CA-08: `AxeBuilder` com `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`, `wcag22aa`, tela fechada e com painel, folha e janelinha abertos; grade por teclado |
 
 ## 8. Papéis
 | Etapa | Papel |
 |---|---|
-| Branch empilhada (T1) | Engenheiro de DevOps |
+| Branch e PR de rascunho (T1) | Engenheiro de DevOps |
 | Ficha visual e peças novas do `DESIGN.md` (T2, etapa 6) | Designer de produto; confere o Revisor de design; aprova o dono |
-| Decisão por tabela e migrations, testes do banco (T3 a T5) | Engenheiro de dados |
-| Domínio, servidor, dados, telas, idiomas, e2e (T6 a T16) | Engenheiro de software |
-| Revisar código | Revisor de código |
-| Revisar banco e conferir o ADR 0007 item por item (E16·1) | Engenheiro de dados (outra instância, que não construiu) e Auditor de risco |
-| Revisar acesso e privacidade (E26, CA-09) | Engenheiro de segurança e Auditor de risco |
-| Revisar a tela (checklist `DESIGN.md` §10, capturas 390 e 1440) | Revisor de design |
-| Veredito CA-01 a CA-12 | Analista de qualidade (QA) |
+| Decisão por tabela, migrations, pgTAP (T3 a T5) | Engenheiro de dados |
+| Matriz no código, domínio, servidor, dados, telas, idiomas, e2e (T6 a T18) | Engenheiro de software |
+| Revisar código e o contrato tocado (§2.6, §2.7) | Revisor de código |
+| Revisar banco e conferir o ADR 0007 item por item (E16·1) | Engenheiro de dados (outra instância) e Auditor de risco |
+| Revisar acesso e privacidade (chaves, alcance, "Ocupado", CA-09, CA-13) | Engenheiro de segurança e Auditor de risco |
+| Revisar a tela (checklist `DESIGN.md` §10) | Revisor de design |
+| Veredito CA-01 a CA-14 | Analista de qualidade (QA) |
 | Conferir o pedido · registros · pedido de merge | Analista de requisitos · Documentador · Gerente de projeto |
 
-## 9. Arquivos (lista FECHADA)
-Fora desta lista nada muda (`AGENTS.md` §6). Arquivo que uma ferramenta crie fora daqui: parar e relatar.
+## 9. Branch (Engenheiro de DevOps)
+`feat/agenda` sai da `previas`, que já tem a trava por estúdio, o design system e o Entrar (PR #7). Não há mais branch
+empilhada nem merge de bases: os passos de preparação de merge da versão anterior (antiga T1) não são mais precisos.
+PR de rascunho com base na `previas`; nada é juntado sem o dono (E22·B). Conflito esperado só em
+`src/app/routeTree.gen.ts` (regenera-se, não se edita à mão).
 
-**Banco (Engenheiro de dados):** `supabase/migrations/<ts>_agenda_nome_exibicao.sql` (só se a T3 escolher a coluna) ·
-`supabase/migrations/<ts>_agenda_bloqueios.sql` · `supabase/tests/database/110_agenda_bloqueios_isolamento_test.sql` ·
-`120_agenda_bloqueios_regras_test.sql` · `130_agenda_bloqueios_papeis_test.sql` · `140_agenda_colunas_test.sql` (só com
-M1) · `docs/adr/0007-agenda-tabelas-do-antigo.md`.
+## 10. Arquivos (lista FECHADA)
+Fora desta lista nada muda (`AGENTS.md` §6). Arquivo que uma ferramenta crie fora daqui: parar e relatar. "(se ...)" =
+só com a condição cumprida, registrada no PR.
+
+**Banco (Engenheiro de dados):** `supabase/migrations/<ts>_agenda_permissoes.sql` · `<ts>_agenda_bloqueios.sql` ·
+`<ts>_agenda_nome_exibicao.sql` (se L-2) · `supabase/tests/database/110_matriz_permissoes_test.sql` (só a linha entre os
+marcadores e o `plan(...)`) · `120_agenda_bloqueios_isolamento_test.sql` · `130_agenda_bloqueios_regras_test.sql` ·
+`140_agenda_bloqueios_permissoes_test.sql` · `150_registro_bloqueios_test.sql` · `160_agenda_colunas_test.sql` (se M1) ·
+`010_base_estrutura_test.sql` (se função `security definer` nova ou privilégio por tabela) ·
+`docs/adr/0007-agenda-tabelas-do-antigo.md`.
+
+**Acesso (Engenheiro de software):** `src/domain/acesso/chaves.ts` (só `MODULOS.agenda`) · `src/domain/acesso/matriz.ts`
+(só as 8 linhas) · `src/domain/acesso/matriz.test.ts` (o caso "catálogo do sistema vazio" passa a esperar as chaves
+`agenda.*`).
+
+**Contrato (Engenheiro de software; §2.6 e §2.7):** `src/server/portas/tipos.ts` e `src/server/portas/executar.ts` (só
+`alcances` no `ContextoEstudio`) · `src/server/portas/executar.test.ts` · `src/server/sessao/acoes.ts` (só `orgId` em
+`SessaoLida`) · `src/server/sessao/acoes.test.ts` · `tests/integracao/entrar.test.ts` (só a forma esperada de
+`sessao.ler`).
 
 **Domínio:** `src/domain/agenda/{tipos,dia,bloqueio,grade,acesso}.ts` e `{dia,bloqueio,grade,acesso}.test.ts`; apagar
 `src/domain/exemplo.ts` e `src/domain/exemplo.test.ts`.
@@ -260,62 +376,64 @@ M1) · `docs/adr/0007-agenda-tabelas-do-antigo.md`.
 
 **Dados:** `src/data/agenda/{colunas,bloqueios}.ts`.
 
-**Telas:** `src/app/routes/agenda.tsx` · `src/app/routeTree.gen.ts` (gerado) · `src/app/navegacao.ts` ·
-`src/app/paginas/agenda/{agenda,barra,grade,cartao,bloqueio-painel,filtros,equipe}.tsx` ·
+**Integração:** `tests/integracao/agenda.test.ts`.
+
+**Telas:** `src/app/routes/_app/agenda.tsx` · `src/app/routes/_app.tsx` · `src/app/routes/__root.tsx` (só o
+`SEM_SESSAO`) · `src/app/routeTree.gen.ts` (gerado) · `src/app/navegacao.ts` ·
+`src/app/paginas/agenda/{agenda,barra,grade,bloqueio-painel,filtros,equipe}.tsx` ·
 `src/app/paginas/agenda/equipe-guardada.ts` · `src/app/paginas/agenda/agenda.css` ·
-`src/app/paginas/agenda/agenda.test.tsx` · `src/app/i18n/{pt,es,en}.ts` (só o bloco `agenda`; `textos.ts`, `formatar.ts` e `i18n.test.ts` são da `feat/entrar-servico` e ficam intactos).
+`src/app/paginas/agenda/agenda.test.tsx` · `src/app/i18n/{pt,es,en}.ts` (só o bloco `agenda`).
 
-**Testes de tela:** `e2e/preparo/agenda-dados.ts` · `e2e/agenda.spec.ts` · `e2e/agenda-estados.spec.ts` ·
-`e2e/agenda-acessibilidade.spec.ts`.
+**Design system (Engenheiro de software, só peças aprovadas na ficha):** `src/app/ui/grade-agenda.tsx` e `.css` ·
+`src/app/ui/seletor-data.tsx` e `.css` · `src/app/ui/componentes.test.tsx` · `src/app/estilos/app.css` (só os
+`@import`) · `src/app/paginas/vitrine.tsx` · `src/app/paginas/vitrine-dados.ts` · `e2e/vitrine.spec.ts` ·
+(se a ficha pedir) `src/app/ui/{campos,estrutura,camadas,estados,icone}.tsx` com os `.css` de cada uma ·
+`src/app/estilos/tokens.css` e `src/app/ui/tokens.test.ts` (se token novo aprovado) ·
+`src/app/paginas/sua-conta.tsx` e `sua-conta.css` (se a ficha mudar o lugar de Sua conta) ·
+`src/app/routes/_app/index.tsx`, `src/app/paginas/inicio.tsx`, `inicio.test.tsx`, `e2e/inicio.spec.ts` (se L-4).
 
-**Ficha visual (Designer de produto):** `specs/20261128-020000-agenda/ficha-visual.md` e `specs/20261128-020000-agenda/ficha/*.png`.
+**Testes de tela:** `e2e/preparo-global.ts` (só as contas da Agenda) · `e2e/agenda.spec.ts` ·
+`e2e/agenda-estados.spec.ts` · `e2e/agenda-acessibilidade.spec.ts`.
 
-**Texto:** `DESIGN.md`, **só** as linhas das peças da L-3 que o dono aprovar na ficha (Designer de produto) ·
-`docs/STATUS.md`, `docs/BACKLOG.md`, `CHANGELOG.md`, `docs/decisoes/2026-11-27-fundacao.md` (respostas E26 e das
-lacunas) (Documentador).
+**Ficha visual (Designer de produto):** `specs/20261128-020000-agenda/ficha-visual.md` e `ficha/*.png`.
+
+**Texto:** `DESIGN.md`, **só** as linhas das peças que o dono aprovar na ficha (Designer de produto) · `docs/STATUS.md`,
+`docs/BACKLOG.md`, `CHANGELOG.md`, `docs/decisoes/2026-11-27-fundacao.md` (respostas L-2, L-4, E50) (Documentador).
 
 **Processo:** `specs/20261128-020000-agenda/{spec.md,plan.md,tasks.md}` · `docs/adr/0006-agenda-tempo-idiomas-e-tetos.md`.
 
-**Intactos:** `src/app/ui/**` e `src/app/estilos/**` (peça nova da L-3 que for componente geral pede ajuste deste
-plano), `src/server/portas/**`, `src/data/cliente.ts`, a tabela do registro, a tela Entrar e a sessão de teste (todos da spec
-"Entrar e camada de serviço", E36·A), `src/*/AGENTS.md`, `src/*/CLAUDE.md`,
-`supabase/config.jsonc`, `supabase/seed.sql`, as migrations dos itens 2 e 3, `package.json`, `pnpm-lock.yaml`,
+**Intactos:** `src/server/portas/{acao,catalogo,erros}.ts` e `molde.test.ts`, `src/server/http/**`,
+`src/data/{cliente,erros,sessao,ambiente}.ts`, `src/app/i18n/{textos,formatar}.ts` e `i18n.test.ts`,
+`src/app/estilos/base.css`, as migrations e os testes do banco já existentes (menos `110_` e `010_` como acima),
+`supabase/moldes/**`, `supabase/matriz/**`, `supabase/config.jsonc`, `supabase/seed.sql`, `scripts/**`,
+`tests/integracao/preparo.ts`, `src/*/AGENTS.md`, `src/*/CLAUDE.md`, `package.json`, `pnpm-lock.yaml`,
 `eslint.config.mjs`, `playwright.config.ts`, `.github/**`, `ARCHITECTURE.md`, `AGENTS.md`.
-
-## 10. Branch (decisão do Engenheiro de DevOps)
-- `feat/agenda` recebe, **por merge**, a `feat/banco-ligacao` e a `feat/design-system-codigo` (as duas já trazem a
-  `chore/fundacao-tecnica`) e a `feat/entrar-servico` (E36·A). PR de rascunho empilhado; nunca se junta
-  numa base. Quando as bases entrarem na `previas`, a base do PR passa à `previas`, antes do pedido de merge.
-- Conflito esperado só em `src/app/routeTree.gen.ts` (regenera-se, não se edita à mão). Antes de construir: conferir
-  que os arquivos das três bases do cabeçalho e os de `src/server/portas/` da `feat/entrar-servico` estão na branch.
 
 ## 11. Critério → prova
 | CA | Prova | Quem confere |
 |---|---|---|
-| CA-01 | `src/domain/agenda/*.test.ts` verdes (23 h, 25 h, meia-noite que não existe, cruzar a meia-noite, encostar, teto) | QA |
-| CA-02 | pgTAP 110 e 120 verdes | Engenheiro de dados revisor; QA |
-| CA-03 | pgTAP 110 e 130; `ler-dia.test.ts` e `bloqueios.test.ts` | QA; Engenheiro de segurança |
-| CA-04 | `ler-dia.test.ts` e `bloqueios.test.ts` (estúdio no pedido recusado e nunca usado; nota do §5.3) | Revisor de código |
-| CA-05, CA-06 | `e2e/agenda.spec.ts` e `e2e/agenda-estados.spec.ts` verdes nos 2 projetos | QA |
-| CA-07 | checklist `DESIGN.md` §10 sobre as capturas 390 e 1440 | Revisor de design |
-| CA-08 | `e2e/agenda-acessibilidade.spec.ts` verde nos 2 projetos | QA |
-| CA-09 | testes do servidor e do e2e (URL, registro, erro) e revisão | Engenheiro de segurança |
-| CA-10 | ADR 0007 com cada tabela da spec §7, conferência preenchida; migrations só das reescritas | Auditor de risco |
+| CA-01 | `src/domain/agenda/*.test.ts` verdes | QA |
+| CA-02 | pgTAP 120 e 130 | Engenheiro de dados revisor; QA |
+| CA-03 | pgTAP 120 e 140; `matriz.test.ts`, `supabase/matriz/matriz.test.ts` e `110_` (código = banco); `ler-dia.test.ts`, `bloqueios.test.ts`, `tests/integracao/agenda.test.ts` | QA; Engenheiro de segurança |
+| CA-04 | `tests/integracao/agenda.test.ts` (`estudio_trocado`) e testes do servidor (campo de estúdio em `dados`) | Revisor de código |
+| CA-05, CA-06 | `e2e/agenda.spec.ts` e `e2e/agenda-estados.spec.ts` nos 2 projetos | QA |
+| CA-07 | checklist `DESIGN.md` §10 nas capturas 390 e 1440 | Revisor de design |
+| CA-08 | `e2e/agenda-acessibilidade.spec.ts` nos 2 projetos | QA |
+| CA-09 | testes do servidor, pgTAP 150 e e2e (URL, registro, erro) e revisão | Engenheiro de segurança |
+| CA-10 | ADR 0007 com cada tabela da spec §7; migrations só das reescritas | Auditor de risco |
 | CA-11 | histórico da CI; nenhum `supabase link`, `db push`, `--remote` ou `--linked` | Auditor de risco |
 | CA-12 | relatórios sem "Bloqueia"; veredito do QA; conferência do dono na prévia | Gerente de projeto |
-| Escopo | `git diff --name-only <base>...HEAD` comparado com o §9 | Revisor de código |
+| CA-13 | `ler-dia.test.ts`, pgTAP 140, `tests/integracao/agenda.test.ts`, `e2e/agenda.spec.ts` | Engenheiro de segurança; QA |
+| CA-14 | pgTAP 130 e 140 (cada regra ao criar e ao alterar) | Engenheiro de dados revisor |
+| Escopo | `git diff --name-only origin/previas...HEAD` comparado com o §10 | Revisor de código |
 
 ## 12. Riscos e não verificado
-- **A construção espera a spec "Entrar e camada de serviço"** (E36·A, `feat/entrar-servico`): sem ela não há portas
-  1, 2 e 6, nem sessão no e2e. Se o contrato dela diferir do §5.1, este plano se ajusta (nova 5b).
-- Item 3 e item 4 não estão construídos: nomes de funções, tabelas e componentes vêm dos planos deles. Se mudarem, este
-  plano se ajusta (nova 5b).
-- **Não verificado:** a extensão `btree_gist` no banco local do Supabase (sem ela, a exclusão do §4.3 vira gatilho);
-  se `@supabase/ssr` 0.12.7 grava o cookie da sessão fora do alcance do JavaScript da página e se `supabase-js` roda
-  no Cloudflare Workers (spec "Entrar e camada de serviço"); o comportamento do `Intl` do Node 26 e do Chromium do Playwright na meia-noite
-  que não existe (o teste do CA-01 prova); se o Cloudflare Workers tem `Temporal` (por isso não se usa, ADR 0006 · D2);
-  a documentação online do `createServerFn` (conferido só no `.d.ts` instalado: o nome é `.validator`).
-- Numeração dos ADRs: 0006 e 0007 podem colidir com as specs dos outros módulos do núcleo, escritas em paralelo; o
+- **Não verificado:** `btree_gist` no banco local (sem ela, a exclusão do §4.3 vira gatilho); desempenho de
+  `app.pode(...)` chamado em cada política (ADR 0020, risco já aberto); se `rpc(..., { get: true })` serve a função de
+  "ocupados" sem gravar nada (ADR 0018 · D18 diz que sim, não rodado aqui); o `Intl` do Node 26 e do Chromium na
+  meia-noite que não existe (o teste do CA-01 prova); `Temporal` no Cloudflare Workers (por isso não se usa).
+- O §2.6 e o §2.7 tocam arquivos do Entrar já juntados: se o Revisor de código ou o Engenheiro de segurança recusarem,
+  RF-11 e o envelope ficam sem caminho e o plano volta à 5b.
+- L-2 sem resposta: as colunas não têm nome; a tela não pode ir à ficha visual completa sem ela.
+- Numeração: ADR 0007 e os pgTAP `120_` a `160_` podem colidir com as specs do núcleo em branches paralelas; o
   Documentador confere no PR e renumera se preciso.
-- Ordem das `<ts>` das migrations: as da Agenda precisam vir depois das do item 3 (data e hora maiores); conferir ao
-  criar.
