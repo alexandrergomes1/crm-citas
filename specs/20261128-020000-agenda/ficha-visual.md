@@ -5,8 +5,9 @@
 - **Escrito por:** Designer de produto · **Norma:** WCAG 2.2, Material Design, Apple HIG · **Fonte:** só o `DESIGN.md`;
   base visual: canvas do dono `docs/design/canvas/N8AgendaPc` e `N8AgendaCel` (pedido (c)), sem o que o `DESIGN.md`
   não tem (vermelho da linha do "agora", "€ previstos", busca na Agenda, faixa da semana)
-- **Conferência:** Revisor de design (P4), 1ª rodada: **Bloqueia** (9 itens e 1 imagem faltando); 2ª versão abaixo,
-  todos corrigidos (ver "Correções da 1ª rodada"); reconferência pendente. **"Sim" do dono:** pendente.
+- **Conferência:** Revisor de design (P4), 1ª rodada: **Bloqueia** (9 itens e 1 imagem faltando), corrigidos; 2ª
+  rodada: **Libera com ressalvas** (5 ressalvas), corrigidas nesta versão (ver "Correções"). **"Sim" do dono:**
+  pendente.
 - **Protótipo:** HTML estático fora do repositório, com o `tokens.css`, o `base.css` e o CSS das peças do item 4
   (`botao`, `contador`, `campos`, `etiqueta-status`, `camadas`, `estados`, `estrutura`, `sua-conta`); fonte Geist;
   ícones Lucide. Capturas com Playwright (Chromium), 390 × 844 e 1440 × 900, escala 2×. Peças novas (L-3) desenhadas só
@@ -35,7 +36,7 @@
 - **E55·4 · Onde se cria um bloqueio:** **A** em "Opções" (`agenda-opcoes-bloquear`) · **B** botão próprio na barra
   (`alternativa-e55-4-b-botao-1440`) · **C** só tocando num horário vazio (depende da ideia E54·1). **Recomendo A:** o
   botão próprio disputa o olho com "Novo agendamento".
-- **Revisado por:** Revisor de design (1ª rodada: Bloqueia; os 9 pontos corrigidos nesta versão).
+- **Revisado por:** Revisor de design, 2ª rodada: Libera com ressalvas (as 5 ressalvas corrigidas).
 - **Desfaz-se assim:** troca-se a linha no `DESIGN.md` e o texto no arquivo de idioma; a E55·1 sai com uma mudança no
   banco; a E55·2 volta a rota `/` à tela de hoje.
 - **Responda:** os códigos, por exemplo "E55·1·A E55·2·A E55·3·A E55·4·A".
@@ -82,7 +83,7 @@
 
 ## Comportamento (para quem constrói e para o e2e)
 - **Uma peça preta:** "Novo agendamento" (computador) e "Agendar" (celular). Na v1, sem o Agendamento (RF-08):
-  "Novo agendamento" esmaecido com "em desenvolvimento" ao lado; o Agendar da barra e o toque no cartão de agendamento
+  "Novo agendamento" esmaecido com "em desenvolvimento" logo à direita dele, antes do divisor (longe de Opções); o Agendar da barra e o toque no cartão de agendamento
   abrem um aviso "em desenvolvimento" (no 390 não cabe a nota ao lado). Painel e folha abertos têm o próprio preto
   (Salvar, Mostrar N itens), e a tela de trás não conta (`DESIGN.md` §8b).
 - **Opções não é "em desenvolvimento":** o botão funciona porque tem "Bloquear horário"; só Exportar e Imprimir, dentro
@@ -104,17 +105,22 @@
   **Agendamento com Ausência ou Cancelado não aparece** nas colunas que a pessoa não vê completas (na imagem, a Paula
   Gil das 16:30, Ausência na coluna da Bruna, some da visão da Carla). "Ocupado" não é botão, não recebe foco por
   toque, só é lido ("Ocupado, 10:30 a 11:00"). Filtros não agem nas colunas "Ocupado"; para a profissional, o painel de
-  Filtros abre com a linha "Os filtros valem só para a sua coluna."
+  Filtros abre com a linha "Os filtros valem só para a sua coluna." e o "Mostrar N itens" conta só os itens da
+  coluna dela (5 na imagem).
 - **Altura mínima e toque (WCAG 2.5.8; `DESIGN.md` §4):** a hora mede 64 px; o cartão desenha a duração, mas **nunca
   fica abaixo de 44 px no celular e 40 px no computador**. Quando essa altura mínima faz um cartão cobrir o seguinte,
   os dois passam a ficar **lado a lado**, pela mesma regra dos que se cruzam de verdade (RN-05); a hora escrita no
   cartão continua a real. Assim nenhum alvo fica abaixo de 40/44 de altura, mesmo com bloqueio de 5 min ou passo de
   15 min (`agenda-celular-pior-caso`).
-- **Largura no pior caso (celular):** com 3 itens lado a lado numa coluna de 160, cada cartão fica com cerca de 48 px
-  de largura e mostra só o começo do nome com reticências e o ícone do status; tocar abre o item inteiro. A altura
-  nunca cai abaixo de 44; a largura cai abaixo de 44 só com 4 ou mais itens ao mesmo tempo na mesma pessoa (neste
-  caso a área de toque fica no limite de 24 da WCAG 2.5.8, não no 44 do `DESIGN.md`; ver "Não verificado").
-- **Conteúdo do cartão:** de 1 h ou mais: nome, "início–fim · serviço" e o status com ícone e palavra; de 45 min:
+- **No máximo 3 lado a lado ("+N"):** até 3 itens que se cruzam ficam lado a lado; com 4 ou mais, ficam os 2 primeiros
+  e o 3º lugar vira um cartão **"+N"** (N = os que não cabem), em `--btn`, com a altura mínima, que abre a lista do
+  horário (menu no computador, folha no celular); o leitor lê "+3 itens a partir das 09:30". Assim cada cartão do
+  celular tem pelo menos ~48 px de largura (coluna de 160 ÷ 3) e 44 de altura (`agenda-celular-pior-caso`: 5 itens às
+  09:30–10:30 viram 2 cartões e "+3").
+- **Cartão estreito (lado a lado):** o status aparece **só com o ícone**, sem a palavra, e o nome do status vai para o
+  leitor (`DESIGN.md` §5); nome e horário terminam em reticências. "Ocupado" estreito leva sempre o horário na 2ª
+  linha.
+- **Conteúdo do cartão (sozinho na coluna):** de 1 h ou mais: nome, "início–fim · serviço" e o status com ícone e palavra; de 45 min:
   nome e ícone do status, e a hora com o serviço; menos de 45 min: uma linha "hora + nome" e o ícone. O que não cabe
   vai para o leitor de tela (`DESIGN.md` §5: no cartão pequeno, só o ícone). Todo texto cortado termina em reticências.
 - **Teclado (RNF-03):** cada coluna é um grupo com o nome da pessoa; Tab percorre os cartões por coluna e por hora;
@@ -167,7 +173,8 @@ não aparecem.
 3. **Cartão do agendamento e do bloqueio:** botão em `--btn` (controle sobre superfície), **canto 10** (hoje só o
    quadrado da inicial), três conteúdos por duração; bloqueio com `lock` e "Bloqueio · motivo".
 4. **Altura mínima do cartão: 44 no celular e 40 no computador**, e "lado a lado" quando a altura mínima cobre o
-   seguinte (regra nova, item 2 da revisão).
+   seguinte; **no máximo 3 lado a lado**, e com 4 ou mais o 3º lugar vira o cartão **"+N"** que abre a lista do
+   horário; em cartão lado a lado o status é só o ícone e o "Ocupado" põe o horário na 2ª linha.
 5. **"Ocupado":** área em `--page` ("fora do seu alcance"), canto 10, "Ocupado" 12 forte `--ink2` e horário 12
    `--ink3`; sem ícone, sem toque, sem ⋮. Uso novo do `--page` dentro de um bloco. Só bloqueio e agendamento ativo.
 6. **Celular:** data como botão ▾ no subtítulo do cabeçalho; faixa da grade (‹ Hoje › · Equipe · ⋮) colada ao
@@ -196,7 +203,7 @@ ninguém na agenda" · "Cada pessoa da equipe que atende aparece aqui como uma c
 carregar a agenda" · "Carregando a agenda" (leitor) · "Este dia tem mais de 500 itens e nem todos aparecem. Escolha
 menos pessoas em Equipe." · "Já há um bloqueio ou agendamento neste horário. Escolha outro horário." · "O fim tem de ser
 depois do início." · "O bloqueio tem de ter pelo menos 5 minutos." · "Não foi possível desfazer: o horário já foi
-ocupado." · "Os filtros valem só para a sua coluna." Nenhum texto diz "estúdio" (E47).
+ocupado." · "Os filtros valem só para a sua coluna." · "+N" e "N itens a partir das HH:MM" (leitor). Nenhum texto diz "estúdio" (E47).
 
 ## Decisões para o dono (detalhe da mensagem acima)
 
@@ -218,7 +225,8 @@ Hoje o sistema não guarda nome da pessoa, só o e-mail.
 ### E55·3 · Peças e nomes novos da Agenda (L-3), como nas imagens
 - **E55·3·A:** aceitar a lista acima, com o celular em 2 colunas à vista e as outras rolando para o lado → entra no
   `DESIGN.md` §4, §5, §6, §8 e §8b e nos arquivos de idioma. **Custo honesto:** quando 3 itens se cruzam na mesma
-  pessoa, cada cartão do celular fica com ~48 px de largura e mostra só "C…" e o ícone (`agenda-celular-pior-caso-390`).
+  pessoa, cada cartão do celular fica com ~48 px de largura e mostra só "C…" e o ícone; com 4 ou mais, aparece "+N" e
+  é preciso um toque a mais para ver os outros (`agenda-celular-pior-caso-390`).
 - **E55·3·B:** igual, mas no celular **uma coluna por vez**, trocada pelo Equipe ("Equipe 1 de 3") → cartões largos,
   sem corte, mas a recepção vê uma pessoa por vez.
 - **E55·3·C:** aceitar e trocar algum → diga qual e o novo.
@@ -254,22 +262,31 @@ os nomes no `DESIGN.md`.
 | 9 | Mensagem ao dono | seção "Mensagem ao dono", com as imagens das alternativas, a E55·3 em 4 mudanças e "Revisado por" |
 | — | Profissional com Filtros aberto | `agenda-filtros-profissional` |
 
+**2ª rodada (Revisor de design: Libera com ressalvas)** · imagens refeitas: `agenda-dia-dona`, `agenda-dia-profissional`,
+`agenda-celular-pior-caso`, `agenda-dia-v1-sem-agendamento`, `agenda-vazio-v1`, `agenda-filtros-profissional`,
+`bloqueio-criar-profissional` (as duas larguras).
+
+| # | Ressalva | O que mudou |
+|---|---|---|
+| 1 | "Ocupado" estreito cortado | horário sempre na 2ª linha, com reticências |
+| 2 | Palavra do status em cartão estreito | lado a lado: só o ícone; a palavra vai para o leitor |
+| 3 | "em desenvolvimento" perto de Opções (1440, v1) | a nota fica à direita do "Novo agendamento", numa linha |
+| 4 | "Mostrar N itens" da profissional | conta só a coluna dela ("Mostrar 5 itens") |
+| 5 | "+N" depois de 3 lado a lado; "Revisado por"; contrastes | regra na lista (item 4) e no pior caso; linha "Revisado por"; contrastes no "Não verificado" |
+
 ## Não verificado
-- **Revisor de design:** a 2ª versão ainda não foi reconferida.
+- **Revisor de design:** as correções das 5 ressalvas da 2ª rodada não foram reconferidas.
 - **Acessibilidade:** o axe (wcag2a, wcag2aa, wcag21a, wcag21aa, wcag22aa) deu 0 violações nas 58 capturas do
-  protótipo; isso não vale para o app real. Não testei com leitor de tela de verdade nem a ordem do Tab na grade. A
+  protótipo (as 14 refeitas na 2ª rodada também); isso não vale para o app real. Não testei com leitor de tela de verdade nem a ordem do Tab na grade. A
   rolagem lateral no celular não foi testada com zoom de 200 % (WCAG 1.4.10).
-- **Toque na largura:** com 4 ou mais itens ao mesmo tempo na mesma pessoa, o cartão do celular fica abaixo de 44 de
-  largura (perto de 36 px); não desenhei esse caso. Saída possível, a decidir na construção: depois de 3 lado a lado,
-  um cartão "+N" que abre a lista do horário.
-- **Contraste:** não medi `--ink3` (hora 11 e horário do "Ocupado") sobre `--page` nem `--warn` sobre `--btn`; o
-  `DESIGN.md` §3 diz que todo texto passa de 4,5:1 sobre fundo, superfície e trilho, mas não cita o caso do cartão.
-  Os textos esmaecidos (60 %) ficam abaixo de 4,5:1 (a WCAG isenta controle desativado).
+- **Toque na largura:** com 3 lado a lado, o cartão do celular tem ~48 px de largura (≥ 44); o "+N" só foi desenhado
+  com 5 itens, e a lista que ele abre não tem imagem própria.
+- **Contraste (calculado pelo Revisor de design, 2ª rodada):** `--ink3` sobre `--page` 5,07:1 (hora da grade e horário
+  do "Ocupado") e `--warn` sobre `--btn` 4,80:1 (Reservado no cartão); os dois passam de 4,5:1. Os textos esmaecidos
+  (60 %) ficam abaixo de 4,5:1 (a WCAG isenta controle desativado).
 - **Imagens estáticas:** menus e camadas abertos desenhados no lugar, sem clique. O protótipo põe `text-decoration:
   none` nos links do menu principal e da barra de baixo, que o CSS do item 4 não tem; no app real eles podem sair
   sublinhados, e o Engenheiro de software precisa conferir.
-- **Corte da palavra do status:** em cartão muito estreito (pior caso), a palavra do status ("Iniciado", "Reservado") é
-  cortada sem reticências; o nome e o detalhe têm reticências.
 - **Barra de baixo:** segue o código ("Mais" sem ícone, E25·2 em aberto).
 - **Dados:** dia e pessoas fictícios; as imagens mostram de 09:00 a 18:00 ou 19:00, mas a grade real tem 24 h com
   rolagem (Assumption 1 da spec). Cartões de agendamento só aparecem depois da spec do Agendamento.
