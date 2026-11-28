@@ -93,6 +93,10 @@ test('entrar: carregando, sucesso, cookie só do servidor e nenhuma ida ao banco
   const caixa = await abrirSuaConta(page, ehCelular(info))
   await expect(caixa.getByText('Trocar de estúdio')).toHaveCount(0)
   await expect(caixa.getByText('Sair', { exact: true })).toBeVisible()
+  // Itens do menu aberto em pílula, mesmo os de duas linhas (DESIGN.md §4; revisão de design R6)
+  if (!ehCelular(info)) {
+    for (const item of await caixa.getByRole('menuitem').all()) await expect(item).toHaveCSS('border-radius', '999px')
+  }
   await capturar(page, info, 'sua-conta-sem-troca')
   expect(await violacoes(page)).toEqual([])
 

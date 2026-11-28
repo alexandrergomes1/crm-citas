@@ -45,6 +45,10 @@ test('escolher, carregando, erro, trocar e sair, com o idioma de cada estúdio (
   const lista = page.getByRole('list', { name: 'Escolher estúdio' })
   await expect(lista.locator('.ds-linha__titulo')).toHaveText([lirio, nube])
   await expect(page.getByText('2 estúdios')).toBeVisible()
+  // A lista começa logo abaixo da linha do topo, sem o espaço de 16 do molde (revisão de design R3)
+  const topo = await page.locator('.escolher__topo').boundingBox()
+  const inicioDaLista = await lista.boundingBox()
+  expect(Math.round(inicioDaLista!.y - (topo!.y + topo!.height))).toBe(0)
   await capturar(page, info, 'escolher-estudio')
   expect(await violacoes(page)).toEqual([])
 

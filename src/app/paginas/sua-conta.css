@@ -15,7 +15,8 @@
   align-items: flex-start;
   justify-content: center;
   padding-block: var(--sp-4);
-  border-radius: var(--r-campo-multi);
+  /* item de menu aberto em pílula, mesmo com duas linhas (DESIGN.md §4; revisão de design R6) */
+  border-radius: var(--r-pilula);
 }
 
 .sua-conta__nota {

@@ -1,6 +1,9 @@
 /* Escolher estúdio (DESIGN.md §3, §4, §8, §8b; ficha E41·4·A). Usa também a "tela sem menu" de entrar.css.
  * Linha de lista 64 com o quadrado da inicial e ›; a linha inteira é o botão. Só var(--...). */
-.escolher .ds-bloco {
+/* Sem o espaço de 16 do molde (entrar.css, .tela-sem-menu__bloco > .ds-bloco): a lista começa logo abaixo da linha
+ * do topo, como na ficha (revisão de design R3). Seletor mais forte que o do molde: não depende da ordem das folhas. */
+.tela-sem-menu__bloco.escolher > .ds-bloco {
+  gap: 0;
   padding: 0 0 var(--sp-24);
 }
 
@@ -54,5 +57,5 @@
 
 .escolher__fim {
   display: flex;
-  padding: var(--sp-12) var(--sp-24) 0;
+  padding: var(--sp-16) var(--sp-24) 0;
 }
