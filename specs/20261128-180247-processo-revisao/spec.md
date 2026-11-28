@@ -152,7 +152,7 @@ como item ou ideia, sem decidir) · **dúvida** (§5) · **fora** (outra branch,
 | 22 | Fresha como referência do produto | 7Rj 19:37 | `docs/produto/README.md` | falta |
 | 23 | Cadastro sozinho e período de teste do estúdio novo | 7Rj E4 | `docs/produto/cadastro-de-estudio-e-assinatura.md`; fila "a decidir" (dinheiro) | falta + fila |
 | 24 | Termos de uso e política de privacidade | 7Rj E4 | `SECURITY.md` §7 (pendência antes da produção) e fila | falta + fila |
-| 25 | Página de status e aviso de queda | 7Rj E4; o dono: "acho que ninguem fica avisando quedas nao" | `ARCHITECTURE.md` §11 ou fila | dúvida E66·2 |
+| 25 | Página de status e aviso de queda | 7Rj E4; o dono: "acho que ninguem fica avisando quedas nao" | fila: item no fim do projeto (página de status; avaliar construir ou usar serviço de uptime) | respondida (E66·2, §5a) · fila |
 | 26 | Avisos ao usuário dentro do sistema e por e-mail | 7Rj E4 | fila (ideia) | fila |
 | 27 | Recuperação a qualquer momento (paga) quando houver muitos estúdios | 7Rj E5·3 | `ARCHITECTURE.md` §9 (opção futura); fila "a decidir" (dinheiro) | falta + fila |
 | 28 | Botão branco × preto e "Agendar" de outra cor, "para debater depois" | 7Rj 20:33 | fila (ideia para debater); `DESIGN.md` já cita | fila |
@@ -160,13 +160,13 @@ como item ou ideia, sem decidir) · **dúvida** (§5) · **fora** (outra branch,
 | 30 | 7 itens de segurança sem documento (ex.: encarregado de dados, prazo de resposta a quem avisa falha) | 7Rj 21:06 | `SECURITY.md` §7 | falta (o Engenheiro de segurança relê a conversa para listar os 7) |
 | 31 | Central de ajuda "como a da Cloudflare" | 7Rj 21:12 | `docs/produto/central-de-ajuda.md` | falta |
 | 32 | gitleaks também na sessão (proposta sem resposta) | 7Rj 21:12 | ADR do DevOps (decisão técnica) e `CONTRIBUTING.md` | falta |
-| 33 | Páginas antigas do canvas com nomes de teste | 7Rj 22:41 (pergunta sem resposta) | `docs/design/README.md` | dúvida E66·3 |
+| 33 | Páginas antigas do canvas com nomes de teste | 7Rj 22:41; E66·3 | `docs/design/README.md` fica como está; fila: item no fim do projeto (avaliar a faxina) | respondida (E66·3, §5a) · fila |
 | 34 | Prévia online na Cloudflare (E23·2·A) | 9ep #18; 8F1 P2 | fila (item próprio; a ordem é do dono) | fila |
 | 35 | Só serviços gratuitos (E23·3·A), regra geral | 9ep #19 | `ARCHITECTURE.md` §12 | falta |
 | 36 | Opção de captcha no entrar (R-13) | 9ep B2 | fila "a decidir" (acesso) | fila |
 | 37 | Configurar o banco online (hash da chave do servidor, chaves assimétricas) | 9ep B4 | `SECURITY.md` §7 (antes da produção) | falta |
 | 38 | Skills do TanStack não aprovadas ("recomendo manter") | 9ep B5 | ADR (decisão técnica do DevOps) | falta |
-| 39 | Prazo de guarda do registro de auditoria e das sessões | 9ep B6; ADR 0018 e 0019 | `SECURITY.md` §7 (o prazo); o banco, por spec própria (linha 57) | dúvida E66·1 |
+| 39 | Prazo de guarda do registro de auditoria e das sessões | 9ep B6; ADR 0018 e 0019 | `SECURITY.md` §7 (o prazo); o banco, por spec própria (linha 57) | em confirmação com o dono (E66·1, §5a); não se aplica |
 | 40 | Cadastro e convite de equipe (senha até 72 bytes, "Esqueci a senha" E39·1·B, trava antes de estúdios reais) | 9ep B10; 8F1 #26 | fila (item) e `docs/produto/equipe.md` | falta + fila |
 | 41 | Planos da Agenda e do Agendamento voltam à 5b | 9ep B11 | `docs/STATUS.md` | falta |
 | 42 | Cloudflare R2 também para arquivos (assinaturas, fotos) | 8F1 #4 | `ARCHITECTURE.md` | falta |
@@ -184,7 +184,7 @@ como item ou ideia, sem decidir) · **dúvida** (§5) · **fora** (outra branch,
 | 54 | Revisão das conversas: feita, com as 4 conversas | 958 #55; linha "Ordem (revisar as conversas)" | `docs/decisoes/` (marcar feito, citar as 4) | falta |
 | 55 | "Pode pedir as liberações que precisar" | 9ep #10 | só valeu naquela hora | nada |
 | 56 | As 4 lacunas do Arquiteto de 27/11 (21:34) e o trecho da conversa 7Rj antes de 27/11 18:13 | 7Rj | — | não verificado |
-| 57 | Guardar o endereço de internet (IP) de cada entrada, se a E66·1 for A | Engenheiro de segurança (E66·1); Marco Civil art. 15 | fila: item com spec própria (mudança de banco) | fila (não é deste 4b) |
+| 57 | Guardar o endereço de internet (IP) de cada entrada, conforme a resposta final da E66·1 | Engenheiro de segurança (E66·1); Marco Civil art. 15 | fila: item com spec própria (mudança de banco) | fila (não é deste 4b; espera a E66·1) |
 
 ## 4. Critérios de aceite
 - **CA-01.** Os textos de T1, T2, T3, T4, T5, T6 (parte do `AGENTS.md`) e T8 estão nos arquivos indicados com a
@@ -237,6 +237,19 @@ como item ou ideia, sem decidir) · **dúvida** (§5) · **fora** (outra branch,
   - **Recomendo A:** o dono disse que os dados do antigo são fictícios (E22·B) e pediu o canvas com as versões
     (E10·1).
   - **Como voltar atrás:** B e C podem ser feitas depois a qualquer hora. C apagada volta pelo histórico do git.
+
+## 5a. Clarifications (respostas do dono)
+Resposta de 28/11/2026 (https://claude.ai/code/session_018cV8b958nnbLyXPMKPeaNK), fala literal:
+> "E66-1: 3 meses, e66-2: vamos ter, avaliar se desenvolvemos ou usar uptime. Mas isso é pro final. E66-3: guardar
+> durante o desenvolvimento e a lo final do projeto avaliamos uma faxina."
+
+A spec **ainda não foi aprovada**: o dono não disse "E66 sim". Status segue Draft.
+
+| Código | O que fica | Onde entra |
+|---|---|---|
+| E66·2 | O sistema **terá** página de status. Avaliar se é construída ou se usa um serviço de uptime (serviço que vigia se o site está no ar). Fica para o fim do projeto | fila: item no fim do projeto (§3, linha 25). Nada muda no `ARCHITECTURE.md` agora |
+| E66·3 | As páginas antigas do canvas **ficam** durante o desenvolvimento. No fim do projeto avalia-se uma faxina | fila: item no fim do projeto (§3, linha 33). `docs/design/` não muda |
+| E66·1 | "3 meses": **em confirmação com o dono, não se aplica.** Não está claro a que se refere (as entradas, o registro do que cada pessoa fez, ou os dois). Há também risco legal: no Brasil, o Marco Civil (art. 15) exige guardar 6 meses a data, a hora e o endereço de internet de cada uso, quando houver empresa no Brasil | nada muda até a confirmação: `SECURITY.md` §7 e a linha 57 esperam |
 
 ## 6. Assumptions (o papel decidiu; recuse pelo número)
 - **A1.** Rótulos do bloco: "▶ PRECISA DE VOCÊ" (ou "▶ Nada para você") e, depois, "Só para informar". Não são
