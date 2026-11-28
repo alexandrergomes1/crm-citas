@@ -1,8 +1,10 @@
 -- Item 3 · spec 20261128-010000-banco-ligacao · plan.md §5 · CA-03 e CA-06: estrutura da trava (vale para toda tabela futura de public)
 -- Molde oficial: https://supabase.com/docs/guides/local-development/testing/overview
 -- Login simulado: set_config('request.jwt.claims') + set local role authenticated (é o que auth.uid() lê).
+-- Lista de privilégios atualizada pela spec 20261128-030000-entrar-servico (plan.md §6; ADR 0019 · D17 substitui
+-- a linha D9 do ADR 0005): anon só as funções de entrar e o pré-pedido; authenticated só as da sessão e da trava.
 begin;
-select plan(19);
+select plan(24);
 
 -- Preparo (como postgres): pessoas e estúdios fictícios, escritos do zero (RG-07).
 -- A = ...0a · B = ...0b · a1 dona A · a2 recepção A · a3 profissional A · b1 dona B
@@ -89,20 +91,40 @@ select is(
   4, 'as 4 funções de app são security definer com search_path vazio');
 
 select is(
-  (select count(*)::int from pg_catalog.pg_proc p
-    where p.pronamespace = 'app'::regnamespace and pg_catalog.has_function_privilege('anon', p.oid, 'execute')),
-  0, 'anon não executa nenhuma função de app');
+  (select coalesce(array_agg(p.oid::regprocedure::text order by p.oid::regprocedure::text collate "C"), array[]::text[])
+     from pg_catalog.pg_proc p
+    where p.pronamespace in ('public'::regnamespace, 'app'::regnamespace)
+      and pg_catalog.has_function_privilege('anon', p.oid, 'execute')),
+  array['app.antes_do_pedido()', 'app.conferir_tentativa(bytea,bytea)', 'app.registrar_tentativa_falha(uuid)',
+        'conferir_tentativa(bytea,bytea)', 'registrar_tentativa_falha(uuid)'],
+  'anon executa só o pré-pedido e as duas funções de entrar');
 select is(
-  (select count(*)::int from pg_catalog.pg_proc p
-    where p.pronamespace = 'public'::regnamespace and pg_catalog.has_function_privilege('anon', p.oid, 'execute')),
-  0, 'anon não executa nenhuma função de public');
-select is(
-  (select coalesce(array_agg(p.oid::regprocedure::text order by 1), array[]::text[])
+  (select coalesce(array_agg(p.oid::regprocedure::text order by p.oid::regprocedure::text collate "C"), array[]::text[])
      from pg_catalog.pg_proc p
     where p.pronamespace in ('public'::regnamespace, 'app'::regnamespace)
       and pg_catalog.has_function_privilege('authenticated', p.oid, 'execute')),
-  array['app.eh_dona()', 'app.escolher_estudio(uuid)', 'app.estudio_da_sessao()', 'app.papel_da_sessao()'],
-  'authenticated executa só as 4 funções da trava em public e app');
+  array['app.antes_do_pedido()', 'app.contexto_da_sessao()', 'app.eh_dona()', 'app.encerrar_sessao(uuid)',
+        'app.escolher_estudio(uuid)', 'app.escolher_estudio_da_sessao(uuid,uuid)', 'app.estudio_da_sessao()',
+        'app.iniciar_sessao(uuid)', 'app.meus_estudios()', 'app.papel_da_sessao()',
+        'app.registrar_recusa(text,text,uuid)',
+        'contexto_da_sessao()', 'encerrar_sessao(uuid)', 'escolher_estudio(uuid,uuid)', 'iniciar_sessao(uuid)',
+        'meus_estudios()', 'registrar_recusa(text,text,uuid)'],
+  'authenticated executa só as funções da trava, da sessão e o pré-pedido');
+select is(
+  (select coalesce(array_agg(p.oid::regprocedure::text order by p.oid::regprocedure::text collate "C"), array[]::text[])
+     from pg_catalog.pg_proc p
+    where p.pronamespace in ('public'::regnamespace, 'app'::regnamespace)
+      and pg_catalog.has_function_privilege('public', p.oid, 'execute')),
+  array[]::text[], 'nenhuma função de public ou app executável por public');
+select is(
+  (select count(*)::int from pg_catalog.pg_proc p
+    where p.pronamespace = 'public'::regnamespace and p.prosecdef),
+  0, 'nenhuma função security definer em public (só passagens security invoker)');
+select is(
+  (select count(*)::int from pg_catalog.pg_proc p
+    where p.pronamespace in ('public'::regnamespace, 'app'::regnamespace)
+      and (p.proconfig is null or not (p.proconfig @> array['search_path=""']))),
+  0, 'toda função de public e app tem search_path vazio');
 select is(
   (select count(*)::int from pg_catalog.pg_class c
      join pg_catalog.pg_namespace n on n.oid = c.relnamespace
@@ -110,7 +132,27 @@ select is(
       and (pg_catalog.has_sequence_privilege('anon', c.oid, 'usage, select, update')
            or pg_catalog.has_sequence_privilege('authenticated', c.oid, 'usage, select, update'))),
   0, 'anon e authenticated sem uso de sequência em public e app');
-select ok(not pg_catalog.has_schema_privilege('anon', 'app', 'usage'), 'anon sem uso do esquema app');
+select is(
+  (select count(*)::int from pg_catalog.pg_class c
+     join pg_catalog.pg_namespace n on n.oid = c.relnamespace
+    where n.nspname = 'app' and c.relkind in ('r', 'p', 'v', 'm')
+      and (pg_catalog.has_table_privilege('anon', c.oid, 'select, insert, update, delete, truncate, references, trigger')
+           or pg_catalog.has_table_privilege('authenticated', c.oid, 'select, insert, update, delete, truncate, references, trigger'))),
+  0, 'anon e authenticated sem privilégio em tabela de app (o uso do esquema serve só às funções)');
+select is(
+  (select count(*)::int from pg_catalog.pg_class c
+     join pg_catalog.pg_namespace n on n.oid = c.relnamespace
+    where n.nspname = 'app' and c.relkind in ('r', 'p') and not (c.relrowsecurity and c.relforcerowsecurity)),
+  0, 'toda tabela de app tem RLS ligada e forçada');
+select is(
+  (select count(*)::int from pg_catalog.pg_publication_tables t where t.pubname = 'supabase_realtime'),
+  0, 'nenhuma tabela na publicação do Realtime');
+select is(
+  case when pg_catalog.to_regclass('storage.buckets') is null then 0
+       else ((pg_catalog.xpath('/row/n/text()',
+               pg_catalog.query_to_xml('select count(*) as n from storage.buckets', false, true, '')))[1])::text::int
+  end,
+  0, 'nenhum balde de Storage');
 
 select is(
   (select count(*)::int from pg_catalog.pg_proc p

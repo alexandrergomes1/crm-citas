@@ -21,6 +21,8 @@ coverage/
 
 # banco local
 supabase/.temp/
+# chave de assinatura local, gerada a cada pnpm db:start (ADR 0018 · D17)
+supabase/signing_keys.json
 
 # sistema
 .DS_Store
