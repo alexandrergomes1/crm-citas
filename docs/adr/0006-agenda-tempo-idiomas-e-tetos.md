@@ -2,51 +2,69 @@
 
 - **Status:** Aceito · decisões técnicas (`AGENTS.md` §5) · 28/11/2026, com a spec
   `specs/20261128-020000-agenda/spec.md` aprovada (commit `4e5b364`). Revisto em 28/11/2026 (tarefa MP1 de
-  `specs/20261128-030000-entrar-servico/tasks.md`): D6 substituída; D7 a D13 novas.
+  `specs/20261128-030000-entrar-servico/tasks.md`): D6 substituída; D7 a D13 novas. **Revisto de novo em 28/11/2026**
+  (spec §16 e §17, commits `217a715` e `a0159f6`): D3 e D7 substituídas, D8 e D12 ajustadas, D14 a D16 novas.
 - **Autor:** Arquiteto de software · **Norma:** modelo C4 e ADR; Clean Architecture; Twelve-Factor; WCAG 2.2; OWASP
-  ASVS 4.0.3 V4.1.1, V4.1.3, V4.1.5, V4.2.1, V8.3.1; RGPD art. 5(1)(c); `ARCHITECTURE.md` §5 e §11
-- **Revisão (E16·1):** pendente · Revisor de código (todas) · Engenheiro de segurança (D6 a D9) · Engenheiro de dados
-  (D3, D7, a parte do banco) · **Revisores de D10/D11:** Revisor de código, Engenheiro de segurança e Auditor de risco,
-  ninguém que construiu o Entrar
+  ASVS 4.0.3 V4.1.1, V4.1.3, V4.1.5, V4.2.1, V5.1.3, V8.3.1; RGPD art. 5(1)(c); `ARCHITECTURE.md` §5 e §11
+- **Revisão (E16·1):** pendente · Revisor de código (todas) · Engenheiro de segurança (D6 a D9, D14, D15) · Engenheiro de
+  dados (D3, D7, D14, D15, a parte do banco) · **Revisores de D10/D11:** Revisor de código, Engenheiro de segurança e
+  Auditor de risco, ninguém que construiu o Entrar
 - **Aviso ao dono:** em uma linha, no pedido de revisão do plano (`AGENTS.md` §3 regra 3).
-- **Detalhe:** `specs/20261128-020000-agenda/plan.md` §2, §5 e §6. Decisões de banco (tabelas do antigo, forma das
-  políticas): ADR 0007, do Engenheiro de dados. Base: ADR 0018 (contrato `acao(...)`, D3, D18, D24) e ADR 0020.
+- **Detalhe:** `specs/20261128-020000-agenda/plan.md` §2 a §6. Decisões de banco (tabelas do antigo, forma das
+  políticas e da coluna nova): ADR 0007, do Engenheiro de dados. Base: ADR 0018 (D3, D16, D18, D24) e ADR 0020.
 
 ## Contexto
 A Agenda é a primeira tela com texto em três idiomas (RNF-05), a primeira regra que depende do fuso do estúdio (RN-01,
-RN-02) e o **primeiro módulo do modo `estudio`**: a primeira a usar a porta 3 por chave e alcance (ADR 0020), o envelope
-com `estudioDaTela` e a matriz copiada no banco. O dono respondeu E26·1·B ("Ocupado"), E26·2·A (próprios) e E26·3·A
-(colunas). O `AGENTS.md` §3 regra 6 manda reusar antes de criar.
+RN-02) e o **primeiro módulo do modo `estudio`** (porta 3 por chave e alcance, ADR 0020; envelope com
+`estudioDaTela`; matriz copiada no banco). Respostas do dono: E26·2·A (próprios), E26·3·A (colunas) e, em 28/11, a
+ordem "cada profissional só vê o dela" com a E58·A (sem "Ocupado" nesta spec; "ver as outras" e "ver ocupação" no item
+6a), a E57·B (formatos de visão, resumo, dias marcados, horário de funcionamento e lupa para a spec seguinte), E54·1 a
+·4 aprovadas, E54·5 trocada por seletor de horários e E55·1·A a E55·4. O `AGENTS.md` §3 regra 6 manda reusar antes
+de criar.
 
 ## Decisões
 
 | # | Decisão | Motivo e norma |
 |---|---|---|
-| D1 | Idiomas pela base que já existe (`src/app/i18n/{pt,es,en}.ts`, chaves do `pt.ts` como tipo das outras, `Intl.PluralRules` e `Intl.DateTimeFormat`); a Agenda só acrescenta o bloco `agenda`. Sem biblioteca de idiomas | reuso (`AGENTS.md` §3 regra 6); o tipo acusa chave faltando e `i18n.test.ts` acusa texto vazio ou marcador diferente |
+| D1 | Idiomas pela base que já existe (`src/app/i18n/{pt,es,en}.ts`, `Intl.PluralRules` e `Intl.DateTimeFormat`); a Agenda só acrescenta o bloco `agenda` (com os atalhos de motivo, RF-22). Sem biblioteca de idiomas | reuso (`AGENTS.md` §3 regra 6); o tipo acusa chave faltando e `i18n.test.ts` acusa texto vazio ou marcador diferente |
 | D2 | Limites do dia do estúdio em `src/domain` só com `Intl.DateTimeFormat`, sem `Temporal` e sem biblioteca de datas; o dia começa no primeiro instante que tem aquela data no fuso | `Temporal` não verificado no Cloudflare Workers nem no Chromium do teste; `Intl` existe nos três. Regra pura com teste (23 h, 25 h, meia-noite que não existe) |
-| D3 | Tetos no trabalho: leitura do dia com no máximo **3 pedidos** (colunas; bloqueios completos; "ocupados" das outras colunas, só com alcance `proprios`); gravação com **1 leitura + 1 gravação**; **500 itens** por dia, lidos com `limit 501`. A spec do Agendamento sobe o teto no ADR dela | `ARCHITECTURE.md` §5 e §11 (limite de idas por tela; nada cortado calado, RN-08); ADR 0018 · D3 (uma gravação por ação). 500 cabe abaixo do `max_rows` 1000 da API local. Provado por teste do servidor que conta as idas |
-| D4 | "Desfazer" depois de excluir = criar de novo com os mesmos dados, pela ação `agenda.bloqueio.criar` (mesmas portas e conflito); nada fica guardado no banco depois de excluído | minimização (RGPD art. 5(1)(c)): sem lixeira; o registro mostra a exclusão e a nova criação. Custo: outro `id` e possível conflito |
+| D3 | **(substitui a D3 anterior, que contava a leitura de "ocupados")** Tetos no trabalho: leitura do dia com no máximo **2 pedidos** (colunas; bloqueios das colunas visíveis); gravação com **1 leitura + 1 gravação**; **500 itens** por dia, lidos com `limit 501`. A spec do Agendamento e a spec seguinte da Agenda sobem o teto no ADR delas | `ARCHITECTURE.md` §5 e §11; ADR 0018 · D3. 500 cabe abaixo do `max_rows` 1000 da API local. Provado por teste do servidor que conta as idas |
+| D4 | "Desfazer" depois de excluir = criar de novo com os mesmos dados, pela ação `agenda.bloqueio.criar`; nada fica guardado no banco depois de excluído | minimização (RGPD art. 5(1)(c)): sem lixeira. Custo: outro `id` e possível conflito |
 | D5 | A escolha do "Equipe N de M" fica no armazenamento local do navegador, por estúdio, só com identificadores das colunas escondidas | spec Assumption 2; sem dado pessoal (`ARCHITECTURE.md` §7); sem tabela nem ida ao banco |
-| D6 | **(substitui a D6 anterior, "constante das E26 e função do papel")** Acesso por **chave e alcance** (ADR 0020): as ações declaram `agenda.ver`, `agenda.criar`, `agenda.editar`, `agenda.remover`; a matriz do código ganha 8 linhas (recepção `todos`, profissional `proprios`, E26·1·B e E26·2·A) e a M2 copia as mesmas no banco. `src/domain/agenda/acesso.ts` recebe alcance e `usuarioId`, nunca papel; "próprios" = a coluna da própria pessoa, conferida na linha antiga e na nova ao alterar | ADR 0020 · D1 a D5, D7; ASVS V1.4.4 (um mecanismo), V4.1.3; o item 6a troca só a fonte, sem tocar a Agenda |
-| D7 | **"Ocupado" em duas camadas:** o banco não entrega linha completa de outra coluna a quem tem `agenda.ver` só `proprios` (política de leitura por `app.pode`) e dá os horários das outras colunas numa leitura que devolve só profissional, início e fim; o servidor monta "Ocupado" sem `id`, cliente, serviço, status nem motivo, e o teste confere que nenhum campo a mais sai. A forma da leitura é do Engenheiro de dados (ADR 0007) | E26·1·B; CA-13 ("esses dados não saem do servidor"); ASVS V4.2.1 e defesa em profundidade: se só o servidor mascarasse, um erro dele ou um acesso direto à API (hoje barrado pela chave do servidor, ADR 0018 · D16) mostraria o motivo das colegas |
-| D8 | **Colunas pelo papel das colegas é compatível com ADR 0020 · D5**, com quatro condições: o papel da pessoa da sessão segue fora do trabalho; "é coluna" mora em um lugar só de cada lado (`ehColuna` em `acesso.ts` e uma condição no banco); o papel das colegas não sai do servidor; se o item 6a separar "atende" do papel, só `ehColuna` e a condição do banco mudam, com pergunta ao dono na spec do 6a | a D5 proíbe decidir **o que a pessoa pode** pelo papel dela; quem é coluna é dado do estúdio aplicado a uma regra do dono (E26·3·A), não decisão de acesso. Ler `membros.papel` já é permitido a todo membro (`membros_ler`, item 3): nada novo exposto. Minimização (RGPD art. 5(1)(c)) para a tela |
-| D9 | A leitura do dia é ação **`POST` com `grava: false`**; a URL da tela leva só `dia` (`validateSearch`), e a entrada da ação vai no corpo | o molde recusa `GET` no modo `estudio` (ADR 0018 · D18; `conferirDefinicao`); ASVS V8.3.1; RNF-04 |
-| D10 | `sessao.ler` passa a devolver `orgId` (`SessaoLida`), e a tela usa esse valor como `estudioDaTela` | o envelope do modo `estudio` exige `estudioDaTela` uuid (`executar.ts`) e hoje a tela não o tem; é identificador, sem dado pessoal, e fica no contexto da rota, nunca na URL; o valor só é comparado no banco (RF-15 do Entrar). Alternativa descartada: ação só para buscar o estúdio (uma ida a mais por tela) |
-| D11 | O `ContextoEstudio` ganha `alcances`: o alcance de cada chave do módulo da ação, pela **mesma fonte** da porta 3 (`infra.alcanceDe`), falha fechada. `agenda.dia.ler` devolve esses alcances para a tela esconder o ⋮ e a entrada de bloqueio | RF-11 e ADR 0020 · D9 (lista efetiva só para a tela); fonte única (ADR 0020 · D6), sem papel no trabalho (D5). Alternativa descartada: calcular na Agenda com `alcancePadrao(papel, ...)`, que leria o papel e pularia a fonte que o 6a troca |
-| D12 | As peças novas do `DESIGN.md` que a Agenda usa (grade, cartões, "Ocupado", data em pílula, campo de hora) ficam em `src/app/ui/`, com teste, vitrine e `@import` no `app.css`; `src/app/paginas/agenda/` só compõe | fonte única do design system (ADR 0004); a dívida D24 do ADR 0018 nasceu de deixar `src/app/ui` fora da lista de arquivos e copiar peças em páginas |
-| D13 | No e2e, as contas da Agenda entram pelo `e2e/preparo-global.ts` (único com a chave local de administração); os bloqueios são criados pelos testes, pela tela ou pela ação com a sessão da dona | o gatilho de registro (`app.registrar_mudanca`) recusa gravação sem pessoa e sem `x-acao` da lista: dado criado pela chave de administração seria recusado; criar pelas portas também prova o caminho real (ISTQB: ambiente controlado) |
+| D6 | Acesso por **chave e alcance** (ADR 0020): `agenda.ver`, `agenda.criar`, `agenda.editar`, `agenda.remover`; a matriz do código ganha 8 linhas (recepção `todos`, profissional `proprios`) e a M2 copia as mesmas no banco. **Nenhuma chave de ocupação** (E58·A). `src/domain/agenda/acesso.ts` recebe alcance e `usuarioId`, nunca papel; "próprios" = a coluna da própria pessoa, conferida na linha antiga e na nova ao alterar | ADR 0020 · D1 a D5, D7; ASVS V1.4.4, V4.1.3; o item 6a troca só a fonte, sem tocar a Agenda |
+| D7 | **(substitui a D7 anterior, "Ocupado em duas camadas")** **Sem "Ocupado"** e sem leitura de "ocupados" (nenhuma função `security definer` nova). **Só a própria coluna, em duas camadas:** (1) a política de leitura de `bloqueios` só entrega a linha a quem tem `agenda.ver` `todos`, ou `proprios` e a linha é da própria pessoa; (2) com `proprios`, o servidor só pede e só devolve a coluna da pessoa, e o teste confere que nada de outra coluna sai. A política do banco fica como **defesa**, não como recurso | E58·A; CA-13; ASVS V4.2.1 e defesa em profundidade: se só o servidor filtrasse, um erro dele mostraria a agenda das colegas. Tirar a leitura de "ocupados" remove superfície (uma função privilegiada a menos) e uma ida ao banco. "Ver ocupação" volta no item 6a com ADR próprio |
+| D8 | **Colunas pelo papel das colegas é compatível com ADR 0020 · D5**, com quatro condições: o papel da pessoa da sessão segue fora do trabalho; "é coluna" mora em um lugar só de cada lado (`ehColuna` e uma condição no banco); o papel das colegas não sai do servidor (só `id` e nome de exibição); se o item 6a separar "atende" do papel, só `ehColuna` e a condição do banco mudam | a D5 proíbe decidir **o que a pessoa pode** pelo papel dela; quem é coluna é dado do estúdio aplicado a uma regra do dono (E26·3·A). Minimização (RGPD art. 5(1)(c)) |
+| D9 | A leitura do dia é ação **`POST` com `grava: false`**; a URL da tela leva só `dia`, e a entrada vai no corpo | o molde recusa `GET` no modo `estudio` (ADR 0018 · D18); ASVS V8.3.1; RNF-04 |
+| D10 | `sessao.ler` passa a devolver `orgId` (`SessaoLida`), e a tela usa esse valor como `estudioDaTela` | o envelope do modo `estudio` exige `estudioDaTela`; é identificador, sem dado pessoal, fica no contexto da rota, nunca na URL. Alternativa descartada: ação só para buscar o estúdio (uma ida a mais por tela) |
+| D11 | O `ContextoEstudio` ganha `alcances`: o alcance de cada chave do módulo da ação, pela **mesma fonte** da porta 3 (`infra.alcanceDe`), falha fechada. `agenda.dia.ler` devolve esses alcances para a tela esconder o ⋮, o "Bloquear horário" do "+ Novo" e o menu do horário vazio | RF-11, RF-13 e ADR 0020 · D9; fonte única (ADR 0020 · D6), sem papel no trabalho (D5). Alternativa descartada: `alcancePadrao(papel, ...)` na Agenda |
+| D12 | As peças novas do `DESIGN.md` que a Agenda usa (grade, cabeçalho de coluna, cartões, linha do "agora", data em pílula) ficam em `src/app/ui/`, com teste, vitrine e `@import` no `app.css`; `src/app/paginas/agenda/` só compõe. "+ Novo" e o menu do horário vazio reusam `MenuAcoes`; o seletor de horários reusa `CampoSelecao`, salvo pedido da ficha | fonte única do design system (ADR 0004); a dívida D24 do ADR 0018 nasceu de copiar peças em páginas; reuso (`AGENTS.md` §3 regra 6) |
+| D13 | No e2e, as contas da Agenda (com nome de exibição fictício) entram pelo `e2e/preparo-global.ts`; os bloqueios são criados pelos testes, pela tela ou pela ação | o gatilho de registro recusa gravação sem pessoa e sem `x-acao` da lista; criar pelas portas também prova o caminho real (ISTQB) |
+| D14 | **Nome de exibição (E55·1·A, RF-21) mora em `public.membros.nome_exibicao`**, por vínculo pessoa × estúdio: `text null`, de 1 a 60 caracteres sem espaço nas pontas, **sem `grant update`** para `authenticated` nesta spec (o módulo Equipe acrescenta privilégio, ação e tela). Em desenvolvimento, nomes fictícios pelo preparo dos testes. Iniciais calculadas na tela. Nunca o e-mail no lugar. Forma final do Engenheiro de dados (ADR 0007) | **Por vínculo:** a mesma pessoa em dois estúdios pode ter nomes diferentes, e o isolamento vem da RLS que `membros` já tem (`ARCHITECTURE.md` §5). **Não em `auth.users`:** os metadados são mudados pela própria pessoa pela API de Auth, fora das portas, e valem para todos os estúdios (ASVS V4.1.3). **Não em tabela nova:** uma ida a mais por tela (D3), mais RLS e teste por um campo. **Sem gravação na v1:** nenhum caminho do app grava, então nenhum privilégio a mais (mínimo privilégio, ASVS V4.1.3; RGPD art. 5(1)(c)) |
+| D15 | **Hora só por seletor, em passos de 15 min, recusada no servidor fora do passo** (E54·5 trocada, RN-09, CA-15). As opções são instantes do dia do estúdio gerados por `src/domain/agenda/horarios.ts` (rótulo local por `Intl`, inclusive dias de 23 e 25 h); o servidor recebe instantes ISO com fuso e recusa com `entrada_invalida`, sem ir ao banco, o que tiver segundos, minuto fora do múltiplo de 15 ou cair fora do dia. Defesa no banco por `check` do passo, se o Engenheiro de dados decidir | Instante, não "HH:MM": no dia de 25 h a mesma hora local existe duas vezes e "HH:MM" seria ambíguo. Passo em UTC = passo local porque os deslocamentos de fuso são múltiplos de 15 min (não verificado para todos os fusos aceitos; o teste cobre os usados). Validar no servidor, não só na tela (ASVS V5.1.3) |
+| D16 | **`/` redireciona para `/agenda`** no `beforeLoad` da rota `/_app/` (RF-12, E55·2·A); `src/app/paginas/inicio.tsx` e o teste saem, e `e2e/inicio.spec.ts` prova o redirecionamento | uma tela só por endereço; a tela inicial provisória do `DESIGN.md` §8b valia "até a Agenda existir". `redirect` do TanStack Router a ler na documentação antes da construção (`AGENTS.md` §6) |
+
+## Ponto aberto · grade da v1 (E59 do dono)
+Até a resposta vale **24 h com rolagem** (spec RN-01 e Assumption 1). **E59·A** (08:00 a 20:00, que se alarga para caber
+item fora): função pura `faixaVisivel` em `grade.ts` com teste, mudança da Assumption 1 pelo Analista; seletor de
+horários, banco, servidor e tetos não mudam. **E59·B** (24 h com rolagem): nada muda. Detalhe: `plan.md` §3.2. Se vier
+A, entra aqui uma D17 com a faixa.
 
 ## Consequências
 - Texto novo de qualquer módulo entra nos três arquivos; a checagem de tipos falha se faltar um.
-- Outros módulos que precisem do dia do estúdio usam `src/domain/agenda/dia.ts`; se virar geral, muda de pasta num ADR
-  novo.
+- Outros módulos que precisem do dia do estúdio ou do seletor de horários usam `dia.ts` e `horarios.ts`; se virarem
+  gerais, mudam de pasta num ADR novo.
 - Os módulos seguintes usam `ctx.alcances` (D11) e `SessaoLida.orgId` (D10) sem mudar o contrato de novo.
-- As ideias E54·1 a E54·8 esperam o dono; onde cada uma entraria está no `plan.md` §3.3. Se aprovada, a que muda o
-  teto (E54·7) pede linha nova aqui. Pessoa que deixou de ser coluna: pendência da Equipe (spec §12); defesa: a
-  ligação sem apagar em cascata.
+- "Ver as outras" e "ver ocupação" (item 6a) pedem ADR novo: chave nova ou alcance novo (ADR 0020 · D2), política de
+  leitura e, se houver "Ocupado", uma leitura só de horários. Nada disso existe nesta spec.
+- RF-16 a RF-20 (spec seguinte) podem subir o teto da D3 (dias marcados: uma ida por mês aberto) no ADR delas.
+- O módulo Equipe acrescenta a gravação de `nome_exibicao` (D14): privilégio por coluna, ação com chave e registro.
+- Pessoa que deixou de ser coluna: pendência da Equipe (spec §12); defesa: a ligação sem apagar em cascata.
 - Para desfazer qualquer linha: ADR novo que a substitui, com o motivo.
 
 ## Não verificado
-- D10 e D11 tocam arquivos já juntados do Entrar: nada rodado; dependem dos revisores de D10/D11 (acima).
-- D7: a forma da leitura de "ocupados" no banco e o uso de `rpc(..., { get: true })` nela não foram rodados.
-- D2: o comportamento do `Intl` na meia-noite que não existe é provado só pelo teste do CA-01, ainda não escrito.
+- D10 e D11 tocam arquivos já juntados do Entrar: nada rodado; dependem dos revisores de D10/D11.
+- D2 e D15: o `Intl` na meia-noite que não existe e os rótulos do dia de 25 h são provados só pelos testes do CA-01 e
+  do CA-15, ainda não escritos; que todo fuso aceito por `estudios_conferir_fuso` tenha deslocamento múltiplo de 15 min
+  não foi conferido.
+- D14: a forma final da coluna e o efeito no `010_base_estrutura_test.sql` são do Engenheiro de dados (ADR 0007).
+- D16: a forma exata do `redirect` na versão instalada do TanStack Router não foi lida ainda.
