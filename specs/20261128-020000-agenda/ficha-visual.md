@@ -1,14 +1,15 @@
 # Ficha visual · Agenda (versão 3: respostas E54, E55, E57 e E58)
 
 - **Spec:** `spec.md` (§3, §4, RF-01 a RF-15, RF-21, RF-22, RN-03 a RN-10, CA-05, CA-13, CA-15, CA-16; respostas na
-  §16 e na §17) · **Plano:** `plan.md` (não tocado nesta versão) · **Tarefa:** P3
+  §16 e na §17) · **Tarefa:** P3
 - **Escrito por:** Designer de produto · **Norma:** WCAG 2.2, Material Design, Apple HIG · **Fonte:** só o `DESIGN.md`
   e a lista de peças novas abaixo (entram no `DESIGN.md` com o "sim" do dono)
 - **Inspiração:** referência do dono (capturas de outro sistema no celular, enviadas em 28/11; **nenhuma imagem dele
   entra no repositório** e nada foi copiado). Ideia aproveitada: o botão do meio da barra de baixo abre as opções de
   criar. Formatos de visão, escala de tempo e configuração dos cartões ficam para a spec seguinte (E57·B).
-- **Conferência:** Revisor de design: versão 2 liberada com ressalvas; **esta versão 3 ainda não foi revisada**.
-  **"Sim" do dono:** pendente (E59 e E60).
+- **Revisado por:** Revisor de design, 3ª rodada: Libera com ressalvas (corrigidas: subtítulo da folha do horário
+  vazio, linha do agora atrás dos cartões, nome no cartão estreito, "Novo agendamento" em desenvolvimento no horário
+  vazio da v1). Gerente de projeto: mensagem ao dono refeita. **"Sim" do dono:** pendente (E59 e E60·1 a E60·5).
 - **Protótipo:** HTML estático fora do repositório, com o CSS real do item 4; fonte Geist; ícones Lucide; capturas com
   Playwright (Chromium), 390 × 844 e 1440 × 900, escala 2×. Dados fictícios: equipe Ana Souza (dona), Bruna Reis,
   Carla Lima; sábado, 28 nov 2026; "agora" = 14:20.
@@ -17,23 +18,41 @@
 
 ## Mensagem ao dono (molde "Ficha visual")
 
-**E59 e E60 · Agenda, versão 3** (fala o Designer de produto · norma WCAG 2.2, Material Design, Apple HIG; o Revisor de
-design confere antes de mandar)
-- **O que é:** a Agenda com as suas respostas: "+ Novo" no lugar do "Novo agendamento", nome de exibição nas colunas, a
-  profissional só com a coluna dela, toque no horário vazio, linha do agora, bloqueio com 1 h, horário só por lista e
-  atalhos de motivo. Tela principal: `ficha/agenda-dia-dona-390.png` e `-1440.png`.
-- **E59 · Quanto da grade aparece:** **A** de 08:00 às 20:00, que se alarga sozinha quando há algo fora
-  (`agenda-dia-dona`; alargada: `agenda-grade-alarga`, com um bloqueio às 06:30) · **B** o dia inteiro (24 h), abrindo
-  rolada perto da hora atual (`alternativa-e59-b-24h`). **Recomendo A:** a manhã do dia de trabalho fica à vista ao
-  abrir, sem espaço vazio de madrugada, e nada some (o que estiver fora alarga a grade). Desfaz-se trocando uma regra
-  na tela, sem banco.
-- **E60 · O que eu decidi no desenho (confirme ou troque):** (1) "Bloquear horário" fica **dentro do "+ Novo"** e no
-  toque num horário vazio, sem botão separado e sem estar em Opções; (2) no celular, o botão preto do meio da barra de
-  baixo **vira "Novo"** e abre as mesmas opções (`agenda-novo-aberto-390`); (3) a linha do agora é **azul ardósia**, a
-  cor de "onde estou"; (4) a profissional não vê o botão "Equipe" (só há a coluna dela). **A** aceitar assim · **B**
-  trocar algo (diga qual). **Recomendo A:** uma só peça preta por tela e o mesmo caminho no computador e no celular.
-- **Desfaz-se assim:** cada item é uma linha no `DESIGN.md` e no arquivo de idioma.
-- **Responda:** os códigos, por exemplo "E59·A E60·A".
+**E59 e E60 · Agenda, versão 3** (fala o Designer de produto · norma WCAG 2.2, Material Design e Apple HIG; revisada pelo
+Revisor de design, 3ª rodada)
+- **O que é:** a Agenda com as suas respostas: botão "Novo" no lugar do "Novo agendamento", nome de exibição nas
+  colunas, a profissional só com a coluna dela, toque no horário vazio, linha da hora atual, bloqueio que nasce com
+  1 h, horário escolhido numa lista (sem digitar) e atalhos de motivo.
+  **Antes:** [celular](https://github.com/alexandrergomes1/crm-citas/blob/feat/agenda/specs/20261128-020000-agenda/ficha/inicio-antes-390.png) · [computador](https://github.com/alexandrergomes1/crm-citas/blob/feat/agenda/specs/20261128-020000-agenda/ficha/inicio-antes-1440.png).
+  **Depois:** [celular](https://github.com/alexandrergomes1/crm-citas/blob/feat/agenda/specs/20261128-020000-agenda/ficha/agenda-dia-dona-390.png) · [computador](https://github.com/alexandrergomes1/crm-citas/blob/feat/agenda/specs/20261128-020000-agenda/ficha/agenda-dia-dona-1440.png).
+- **E59 · Quanto da grade aparece ao abrir.** Não é o horário de funcionamento (esse fica para a spec seguinte,
+  E57·B): é só a faixa de horas que a tela mostra, e vale até a spec "visões e horário de funcionamento".
+  **A** de 08:00 às 20:00, alargando sozinha quando há algo fora ([dia](https://github.com/alexandrergomes1/crm-citas/blob/feat/agenda/specs/20261128-020000-agenda/ficha/agenda-dia-dona-390.png) ·
+  [alargada com um bloqueio às 06:30](https://github.com/alexandrergomes1/crm-citas/blob/feat/agenda/specs/20261128-020000-agenda/ficha/agenda-grade-alarga-390.png)) · **B** o dia inteiro, 24 h, aberto na hora
+  atual; é o que a spec diz hoje ([celular](https://github.com/alexandrergomes1/crm-citas/blob/feat/agenda/specs/20261128-020000-agenda/ficha/alternativa-e59-b-24h-390.png) ·
+  [computador](https://github.com/alexandrergomes1/crm-citas/blob/feat/agenda/specs/20261128-020000-agenda/ficha/alternativa-e59-b-24h-1440.png)). **Recomendo A:** atende o seu "não ficar 24 h aberto ocupando
+  espaço", e nada some, porque o que está fora alarga a grade.
+- **E60·1 · Onde se cria o bloqueio.** **A** dentro do "Novo" e tocando num horário vazio, fora de Opções
+  ([Novo aberto](https://github.com/alexandrergomes1/crm-citas/blob/feat/agenda/specs/20261128-020000-agenda/ficha/agenda-novo-aberto-1440.png) · [horário vazio](https://github.com/alexandrergomes1/crm-citas/blob/feat/agenda/specs/20261128-020000-agenda/ficha/agenda-horario-vazio-1440.png)) · **B** também
+  num botão próprio ao lado. **Recomendo A:** só um botão preto por tela, sem dois botões disputando o olho.
+- **E60·2 · O botão preto do meio da barra do celular.** **A** "Agendar" vira "Novo" e abre as mesmas opções do
+  computador; **a mudança vale para a barra de todo o app** ([antes](https://github.com/alexandrergomes1/crm-citas/blob/feat/agenda/specs/20261128-020000-agenda/ficha/barra-celular-antes-390.png) ·
+  [depois](https://github.com/alexandrergomes1/crm-citas/blob/feat/agenda/specs/20261128-020000-agenda/ficha/barra-celular-depois-390.png) · [aberto](https://github.com/alexandrergomes1/crm-citas/blob/feat/agenda/specs/20261128-020000-agenda/ficha/agenda-novo-aberto-390.png)) · **B** fica "Agendar" e o
+  bloqueio no celular só sai tocando num horário vazio. **Recomendo A:** o mesmo caminho no celular e no computador.
+  Custo: marcar no celular ganha um toque (Novo › Novo agendamento).
+- **E60·3 · Cor da linha da hora atual.** **A** azul ardósia, a cor de "onde estou" ([ver](https://github.com/alexandrergomes1/crm-citas/blob/feat/agenda/specs/20261128-020000-agenda/ficha/agenda-dia-dona-1440.png))
+  · **B** preta. **Recomendo A:** o preto é a cor da ação, e o vermelho é erro.
+- **E60·4 · Botão "Equipe" para a profissional.** **A** some, porque ela só tem a coluna dela
+  ([ver](https://github.com/alexandrergomes1/crm-citas/blob/feat/agenda/specs/20261128-020000-agenda/ficha/agenda-dia-profissional-390.png)) · **B** aparece apagado. **Recomendo A:** botão sem escolha só confunde.
+- **E60·5 · Nome do botão que cria com opções.** Hoje o `DESIGN.md` manda "Adicionar ▾" e proíbe "Novo".
+  **A** "Novo ▾" só na Agenda e "Novo" na barra do celular de todo o app; "Adicionar ▾" continua no resto (risco: dois
+  nomes para a mesma coisa, e numa tela de Clientes aparecem "Novo" na barra e "Adicionar" no topo) · **B** "Novo ▾"
+  vira o nome de todo botão que cria com opções, em todo o app (o Financeiro passa de "Adicionar ▾" a "Novo ▾");
+  "Adicionar" fica só para criar o item da lista · **C** "Adicionar ▾" também na Agenda e "Adicionar" na barra (vai
+  contra o "+novo" que o senhor pediu). **Recomendo B:** uma regra só para todo o app ("Novo" abre opções; "Adicionar"
+  cria um item) e o nome que o senhor pediu.
+- **Desfaz-se assim:** cada escolha é uma linha no `DESIGN.md` e no arquivo de idioma; nada muda no banco.
+- **Responda:** os códigos, por exemplo "E59·A E60·1·A E60·2·A E60·3·A E60·4·A E60·5·B".
 
 ---
 
@@ -45,10 +64,11 @@ design confere antes de mandar)
 
 | Depois · estado | Celular (390) | Computador (1440) |
 |---|---|---|
+| Barra de baixo do celular, antes ("Agendar") × depois ("Novo"; vale em todo o app) | ![](ficha/barra-celular-antes-390.png) ![](ficha/barra-celular-depois-390.png) | — |
 | Dia, dona ou recepção (todas as colunas; linha do agora às 14:20; grade E59·A) | ![](ficha/agenda-dia-dona-390.png) | ![](ficha/agenda-dia-dona-1440.png) |
 | Dia, profissional (só a própria coluna; sem "Equipe"; E58·A) | ![](ficha/agenda-dia-profissional-390.png) | ![](ficha/agenda-dia-profissional-1440.png) |
 | "+ Novo" aberto, na v1 ("Novo agendamento" em desenvolvimento; "Bloquear horário" funciona) | ![](ficha/agenda-novo-aberto-390.png) | ![](ficha/agenda-novo-aberto-1440.png) |
-| Toque num horário vazio (marca 1 h e abre o menu com a hora e a pessoa; E54·1) | ![](ficha/agenda-horario-vazio-390.png) | ![](ficha/agenda-horario-vazio-1440.png) |
+| Toque num horário vazio, na v1 (marca 1 h e abre o menu com a hora e a pessoa; "Novo agendamento" em desenvolvimento; E54·1) | ![](ficha/agenda-horario-vazio-390.png) | ![](ficha/agenda-horario-vazio-1440.png) |
 | E59·A, grade alargada (bloqueio às 06:30 abre a grade às 06:00) | ![](ficha/agenda-grade-alarga-390.png) | ![](ficha/agenda-grade-alarga-1440.png) |
 | Celular, pior caso: 3 itens que se cruzam e itens de 15 e de 5 min | ![](ficha/agenda-celular-pior-caso-390.png) | ![](ficha/agenda-celular-pior-caso-1440.png) |
 | Dia na v1, antes do Agendamento (só bloqueios) | ![](ficha/agenda-dia-v1-sem-agendamento-390.png) | ![](ficha/agenda-dia-v1-sem-agendamento-1440.png) |
@@ -95,11 +115,13 @@ própria coluna, e a frase "Os filtros valem só para a sua coluna." deixou de t
    no toque do horário vazio, escondido (Nielsen 6, reconhecer em vez de lembrar). **Custo:** marcar um agendamento no
    celular passa a ter um toque a mais (Novo › Novo agendamento). A barra de baixo é a mesma em todo o app; nas telas de
    outros módulos o "Novo" abre a mesma folha (o que mais entrar nela vem com pedido do dono, RF-08).
-3. **Nome "Novo" com ▾.** O dono pediu "+ Novo"; o `DESIGN.md` §6 chama de "Adicionar ▾" o botão que cria mais de um
-   tipo. Vale a ordem do dono só na Agenda; o ▾ (e `aria-haspopup="menu"`) diz que abre opções, como em "Opções ▾". O
-   §6 ganha a linha "Novo ▾ · Agenda (computador) e botão do meio (celular)" e "Novo agendamento" passa a ser item do
-   menu. **Risco registrado:** dois nomes para "criar com opções" (Novo ▾ na Agenda, Adicionar ▾ no Financeiro).
-4. **Linha do agora em `--id` (azul ardósia).** 2 px na largura das colunas, por cima dos cartões, sem receber toque;
+3. **Nome do botão (vai ao dono, E60·5).** O dono pediu "+ Novo"; o `DESIGN.md` §6 manda "Adicionar ▾" para o botão
+   que cria mais de um tipo e põe "Novo" em "Nunca escrever", e o "Novo" da barra do celular vale para todo o app.
+   **Recomendo E60·5·B:** "Novo ▾" para todo botão que abre opções de criar, em todo o app (Financeiro inclusive), e
+   "Adicionar" só para criar o item da lista: uma regra só (Nielsen 4) e o nome que o dono pediu. O ▾ (e
+   `aria-haspopup="menu"`) diz que abre opções, como em "Opções ▾"; "Novo agendamento" passa a ser item do menu. Nas
+   imagens está "Novo ▾", que serve à A e à B.
+4. **Linha do agora em `--id` (azul ardósia).** 2 px na largura das colunas, **atrás dos cartões** (passa só no espaço vazio e nunca encosta no texto), sem receber toque;
    na coluna das horas, a hora em pílula `--id` com texto branco 11 forte ("14:20"); o leitor de tela ouve "Agora,
    14:20". Só aparece quando o dia à vista é hoje; anda a cada minuto, sem animação. **Motivo:** o `--id` é "onde
    estou", e a linha diz onde se está no tempo; vermelho é erro, preto é ação (`DESIGN.md` §3). Contraste: branco sobre
@@ -151,7 +173,8 @@ própria coluna, e a frase "Os filtros valem só para a sua coluna." deixou de t
 - **Altura mínima e toque (WCAG 2.5.8):** 64 px por hora; o cartão nunca fica abaixo de 44 (celular) e 40
   (computador); quando a altura mínima cobre o seguinte, ficam lado a lado (RN-05); no máximo 3 lado a lado, e com 4 ou
   mais o 3º lugar vira o "+N" que abre a lista do horário.
-- **Cartão estreito:** status só com o ícone (nome no leitor); nome e horário com reticências.
+- **Cartão estreito:** status só com o ícone (nome no leitor); nome e horário com reticências. Cartão estreito de uma
+  linha mostra o **nome** (não a hora: a posição na grade já diz a hora, e o leitor lê "10:30 até 11:00").
 - **Conteúdo do cartão sozinho:** 1 h ou mais: nome, "início–fim · serviço" e status com ícone e palavra; 45 min: nome e
   ícone, e a hora com o serviço; menos de 45 min: "hora + nome" e o ícone.
 - **Teclado (RNF-03):** cada coluna é um grupo com o nome da pessoa; Tab percorre os cartões por coluna e por hora e
@@ -201,19 +224,19 @@ desenvolvimento" (leitor) · "A busca na Agenda está em desenvolvimento." · Os
 (Bloqueio, Bloqueio de horário, Profissional, Data, Início, Fim, Motivo, "Exemplo: almoço", Bloqueio salvo, Bloqueio
 excluído, "Excluir este bloqueio?", Exportar, Imprimir, Modo de ver, Equipe, Status, Bloqueios, Mostrar N itens,
 estados e erros). **Saíram:** Ocupado, "Ocupado, HH:MM a HH:MM", "Os filtros valem só para a sua coluna.", e "Agendar"
-no celular (se a E60 for aceita). Nenhum texto diz "estúdio" (E47).
+no celular (se a E60·2·A for aceita). Nenhum texto diz "estúdio" (E47).
 
 ## Para outros papéis (não toco nos arquivos deles)
-- **Analista de requisitos:** a spec §4 ainda diz "Agendar" e "peça preta no meio"; com a E60·A, vira "Novo". A §13
+- **Analista de requisitos:** a spec §4 ainda diz "Agendar" e "peça preta no meio"; com a E60·2·A, vira "Novo". A §13
   Assumption 1 (24 h) depende da E59.
 - **Arquiteto de software:** sai do plano a frase da versão 2 sobre filtrar Ausência e Cancelado no "Ocupado" (o
   "Ocupado" saiu pela E58·A). A grade da E59·A precisa saber o primeiro e o último item do dia, que a leitura do dia já
   traz (nada novo no banco).
-- **Gerente de projeto:** códigos E59 (dado pelo Gerente) e E60 (livre na `feat/agenda` em 28/11; conferir colisão).
+- **Gerente de projeto:** códigos E59 e E60·1 a E60·5 (E61 e E62 evitados).
 
 ## Não verificado
-- **Revisor de design:** a versão 3 não foi revisada.
-- **Acessibilidade:** o axe (wcag2a, wcag2aa, wcag21a, wcag21aa, wcag22aa) deu 0 violações nas 55 capturas do
+- **Revisor de design:** as 3 correções de imagem da 3ª rodada não foram reconferidas por ele.
+- **Acessibilidade:** o axe (wcag2a, wcag2aa, wcag21a, wcag21aa, wcag22aa) deu 0 violações nas 57 capturas do
   protótipo; não vale para o app real. Não testei com leitor de tela, nem a ordem do Tab, nem o ponto "horário vazio"
   com setas, nem zoom de 200 % na rolagem lateral (WCAG 1.4.10). No protótipo, o Fim fechado aponta `aria-controls`
   para uma lista que não existe na página (só a do Início foi desenhada aberta).
