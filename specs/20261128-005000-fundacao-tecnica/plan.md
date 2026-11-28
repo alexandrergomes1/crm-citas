@@ -71,16 +71,26 @@ e relatar.
 
 **Spec Kit (Engenheiro de DevOps)**: `.specify/**` (criado por `specify init`); `.claude/skills/speckit-*/SKILL.md`
 (9 pastas **novas**: analyze, checklist, clarify, constitution, converge, implement, plan, specify, tasks). As 4 skills e
-os 14 papéis existentes em `.claude/` **não mudam**. `.claude/settings.json` **não** pode ser criado.
+os 14 papéis existentes em `.claude/` **não mudam**. O `specify init` não pode criar `.claude/settings.json` (só a
+trava T5 do §13 o cria).
+
+**Travas do antigo (R17; Engenheiro de DevOps; só o que a decisão final de cada trava, no ADR 0003, mandar):**
+`.claude/settings.json` (só `hooks` e `permissions.deny`), `.claude/hooks/TRAVAS.md`, `.claude/hooks/guarda.mjs`,
+`.claude/hooks/guarda.test.mjs`, `.claude/hooks/regras-de-envio.mjs`, `.claude/hooks/decisao-com-prova.mjs`,
+`.claude/hooks/decisao-com-prova.test.mjs`, `.claude/hooks/inicio-de-sessao.mjs`,
+`.claude/hooks/inicio-de-sessao.test.mjs`, `.githooks/pre-push`, `.githooks/pre-push.mjs`, `.githooks/pre-push.test.mjs`,
+`.github/pull_request_template.md`, o job `travas` no `.github/workflows/ci.yml`, a chave `groups` no
+`.github/dependabot.yml`, e `docs/adr/0003-travas-do-projeto-antigo.md`.
 
 **Texto (Documentador)**: `AGENTS.md` §1, só o parágrafo "Comandos" (§6 deste plano); `docs/guias/processo-sdd.md` §5,
-só a linha dos nomes dos comandos (§7 deste plano); `docs/STATUS.md`, `docs/BACKLOG.md`, `CHANGELOG.md` (R16);
-`docs/decisoes/` (fala de 28/11 sobre repositório público e aprovação do R15).
+só a linha dos nomes dos comandos (§7 deste plano); `README.md`, só a seção "Como rodar" (R16 e CA13: os mesmos
+comandos do §5); `docs/STATUS.md`, `docs/BACKLOG.md`, `CHANGELOG.md` (R16); `docs/decisoes/` (fala de 28/11 sobre
+repositório público e aprovação do R15).
 
 **Processo**: `specs/20261128-005000-fundacao-tecnica/{spec.md,plan.md,tasks.md}`;
 `docs/adr/0002-fundacao-tecnica-ferramentas-e-versoes.md`.
 
-Fora: `README.md` (a seção "Como rodar" fica desatualizada; ver §10 R-11), `SECURITY.md` (D1, fora da spec),
+Fora: `SECURITY.md` (D1, fora da spec), `.claude/rules/`, `.cursor/`, `scripts/` (ver §13),
 `ARCHITECTURE.md`, `DESIGN.md`, `CONTRIBUTING.md`, qualquer configuração do repositório no GitHub.
 
 ## 4. Estrutura das camadas no código
@@ -165,6 +175,7 @@ roda a checagem de tipos, o lint e os testes." pelo texto abaixo; o resto do par
 | `verificar` | checkout → pnpm/action-setup → setup-node (`node-version-file: .nvmrc`, `cache: pnpm`) → `pnpm install --frozen-lockfile` → `pnpm typecheck` → `pnpm lint` → `pnpm test` → `pnpm build` | CA1, CA3, CA4 (automático), CA5 |
 | `telas` | o mesmo preparo → `pnpm exec playwright install --with-deps chromium` → `pnpm test:e2e`; relatório enviado como artefato **só se falhar**, `retention-days: 7` | CA2 |
 | `banco` | o mesmo preparo → `pnpm db:start` → `pnpm db:test` → `pnpm db:stop` (sempre) | CA6 |
+| `travas` (só se T1 a T7 do §13 entrarem) | checkout → setup-node → `node` nos testes de cada trava trazida → JSON do `.claude/settings.json` válido | R17 |
 | `segredos` | checkout com `fetch-depth: 0` → `docker run --rm -v "$GITHUB_WORKSPACE:/repo" <imagem do §2> git --redact --verbose /repo` (código de saída 1 se achar) | CA8, CA12 |
 
 - **gitleaks pela linha de comando (imagem oficial), não pela gitleaks-action.** A ação não pede licença em conta pessoal
@@ -213,7 +224,7 @@ de versão; as de segurança são um botão das configurações do repositório 
 
 **D3 · Proteção de branch.** Sem regra, a CI vermelha não impede o merge. Regras (rulesets) são grátis em repositório
 público. Proposta para o pedido separado, com cliques exatos montados pelo Engenheiro de DevOps:
-- D3·A: ruleset em `previas` e `main`: exigir PR; exigir os checks `verificar`, `telas`, `banco` e `segredos`, com a
+- D3·A: ruleset em `previas` e `main`: exigir PR; exigir os checks `verificar`, `telas`, `banco`, `segredos` (e `travas`, se entrar), com a
   branch atualizada; bloquear force push e apagar; ninguém na lista de exceção; **0 aprovações exigidas** (o dono é a
   única pessoa, e o autor não aprova o próprio PR: a revisão continua sendo a dos papéis e a autorização no chat). Junto:
   em Settings → Actions, "Require approval for all external contributors" para PR de fork, e permissão padrão do token
@@ -225,12 +236,12 @@ público. Proposta para o pedido separado, com cliques exatos montados pelo Enge
 **Outros riscos técnicos**
 - R-1 · TypeScript 7 incompatível com o typescript-eslint: fica o 6.0.3 até o typescript-eslint aceitar o 7 (Dependabot vai
   propor; o revisor recusa enquanto o par não fechar).
-- R-2 · **CA11 não é atingível como escrito:** o Spec Kit oficial não "propõe branch `tipo/area-assunto`" (§7). Recomendo
-  ao Analista de requisitos reescrever o CA11: "cria a pasta `specs/AAAAMMDD-HHMMSS-nome/` e não cria branch; a branch
-  segue a etapa 2". É técnico e não muda o que o dono vê; o `processo-sdd.md` §5 ganha a frase do §7.
-- R-3 · A máquina local tem Node 22; o projeto pede 26. Instalar 26.13.1 do `nodejs.org` antes da tarefa 2. O Node 25+
-  não traz mais o Corepack (fonte não lida nesta sessão: **não verificado**), por isso o pnpm vem pela ação
-  `pnpm/action-setup` na CI e por instalação direta na máquina.
+- R-2 · (resolvido em 28/11) o CA11 foi reescrito pelo Analista: o Spec Kit cria a pasta com data e hora e não cria
+  branch; a branch segue a etapa 2.
+- R-3 · Node 26.13.1 já está na máquina em `/home/user/tools/node-v26.13.1-linux-x64/bin` (conferido por SHA-256,
+  informado pelo coordenador em 28/11/2026): pôr essa pasta à frente no `PATH` antes da tarefa 2. O Node 25+ não traz
+  mais o Corepack (fonte não lida nesta sessão: **não verificado**), por isso o pnpm vem pela ação `pnpm/action-setup`
+  na CI e por instalação direta na máquina.
 - R-4 · pnpm 12 recusa versão com menos de 1 dia (`minimumReleaseAge` padrão 1440 min) e para a instalação se um pacote
   tiver script de instalação não aprovado (`strictDepBuilds` padrão `true`) (`https://pnpm.io/settings/dependency-resolution`,
   `https://pnpm.io/settings/build`). Mantém-se o padrão (protege a cadeia de fornecimento); exceção só com o Eng. de segurança.
@@ -247,8 +258,7 @@ público. Proposta para o pedido separado, com cliques exatos montados pelo Enge
   Cloudflare (E23·2). A troca entra nela.
 - R-10 · Telemetria do Supabase CLI: a página oficial de telemetria deu 404 em 27/11/2026; desligar só depois de ler a
   forma certa (tarefa 7).
-- R-11 · `README.md` "Como rodar" diz que não há código; a spec não o lista. Recomendo ao Analista incluir o `README.md`
-  no R16 (Documentador) ou deixar para o próximo PR de texto.
+- R-11 · (resolvido em 28/11) o `README.md` "Como rodar" entrou no R16 e no CA13 da spec.
 
 ## 11. Como provar cada critério de aceite
 
@@ -260,13 +270,14 @@ público. Proposta para o pedido separado, com cliques exatos montados pelo Enge
 | CA4 | automático: `eslint.camadas.test.ts`; manual: o QA cria `src/domain/proibido.ts` importando `@/data/x`, vê `pnpm lint` falhar, apaga, vê passar; registra no veredito | QA |
 | CA5 | passos `typecheck` e `lint` do job `verificar` | QA |
 | CA6 | job `banco` verde e a mesma sequência na máquina (`db:start`, `db:test`, `db:stop`) | Engenheiro de dados; QA confere |
-| CA7 | PR para `previas` dispara os 4 jobs sozinho e todos ficam verdes | QA, link |
+| CA7 | PR para `previas` dispara os jobs sozinho (os 4 do §8 e o `travas`, se alguma trava for trazida) e todos ficam verdes | QA, link |
 | CA8 | branch descartável com um token **falso** num arquivo; job `segredos` vermelho com o achado mascarado; branch apagada depois | QA com o Engenheiro de segurança |
 | CA9 | aba Insights → Dependency graph → Dependabot sem erro de configuração | DevOps mostra; QA confere |
 | CA10 | §9 deste plano | Analista de requisitos |
 | CA11 | `git diff --stat` só com `.specify/**` e `.claude/skills/speckit-*`; criar spec de teste, conferir pasta com data e hora, apagar; constituição com uma linha | QA |
 | CA12 | `git diff --name-only previas...HEAD` comparado com o §3; job `segredos` verde | Revisor de código, Auditor de risco |
-| CA13 | §5 igual ao `package.json`; `AGENTS.md` §1 e `processo-sdd.md` §5 iguais ao §6 e §7 | outro papel que não o Documentador (Analista de requisitos) |
+| CA13 | §5 igual ao `package.json`; `AGENTS.md` §1 e `processo-sdd.md` §5 iguais ao §6 e §7; "Como rodar" do `README.md` com os mesmos comandos do §5 | outro papel que não o Documentador (Analista de requisitos) |
+| R17 | cada trava do §13 com a decisão final no ADR 0003, conferida por outro papel; teste próprio verde no job `travas` | Engenheiro de DevOps decide; Engenheiro de segurança e Auditor de risco conferem |
 
 ## 12. Não verificado (nesta etapa)
 - Nada foi construído nem rodado no projeto; só o `specify init` numa pasta vazia de rascunho.
@@ -278,3 +289,36 @@ público. Proposta para o pedido separado, com cliques exatos montados pelo Enge
   `react-dom/server`); se o `routeTree.gen.ts` gerado fica igual entre máquinas.
 - Se as "Dependabot security updates" já vêm ligadas neste repositório público (afeta o D2 enquanto o dono não decide).
 - Se o arquivo do Dependabot precisa estar na branch padrão para valer (afeta quando o CA9 aparece; com D2·A some).
+- Travas do antigo (§13): li o cabeçalho, o `TRAVAS.md` e os trechos principais; não li linha a linha os 620 da
+  `guarda.mjs` nem rodei nenhum teste do antigo. Se o Cursor lê o `AGENTS.md` sozinho (base da sugestão T10).
+
+## 13. Travas automáticas do projeto antigo (R17; E22·B)
+Lido só para listar, em 28/11/2026, em `/home/user/crm-agenda` (só leitura): `.githooks/`, `.github/`, `.claude/settings.json`,
+`.claude/hooks/` (com o `TRAVAS.md`), `.claude/rules/`, `.cursor/`, `scripts/` e os scripts do `package.json`. **Nada foi
+copiado.** A coluna "Sugestão" é do Arquiteto; a **decisão final** é do Engenheiro de DevOps (CI e ganchos) ou do papel da
+área ao construir, no `docs/adr/0003-travas-do-projeto-antigo.md`, conferida por outro papel (E16·1). "Reescrever" =
+mesma intenção, código novo, apontando para as regras **deste** projeto (`AGENTS.md`, `processo-sdd.md`), com teste.
+
+| # | Trava (antigo) | O que faz, em uma linha | Sugestão e motivo (norma) |
+|---|---|---|---|
+| T1 | `.claude/hooks/guarda.mjs` (+ teste) | antes de cada ação do Claude, barra merge sem autorização gravada, envio direto a `previas`/`main`, envio forçado, publicar, banco remoto, ler/gravar `.env`, mexer em workflow sem spec aprovada | **Reescrever**: a intenção é o `AGENTS.md` §1, §6 e §8, mas o antigo cita caminhos, rótulo `aguardando-merge`, métodos de merge e a exceção "CI sem minutos" que aqui não existem (repositório público). Defesa em profundidade (OWASP ASVS V1.1; ISO 31000, tratar o risco na origem); mais curto, com teste |
+| T2 | `.claude/hooks/regras-de-envio.mjs` | lista das branches protegidas e o padrão `tipo/area-assunto` | **Copiar e conferir**: 13 linhas, regra igual ao `AGENTS.md` §8 |
+| T3 | `.claude/hooks/decisao-com-prova.mjs` (+ teste; roda na CI) | spec "Approved" exige "Aprovação do dono" com fala literal, data e link; "Aprovação do merge" com SHA; decisão gravada não se reescreve | **Reescrever**: regra igual ao `AGENTS.md` §3 regra 1 e §8, mas o formato de `docs/decisoes/` aqui é uma tabela, não um arquivo por decisão |
+| T4 | `.claude/hooks/inicio-de-sessao.mjs` (+ teste) | no começo da conversa mostra branch, commit, próxima tarefa da fila e PRs esperando o dono | **Reescrever** enxuto: ajuda a não escolher tarefa (`AGENTS.md` §5), mas lê `docs/OWNER.md` e rótulos que aqui não existem; lê só `docs/BACKLOG.md` e `docs/STATUS.md` |
+| T5 | `.claude/settings.json` | liga T1 e T4 como ganchos; nega skills e agentes de mercado que duplicam o fluxo; lista de permissões e de plugins | **Reescrever**: só `hooks` e `permissions.deny` (lista refeita para as skills de hoje). **Descartar** `enabledPlugins` (é da máquina do dono, não do projeto) e a lista `allow` (menor privilégio, ASVS V1.4). Revisão do Engenheiro de segurança obrigatória |
+| T6 | `.githooks/pre-push` (+ `.mjs` e teste) | as mesmas regras de envio de T2 para Cursor, Codex e pessoas; vale só onde se liga `core.hooksPath` | **Copiar e conferir**: depende só de T2; regra do `AGENTS.md` §8 vale para qualquer ferramenta |
+| T7 | `.github/workflows/base.yml` | roda na CI os testes de T1 a T6 e confere o JSON do `settings.json` | **Reescrever** como job `travas` do nosso `ci.yml`, com as ações fixadas por commit (§2) |
+| T8 | `scripts/conferir-pedido.mjs` (+ teste) | antes de planejar ou construir: no máximo 3 PRs abertos, nada de dois PRs nos mesmos arquivos, nome de branch, spec aprovada | **Descartar**: rodava de dentro das skills, que aqui não mudam (R9); nome de branch fica em T2/T6 e spec aprovada em T3. O limite de 3 PRs é regra nova, que só o dono cria |
+| T9 | `.github/workflows/seguranca.yml` | gitleaks pela `gitleaks-action@v2` | **Descartar**: já coberto pelo job `segredos` (ADR 0002 · D5); a v2 para de funcionar em 16/09/2026 (README oficial da ação) |
+| T10 | `.github/dependabot.yml` | mensal, para a `previas`, junta menores e correções num PR só, no máximo 2 abertos | **Reescrever em parte**: trazer só `groups` (menos PRs); manter semanal (Assumption 7 da spec) |
+| T11 | `.github/workflows/ci.yml` e `e2e.yml` | checagens do app, teste de tela, `wrangler deploy --dry-run` | **Descartar**: substituídos pelo §8; usam ações sem fixar commit e Cloudflare (fora de escopo) |
+| T12 | `.github/pull_request_template.md` | molde do PR no formato do pedido de merge | **Reescrever** apontando para `docs/moldes/pergunta.md` (fonte única); não é trava, mas evita PR sem prova |
+| T13 | `.claude/rules/*.md` e `.cursor/rules/*.mdc` | regras por pasta (banco, servidor, tela) para Claude e Cursor | **Descartar**: duplicam os `src/*/AGENTS.md` (E15) e citam pastas do antigo; duas fontes da mesma regra divergem |
+| T14 | `migrations-dev.yml`, `scripts/db/apply-dev.sh`, `apply-migrations.sh` | aplica migrations no banco remoto de desenvolvimento pela CI | **Descartar agora**: banco remoto está fora desta spec; candidato do item 3 |
+| T15 | `backup-diario.yml`, `teste-restauracao.yml` | cópia cifrada do banco em R2 e B2 e teste mensal de restauração (desligados) | **Descartar agora**: usam segredos e banco remoto; candidatos da spec de recuperação (`ARCHITECTURE.md` §9) |
+| T16 | `scripts/db/replay-migrations.sh`, `schema-fingerprint.sql`, `diff-fingerprint.py`, `migration-order.txt`, `gen-types.sh`; scripts `db:verify` e `db:types` | refaz as migrations num Postgres puro, compara o esquema e gera os tipos | **Descartar agora**: aqui o teste é `supabase test db` (ADR 0002 · D10) e não há tabela; candidatos do item 3 |
+| T17 | `.gitleaks.toml` | regras padrão do gitleaks e exceção para a chave pública do Supabase | **Descartar agora**: não há chave no repositório; exceção a mais em repositório público só quando a chave existir (spec da Cloudflare) |
+| T18 | scripts do `package.json` (`lint --max-warnings=0`, `typecheck`, `test`, `test:e2e`) | checagens antes de enviar | **Já coberto** pelo §5 (mesmos nomes) |
+
+Ligar o `.githooks` na máquina (`git config core.hooksPath .githooks`) é configuração local, não arquivo: fica no
+"Como rodar" do `README.md` se T6 entrar.
