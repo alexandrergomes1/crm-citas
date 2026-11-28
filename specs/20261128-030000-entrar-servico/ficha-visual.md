@@ -2,15 +2,15 @@
 
 - **Spec:** `spec.md` (RF-30 a RF-33) · **Plano:** `plan.md` §7 e L-4 · **Tarefa:** P3 do `tasks.md`
 - **Escrito por:** Designer de produto · **Norma:** WCAG 2.2, Material Design, Apple HIG · **Fonte:** só o `DESIGN.md`
-- **Conferência:** Revisor de design (P4), **pendente** — esta ficha ainda não vai ao dono antes disso.
+- **Conferência:** Revisor de design (P4), 1ª rodada: aprovada com ressalvas; 2ª rodada (abaixo) **aguarda nova conferência**.
 - **Protótipo:** HTML estático fora do repositório, com o `tokens.css`, o `base.css` e o CSS das peças do item 4
   (`botao`, `campos`, `bloco-lista`, `conteudo`); fonte Geist; ícones Lucide. Capturas com Playwright (Chromium),
   escala 2×. Dados fictícios: `pessoa@exemplo.com`, "Estúdio Aurora", "Estúdio Lírio".
 
 ---
 
-**E41 · Telas Entrar e Escolher estúdio** (fala o Designer de produto · norma WCAG 2.2; conferência do Revisor de
-design pendente)
+**E41 · Telas Entrar e Escolher estúdio** (fala o Designer de produto · norma WCAG 2.2; 1ª rodada conferida pelo
+Revisor de design com ressalvas; 2ª rodada aguarda conferência)
 
 **Antes:** as duas telas não existem (são novas); não há imagem de antes.
 
@@ -22,6 +22,31 @@ design pendente)
 | Entrar · erro genérico | ![](ficha/entrar-erro-390.png) | ![](ficha/entrar-erro-1440.png) |
 | Entrar · carregando | ![](ficha/entrar-carregando-390.png) | ![](ficha/entrar-carregando-1440.png) |
 | Escolher estúdio · 2 estúdios | ![](ficha/escolher-estudio-390.png) | ![](ficha/escolher-estudio-1440.png) |
+| Entrar · senha mostrada (`eye-off`, "Esconder senha") | ![](ficha/entrar-senha-mostrada-390.png) | ![](ficha/entrar-senha-mostrada-1440.png) |
+| Entrar · foco no campo Senha depois do erro (anel 2 px) | ![](ficha/entrar-foco-390.png) | ![](ficha/entrar-foco-1440.png) |
+| Escolher estúdio · carregando | ![](ficha/escolher-estudio-carregando-390.png) | ![](ficha/escolher-estudio-carregando-1440.png) |
+| Escolher estúdio · erro ("Tentar de novo") | ![](ficha/escolher-estudio-erro-390.png) | ![](ficha/escolher-estudio-erro-1440.png) |
+| Sua conta · com "Trocar de estúdio" (folha no celular, menu no computador; inicial "P" na bolinha) | ![](ficha/sua-conta-com-troca-390.png) | ![](ficha/sua-conta-com-troca-1440.png) |
+| Sua conta · sem "Trocar de estúdio" (um estúdio só) | ![](ficha/sua-conta-sem-troca-390.png) | ![](ficha/sua-conta-sem-troca-1440.png) |
+
+As 8 primeiras são da 1ª rodada; as 12 seguintes, da 2ª (pedido do Revisor de design).
+
+**Comportamento (para quem constrói e para o e2e):**
+- **Depois do erro:** o foco vai para o campo Senha, que fica limpo; o e-mail continua escrito. A frase de erro é
+  anunciada (`role="alert"`).
+- **Carregando ao entrar:** o botão usa `aria-disabled="true"` e `aria-busy="true"` (não `disabled`, para não perder o
+  foco nem sumir do leitor) e o texto "Entrando…" também vai a uma área de anúncio (`role="status"`). O botão do olho
+  trava junto (`aria-disabled`); os campos ficam só leitura. As imagens de "carregando" da 1ª rodada foram feitas com
+  `disabled`; o desenho é o mesmo (60 %), só o atributo muda.
+- **Limite de tentativas (CA-14):** a mesma frase genérica de E41·1 e o mesmo desenho do "erro genérico"; não há tela
+  nem texto próprio, para não dizer o motivo.
+- **Escolher estúdio:** o nome acessível de cada linha é o nome do estúdio ("Estúdio Aurora"); o quadrado da inicial e
+  a seta › são enfeite (`aria-hidden`). Carregando: linhas cinza do §8 (depois de 0,3 s), anunciadas como
+  "Carregando estúdios". Erro: estado de erro do §8 ("Não foi possível carregar", "Tentar de novo"), com "Sair" embaixo.
+- **Sua conta:** itens na ordem do §8b; Minha conta, Preferências e Meu faturamento esmaecidos com "em
+  desenvolvimento" ao lado (celular) ou embaixo (computador, porque 240 não cabe numa linha), com `aria-disabled`;
+  "Trocar de estúdio" só com mais de um estúdio. Bolinha com a inicial "P" = primeira letra do e-mail da própria
+  pessoa (proposta do `plan.md` L-4; entra em E41·1 junto dos nomes).
 
 **O que já segue o `DESIGN.md` sem decisão nova:** fundo `--page` e bloco branco canto 20 (§2: nenhum controle direto
 sobre o fundo) · título 20 forte · campos em pílula, 44, rótulo acima em `--ink2`, contorno `--field` (§4, §8, §8b) ·
@@ -34,7 +59,7 @@ Botão **Entrar** · rótulos **E-mail** e **Senha** · título **Escolher estú
 **Entrando…** · nome do ícone de olho **Mostrar senha** / **Esconder senha** (leitor de tela) · frase de erro
 **"Não foi possível entrar. Confira o e-mail e a senha e tente de novo."**
 - **E41·1·A:** aceitar todos como estão → entram no §6 e nos arquivos de idioma (pt; es e en traduzidos).
-- **E41·1·B:** aceitar e trocar algum → diga qual e o novo texto.
+- **E41·1·B:** aceitar e trocar algum (inclui a inicial da bolinha Sua conta = primeira letra do e-mail) → diga qual e o novo texto.
 - **Recomendo A.** "Sair" já está no §8b (menu Sua conta) e o §6 só o barra como sinônimo de Fechar/Cancelar; aqui é
   encerrar a sessão, que é outro sentido. A frase não diz qual parte falhou (spec RF-02, ASVS V2.2).
 
@@ -69,10 +94,11 @@ Botão **Entrar** · rótulos **E-mail** e **Senha** · título **Escolher estú
 
 ## Não verificado
 - **Conferência do Revisor de design (P4):** ainda não feita.
-- **Fora destas capturas, mas pedido no P3:** Entrar com limite de tentativas, Escolher estúdio carregando e com erro
-  ("Tentar de novo"), menu e folha Sua conta (com e sem Trocar de estúdio), estado da senha mostrada (`eye-off`) e a
-  inicial da bolinha Sua conta (L-4). Ficam para a próxima rodada da ficha.
-- **Acessibilidade:** axe (wcag2a, wcag2aa, wcag21aa, wcag22aa) deu 0 violações no protótipo, nas 8 capturas; não é o
+- **Limite de tentativas:** sem imagem própria; usa o mesmo desenho do erro genérico (descrito acima).
+- **Folha Sua conta no celular:** sem véu escuro atrás, porque o `DESIGN.md` não define um (igual ao componente do item
+  4); o Revisor deve dizer se a tela de trás fica clara demais.
+- **Fundo das telas de Sua conta:** só a barra com a bolinha; a página inicial real é do item 2 e não foi desenhada.
+- **Acessibilidade:** axe (wcag2a, wcag2aa, wcag21aa, wcag22aa) deu 0 violações no protótipo, nas 20 capturas; não é o
   app real. Não conferi com leitor de tela de verdade nem foco por teclado. O texto "Entrando…" esmaecido (60 %) fica
   abaixo de 4,5:1; a WCAG isenta controle desativado, mas o Revisor deve olhar.
 - **Textos em es e en:** não escritos aqui (são do arquivo de idioma, na construção).
