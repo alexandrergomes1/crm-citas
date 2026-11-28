@@ -93,6 +93,10 @@ o botão de avançar etapa e o nome da ação de remarcar no ⋮.
 | Iniciado `play` | Concluído |
 | Concluído · Ausência · Cancelado | nenhuma (finais) |
 
+Com checkout fechado (Pago ou Sem valor), a troca para Cancelado ou Ausência é recusada em qualquer status, no servidor
+e no banco (RF-17 da spec do Checkout, `specs/20261128-022500-checkout/spec.md`, branch do Checkout); liberar fica
+para a spec "Checkout · estorno e desconto".
+
 ## 6. Requisitos não funcionais
 | ID | Requisito | Fonte |
 |---|---|---|
