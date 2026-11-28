@@ -84,6 +84,7 @@ Documentador.
 | RT-8 | `--foco-cor: var(--ink3)` · `--foco-largura: 2px` · `--foco-afastado: 2px` · `--opac-desativado: .6` · `--atraso-carregando: 300ms` |
 | Ícone (só com E25·2) | `--ic-14` `--ic-16` `--ic-18` `--ic-20` `--ic-24` · `--ic-traco` |
 | Troca de desenho (criados na construção, registrados depois da revisão de código, 28/11) | `--fs-texto` (15 celular, 14 computador) · `--mostra-celular` (`flex` / `none`) · `--mostra-computador` (`none` / `flex`) · `--w-busca-tela-atual` (100 % celular, `--w-busca-tela` computador) |
+| Movimento (criado na construção, registrado depois da revisão de código, 28/11) | `--dur-interruptor: 150ms` (duração do movimento do interruptor: duração escrita fora do `tokens.css` seria valor solto, RT-9; só vale sem "movimento reduzido", RA-6) |
 
 - **Motivo dos 4 tokens de troca:** o ponto de troca de 840 px (E25·3) só pode estar escrito no `tokens.css`
   (RT-9 / CA-2 proíbem `px` fora dele, e propriedade CSS não funciona dentro de `@media`). Por isso o `@media` do
