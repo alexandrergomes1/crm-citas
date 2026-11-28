@@ -2,29 +2,27 @@
 
 > Aprovado pelo dono em 27/11/2026 (E18). Escrito por: Documentador · Revisado por: Gerente de projeto
 
-## Onde estamos (28/11, manhã)
-- **Na `previas`:** PRs #1 (base), #2 (item 1), #3 (ordem E21·1) e #4 (item 2, fundação técnica). A branch
-  `chore/base-fundacao` o dono apaga no PR #1 (botão "Delete branch"; E19·1).
-- **PR #5 rascunho** (`feat/banco-ligacao`, item 3): construído e testado no banco local.
-- **PR #6 rascunho** (`feat/design-system-codigo`, item 4): construído, com ficha e capturas.
-- **PR #7 rascunho** (`feat/entrar-servico`, item 4a Entrar, E36·A): banco (commit `4f13862`) e servidor S1–S6
-  (commit `5f085a3`); typecheck e lint limpos, 344 testes de unidade, 13 de integração verdes e 2 pendentes.
-  Falta: T1–T3 (telas, esperam E41), i18n em `src/app/i18n` e `src/app/navegacao.ts`,
-  `tests/integracao/registro.test.ts`, revisões (código, dados, segurança, auditor de risco, design), QA e CI.
-- **Só com spec, plano e tarefas revisados** (sem código, esperam aprovação): `feat/agenda`, `feat/agendamento`,
-  `feat/clientes`, `feat/formularios`, `feat/catalogo`, `feat/checkout`, `feat/caixa`
-  (`specs/20261128-020000-agenda` até `specs/20261128-023000-caixa`).
-- **Respostas do dono:** `docs/decisoes/2026-11-27-fundacao.md`.
+## Onde estamos (28/11, tarde)
+- **Na `previas`:** PRs #1 a #4. A branch `chore/base-fundacao` está toda na `previas`; o dono autorizou apagar, mas
+  o acesso desta sessão recusou: **o dono apaga** em https://github.com/alexandrergomes1/crm-citas/branches (lixeira).
+- **Respostas do relatório gravadas** (`docs/decisoes/2026-11-27-fundacao.md`) e **as 10 specs aprovadas**. Só a spec
+  do Entrar já tem a linha "Aprovação do dono" (esta branch); as outras 9 recebem a linha quando a branch de cada uma
+  for trabalhada (esta sessão só envia à `feat/entrar-servico`). Respostas com ajuste ou pedido junto (E29·1, E31·1,
+  E31·2, E32·1, E39·2, E39·3) entram no texto de cada spec pelo Analista de requisitos nessa hora.
+- **PR #7 rascunho** (`feat/entrar-servico`): spec Approved; P4 feita (nomes, ícones e "tela sem menu" no `DESIGN.md`);
+  revisões de código, segurança e design: aprovam com ressalvas, ressalvas resolvidas (commits `f5bed79`, `99d0877`);
+  typecheck e lint limpos, 353 testes de unidade. Falta: T1–T3 (telas), i18n, `tests/integracao/registro.test.ts`,
+  auditor de risco, revisão de dados, QA e CI. Não verificado aqui (sem Docker): `pnpm db:test`, integração, e2e.
+- **Avaliação do antigo** (só leitura, nada copiado): `docs/produto/avaliacao-crm-agenda/regras-do-banco.md` (40
+  regras: 16 ideias a aproveitar) e `permissoes-e-pin.md` (15 ideias e modelo proposto). Esperam autorização do dono.
+- **Specs revisadas, sem código** (aprovadas): agenda, agendamento, clientes, formulários, catálogo, checkout, caixa.
 
 ## Esperando o dono
-1. **Relatório** com as 34 perguntas (E24·1–3, E25·1–3, E26·1–3, E27·1–2, E28·1–3, E29·1–3, E40, E30·1–3,
-   E31·1–3, E32·1–3, E39·1–3, E41·1–4) e a aprovação das 10 specs:
-   https://claude.ai/artifact/FoTgdyW2jT3bVD9WQS3PQb. Cada pergunta já vem marcada na recomendação. O texto completo
-   de cada uma está na spec da pasta respectiva (seção de dúvidas); E40 em `specs/20261128-021500-formularios/plan.md`
-   §0; E41 em `specs/20261128-030000-entrar-servico/ficha-visual.md`.
-2. **E38·A:** instalar as travas em `.claude/` com o dono presente (a gravação pede permissão na tela;
-   `specs/20261128-005000-fundacao-tecnica/travas-claude-propostas/`, ADR 0003).
-3. D2 (PRs do Dependabot e a `main`): pedido separado, com os cliques exatos.
+1. **E40:** a mensagem do dono traz "E40-B" e "E40·A"; qual vale? A cifra da ficha de saúde não se constrói antes.
+2. **E39·3:** confirmar 1 h parado sabendo que fica abaixo da ASVS nível 2 (que pede 30 min).
+3. **E42 · Perfis e permissões:** spec nova antes do núcleo (pedido do dono de 28/11).
+4. **E43 · Ideias do antigo:** autorizar as ideias marcadas "aproveitar" nos dois relatórios.
+5. **E38·A:** travas em `.claude/` com o dono presente. **D2:** PRs do Dependabot e a `main`.
 
 ## Já aprovado
 
@@ -62,26 +60,16 @@
 | E36 | item novo da fila: Entrar e camada de serviço, antes do núcleo |
 | E37·A | spec do item 2 (com o R15) e ordem de merge #4, #2, #3 |
 | E38·A | ligar as travas do Claude em `.claude/` num PR próprio (pendente da permissão na hora) |
+| E24–E41 | respostas do relatório de 28/11 e aprovação das 10 specs (detalhe e falas em `docs/decisoes/`) |
 
 ## Pendências técnicas para a próxima conversa
-Para Engenheiro de software, Arquiteto e Engenheiro de segurança; nenhuma é decisão do dono.
-1. **Arquiteto:** revisar a divergência do contrato §4 do plano do Entrar: cada ação é
-   `export const x = acaoPost.handler(acao({...}))`, porque o TanStack Start só aceita `.handler` no nível do
-   módulo; a entrada fica `unknown` na chamada.
-2. `src/app/start.ts` foi escrito antes da T2 (liga CSRF por origem e `no-store`): registrar no plano.
-3. Removido `x-estudio-esperado` da chamada a `registrar_recusa` (senão a recusa por estúdio trocado nunca era
-   registrada).
-4. **Segurança:** a ação GET leva dados em `?payload=` (risco de `estudioDaTela` na URL, RF-33); senha de 200
-   caracteres não cria conta no Auth local (suspeita do limite de 72 bytes do bcrypt, não confirmado); o CA-18a
-   prova com 64.
-5. **DevOps:** a variável `SUPABASE_CHAVE_ADMIN_LOCAL` (nome provisório) é usada no preparo da integração;
-   combinar o nome e pôr na CI.
-6. **Não verificado:** CA-09, CA-09a, CA-15, contagem do registro no CA-04, Workers, e2e, `pnpm dev` com recarga.
-7. As revisões de código e de segurança do commit `5f085a3` começaram e foram interrompidas pela troca de
-   conversa: refazer.
-8. Avisos ao dono já dados: R-13 (`/auth/v1` fora da trava, só o limite por IP do Auth) e R-3 (limite do Auth
-   compartilhado; passo a passo no pedido de merge do Entrar). Chave de servidor e chave de assinatura no banco
-   online só com autorização de publicação.
+1. Entrar: T1–T3 (telas) com as notas da ficha (autocomplete, olho sem `aria-pressed`, nenhuma consulta automática
+   renova a sessão); provar na T2 que `acaoPost.handler` importado separa servidor e navegador (`pnpm build`).
+2. Entrar: auditor de risco, revisão de dados (Engenheiro de dados que não fez), QA; CI no PR #7.
+3. Achado do Engenheiro de dados: pessoa em dois estúdios pode ser marcada no mesmo horário nos dois (Analista).
+4. DevOps: nome da variável `SUPABASE_CHAVE_ADMIN_LOCAL` na CI. `prettier --check` acusa 17 arquivos (não é check
+   exigido; conferir).
+5. Avisos já dados: R-13, R-3. Chave de servidor e de assinatura no banco online só com autorização de publicação.
 
 ## Falta na base
 - E-mail de segurança quando houver domínio (E14·1); travas do Claude Code em `.claude/` (E38·A).
