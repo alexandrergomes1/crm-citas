@@ -90,7 +90,7 @@ Toda política `to authenticated`; `S` = `org_id = (select app.estudio_da_sessao
 | Tabela | Ler | Criar | Alterar | Apagar | Privilégio de `authenticated` |
 |---|---|---|---|---|---|
 | `estudios` | `S` | ninguém | `S and D` (using e with check) | ninguém | `select`; `update (nome, moeda, idioma, fuso_horario)` |
-| `membros` | `S or user_id = (select auth.uid())` | with check `S and D` | `S and D` (using e with check) | `S and D` | `select`; `insert (org_id, user_id, papel)`; `update (papel, ativo)`; `delete` |
+| `membros` | `S or user_id = (select auth.uid())` | ninguém (convite só pelo servidor, R-7) | `S and D` (using e with check) | `S and D` | `select`; `update (papel, ativo)`; `delete` |
 
 - `anon` sem nenhum privilégio nas duas tabelas e sem execução nas funções (RF-05).
 - Ler as próprias linhas em `membros` deixa a pessoa ver em quais estúdios tem papel (para escolher); não mostra nada
@@ -110,7 +110,7 @@ que já vem no Supabase).
 |---|---|
 | `010_base_estrutura_test.sql` | toda tabela de `public` tem `org_id` não nulo e RLS ligada (consulta a `pg_class` e `information_schema`, vale para tabelas futuras); `anon` sem privilégio em tabela de `public`; as 4 funções de `app` são `security definer` com `search_path=''`; `anon` sem execução; `app.estudio_da_sessao` tem 0 parâmetros (CA-03, CA-06) |
 | `020_isolamento_estudios_test.sql` | dona de A lê só A; alterar B atinge 0 linhas e B fica igual; criar e apagar estúdio recusado (`42501`); recepção de A não altera A; pessoa sem papel lê 0; `anon` recebe `42501` (CA-04, CA-05) |
-| `030_isolamento_membros_test.sql` | dona de A não cria vínculo em B (`42501`), não altera nem apaga vínculo de B (0 linhas); recepção e profissional de A não criam, alteram nem apagam; vínculo inativo só vê a própria linha (política "próprias linhas", §4) e nada mais de A; gravar `estudio_atual` direto recusado (`42501`); sem papel lê 0; `anon` `42501` (CA-04, CA-05) |
+| `030_isolamento_membros_test.sql` | ninguém com login cria vínculo, nem a dona em A, e id sem conta dá o mesmo `42501` (não `23503`); dona de A não altera nem apaga vínculo de B (0 linhas); recepção e profissional de A não criam, alteram nem apagam; vínculo inativo só vê a própria linha (política "próprias linhas", §4) e nada mais de A; gravar `estudio_atual` direto recusado (`42501`); sem papel lê 0; `anon` `42501` (CA-04, CA-05) |
 | `040_funcao_acesso_test.sql` | token com `org_id`, `app_metadata.org_id` ou `user_metadata.org_id` de B não muda nada: a função devolve A e só A é lido; `escolher_estudio(B)` sem vínculo em B → `42501` e continua A; pessoa com papel em A e B escolhe B e passa a ler só B; sem login → `null` (CA-06) |
 | `050_estudio_configuracao_test.sql` | idioma `fr`, `PT` ou nulo recusado; moeda `eur`, `EU` ou nula recusada; fuso `Marte/Base` ou nulo recusado, também ao alterar; `EUR`/`es`/`Europe/Madrid` aceito (CA-13) |
 

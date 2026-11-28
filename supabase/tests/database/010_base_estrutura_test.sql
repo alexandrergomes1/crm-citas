@@ -2,7 +2,7 @@
 -- Molde oficial: https://supabase.com/docs/guides/local-development/testing/overview
 -- Login simulado: set_config('request.jwt.claims') + set local role authenticated (é o que auth.uid() lê).
 begin;
-select plan(18);
+select plan(19);
 
 -- Preparo (como postgres): pessoas e estúdios fictícios, escritos do zero (RG-07).
 -- A = ...0a · B = ...0b · a1 dona A · a2 recepção A · a3 profissional A · b1 dona B
@@ -75,7 +75,11 @@ select is(
 select table_privs_are('public', 'estudios', 'authenticated', array['SELECT'],
   'authenticated só lê estudios (alteração só por coluna)');
 select table_privs_are('public', 'membros', 'authenticated', array['SELECT', 'DELETE'],
-  'authenticated lê e apaga membros (criar e alterar só por coluna)');
+  'authenticated lê e apaga membros (alterar só por coluna)');
+select is(
+  (select count(*)::int from information_schema.role_column_grants
+    where grantee = 'authenticated' and table_schema = 'public' and table_name = 'membros' and privilege_type = 'INSERT'),
+  0, 'authenticated não insere em membros, nem por coluna');
 
 select is(
   (select count(*)::int from pg_catalog.pg_proc p

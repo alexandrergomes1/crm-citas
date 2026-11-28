@@ -2,7 +2,7 @@
 -- Molde oficial: https://supabase.com/docs/guides/local-development/testing/overview
 -- Login simulado: set_config('request.jwt.claims') + set local role authenticated (é o que auth.uid() lê).
 begin;
-select plan(17);
+select plan(18);
 
 -- Preparo (como postgres): pessoas e estúdios fictícios, escritos do zero (RG-07).
 -- A = ...0a · B = ...0b · a1 dona A · a2 recepção A · a3 profissional A · b1 dona B
@@ -40,9 +40,12 @@ select is((select count(*)::int from public.membros), 5, 'dona de A lê os 5 ví
 select throws_ok(
   $$insert into public.membros (org_id, user_id, papel) values ('00000000-0000-0000-0000-00000000000b', '00000000-0000-0000-0000-0000000000c1', 'dona')$$,
   '42501', null, 'dona de A não cria vínculo em B');
-select lives_ok(
+select throws_ok(
   $$insert into public.membros (org_id, user_id, papel) values ('00000000-0000-0000-0000-00000000000a', '00000000-0000-0000-0000-0000000000e1', 'profissional')$$,
-  'dona de A cria vínculo em A');
+  '42501', null, 'nem a dona de A cria vínculo em A direto (convite só pelo servidor)');
+select throws_ok(
+  $$insert into public.membros (org_id, user_id, papel) values ('00000000-0000-0000-0000-00000000000a', '00000000-0000-0000-0000-0000000000ff', 'dona')$$,
+  '42501', null, 'id sem conta dá o mesmo 42501, não 23503 (não revela quem tem conta)');
 select results_eq(
   $$with u as (update public.membros set papel = 'profissional' where org_id = '00000000-0000-0000-0000-00000000000b' returning 1)
     select count(*)::int from u$$,
