@@ -28,7 +28,8 @@ atendimento repetido · linha do tempo do atendimento · política de cancelamen
 | **Agendamento** (esta spec) | criar, remarcar, cancelar e mudar o status de **um** agendamento; a regra de conflito | desenhar o calendário |
 
 A Agenda abre o "Novo agendamento" e o painel do agendamento, e o arrastar da Agenda usa a regra de remarcar desta spec
-(RF-05 e RF-06). O "Bloqueio de horário" (`DESIGN.md` §5) é da Agenda.
+(RF-05 e RF-06). O "Bloqueio de horário" (`DESIGN.md` §5) é da Agenda e é sempre de uma profissional (RF-07 e RN-04 da spec da Agenda).
+O arrastar e a lista de espera ficam **depois** (a Agenda não os tem na primeira versão).
 
 ## 2. Primeira versão (mínima) e depois
 | Recurso candidato | Primeira versão | Motivo |
@@ -44,18 +45,19 @@ A Agenda abre o "Novo agendamento" e o painel do agendamento, e o arrastar da Ag
 | Política de cancelamento e falta | depois | mexe com dinheiro (multa, sinal): E21·3 |
 
 ## 3. Quem usa
-Dona, recepção e profissional (`ARCHITECTURE.md` §6). O que a profissional pode fazer: dúvida **E27·1** (§10).
+Dona, recepção e profissional (`ARCHITECTURE.md` §6). O que a profissional vê e faz segue as respostas da E26·1 e da
+E26·2 da spec da Agenda (branch `feat/agenda`), aplicadas também aos agendamentos; quem é profissional é a E26·3.
 
 ## 4. Telas e estados (nomes do `DESIGN.md`)
 | Tela | Computador (1440) | Celular (390) |
 |---|---|---|
 | **Novo agendamento** | aberto pelo botão "Novo agendamento" da Agenda; painel à direita de 480 px (`DESIGN.md` §8) | aberto pelo **Agendar** da barra de baixo; tela sem barra, com ‹ voltar uma etapa e o botão do rodapé "Salvar" (`DESIGN.md` §5 e §6) |
-| Etapas | 1 Cliente (campo "Buscar cliente") · 2 Serviços ("Adicionar", só serviço) · 3 Data e hora (profissional, data, hora) · 4 Conferência ("Salvar") | igual |
+| Etapas | 1 Cliente (campo "Buscar cliente") · 2 Serviços (escolher entre os serviços do Catálogo; cadastrar serviço é do Catálogo) · 3 Data e hora (profissional, data, hora) · 4 Conferência ("Salvar") | igual |
 | **Painel do agendamento** | painel à direita de 480 px: botão de status "ícone + nome ▾"; ⋮ do topo com as ações (remarcar, "Cancelar agendamento"); "Checkout" desativado com "em desenvolvimento" até a spec do Checkout (`DESIGN.md` §8) | igual, com as ações no ⋮ do topo do painel (`DESIGN.md` §5) |
 | Remarcar | dentro do painel: profissional, data e hora; "Salvar" e "Cancelar" | igual |
 
 **Estados de toda tela** (`DESIGN.md` §8): vazio ("Ainda não há clientes" / "Ainda não há serviços", com o
-"Adicionar <coisa>" de contorno, conforme E27·2) · sem resultado (o que foi buscado e "Limpar filtros") · carregando
+"Adicionar <coisa>" de contorno, conforme E27·1) · sem resultado (o que foi buscado e "Limpar filtros") · carregando
 (linhas cinza depois de 0,3 s, anunciado ao leitor) · erro ("Tentar de novo"; no conflito, a mensagem diz que o
 horário está ocupado, sem nome de cliente) · sucesso (aviso embaixo; "Desfazer" na troca de status, RF-08).
 
@@ -67,18 +69,19 @@ o botão de avançar etapa e o nome da ação de remarcar no ⋮.
 |---|---|---|
 | RF-01 | Criar agendamento com: uma cliente, um ou mais serviços do Catálogo, uma profissional, data e hora de início. | candidata; E3·2 |
 | RF-02 | O fim é o início mais a soma das durações dos serviços (do Catálogo), feitos em sequência pela mesma profissional. | candidata; Assumption 4 |
-| RF-03 | Só se escolhe serviço ativo do Catálogo e profissional que faz esse serviço (regra do Catálogo). | dependência Catálogo |
-| RF-04 | **Conflito:** não se grava agendamento cujo intervalo [início, fim) cruza o de outro da mesma profissional com status diferente de Cancelado e Ausência, nem um bloqueio de horário dela ou do estúdio todo (Agenda). Com E27·3·B, dona e recepção podem marcar mesmo assim. | E27·3; dependência Agenda |
+| RF-03 | Só se escolhe serviço ativo do Catálogo e uma profissional do estúdio (quem é profissional: E26·3 da Agenda); se o Catálogo tiver "quem faz cada serviço", vale essa regra. | dependência Catálogo e Agenda |
+| RF-04 | **Conflito:** não se grava agendamento cujo intervalo [início, fim) cruza o de outro da mesma profissional com status diferente de Cancelado e Ausência, nem um bloqueio de horário dessa profissional (Agenda). Sem expediente na primeira versão, só bloqueios e agendamentos contam. Com E27·2·B, dona e recepção podem marcar mesmo assim. | E27·2; dependência Agenda |
 | RF-05 | **Remarcar:** muda profissional, data e hora, com a mesma regra de conflito (ignorando o próprio agendamento); só nos status Reservado e Confirmado; Confirmado volta a Reservado. | candidata; Assumption 3 |
-| RF-06 | A Agenda remarca (arrastar) chamando a mesma regra do RF-05; não há segunda regra. | §1 |
+| RF-06 | Depois: quando a Agenda tiver o arrastar, ele chama a mesma regra do RF-05; não há segunda regra. | §1 |
 | RF-07 | **Status e transições** (status do `DESIGN.md` §5, menos "Bloqueio de horário"): o agendamento nasce Reservado; só valem as transições da tabela abaixo; Concluído, Ausência e Cancelado são finais na primeira versão. | `DESIGN.md` §5; Assumption 1 e 2 |
 | RF-08 | Troca para Cancelado ("Cancelar agendamento") ou Ausência pede a janelinha de confirmação; as outras trocas saem com aviso e "Desfazer", que só volta ao status imediatamente anterior. | `DESIGN.md` §6 e §8 |
 | RF-09 | Toda troca de status grava histórico: status, quem e quando. | candidata (linha do tempo) |
 | RF-10 | Toda criação, remarcação e troca de status passa pelas 6 portas e fica no registro (porta 6), sem nome, telefone ou dado de saúde no texto. | `ARCHITECTURE.md` §4 e §7 |
-| RF-11 | Permissão por papel: dona e recepção em todos os agendamentos do estúdio; a profissional conforme E27·1. | `ARCHITECTURE.md` §6; E27·1 |
+| RF-11 | Permissão por papel: dona e recepção em todos os agendamentos do estúdio; a profissional conforme a E26·1 e a E26·2 da Agenda. | `ARCHITECTURE.md` §6; E26·1; E26·2 |
 | RF-12 | Horários no fuso do estúdio; o estúdio vem da sessão, nunca do pedido. | `ARCHITECTURE.md` §4 e §11 |
 | RF-13 | Não se cria nem se remarca para início já passado (na primeira versão). | Assumption 5 |
-| RF-14 | Cliente nova na etapa 1 conforme E27·2. | E27·2 |
+| RF-14 | Cliente nova na etapa 1 conforme E27·1. | E27·1 |
+| RF-15 | **Plano B:** enquanto Clientes ou Catálogo não existirem, a etapa correspondente aparece "em desenvolvimento" (`DESIGN.md` §8) e os testes usam dados de exemplo locais, fictícios, escritos do zero (RG-07). | `DESIGN.md` §8; item 3 RG-07 |
 
 **Transições (RF-07):**
 
@@ -122,36 +125,37 @@ teste de isolamento em cada tabela. Como garantir o RNF-02 no banco é decisão 
 | CA-03 | Fim = início + soma das durações; início no passado recusado; fuso do estúdio respeitado (inclui troca de horário de verão). | unidade |
 | CA-04 | Duas gravações simultâneas no mesmo horário: só uma grava. | teste de banco na CI |
 | CA-05 | O estúdio A não lê, cria, altera nem apaga agendamento, item ou histórico do estúdio B; sem login ou sem papel, nada. | teste de isolamento na CI (molde do item 3) |
-| CA-06 | Permissão por papel conforme RF-11 e E27·1 (cada papel × cada ação). | teste de servidor e de banco |
+| CA-06 | Permissão por papel conforme RF-11, E26·1 e E26·2 (cada papel × cada ação). | teste de servidor e de banco |
 | CA-07 | Toda troca de status gera uma linha de histórico e um registro (porta 6), sem dado pessoal no texto. | teste automático |
 | CA-08 | Ponta a ponta em 390 e 1440: criar nas 4 etapas, remarcar, trocar status com "Desfazer", cancelar com a janelinha, e o erro de conflito. | Playwright (`e2e/`) |
 | CA-09 | Estados vazio, sem resultado, carregando, erro e sucesso presentes; checklist do `DESIGN.md` §10 sem falha. | e2e e Revisor de design |
 | CA-10 | Nenhum dado pessoal na URL do painel nem nos registros. | teste e revisão do Engenheiro de segurança |
 | CA-11 | Cada tabela do §7 tem ADR com saída, motivo, norma e o papel que conferiu; nada do antigo copiado sem ADR. | `docs/adr/` |
-| CA-12 | Revisores do tipo sem "Bloqueia", veredito do QA e conferência do dono na prévia. | relatórios no PR |
+| CA-12 | Nada aplicado no banco remoto pela IA; banco só local até a "Aprovação do merge". | histórico da CI |
+| CA-13 | Sem Clientes ou Catálogo, a etapa mostra "em desenvolvimento" e o e2e passa com os dados de exemplo locais (RF-15). | e2e |
+| CA-14 | Revisores do tipo sem "Bloqueia", veredito do QA e conferência do dono na prévia. | relatórios no PR |
 
 ## 9. Dependências
 - **Item 2** (CI, app vazio, Spec Kit) · **item 3** (estúdio, membros, papéis, função de checagem, molde do teste de
   isolamento) · **item 4** (design system no código).
-- **Agenda:** profissionais, horário de trabalho e bloqueios; o botão "Novo agendamento" e a abertura do painel.
-  Se a Agenda não checar horário de trabalho na primeira versão, esta spec também não checa.
-- **Clientes:** a tabela e a busca da cliente (E27·2 depende dela). **Catálogo:** serviços, duração e quem faz cada um.
+- **Agenda:** quem é profissional (E26·3), acesso da profissional (E26·1, E26·2), bloqueios; o botão "Novo
+  agendamento" e a abertura do painel. A Agenda não tem expediente na primeira versão (`staff_shifts` adiada), então a
+  regra de horário usa só bloqueios e agendamentos.
+- **Clientes:** a tabela e a busca da cliente (E27·1 depende dela). **Catálogo:** serviços e duração. Sem eles, vale
+  o plano B (RF-15).
 - **Checkout:** só o botão "Checkout" (desativado até a spec dele). **E22·B:** leitura do antigo e ADR por tabela.
 
 ## 10. Dúvidas ao dono (máx. 3)
-**E27·1 · O que a profissional pode fazer** (acesso)
-- **E27·1·A:** cria, remarca, cancela e muda o status **só dos próprios** agendamentos; dona e recepção, de todos.
-- **E27·1·B:** a profissional faz tudo em todos os agendamentos do estúdio.
-- **Recomendo A:** menor acesso necessário (OWASP ASVS 4.0.3 V4.1.3). Desfaz-se mudando a permissão do papel.
+O que a profissional pode fazer: respondido pela E26·1 e pela E26·2 da spec da Agenda (não se pergunta de novo).
 
-**E27·2 · Cliente nova durante o agendamento** (dado de cliente)
-- **E27·2·A:** na etapa Cliente, "Adicionar cliente" cadastra ali só nome e telefone; o resto se completa em Clientes.
-- **E27·2·B:** só se escolhe cliente já cadastrada; cadastro só em Clientes.
+**E27·1 · Cliente nova durante o agendamento** (dado de cliente)
+- **E27·1·A:** na etapa Cliente, "Adicionar cliente" cadastra ali só nome e telefone; o resto se completa em Clientes.
+- **E27·1·B:** só se escolhe cliente já cadastrada; cadastro só em Clientes.
 - **Recomendo A:** evita sair do agendamento e pede o mínimo de dados (RGPD art. 5(1)(c)). Desfaz-se tirando o botão.
 
-**E27·3 · Horário ocupado** (tela e acesso)
-- **E27·3·A:** o sistema sempre impede marcar em horário ocupado ou bloqueado.
-- **E27·3·B:** avisa, e dona e recepção podem marcar mesmo assim (encaixe), com registro.
+**E27·2 · Horário ocupado** (tela e acesso)
+- **E27·2·A:** o sistema sempre impede marcar em horário ocupado ou bloqueado.
+- **E27·2·B:** avisa, e dona e recepção podem marcar mesmo assim (encaixe), com registro.
 - **Recomendo A na primeira versão:** regra simples e testável; o B entra depois sem mudar os dados.
 
 ## 11. Assumptions (decisões do papel, à vista na aprovação; recuse pelo número)
@@ -165,5 +169,5 @@ teste de isolamento em cada tabela. Como garantir o RNF-02 no banco é decisão 
 
 ## 12. Fora de escopo
 - Cobrança à cliente, sinal, multa de cancelamento ou falta, preço, desconto e gorjeta (E21·3; Checkout).
-- Os recursos marcados "depois" no §2. Visões, filtros, cartões, bloqueios, lista de espera e arrastar (Agenda).
+- Os recursos marcados "depois" no §2. Visões, filtros, cartões e bloqueios (Agenda); lista de espera e arrastar (depois, nas duas specs).
 - Avisos à cliente (WhatsApp, e-mail, lembretes) e o sininho. Reserva online pela cliente (portal, E21·1).
