@@ -37,7 +37,7 @@ Agendamento). Cumpre os pedidos da cliente pelo RGPD e pela LGPD conforme **E28�
 ### 2.1 Recursos da lista candidata (`docs/produto/clientes.md`)
 | Recurso | Primeira versão | Motivo |
 |---|---|---|
-| lista, busca, filtros, criar, editar, perfil | **sim** (filtros: só cadastro, última visita e aniversário; §5 RF-04) | é o núcleo do módulo |
+| lista, busca, filtros, criar, editar, perfil | **sim** (filtros: só cadastro e última visita; §5 RF-04) | é o núcleo do módulo |
 | histórico de atendimentos | **sim, só leitura** | vem do Agendamento; sem ele o perfil não cumpre a frase da E21 |
 | exportar | **só os dados de uma cliente, a pedido dela** (E28·3) | dever do RGPD art. 15 e 20 e da LGPD art. 18; exportar a lista inteira fica para Importação e exportação |
 | notas e alertas | depois | texto livre e a etiqueta "Alergia" podem receber dado de saúde; entram com a spec de Formulários (E5·2, E21·2), como no Agendamento |
@@ -64,16 +64,18 @@ primeiro (ficha visual, etapa 6).
 - **Computador (1440):** barra do topo: título e subtítulo (total, ex.: "128 clientes") · busca geral · **Opções ▾**
   (itens "em desenvolvimento", `DESIGN.md` §8) · **+ Adicionar** (preto, única ação principal) · ajuda · Notificações ·
   Sua conta. Barra da lista: campo "Buscar cliente" · **Filtros ▾** · (à direita) **Ordenar: Última visita ▾**.
-  Tabela (linha 40, texto 13): bolinha da cliente 24 · nome · telefone · última visita · ⋮ (Editar · Arquivar ·
-  Excluir em vermelho, este conforme E28·3; "Duplicar" não se aplica a cliente).
+  Tabela (linha 40, texto 13): bolinha da cliente 24 · nome · telefone · última visita · ⋮ (Editar · Arquivar;
+  "Duplicar" não se aplica a cliente; "Excluir" não fica na lista, só no perfil, conforme E28·3).
 - **Celular (390):** nível 1: título "Clientes", sininho e Sua conta; **+ Adicionar** com contorno, com nome, no topo;
   campo "Buscar cliente" com o funil ao lado; linhas de 64 com bolinha 40, nome e telefone; barra de baixo com
   Clientes atual em azul e **Agendar** preto no meio. Filtros e Ordenar em folha de baixo (Ordenar na primeira linha).
 - **Perfil da cliente** ("Ver cliente"): cabeçalho com bolinha, nome e ⋮ (Opções da cliente). Seletor com as abas
   **Dados** e **Atendimentos** (`DESIGN.md` §5). Dados: nome, telefone, e-mail e data de nascimento (conforme E28·1),
   "Cliente desde". Atendimentos: linha do tempo do mais novo ao mais antigo (data, serviço, profissional, status com
-  ícone e palavra). Botão de agendar para esta cliente leva ao Agendamento ("em desenvolvimento" até ele existir).
-  Título do perfil e nome do botão de agendar daqui não estão no `DESIGN.md` §6: vão à ficha visual.
+  ícone e palavra); a profissional vê aqui só o que a E26·1 da Agenda e a E28·2 deixam (atendimento de outra
+  profissional aparece sem serviço, se E26·1·B). Botão de agendar para esta cliente leva ao Agendamento ("em desenvolvimento" até ele existir).
+  Título do perfil, nome do botão de agendar daqui e "Exportar dados da cliente" (E28·3) não estão no `DESIGN.md`
+  §6: vão à ficha visual.
 - **Adicionar e Editar cliente:** painel à direita de 480 no computador; tela sem barra no celular com "Salvar" no
   rodapé. Campos conforme E28·1 (rótulo acima, obrigatório com * cinza, erro com contorno vermelho e mensagem com
   ícone); telefone com o código do país, já preenchido com o país do estúdio. Salvar · Cancelar.
@@ -90,13 +92,13 @@ de salvar; "Desfazer" depois de arquivar).
 | RF-01 | A lista mostra as clientes ativas do estúdio, paginada, na ordem "Última visita" (mais recente primeiro; quem nunca veio por último); **Ordenar** também oferece "Nome" (A–Z). | `DESIGN.md` §7 e §8b; `ARCHITECTURE.md` §5 |
 | RF-02 | **Buscar cliente** acha por parte do nome (sem diferença de maiúscula e acento) ou por parte do telefone (só os dígitos). | `DESIGN.md` §5 e §6 |
 | RF-03 | **Adicionar** cria a cliente com os campos e as regras da E28·1. | candidata; E28·1 |
-| RF-04 | **Filtros** (dentro do botão, com a pílula de contador e "Limpar filtros"): cadastro (Ativas, padrão · Arquivadas), última visita (nunca · há mais de 30, 60 ou 90 dias) e aniversário (este mês; só se a data de nascimento entrar pela E28·1). Etiquetas, saldo e origem: depois. | `DESIGN.md` §7 |
+| RF-04 | **Filtros** (dentro do botão, com a pílula de contador e "Limpar filtros"): cadastro (Ativas, padrão · Arquivadas), última visita (nunca · há mais de 30, 60 ou 90 dias). Aniversário: depois, com Marketing (o uso para campanha não se apoia na base do DP-02). Etiquetas, saldo e origem: depois. | `DESIGN.md` §7; DP-02 |
 | RF-05 | **Editar** muda os mesmos campos, com as mesmas regras. | candidata |
 | RF-06 | **Arquivar** tira a cliente da lista padrão e da busca do Agendamento, sem apagar dado nem atendimento; desarquivar a traz de volta. | `DESIGN.md` §6 |
 | RF-07 | O **perfil** mostra os dados e os atendimentos da cliente (todos os status), lidos do Agendamento. | E21 (`docs/produto/clientes.md`) |
 | RF-08 | **Última visita** é a data do último atendimento Concluído da cliente, no fuso do estúdio. | spec do Agendamento (status) |
-| RF-09 | O cadastro rápido do Agendamento (E27·2·A, nome e telefone) usa as mesmas regras desta spec (RN-01 a RN-04) e a mesma tabela; a cliente nasce com o cadastro incompleto e se completa em Clientes. | spec do Agendamento RF-14 |
-| RF-10 | Pedidos da cliente pelo RGPD e pela LGPD (acesso, portabilidade, apagamento) conforme E28·3. | RGPD art. 15, 17 e 20; LGPD art. 18 |
+| RF-09 | O cadastro rápido do Agendamento (E27·1·A, nome e telefone) usa as mesmas regras desta spec (RN-01 a RN-04) e a mesma tabela; a cliente nasce com o cadastro incompleto e se completa em Clientes. | spec do Agendamento RF-14 |
+| RF-10 | Pedidos da cliente pelo RGPD e pela LGPD: acesso, portabilidade e apagamento conforme E28·3; retificação (corrigir dado errado) pelo **Editar** (RF-05). Antes de cumprir, quem atende confere que quem pede é a própria cliente (ex.: pedido vindo do telefone ou e-mail cadastrado, ou presencial); na dúvida, pede mais um dado. | RGPD art. 12(6), 15, 16, 17 e 20; LGPD art. 18 II, III, V e VI |
 | RF-11 | Toda ação passa pelas 6 portas; criar, editar, arquivar, desarquivar, exportar e apagar ficam no registro (porta 6) só com identificadores, sem nome, telefone, e-mail ou data de nascimento. | `ARCHITECTURE.md` §4 e §7 |
 
 ## 6. Regras de negócio (verificáveis)
@@ -119,6 +121,8 @@ de salvar; "Desfazer" depois de arquivar).
 | DP-03 | Minimização: a v1 guarda só os campos da E28·1; documento, gênero, endereço, foto e notas não entram. | RGPD art. 5(1)(c); LGPD art. 6 III |
 | DP-04 | Nome, telefone, e-mail, data de nascimento e o texto buscado nunca em URL, registro de erro, monitoramento ou notificação; o perfil abre pelo identificador. | `ARCHITECTURE.md` §7; `SECURITY.md` §4 |
 | DP-05 | Exportar e apagar a pedido da cliente: o que entra na v1 é a E28·3. Prazo automático de guarda (apagar depois de X anos sem visita): depois, com Ajustes. | RGPD art. 5(1)(e), 15, 17 e 20; LGPD art. 16 e 18 |
+| DP-07 | Apagamento e cópias de segurança: o dado apagado continua só nas cópias diárias cifradas (`SECURITY.md` §6; E5·3) até elas vencerem, pelo prazo de guarda das cópias, que ainda não está escrito em `ARCHITECTURE.md` nem em `SECURITY.md` e tem de ser fixado na spec da cópia diária antes da produção; a cliente é informada desse prazo. Numa restauração, o processo reaplica os apagamentos feitos depois da cópia, e o dado não volta. | RGPD art. 17 e 5(1)(e); E5·3 |
+| DP-08 | Arquivo exportado (E28·3): nome só com identificador e data, sem nome nem telefone da cliente; resposta sem guarda em cache (`Cache-Control: no-store`); nada do arquivo fica guardado no servidor depois da entrega. | OWASP ASVS 4.0.3 V8.2.1 e V8.3; RGPD art. 32 |
 | DP-06 | Dados na UE (E5·1). As exceções E6·1 e E6·2 valem como estão: o modo suporte do dono não gera registro. | E5·1; `ARCHITECTURE.md` §6 |
 
 ## 8. Tabelas
@@ -155,7 +159,8 @@ e teste de isolamento em cada tabela.
 | CA-04 | Estúdio vindo no pedido é ignorado. | teste do servidor |
 | CA-05 | Em 390 e 1440: adicionar, editar, erro de campo, aviso de duplicado (E28·1), buscar por nome e por telefone, filtros e "Limpar filtros", Ordenar, arquivar com "Desfazer", abrir o perfil e as duas abas. | e2e (`e2e/`), CI verde |
 | CA-06 | Em 390 e 1440: estados carregando, vazio, sem resultado, aba vazia e erro como na §4. | e2e |
-| CA-07 | Pedidos RGPD/LGPD conforme E28·3: o arquivo exportado tem todos os dados da cliente e nada de outra; depois de apagar, nenhum campo pessoal se lê no banco e o histórico mostra "Cliente removida". | teste do servidor e de banco |
+| CA-07 | Pedidos RGPD/LGPD conforme E28·3: o arquivo exportado tem todos os dados da cliente e nada de outra, nome do arquivo sem dado pessoal, resposta com `no-store` e nada guardado no servidor (DP-08); depois de apagar, nenhum campo pessoal se lê no banco e o histórico mostra "Cliente removida". | teste do servidor e de banco |
+| CA-07b | A profissional (conforme E28·2) não recebe, nem no aviso de telefone repetido nem na aba Atendimentos, nome de cliente ou serviço que não pode ver. | teste do servidor |
 | CA-08 | Nenhuma URL, registro, erro ou notificação contém nome, telefone, e-mail, data de nascimento ou o texto buscado. | teste e revisão do Engenheiro de segurança |
 | CA-09 | Uma só peça preta de ação por tela; nenhuma peça, cor ou nome fora do `DESIGN.md`; checagem automática de acessibilidade sem falha nas duas larguras. | checklist §10 do `DESIGN.md`, Revisor de design, e2e |
 | CA-10 | Cada tabela e função da §8 tem ADR com saída, motivo, norma e quem conferiu; migration só para as copiadas ou reescritas; nenhum seed ou dado do antigo no PR. | `docs/adr/` × PR; gitleaks |
@@ -167,7 +172,7 @@ e teste de isolamento em cada tabela.
 - **Item 3** (banco): estúdio com fuso e país, membros, papéis, função de checagem, molde do teste de isolamento.
 - **Item 4** (design system no código): componentes do `DESIGN.md`.
 - **Agendamento:** atendimentos e status (aba Atendimentos, última visita); usa a tabela e as regras desta spec no
-  cadastro rápido (E27·2). Sem ele construído, a aba fica vazia e a última visita "nunca".
+  cadastro rápido (E27·1). Sem ele construído, a aba fica vazia e a última visita "nunca".
 - **Agenda:** mostra o nome da cliente no cartão; cliente apagada aparece como "Cliente removida" (RN-07).
 - **E22·B:** construção em PR de rascunho; banco só local; leitura do antigo e ADR por tabela; nada juntado sem o dono.
 
@@ -180,23 +185,27 @@ automático de guarda; banco de produção e publicação.
 ## 13. Dúvidas ao dono (máx. 3)
 **E28·1 · Dados do cadastro e telefone repetido** (dado de cliente, tela)
 - **E28·1·A:** nome* e telefone*, e-mail e data de nascimento opcionais; telefone já usado no estúdio mostra "já
-  existe uma cliente com este telefone", com o nome dela, e deixa salvar (mãe e filha dividem número).
+  existe uma cliente com este telefone", com o nome dela só para quem pode ver essa cliente (para a profissional,
+  conforme E28·2; senão, sem nome), e deixa salvar (mãe e filha dividem número).
 - **E28·1·B:** os mesmos campos; telefone repetido não deixa salvar.
 - **E28·1·C:** como A, mais documento (NIF, DNI, CPF), gênero e cidade.
 - **Recomendo A:** o mínimo que o atendimento usa (RGPD art. 5(1)(c)), igual ao cadastro rápido do Agendamento
-  (E27·2·A), sem barrar famílias. Desfaz-se: campo novo entra por migration; B liga uma trava.
+  (E27·1·A), sem barrar famílias. Desfaz-se: campo novo entra por migration; B liga uma trava.
 
-**E28·2 · O que a profissional vê e faz em Clientes** (acesso, dado de cliente)
+**E28·2 · O que a profissional vê e faz em Clientes** (acesso, dado de cliente) · **vai ao dono junto da E26·1 da
+Agenda** (o que a profissional vê na Agenda); as duas respostas têm de ser coerentes.
 - **E28·2·A:** vê e busca todas as clientes (nome e telefone) e o perfil; adiciona e edita; não arquiva nem faz os
-  pedidos RGPD/LGPD.
-- **E28·2·B:** vê só as clientes que já atendeu ou tem marcadas; não adiciona nem edita.
+  pedidos RGPD/LGPD. Coerente só com E26·1·A.
+- **E28·2·B:** vê, busca e abre o perfil só das clientes que já atendeu ou tem marcadas com ela; adiciona cliente nova
+  (para marcar o próprio agendamento) e edita as que vê; não arquiva nem faz os pedidos RGPD/LGPD; o aviso de
+  telefone repetido não lhe mostra nome de cliente que ela não vê. Coerente com E26·1·B.
 - **E28·2·C:** tudo o que a recepção faz.
-- **Recomendo A:** pela E27·1·A ela marca os próprios agendamentos e precisa achar e cadastrar a cliente; arquivar e
-  os pedidos legais ficam com quem responde pelo estúdio (OWASP ASVS V4.1.3, menor acesso). Desfaz-se mudando a
-  permissão do papel.
+- **Recomendo B, junto com E26·1·B:** não vê cliente alheia (RGPD art. 5(1)(c), minimização; OWASP ASVS V4.1.3,
+  menor acesso) e ainda cadastra e marca as próprias clientes, como pede a E26·2·A da Agenda. Desfaz-se mudando
+  a permissão do papel.
 
 **E28·3 · Pedidos da cliente: exportar e apagar os dados** (dado de cliente)
-- **E28·3·A:** na v1, no ⋮ do perfil, só a dona: "Exportar dados da cliente" (arquivo baixado na hora) e "Excluir"
+- **E28·3·A:** na v1, no ⋮ do perfil, só a dona: "Exportar dados da cliente" (arquivo baixado na hora, DP-08) e "Excluir"
   (vermelho, janelinha de confirmação), que apaga nome, telefone, e-mail e nascimento para sempre e mantém os
   atendimentos como "Cliente removida".
 - **E28·3·B:** na v1 nada na tela; o estúdio pede ao suporte da plataforma, que faz à mão.
