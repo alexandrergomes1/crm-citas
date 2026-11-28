@@ -1,0 +1,3 @@
+-- Migration inicial da fundação (item 2, spec 20261128-005000-fundacao-tecnica, R8).
+-- Vazia de propósito: nenhuma tabela nesta spec. As tabelas do estúdio (com org_id, RLS e
+-- teste de isolamento) entram nas próximas specs, cada uma em migration própria.
