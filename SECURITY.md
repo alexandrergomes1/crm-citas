@@ -55,7 +55,10 @@ Valem como estão; não se corrigem nem se contornam sem nova decisão do dono (
   nesse modo (`ARCHITECTURE.md` §6).
 - **E39·3·B (ajuste):** a sessão cai depois de **1 h parada** (máximo de 12 h). Resposta: "E39·3·B (1hr parado)".
   Fica abaixo da ASVS V3.3.2 nível 2 só na parada (a norma pede 30 min). Risco: aparelho dividido na recepção fica
-  aberto até 1 h. **Confirmação do risco pelo dono: pendente** (mostrado em 28/11, depois da resposta).
+  aberto até 1 h. Risco aceito pelo dono: "E39·3·i" (28/11/2026).
+- **E40·B:** a chave que cifra as fichas de saúde fica como segredo da Cloudflare, não num cofre que cifra sozinho (KMS).
+  Resposta: "E40·B". Fica abaixo da ASVS V6.4.2 nível 3 (cumpre a cifra da V6.1.2). Risco: quem tiver acesso ao
+  servidor pode ler a chave; ela nunca vai ao repositório, ao chat, a registro nem ao banco.
 
 ## 6. Incidente e prazos de aviso
 - Roteiro de incidente escrito (`ARCHITECTURE.md` §9).

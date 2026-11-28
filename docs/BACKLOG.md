@@ -18,6 +18,7 @@ antes do núcleo (E36·A); leva "4a" para não mudar os números citados nas dec
 | 4a | Entrar e camada de serviço (login, sessão, 6 portas, auditoria, base de idiomas) | E36·A, E4·1, E3·1 | spec em revisão (branch `feat/entrar-servico`) |
 | 5 | Núcleo, um módulo por spec: Agenda, Agendamento, Clientes, Formulários, Catálogo, Checkout, Caixa | E3·2, `ARCHITECTURE.md` §2 | livre |
 | 6 | Os outros módulos, um por vez, incluindo a central de ajuda e o assistente de IA | E3·2, pedido do dono (módulos), E21·1 | livre |
+| 6a | Perfis e permissões ajustáveis (por módulo e ação, por pessoa, papéis padrão personalizáveis); até lá só o dono usa, com acesso total | E42·A (ajustada) | livre |
 | 7 | Painel admin básico | E4·2, E4·3, E21·1 | livre |
 | 8 | Cadastro de estúdio e cobrança da assinatura | E4·3, E21·1 | livre |
 | 9 | Portal público do estúdio (reserva online) | E4·3, E21·1 | livre |
