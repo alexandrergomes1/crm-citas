@@ -3,7 +3,7 @@
 - **Status:** Approved
 - **Aprovação do dono:** "Aprovo as specs: Entrar e camada de serviço, Trava por estúdio no banco, Design system no código, Agenda, Agendamento, Clientes, Formulários, Catálogo, Checkout, Caixa." · 28/11/2026 · https://claude.ai/code/session_018cV8b8F1poNHjA4eEd3VyN
   (`docs/decisoes/2026-11-27-fundacao.md`, linha "Aprovação das specs") · gravado pelo Analista de requisitos (E16·3)
-- **Aprovação do merge:** (pendente)
+- **Aprovação do merge:** "E49a juntar" (E49·A, pedido de merge do PR #7: "Junto vêm os PRs #5 (banco) e #6 (design system). Eles já estão dentro desta branch. Juntar o #7 junta os três.") · 28/11/2026 · https://claude.ai/code/session_018cV8b958nnbLyXPMKPeaNK · pedido no commit `f47837e`, merge na `previas` em `2dad348` (squash do PR #7), CI verde nos 5 jobs · **vale só para o merge na `previas`; não autoriza aplicar nada no banco remoto** (o pedido dizia "o banco online não muda"; a aplicação da E24·2·A pede pedido e autorização próprios) · gravado pelo Engenheiro de DevOps.
 - **Item da fila:** 3 (`docs/BACKLOG.md`), em paralelo aos itens 1 e 2 por ordem do dono (E22·B, §1)
 - **Branch:** `feat/banco-ligacao`, única do item 3 (spec, plano, construção e registros), já com a `chore/fundacao-tecnica`
   juntada por merge; PR de rascunho empilhado sobre ela, nunca juntado nela; a base passa à `previas` quando o item 2

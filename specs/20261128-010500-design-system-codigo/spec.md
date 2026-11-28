@@ -8,6 +8,7 @@
 - **Status:** Approved
 - **Aprovação do dono:** "Aprovo as specs: Entrar e camada de serviço, Trava por estúdio no banco, Design system no código, Agenda, Agendamento, Clientes, Formulários, Catálogo, Checkout, Caixa." · 28/11/2026 · https://claude.ai/code/session_018cV8b8F1poNHjA4eEd3VyN
   (`docs/decisoes/2026-11-27-fundacao.md`, linha "Aprovação das specs") · gravado pelo Analista de requisitos (E16·3)
+- **Aprovação do merge:** "E49a juntar" (E49·A, pedido de merge do PR #7: "Junto vêm os PRs #5 (banco) e #6 (design system). Eles já estão dentro desta branch. Juntar o #7 junta os três.") · 28/11/2026 · https://claude.ai/code/session_018cV8b958nnbLyXPMKPeaNK · pedido no commit `f47837e`, merge na `previas` em `2dad348` (squash do PR #7), CI verde nos 5 jobs · gravado pelo Engenheiro de DevOps.
 - **Escrito por:** Analista de requisitos · **Norma:** IEEE 29148, BABOK · **Revisa:** Gerente de projeto (etapa 5b)
 - **Fontes lidas:** `AGENTS.md`, `ARCHITECTURE.md` §3, §11, §12, `DESIGN.md` (inteiro), `docs/design/README.md`,
   `docs/design/imagens/` (01 a 06 e provas 1 a 4), `src/app/AGENTS.md`, `docs/guias/processo-sdd.md`,
