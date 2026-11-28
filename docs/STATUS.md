@@ -9,10 +9,11 @@
   do Entrar já tem a linha "Aprovação do dono" (esta branch); as outras 9 recebem a linha quando a branch de cada uma
   for trabalhada (esta sessão só envia à `feat/entrar-servico`). Respostas com ajuste ou pedido junto (E29·1, E31·1,
   E31·2, E32·1, E39·2, E39·3) entram no texto de cada spec pelo Analista de requisitos nessa hora.
-- **PR #7 rascunho** (`feat/entrar-servico`): spec Approved; P4 feita (nomes, ícones e "tela sem menu" no `DESIGN.md`);
-  revisões de código, segurança e design: aprovam com ressalvas, ressalvas resolvidas (commits `f5bed79`, `99d0877`);
-  typecheck e lint limpos, 353 testes de unidade. Falta: T1–T3 (telas), i18n, `tests/integracao/registro.test.ts`,
-  auditor de risco, revisão de dados, QA e CI. Não verificado aqui (sem Docker): `pnpm db:test`, integração, e2e.
+- **PR #7 rascunho** (`feat/entrar-servico`): spec Approved; P4 feita; matriz de permissões (ADR 0020, S7 e B7).
+  Revisões: código, segurança, design, dados e **auditor de risco: liberam com ressalvas**, ressalvas resolvidas
+  (último `d91ec4a`). Unidade: 398 verdes. Banco: 11 migrations e 12 arquivos pgTAP verdes (280) num Postgres 16
+  local com papéis e auth simulados (não é o Supabase oficial; a prova final é a CI). Falta: T1–T3 (telas), i18n,
+  `tests/integracao/registro.test.ts`, QA e CI. Não verificado: integração e e2e (precisam do Supabase local).
 - **Avaliação do antigo** (só leitura, nada copiado; E43·A autorizou as ideias): `docs/produto/avaliacao-crm-agenda/`
   `regras-do-banco.md` (74 regras, 2 leituras), `seguranca-do-banco.md` (25) e `permissoes-e-pin.md`. Banco do antigo
   **esgotado** para o núcleo. As ideias entram em cada spec quando a branch dela for trabalhada.
