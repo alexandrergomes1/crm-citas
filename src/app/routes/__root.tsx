@@ -11,7 +11,7 @@ import { lerSessao, type SessaoLida } from '@/server/sessao/acoes'
 // Folha única do design system (plan.md §5; molde ?url do TanStack Start)
 import appCss from '../estilos/app.css?url'
 
-const SEM_SESSAO: SessaoLida = { comSessao: false, comEstudio: false, idioma: IDIOMA_PADRAO }
+const SEM_SESSAO: SessaoLida = { comSessao: false, comEstudio: false, idioma: IDIOMA_PADRAO, inicial: null }
 
 export const Route = createRootRoute({
   // sessao.ler a cada carga de página ou navegação pedida pela pessoa; nunca por recarga automática (ADR 0018 · D5).

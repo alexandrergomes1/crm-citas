@@ -16,8 +16,22 @@ import { ErroDoBanco, codigoDoAuth, codigoDoPostgrest, type CodigoDoBanco } from
 
 export type Papel = 'dona' | 'recepcao' | 'profissional'
 
-/** Declarações do token que o servidor usa (só identificadores; nada de e-mail). */
-export type Declaracoes = { readonly usuarioId: string; readonly sessaoId: string }
+/**
+ * Declarações do token que o servidor usa: identificadores e, no máximo, a inicial do e-mail (DESIGN.md §8b, bolinha
+ * Sua conta). O e-mail inteiro nunca sai daqui (AGENTS.md §6). Sem e-mail no token, a inicial fica ausente.
+ */
+export type Declaracoes = { readonly usuarioId: string; readonly sessaoId: string; readonly inicial?: string }
+
+/**
+ * Inicial da pessoa = primeira letra do e-mail, em maiúscula (DESIGN.md §8b; ficha E41·1·A). Um caractere só (por
+ * ponto de código; `toUpperCase` sem região, para não depender do idioma do servidor). Sem e-mail → undefined.
+ */
+export function inicialDoEmail(email: unknown): string | undefined {
+  if (typeof email !== 'string') return undefined
+  const primeira = Array.from(email.trim())[0]
+  if (primeira === undefined || primeira === '@') return undefined
+  return Array.from(primeira.toUpperCase())[0]
+}
 
 /** Linha de `public.contexto_da_sessao()`; `orgId` e `papel` vazios antes de escolher o estúdio. */
 export type ContextoDaSessao = {
@@ -120,7 +134,10 @@ export function abrirConexao(opcoes: OpcoesDaConexao): Conexao {
         const usuarioId = uuid.safeParse(data.claims.sub)
         const sessaoId = uuid.safeParse(data.claims.session_id)
         if (!usuarioId.success || !sessaoId.success || data.claims.role !== 'authenticated') return null
-        return { usuarioId: usuarioId.data, sessaoId: sessaoId.data }
+        const inicial = inicialDoEmail(data.claims.email)
+        return inicial === undefined
+          ? { usuarioId: usuarioId.data, sessaoId: sessaoId.data }
+          : { usuarioId: usuarioId.data, sessaoId: sessaoId.data, inicial }
       } catch {
         return null
       }

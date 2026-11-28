@@ -2,7 +2,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import type { Banco } from '@/data/cliente'
 import { ErroDoBanco } from '@/data/erros'
-import type { Conexao, ContextoDaSessao } from '@/data/sessao'
+import { inicialDoEmail, type Conexao, type ContextoDaSessao } from '@/data/sessao'
 import { acoesDoCatalogo } from '../portas/catalogo'
 import type { ContextoPessoa, ContextoSemSessao } from '../portas/tipos'
 import { entradaDeEntrar, trabalhoDeEntrar } from './acoes'
@@ -305,22 +305,66 @@ describe('estudio.listar e estudio.escolher (plan.md §3.3)', () => {
 })
 
 describe('sessao.ler', () => {
-  it('sem sessão: só o idioma do navegador', async () => {
+  it('sem sessão: só o idioma do navegador, sem inicial e sem ler o token', async () => {
     const { conexao } = conexaoFalsa()
     const lido = await definicao('sessao.ler').trabalho(
       { pedidoId: PEDIDO, idiomaDoNavegador: 'es', sessao: null, conexao } as never,
       {},
     )
-    expect(lido).toEqual({ comSessao: false, comEstudio: false, idioma: 'es' })
+    expect(lido).toEqual({ comSessao: false, comEstudio: false, idioma: 'es', inicial: null })
+    expect(conexao.quemE).not.toHaveBeenCalled()
   })
 
-  it('com estúdio: idioma do estúdio (RF-35)', async () => {
-    const { conexao } = conexaoFalsa()
+  it('com estúdio: idioma do estúdio (RF-35) e a inicial do token (DESIGN.md §8b)', async () => {
+    const { conexao } = conexaoFalsa({
+      quemE: vi.fn(async () => ({ usuarioId: PESSOA, sessaoId: PEDIDO, inicial: 'P' })),
+    })
     const lido = await definicao('sessao.ler').trabalho(
       { pedidoId: PEDIDO, idiomaDoNavegador: 'es', sessao: contexto({ orgId: ORG_A, papel: 'dona', idioma: 'en' }), conexao } as never,
       {},
     )
-    expect(lido).toEqual({ comSessao: true, comEstudio: true, idioma: 'en' })
+    expect(lido).toEqual({ comSessao: true, comEstudio: true, idioma: 'en', inicial: 'P' })
+  })
+
+  it('token sem e-mail ou que deixou de valer: inicial null, o resto igual', async () => {
+    for (const quem of [{ usuarioId: PESSOA, sessaoId: PEDIDO }, null]) {
+      const { conexao } = conexaoFalsa({ quemE: vi.fn(async () => quem) })
+      const lido = await definicao('sessao.ler').trabalho(
+        { pedidoId: PEDIDO, idiomaDoNavegador: 'pt', sessao: contexto(), conexao } as never,
+        {},
+      )
+      expect(lido).toEqual({ comSessao: true, comEstudio: false, idioma: 'pt', inicial: null })
+    }
+  })
+
+  it('a resposta não leva o e-mail nem outro campo além dos quatro (AGENTS.md §6)', async () => {
+    const { conexao } = conexaoFalsa({
+      quemE: vi.fn(async () => ({ usuarioId: PESSOA, sessaoId: PEDIDO, inicial: 'P' })),
+    })
+    const lido = await definicao('sessao.ler').trabalho(
+      { pedidoId: PEDIDO, idiomaDoNavegador: 'pt', sessao: contexto({ orgId: ORG_A }), conexao } as never,
+      {},
+    )
+    expect(Object.keys(lido as object).sort()).toEqual(['comEstudio', 'comSessao', 'idioma', 'inicial'])
+    expect(JSON.stringify(lido)).not.toContain(PESSOA)
+  })
+})
+
+describe('inicialDoEmail (DESIGN.md §8b; ficha E41·1·A)', () => {
+  it.each([
+    ['pessoa@exemplo.test', 'P'],
+    ['Pessoa@exemplo.test', 'P'],
+    ['  ana@exemplo.test ', 'A'],
+    ['7mar@exemplo.test', '7'],
+    ['élia@exemplo.test', 'É'],
+    ['ßeta@exemplo.test', 'S'],
+    ['istanbul@exemplo.test', 'I'],
+  ])('%s → %s (um caractere, maiúsculo)', (email, inicial) => {
+    expect(inicialDoEmail(email)).toBe(inicial)
+  })
+
+  it.each([[undefined], [null], [''], ['   '], ['@exemplo.test'], [42]])('%s → sem inicial', (email) => {
+    expect(inicialDoEmail(email)).toBeUndefined()
   })
 })
 

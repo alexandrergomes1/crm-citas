@@ -28,8 +28,9 @@ describe.skipIf(!bancoPronto)('sessao.entrar (integração)', () => {
     const resposta = await navegador.chamar(def('sessao.entrar'), { dados: { email: comEstudio, senha: SENHA } })
     expect(resposta.resultado).toEqual({ ok: true, valor: { destino: 'inicio' } })
     for (const c of resposta.cookies) expect(c.opcoes).toMatchObject({ httpOnly: true, secure: true, sameSite: 'lax', path: '/' })
+    // inicial = primeira letra do e-mail fictício "com-estudio.…" (DESIGN.md §8b); o e-mail inteiro não volta
     const lida = await navegador.chamar(def('sessao.ler'), undefined)
-    expect(lida.resultado).toEqual({ ok: true, valor: { comSessao: true, comEstudio: true, idioma: 'pt' } })
+    expect(lida.resultado).toEqual({ ok: true, valor: { comSessao: true, comEstudio: true, idioma: 'pt', inicial: 'C' } })
   })
 
   it('CA-01: senha errada, sem conta e sem estúdio dão a mesma resposta, com tempo parecido', async () => {

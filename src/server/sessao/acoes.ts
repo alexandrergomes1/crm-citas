@@ -5,7 +5,7 @@ import { codigoDe } from '@/data/erros'
 import type { Idioma } from '@/domain/idioma'
 import { acao, acaoGet, acaoPost } from '../portas/acao'
 import { Recusa } from '../portas/erros'
-import type { ContextoSemSessao } from '../portas/tipos'
+import type { ContextoOpcional, ContextoSemSessao } from '../portas/tipos'
 import { chavesDaTentativa } from './tentativas'
 
 /** Para onde a tela vai depois de entrar (RF-11). */
@@ -123,11 +123,27 @@ export const entrar = acaoPost.handler(
   }),
 )
 
-/** O que a tela sabe da sessão (sem dado pessoal). */
+/**
+ * O que a tela sabe da sessão. Único traço pessoal: a inicial do e-mail para a bolinha Sua conta (DESIGN.md §8b),
+ * nunca o e-mail inteiro (AGENTS.md §6). `null` sem sessão ou quando o token não traz e-mail.
+ */
 export type SessaoLida = {
   readonly comSessao: boolean
   readonly comEstudio: boolean
   readonly idioma: Idioma
+  readonly inicial: string | null
+}
+
+/** Trabalho de `sessao.ler`, sem framework, para o teste de unidade. */
+export async function trabalhoDeLerSessao(ctx: ContextoOpcional): Promise<SessaoLida> {
+  // A inicial vem do token já conferido pela porta 1 (getClaims confere a assinatura de novo; nada se guarda).
+  const quem = ctx.sessao === null ? null : await ctx.conexao.quemE()
+  return {
+    comSessao: ctx.sessao !== null,
+    comEstudio: ctx.sessao?.orgId != null,
+    idioma: ctx.sessao?.idioma ?? ctx.idiomaDoNavegador,
+    inicial: quem?.inicial ?? null,
+  }
 }
 
 export const lerSessao = acaoGet.handler(
@@ -138,11 +154,7 @@ export const lerSessao = acaoGet.handler(
     permissao: 'qualquer',
     entrada: z.strictObject({}),
     grava: false,
-    trabalho: async (ctx): Promise<SessaoLida> => ({
-      comSessao: ctx.sessao !== null,
-      comEstudio: ctx.sessao?.orgId != null,
-      idioma: ctx.sessao?.idioma ?? ctx.idiomaDoNavegador,
-    }),
+    trabalho: trabalhoDeLerSessao,
   }),
 )
 

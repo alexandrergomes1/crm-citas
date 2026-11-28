@@ -41,8 +41,9 @@ function AreaComSessao() {
     <>
       <BarraSuaConta
         textos={textosDe(sessao.idioma)}
-        // PENDENTE: sessao.ler ainda não devolve a inicial do e-mail (DESIGN.md §8b); fora dos arquivos da T2
-        inicial=""
+        // Inicial = primeira letra do e-mail (DESIGN.md §8b), vinda de sessao.ler. Sem ela, a bolinha fica vazia:
+        // a ficha (E41) não define um estado neutro (pendente, para o Designer de produto).
+        inicial={sessao.inicial ?? ''}
         quantosEstudios={quantosEstudios}
         onTrocar={() => void navegar({ to: '/escolher-estudio' })}
         onSair={() => void sairEVoltar()}

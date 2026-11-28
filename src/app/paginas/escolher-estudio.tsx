@@ -7,7 +7,7 @@ import type { Textos } from '@/app/i18n/textos'
 import { Bloco } from '@/app/ui/bloco-lista'
 import { Botao } from '@/app/ui/botao'
 import { InicialEstudio } from '@/app/ui/conteudo'
-import { Carregando, Erro } from '@/app/ui/estados'
+import { Carregando } from '@/app/ui/estados'
 import { Icone } from '@/app/ui/icone'
 import type { Idioma } from '@/domain/idioma'
 
@@ -34,6 +34,26 @@ function inicialDe(nome: string): string {
   return Array.from(nome.trim())[0]?.toLocaleUpperCase() ?? ''
 }
 
+/**
+ * Erro desta tela: só o título e "Tentar de novo", sem frase de detalhe (ficha E41, ressalvas da 2ª rodada).
+ * Mesmo desenho e classes do `Erro` de `src/app/ui/estados.tsx`, que sempre desenha o parágrafo da frase (com
+ * `frase=""` ficava um <p> vazio no leitor de tela e no espaço da tela). Tornar a frase opcional lá é a correção de
+ * fundo, mas o arquivo está fora da lista do plan.md §10.
+ */
+function ErroSemFrase({ titulo, rotuloTentar, onTentar }: Readonly<{ titulo: string; rotuloTentar: string; onTentar: () => void }>) {
+  return (
+    <div className="ds-estado">
+      <span className="ds-estado__icone ds-estado__icone--erro">
+        <Icone nome="circle-alert" />
+      </span>
+      <p className="ds-estado__titulo">{titulo}</p>
+      <Botao variante="claro" onClick={onTentar}>
+        {rotuloTentar}
+      </Botao>
+    </div>
+  )
+}
+
 /** O desenho da tela, sem estado próprio (testado por renderToString). */
 export function EscolherEstudioVista({ textos, idioma, estado, escolhendo = false, onEscolher, onTentar, onSair }: Readonly<EscolherEstudioVistaProps>) {
   const t = textos.escolherEstudio
@@ -50,8 +70,7 @@ export function EscolherEstudioVista({ textos, idioma, estado, escolhendo = fals
               <Carregando rotulo={t.carregando} linhas={2} />
             </div>
           ) : null}
-          {/* Erro: só o título e "Tentar de novo", sem frase de detalhe (ficha, ressalvas da 2ª rodada) */}
-          {estado.tipo === 'erro' ? <Erro titulo={t.erroTitulo} frase="" rotuloTentar={textos.comum.tentarDeNovo} onTentar={onTentar} /> : null}
+          {estado.tipo === 'erro' ? <ErroSemFrase titulo={t.erroTitulo} rotuloTentar={textos.comum.tentarDeNovo} onTentar={onTentar} /> : null}
           {estado.tipo === 'lista' ? (
             <ul className="ds-lista escolher__lista" aria-label={t.titulo}>
               {estado.estudios.map((estudio) => (

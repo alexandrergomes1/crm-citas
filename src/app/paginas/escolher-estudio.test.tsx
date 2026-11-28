@@ -53,6 +53,14 @@ describe('Escolher estúdio · carregando e erro', () => {
     expect(html).toContain('Tentar de novo')
     expect(html.indexOf('Tentar de novo')).toBeLessThan(html.lastIndexOf('Sair'))
   })
+
+  it('erro: nenhum parágrafo vazio nem frase de detalhe (ficha, ressalvas da 2ª rodada)', () => {
+    const html = vista({ tipo: 'erro' })
+    expect(html).not.toMatch(/<p[^>]*>\s*<\/p>/)
+    expect(html).not.toContain('ds-estado__frase')
+    expect(html).toContain('<p class="ds-estado__titulo">Não foi possível carregar</p>')
+    expect(html).toContain('ds-estado__icone--erro')
+  })
 })
 
 describe('Escolher estúdio · idiomas (CA-20)', () => {
