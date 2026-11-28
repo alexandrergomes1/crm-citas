@@ -16,7 +16,9 @@
 - Pedido (travas): "recupera as travas pra vc nao tomar decisao e saber falar comigo".
 - `AGENTS.md` §1: os comandos entram com a spec da fundação; antes de enviar, checagem de tipos, lint e testes.
 - Contexto do dono em 28/11/2026: o repositório fica **público** de propósito, para usar os minutos grátis do
-  GitHub Actions. Fala literal a gravar em `docs/decisoes/` pelo Documentador (ver §8, D1).
+  GitHub Actions: "Eu deixei público o projeto para vc ter os actions pra usar se preciso pq no privado tá sem
+  limite. Salvo se conseguires mudar entre público e privado qdo precisar ." (E19·1 troca, PR #2; ver §8, D1).
+- E22·B (28/11/2026): travas do antigo autorizadas e construção em PR de rascunho (ver §5).
 
 ## 2. Objetivo
 Deixar o projeto pronto para construir com segurança: um app vazio que roda, as quatro camadas no lugar, testes e
@@ -34,23 +36,29 @@ checagens automáticas a cada PR, banco local para testes e o Spec Kit instalado
 | R6 | Checagem de tipos e lint, sem erro no projeto inteiro. | `AGENTS.md` §1 |
 | R7 | Scripts fixos no `package.json` para: tipos, lint, testes, testes de tela, banco local e teste do banco. A lista exata de nomes fica no plano. | `AGENTS.md` §1 |
 | R8 | Supabase local (linha de comando com Docker), com 1 migration vazia e 1 teste de banco de exemplo que passa. Nada liga a banco remoto. | `ARCHITECTURE.md` §3 e §8; `AGENTS.md` §1 |
-| R9 | Spec Kit instalado conforme `processo-sdd.md` §5: pastas `specs/AAAAMMDD-HHMMSS-nome/` (numeração por data e hora), branch no padrão `tipo/area-assunto`, constituição que só aponta para o `AGENTS.md`. A instalação não sobrescreve `AGENTS.md`, `CLAUDE.md`, `.claude/agents/` nem `.claude/skills/`. Os nomes dos comandos do Spec Kit entram no `processo-sdd.md` §5. | `processo-sdd.md` §5; `AGENTS.md` §6 |
+| R9 | Spec Kit instalado conforme `processo-sdd.md` §5: pastas `specs/AAAAMMDD-HHMMSS-nome/` (numeração por data e hora), sem criar branch (a branch `tipo/area-assunto` é aberta pelo Engenheiro de DevOps na etapa 2), constituição que só aponta para o `AGENTS.md`. A instalação não sobrescreve `AGENTS.md`, `CLAUDE.md`, `.claude/agents/` nem `.claude/skills/`. Os nomes dos comandos do Spec Kit entram no `processo-sdd.md` §5. | `processo-sdd.md` §5; `AGENTS.md` §6 |
 | R10 | CI no GitHub Actions a cada PR para `previas` e para `main`, rodando: tipos, lint, testes, testes de tela (390 e 1440), banco local com a migration e o teste de banco, e gitleaks. | `AGENTS.md` §8; `ARCHITECTURE.md` §8 ("nada vai direto à `previas` ou à `main`: só por PR com CI verde") |
 | R11 | gitleaks procura segredo no histórico inteiro e em cada PR; achou, a CI fica vermelha. | E14·3; `SECURITY.md` §2 e §7 |
 | R12 | Dependabot ligado para as dependências do pnpm e para as ações do GitHub Actions. | E14·3; `SECURITY.md` §7 |
 | R13 | Gratuidade e limites de GitHub Actions, Dependabot e gitleaks em repositório público confirmados na documentação oficial, com link e data, no plano. Achou custo ou limite que afete o projeto: o trabalho para e vira pergunta ao dono. | E14·3 ("se for gratuito ver limites tbm") |
 | R14 | Testes e CI usam só dados fictícios; nenhum dado pessoal ou de saúde, nenhum segredo. | `AGENTS.md` §6; E5·1 |
 | R15 | `AGENTS.md` §1 recebe a lista de comandos do R7. O texto exato vai no plano e é aprovado pelo dono junto com esta spec; o Documentador registra a aprovação em `docs/decisoes/`. | `AGENTS.md` §1 e cabeçalho |
-| R16 | Documentos de controle (`docs/STATUS.md`, `docs/BACKLOG.md`, `CHANGELOG.md`) atualizados no mesmo PR, pelo Documentador. | `AGENTS.md` §9 |
+| R16 | Documentos de controle (`docs/STATUS.md`, `docs/BACKLOG.md`, `CHANGELOG.md`) e a seção "Como rodar" do `README.md` atualizados no mesmo PR, pelo Documentador. | `AGENTS.md` §9 |
 
 ## 4. Fora de escopo
 Publicar (Cloudflare, Wrangler, prévia online) · banco remoto (desenvolvimento ou produção) · segredos em qualquer
 cofre · qualquer módulo · design system (item 4 da fila) · tabelas, trava RLS e teste de isolamento por estúdio
 (item 3) · ligar o banco existente · mudar configurações do repositório no GitHub (visibilidade, proteção de branch).
 
-## 5. Parte condicionada: travas do projeto antigo
-As "travas automáticas do projeto antigo" (item 2 da fila) dependem da autorização do dono (E22, em aberto).
-Nada do projeto antigo é lido nem copiado nesta spec (`AGENTS.md` §3 regra 4). Ver dúvida E23·1.
+## 5. Travas do projeto antigo (autorizadas pelo E22·B)
+O dono respondeu ao E22 em 28/11/2026: "O banco de dados atual é tudo de desenvolvimento, todos os dados são
+fictícios. O que se tem são as tabelas e regras dele. Então use se precisar. E22b Bom trabalho e obrigado."
+(`docs/decisoes/`, PR #2). Fica autorizado ler e trazer do projeto antigo as travas automáticas deste item, pela
+skill `trazer-do-antigo`.
+- R17: cada trava é decidida pelo papel da área (copiar, reescrever ou descartar), com o motivo em `docs/adr/` e a
+  conferência de outro papel (`AGENTS.md` §3 regra 4; E16·1). Dado real e segredo nunca vêm.
+- A lista das travas trazidas e a decisão de cada uma ficam no plano, antes de construir.
+- Construção em PR de rascunho antes da aprovação da spec é permitida (E22·B); nada é juntado sem o dono.
 
 ## 6. Critérios de aceite (verificáveis)
 
@@ -66,17 +74,13 @@ Nada do projeto antigo é lido nem copiado nesta spec (`AGENTS.md` §3 regra 4).
 | CA8 | Um segredo falso de teste num commit descartável faz o gitleaks deixar a CI vermelha (prova feita em branch de teste, apagada depois). | link da execução |
 | CA9 | O arquivo de configuração do Dependabot existe e o GitHub o aceita sem erro. | aba do Dependabot no GitHub |
 | CA10 | O plano traz os links oficiais que confirmam gratuidade e limites (R13). | `plan.md` |
-| CA11 | O Spec Kit cria uma pasta de spec de teste com data e hora e propõe branch `tipo/area-assunto`; a constituição só aponta para o `AGENTS.md`; `AGENTS.md`, `CLAUDE.md`, `.claude/agents/` e `.claude/skills/` sem mudança fora do R15. | `git diff` revisado |
+| CA11 | O Spec Kit cria a pasta `specs/AAAAMMDD-HHMMSS-nome/` de uma spec de teste e não cria branch (a branch segue a etapa 2 do `processo-sdd.md`); a constituição só aponta para o `AGENTS.md`; `AGENTS.md`, `CLAUDE.md`, `.claude/agents/` e `.claude/skills/` sem mudança fora do R15. | `git diff` revisado |
 | CA12 | Nenhum arquivo fora da lista do plano muda; nenhum segredo, dado pessoal ou endereço de banco remoto no repositório. | revisão de código e gitleaks |
-| CA13 | `AGENTS.md` §1 e `processo-sdd.md` §5 trazem os comandos reais, iguais aos scripts. | revisão de texto |
+| CA13 | `AGENTS.md` §1, `processo-sdd.md` §5 e o "Como rodar" do `README.md` trazem os comandos reais, iguais aos scripts. | revisão de texto |
 
-## 7. Dúvidas para o dono (até 3)
+## 7. Dúvidas para o dono (2)
 
-**E23·1 · Travas do projeto antigo**
-- E23·1·A: ficam numa spec própria, depois da resposta ao E22; esta spec segue sem elas. → a fundação anda; as
-  travas entram depois, item por item.
-- E23·1·B: esta spec espera o E22. → nada da fundação se constrói até lá.
-- **Recomendo A:** a fundação não depende delas, e a regra 4 do `AGENTS.md` §3 pede autorização item por item.
+(A E23·1, sobre as travas do antigo, saiu: já respondida pelo E22·B, ver §5.)
 
 **E23·2 · Prévia online na Cloudflare (precisa da sua conta e de um token)**
 - E23·2·A: depois, numa spec própria antes do item 4 (primeira tela de verdade). → nada de conta ou token agora.
@@ -90,10 +94,10 @@ Nada do projeto antigo é lido nem copiado nesta spec (`AGENTS.md` §3 regra 4).
   no plano, R13), e o Supabase roda local.
 
 ## 8. Dependências e riscos (para o dono ver; não são Assumptions)
-- **D1 · Repositório público:** o E19·1 pedia repositório privado e o `SECURITY.md` §1 diz "este é privado". A fala
-  de 28/11 muda isso: o Documentador grava em `docs/decisoes/` e o `SECURITY.md` §1 precisa de correção (fora
-  desta spec; quem decide o caminho é o Gerente de projeto). Em repositório público, tudo o que entra fica visível:
-  o gitleaks no histórico inteiro (R11) é a proteção.
+- **D1 · Repositório público:** decidido pelo dono em 28/11/2026 (troca do E19·1, registrada em `docs/decisoes/`,
+  PR #2): o repositório fica público. O `SECURITY.md` §1, que diz "este é privado", é corrigido em PR próprio, fora
+  desta spec. Em repositório público, tudo o que entra fica visível: o gitleaks no histórico inteiro (R11) e o log
+  com o segredo escondido são a proteção.
 - **D2 · PR do Dependabot:** cada atualização vira um PR que pede revisão e merge autorizado. O plano confere na
   documentação oficial para qual branch vão os PRs de segurança (nunca direto à `main`, `AGENTS.md` §8).
 - **D3 · CI obrigatória:** a CI só barra o merge se a `previas` e a `main` exigirem a CI verde (configuração do
