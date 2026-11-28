@@ -1,8 +1,8 @@
 # Plano · Ligar o banco: base da trava por estúdio (item 3 da fila)
 
-- **Spec:** `specs/20261128-010000-banco-ligacao/spec.md` (Draft, revisão 5b feita)
+- **Spec:** `specs/20261128-010000-banco-ligacao/spec.md` (Draft)
 - **Escrito por:** Engenheiro de dados (banco), pelo Arquiteto de software · **Norma:** modelo C4 e ADR; boas práticas
-  oficiais do Postgres e do Supabase · **Revisão:** pendente (etapa 5 Analista de requisitos; 5b Gerente de projeto)
+  oficiais do Postgres e do Supabase · **Revisão:** 5b (Gerente de projeto) feita com ajustes, 28/11; etapa 5 (Analista de requisitos) pendente
 - **Decisões técnicas:** `docs/adr/0005-banco-base-trava-por-estudio.md` (saída de cada item do antigo e desenho)
 - **Base técnica:** item 2 (`chore/fundacao-tecnica`): `supabase/config.jsonc`, migration `20261128000921_fundacao.sql`,
   `supabase/tests/database/fundacao_test.sql`, scripts `db:start`, `db:test`, `db:stop`, ADR 0002 · D10.
@@ -25,12 +25,12 @@ app.estudio_da_sessao() · app.papel_da_sessao() · app.eh_dona() · app.escolhe
 políticas RLS de estudios e membros (e, depois, de toda tabela de módulo)
 ```
 
-## 2. Construção empilhada (E22·B)
-- Os documentos (spec, plano, tarefas, ADR 0005) ficam na `feat/banco-ligacao`.
-- A construção sai de uma branch nova criada **a partir da `chore/fundacao-tecnica`** (precisa do `supabase/` e da CI do
-  item 2). Nome sugerido: `feat/banco-trava-estudio`; quem cria é o Engenheiro de DevOps. PR de rascunho com base na
-  `chore/fundacao-tecnica`; depois do merge do item 2, a base do PR passa à `previas`.
-- Antes de começar: conferir que a `chore/fundacao-tecnica` ainda tem os arquivos da linha "Base técnica" acima.
+## 2. Branch única, PR empilhado (E22·B; decisão do Engenheiro de DevOps, 28/11)
+- Tudo do item 3 (spec, plano, tarefas, ADR 0005, migrations, testes, molde, registros) fica na `feat/banco-ligacao`,
+  que já recebeu a `chore/fundacao-tecnica` por merge (traz o `supabase/` e a CI do item 2).
+- O PR é de rascunho, empilhado sobre a `chore/fundacao-tecnica`; **nunca** se junta na `chore/fundacao-tecnica`.
+  Quando o item 2 entrar na `previas`, a base do PR passa à `previas`, e isso acontece **antes** do pedido de merge.
+- Antes de começar: conferir que a `feat/banco-ligacao` tem os arquivos da linha "Base técnica" acima.
 
 ## 3. Migrations novas (nesta ordem)
 Criadas com `pnpm exec supabase migration new <nome>` (gera `supabase/migrations/<AAAAMMDDHHMMSS>_<nome>.sql`; formato
@@ -148,9 +148,10 @@ fundação **não** mudam.
   - passos: o preparo do item 2 → aplicar as migrations no banco de desenvolvimento pela Supabase CLI (comando e opções
     exatos lidos na referência oficial da CLI 3.4.0 na hora de construir; primeiro em modo de ensaio, depois de verdade)
     → `supabase test db` contra o mesmo banco para provar a trava lá;
-  - se E24·2·A: o histórico de migrations do antigo nesse banco precisa ser tratado antes do primeiro envio; isso é um
-    passo destrutivo, desenhado só depois da resposta, com revisão do Auditor de risco, e não roda sem pedido próprio ao
-    dono. Se E24·2·B ou E24·1·B: projeto novo na UE, sem esse passo.
+  - se o dono escolher E24·2·A: o histórico de migrations do antigo nesse banco precisa ser tratado antes do primeiro
+    envio. Esse passo é destrutivo e **não está na lista de arquivos (§6) agora**: vira ajuste deste plano, com nova
+    revisão 5b, revisão do Auditor de risco e pedido próprio ao dono antes de rodar. Se E24·2·B ou E24·1·B: projeto
+    novo na UE, sem esse passo.
 - Sem a Fase B pronta, o PR pode ficar verde mas **não** é pedido o merge (CA-08, CA-09, CA-11 dependem dela).
 
 ## 8. Onde entram os itens fora de escopo (spec §8)

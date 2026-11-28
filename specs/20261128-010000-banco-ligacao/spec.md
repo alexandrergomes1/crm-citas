@@ -4,7 +4,9 @@
 - **Aprovação do dono:** (pendente)
 - **Aprovação do merge:** (pendente)
 - **Item da fila:** 3 (`docs/BACKLOG.md`), em paralelo aos itens 1 e 2 por ordem do dono (E22·B, §1)
-- **Branch:** `feat/banco-ligacao` (a partir da `previas`), construção em PR de rascunho; nada é juntado sem o dono (E22·B)
+- **Branch:** `feat/banco-ligacao`, única do item 3 (spec, plano, construção e registros), já com a `chore/fundacao-tecnica`
+  juntada por merge; PR de rascunho empilhado sobre ela, nunca juntado nela; a base passa à `previas` quando o item 2
+  entrar, antes do pedido de merge; nada é juntado sem o dono (E22·B)
 - **Tipo:** Banco (`docs/guias/processo-sdd.md` §3) · **Revisores:** Engenheiro de dados (quem não fez), Auditor de
   risco e Engenheiro de segurança (acesso) e QA
 - **Escrito por:** Analista de requisitos · **Norma:** IEEE 29148 e BABOK
@@ -125,7 +127,7 @@ de permissões), `org_profiles` e `org_profile_permissions` (perfis de acesso cr
 ## 11. Assumptions (decisões técnicas do papel, à vista na aprovação)
 1. Uma migration por tabela, com data e hora no nome, na pasta de migrations do Supabase em `supabase/` (caminho exato após ler a documentação oficial).
 2. A ferramenta do teste de isolamento é escolhida pelo Arquiteto no plano, depois de lida a documentação oficial.
-3. Os ADRs seguem a numeração de `docs/adr/` (próximo: 0002).
+3. Os ADRs seguem a numeração de `docs/adr/` (este item: ADR 0005).
 
 ## Anexo A · Inventário do antigo para as specs dos módulos (informativo, nada decidido)
 Lido em `crm-agenda/supabase/migrations/` (177 arquivos, só leitura, E22·B), pelos comandos `create table` e
