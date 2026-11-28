@@ -10,7 +10,7 @@
 - **Agenda (item 5), em planejamento na `feat/agenda`** (a branch já existia; pedido do dono "pode criar a branch da
   Agenda"). [Spec](https://github.com/alexandrergomes1/crm-citas/blob/feat/agenda/specs/20261128-020000-agenda/spec.md) com "Status: Approved" e os ajustes E54 a E58;
   plano e [ficha visual](https://github.com/alexandrergomes1/crm-citas/tree/feat/agenda/specs/20261128-020000-agenda/ficha) sendo atualizados pelo Arquiteto e pelo Designer.
-  **Espera a E59 do dono.** Sem código ainda.
+  **Espera a E59 e a E60 do dono.** Sem código ainda.
 - **Ordem da fila (E57·B):** a Agenda sai antes sem as visões, que aparecem "em desenvolvimento"; a spec
   "Agenda · visões e horário de funcionamento" vem logo depois ([fila](https://github.com/alexandrergomes1/crm-citas/blob/feat/agenda/docs/BACKLOG.md), item 5).
 - **Avaliação do antigo** (só leitura, nada copiado; E43·A autorizou as ideias): `docs/produto/avaliacao-crm-agenda/`.
@@ -22,6 +22,7 @@
 
 ## Esperando o dono
 1. **E59:** resposta sobre a Agenda (plano e ficha atualizados).
+   **E60:** decisões do Designer na ficha da Agenda.
 2. **E38·A1:** travas em `.claude/` agora que o Entrar entrou, numa conversa nova, num PR só para elas.
    **D2:** PRs do Dependabot e a `main`.
 3. Apagar `chore/base-fundacao` (o dono, na página de branches). Fechar ou não os PRs #5 e #6 (abertos sem uso).
