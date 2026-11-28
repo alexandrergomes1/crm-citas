@@ -57,7 +57,7 @@ reescrever.
 | RF-16 | Existe um único jeito de declarar uma ação do servidor: recebe a permissão pedida, o esquema da entrada e o trabalho; resolve as portas 1 a 4 antes do trabalho, entrega ao trabalho `usuarioId`, `orgId` e `papel` (da sessão) e o acesso ao banco com a sessão da pessoa (porta 5), e grava o registro (porta 6). | E4·1; `ARCHITECTURE.md` §4; plano da Agenda §5.1 |
 | RF-17 | As portas rodam nesta ordem; a primeira que recusa para tudo, e nada depois dela roda. | `ARCHITECTURE.md` §4; `src/server/AGENTS.md` |
 | RF-18 | Porta 3: cada ação do modo estúdio declara uma chave de permissão `modulo.acao` de um catálogo fechado; a permissão é conferida pela matriz padrão de cada papel da sessão (dona tem tudo; recepção e profissional pelas respostas do dono), a mesma no servidor e no banco; o que cada papel pode em cada módulo vem da spec do módulo. Esta spec entrega o mecanismo e as permissões das ações dela; a personalização é o item 6a (E42·A). | ADR 0005 T5; ADR 0020; E42·A |
-| RF-19 | Porta 4: toda entrada é validada por esquema; campo a mais, tipo errado, tamanho acima do limite ou texto vazio onde é obrigatório → `entrada_invalida`, e nada chega ao banco. | ASVS V5.1.3, V5.1.4 |
+| RF-19 | Porta 4: toda entrada é validada por esquema; campo a mais, tipo errado, tamanho acima do limite ou texto vazio onde é obrigatório → `entrada_invalida`; o trabalho não roda e nenhum dado do módulo é lido nem gravado (antes só houve a leitura do contexto da sessão, portas 1 e 2; ajuste de texto L-2, §10). | ASVS V5.1.3, V5.1.4 |
 | RF-20 | Porta 5: o servidor fala com o banco só com a sessão da pessoa (trava RLS); a chave de serviço não aparece em `src/server` nem em `src/data` nesta spec. | `ARCHITECTURE.md` §4; `src/data/AGENTS.md` |
 | RF-21 | Toda ação do servidor (das telas, e no futuro do painel, do portal e da API) é declarada por RF-16; ação declarada de outro jeito é barrada por checagem automática. | E4·1; `src/server/AGENTS.md` |
 | RF-22 | Erros saem só como **códigos** (`sem_login`, `estudio_trocado`, `sem_estudio`, `sem_permissao`, `entrada_invalida`, `conflito`, `limite`, `erro_interno`), sem mensagem do banco, pilha, identificador interno ou dado de pessoa; a tela traduz o código em frase genérica. | ASVS V7.4.1; `ARCHITECTURE.md` §7 |
@@ -71,7 +71,7 @@ reescrever.
 | RF-25 | **O que nunca se grava:** nome, e-mail, telefone, texto digitado, conteúdo dos campos, respostas de ficha de saúde, senha, token, cookie, endereço IP, endereço (URL) com parâmetros. | `ARCHITECTURE.md` §4 e §7; ASVS V7.1.1, V7.1.2; RGPD art. 5(1)(c) |
 | RF-26 | Ninguém com login altera nem apaga uma linha do registro; cada pessoa só acrescenta a própria linha, no estúdio da sessão (ou nas formas de RF-24a); a linha de tentativa que falha só aceita os campos de RF-24a. Ler o registro fica para spec própria (nenhuma tela lê nesta spec). | `ARCHITECTURE.md` §4; ASVS V7.3.3 |
 | RF-27 | Se o registro de uma ação que grava falha, a gravação é desfeita e a resposta é `erro_interno`. | `ARCHITECTURE.md` §4 ("quem fez o quê") |
-| RF-28 | Pedido recusado na porta 1 (sem login) não grava no banco (não há quem), salvo a tentativa de entrar que falha (RF-24a). | dedução de `ARCHITECTURE.md` §4 |
+| RF-28 | Pedido recusado na porta 1 (sem login) não grava no banco (não há quem), salvo a tentativa de entrar que falha (RF-24a) e a marca do fim da sessão vencida ou parada (uma linha `sessao.sair` com resultado `sem_login`, só no primeiro pedido depois de vencer; ajuste de texto, §10). | dedução de `ARCHITECTURE.md` §4 |
 | RF-29 | Exceções E6·1 e E6·2 valem como estão: o modo "entrar como o estúdio" e o painel admin não entram nesta spec, e nada aqui os registra nem os impede. | `SECURITY.md` §5 |
 
 ### 3.5 Tela de entrar e idiomas
@@ -99,11 +99,11 @@ reescrever.
 | CA-01 | Entrar com e-mail e senha certos cria sessão; senha errada, e-mail sem conta e conta sem estúdio ativo dão a mesma resposta. | integração com o Auth do banco local |
 | CA-02 | O cookie da sessão tem HttpOnly, Secure e SameSite; `document.cookie` não o mostra; nada no armazenamento local. | e2e |
 | CA-03 | O pacote do navegador não contém cliente do banco, endereço do banco nem chave; nenhuma ida do navegador ao Supabase durante o fluxo. | teste do build e e2e (rede observada) |
-| CA-04 | **Sem sessão, nada passa:** um teste percorre todas as ações declaradas e chama cada uma sem sessão e com sessão vencida → `sem_login`, nada gravado. | integração |
+| CA-04 | **Sem sessão, nada passa:** um teste percorre todas as ações declaradas e chama cada uma sem sessão, com sessão encerrada e com sessão vencida → `sem_login`. Sem sessão e com sessão encerrada, nada é gravado. Com sessão vencida, o primeiro pedido só marca o fim da sessão (motivo `tempo` ou `parada`) e grava uma linha `sessao.sair` com resultado `sem_login` (`plan.md` §3.4); nenhuma ação lê nem grava dado, e os pedidos seguintes não gravam mais nada (ajuste de texto, §10). | integração |
 | CA-05 | **Um estúdio não usa a sessão de outro:** pessoa de A e B com A escolhido manda `org_id` de B no pedido → recusado com `estudio_trocado`, nada lido nem gravado em A ou B; pessoa só de A tenta escolher B → recusado, nada muda; pessoas de A e de B ao mesmo tempo nunca veem dado uma da outra. | integração e pgTAP |
 | CA-06 | Troca de estúdio feita em outro aparelho → a próxima ação da tela antiga recebe `estudio_trocado` e não grava. | integração |
 | CA-07 | As portas rodam na ordem; recusa numa porta impede as seguintes (inclusive o trabalho e o banco). | unidade |
-| CA-08 | Entrada fora do esquema (campo a mais, tipo, tamanho, vazio) → `entrada_invalida`, nenhuma ida ao banco. | unidade |
+| CA-08 | Entrada fora do esquema (campo a mais, tipo, tamanho, vazio) → `entrada_invalida`; o trabalho não é chamado e o banco do módulo não é tocado (só a leitura do contexto da sessão, antes; L-2, §10). | unidade |
 | CA-09 | Ação que grava cria uma linha de registro com os campos de RF-24; busca no registro pelos e-mails, nomes e textos usados no teste não acha nada. | integração |
 | CA-09a | Entrar com sucesso, entrar que falha, escolher, trocar e sair gravam as linhas de RF-24a; a de falha não tem e-mail, IP, `usuario_id` nem `org_id`; o contador de tentativas não aparece no registro e expira. | integração |
 | CA-10 | Ninguém com login altera ou apaga o registro, nem grava linha de outra pessoa ou de outro estúdio; `anon` não toca o registro. | pgTAP (molde de isolamento do item 3) |
@@ -179,3 +179,39 @@ reescrever.
    na spec dele).
 3. Bibliotecas, desenho do registro e da função de passagem, e os números de RF-08: no plano, com ADR (sugestão do
    plano da Agenda §5.1: `@supabase/supabase-js`, `@supabase/ssr` sem cliente no navegador, `zod`).
+
+## 10. Ajustes de texto depois da aprovação (etapa 10, Analista de requisitos, 28/11/2026)
+Nenhum ajuste muda o comportamento aprovado: alinham o texto ao `plan.md` (revisado na 5b) e às respostas do dono.
+
+**Alinhamento ao plano**
+- **CA-04 e RF-28 (achado do Engenheiro de software):** o texto dizia "nada gravado", mas o `plan.md` §3.4 e a migration
+  `supabase/migrations/20261128013149_sessoes.sql` fazem a sessão vencida ou parada gravar, no primeiro pedido, a marca do
+  fim (motivo `tempo` ou `parada`) e uma linha `sessao.sair` com resultado `sem_login`. É o registro do fim da sessão
+  pedido por RF-23 (sair registra) e ASVS V7.1.3; sem dado de pessoa além do `usuario_id` (RF-24a). Prova:
+  `tests/integracao/portas.test.ts` (CA-04 e CA-15).
+- **RF-19 e CA-08 (L-2 do `plan.md` §13):** "nada chega ao banco" não cabe com a porta 2 antes da 4 (estúdio e papel vêm do
+  banco). Vale: entrada inválida não chama o trabalho nem lê ou grava dado do módulo. Prova: `src/server/portas/executar.test.ts`.
+- **RF-06 e CA-13 (L-1):** o texto já diz "o meio fica no plano"; o plano confere a sessão no banco a cada pedido (ADR 0018 · D4).
+  Sem mudança.
+
+**Nome visível "estúdio" → "empresa" / "business" (E47·1·A, `docs/decisoes/2026-11-27-fundacao.md`)**
+Nas telas, avisos e mensagens o nome visível passa a ser **empresa** (pt e es) e **business** (en), como no `DESIGN.md` §6.
+Os nomes técnicos não mudam (`estudio`, `org_id`, `estudios.idioma`, `app.escolher_estudio`, `estudio_trocado`,
+`sem_estudio`, `estudio.listar`, `estudio.escolher`, `escolher-estudio.tsx`, `/escolher-estudio`). Onde esta spec cita o
+nome visível, leia assim:
+
+| Onde | Texto da spec | Na tela |
+|---|---|---|
+| RF-11, RF-13, RF-30, RF-31, CA-18 | tela / título "Escolher estúdio" | **Escolher empresa** (es: Elegir empresa; en: Choose business, conforme `src/app/i18n/`) |
+| RF-14, RF-30 | item "Trocar de estúdio" do menu Sua conta | **Trocar de empresa** (es: Cambiar de empresa; en: Switch business) |
+| RF-13 | contador e nomes da lista | "1 empresa · N empresas" (`DESIGN.md` §6) |
+| RF-22 (frases da tela) | frases de `estudio_trocado` e `sem_estudio` | "A empresa mudou em outro aparelho..." · "Escolha uma empresa para continuar." |
+| §2, §3 e §5 em geral | "estúdio" como palavra do negócio | continua termo da spec (técnico); na tela é "empresa" |
+
+**Outras respostas do dono que tocam as telas desta spec**
+- **E47·1·A (letra do quadradinho):** em Escolher empresa, o quadradinho de cada item mostra a primeira letra do nome próprio,
+  pulando a palavra genérica do começo ("Estúdio Aurora" → A), regra no `DESIGN.md` §8b. Prova: `src/app/paginas/escolher-estudio.test.tsx`.
+- **E47·2·A (ícone user):** a bolinha de Sua conta sem inicial (sem e-mail) mostra o ícone `user`; fecha a L-4 junto com a
+  inicial do e-mail (E41·1·A). Prova: `src/app/paginas/sua-conta.test.tsx`.
+- **E47·3·A (tela inicial):** a página inicial de depois de entrar (Assumption 2) fica só com a barra do topo, sem o texto
+  "crm-citas", até a Agenda. Prova: `src/app/paginas/inicio.test.tsx` e `e2e/inicio.spec.ts`.
