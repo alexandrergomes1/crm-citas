@@ -79,15 +79,36 @@ export async function trabalhoDeEntrar(
   if (estudios === 1) {
     const [unico, ...outros] = await conexao.meusEstudios()
     if (unico && outros.length === 0) {
-      await conexao.escolherEstudio(unico.orgId)
+      await escolherAoEntrar(ctx, unico.orgId)
       return { destino: 'inicio' }
     }
     return { destino: 'escolher_estudio' }
   }
 
-  // Mais de um: já escolhido e ativo segue nele; senão, Escolher estúdio.
+  // Mais de um: já escolhido e ativo segue nele, com a escolha registrada nesta sessão (ASVS V7.1.3);
+  // senão, Escolher estúdio.
   const sessao = await conexao.contexto()
-  return { destino: sessao.orgId ? 'inicio' : 'escolher_estudio' }
+  if (!sessao.orgId) return { destino: 'escolher_estudio' }
+  await escolherAoEntrar(ctx, sessao.orgId)
+  return { destino: 'inicio' }
+}
+
+/**
+ * Escolhe o estúdio ao entrar pela mesma função de `estudio.escolher` (grava o registro no banco).
+ * Falhou: encerra a sessão em melhor esforço e faz signOut local antes do erro (ASVS V3.3.1).
+ */
+async function escolherAoEntrar({ conexao }: ContextoSemSessao, orgId: string): Promise<void> {
+  try {
+    await conexao.escolherEstudio(orgId)
+  } catch {
+    try {
+      await conexao.encerrarSessao()
+    } catch {
+      // segue para o signOut (ADR 0018 · D4)
+    }
+    await conexao.sairLocal()
+    throw new Recusa('erro_interno')
+  }
 }
 
 export const entrar = acaoPost.handler(

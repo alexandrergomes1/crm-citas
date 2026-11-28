@@ -188,6 +188,58 @@ describe('sessao.entrar (plan.md §3.1)', () => {
       contexto: vi.fn(async () => contexto({ orgId: ORG_B, papel: 'dona' })),
     })
     expect(await trabalhoDeEntrar(ctxEntrar(conexao), credenciais)).toEqual({ destino: 'inicio' })
+    expect(conexao.escolherEstudio).toHaveBeenCalledWith(ORG_B)
+  })
+
+  it('mais de um estúdio, já escolhido: a escolha é registrada pela função de escolher (ASVS V7.1.3)', async () => {
+    const { conexao, passos } = conexaoFalsa({
+      iniciarSessao: vi.fn(async () => {
+        passos.push('iniciarSessao')
+        return 2
+      }),
+      contexto: vi.fn(async () => {
+        passos.push('contexto')
+        return contexto({ orgId: ORG_B, papel: 'dona' })
+      }),
+    })
+    await trabalhoDeEntrar(ctxEntrar(conexao), credenciais)
+    expect(passos).toEqual(['conferirTentativa', 'entrarComSenha', 'iniciarSessao', 'contexto', `escolherEstudio(${ORG_B})`])
+  })
+
+  it('mais de um estúdio, escolha falha → encerra a sessão, signOut local e erro_interno (ASVS V3.3.1)', async () => {
+    const { conexao, passos } = conexaoFalsa({
+      iniciarSessao: vi.fn(async () => 2),
+      contexto: vi.fn(async () => contexto({ orgId: ORG_B, papel: 'dona' })),
+      escolherEstudio: vi.fn(async () => {
+        throw new ErroDoBanco('sem_permissao')
+      }),
+    })
+    expect(await motivo(trabalhoDeEntrar(ctxEntrar(conexao), credenciais))).toBe('erro_interno')
+    expect(passos.slice(-2)).toEqual(['encerrarSessao', 'sairLocal'])
+  })
+
+  it('um estúdio, escolha falha → encerra a sessão, signOut local e erro_interno (ASVS V3.3.1)', async () => {
+    const { conexao, passos } = conexaoFalsa({
+      escolherEstudio: vi.fn(async () => {
+        throw new ErroDoBanco('erro_interno')
+      }),
+    })
+    expect(await motivo(trabalhoDeEntrar(ctxEntrar(conexao), credenciais))).toBe('erro_interno')
+    expect(passos.slice(-2)).toEqual(['encerrarSessao', 'sairLocal'])
+    expect(conexao.registrarTentativaFalha).not.toHaveBeenCalled()
+  })
+
+  it('um estúdio, escolha e encerramento falham → signOut local roda mesmo assim', async () => {
+    const { conexao } = conexaoFalsa({
+      escolherEstudio: vi.fn(async () => {
+        throw new ErroDoBanco('erro_interno')
+      }),
+      encerrarSessao: vi.fn(async () => {
+        throw new ErroDoBanco('erro_interno')
+      }),
+    })
+    expect(await motivo(trabalhoDeEntrar(ctxEntrar(conexao), credenciais))).toBe('erro_interno')
+    expect(conexao.sairLocal).toHaveBeenCalledTimes(1)
   })
 })
 
