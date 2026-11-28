@@ -4,7 +4,9 @@
 - **Aprovação do dono:** (pendente)
 - **Aprovação do merge:** (pendente)
 - **Item da fila:** 5 (`docs/BACKLOG.md`), módulo Agendamento do núcleo (E3·2), em paralelo por ordem do dono (E22·B)
-- **Branch:** `feat/agendamento` (a partir da `previas`), construção em PR de rascunho; nada é juntado sem o dono (E22·B)
+- **Branch:** `feat/agendamento`, empilhada por merge sobre `feat/banco-ligacao`, `feat/design-system-codigo`,
+  `feat/entrar-servico` e as branches dos módulos de que depende (decisão do Engenheiro de DevOps, `plan.md` §11);
+  construção em PR de rascunho; nada é juntado sem o dono (E22·B)
 - **Tipo:** Tela, com Banco e Código (`docs/guias/processo-sdd.md` §3) · **Revisores:** Revisor de design,
   Engenheiro de dados (quem não fez), Auditor de risco e Engenheiro de segurança (acesso), Revisor de código e QA
 - **Escrito por:** Analista de requisitos · **Norma:** IEEE 29148 e BABOK
@@ -27,7 +29,9 @@ atendimento repetido · linha do tempo do atendimento · política de cancelamen
 | **Agenda** (spec própria, `feat/agenda`) | ver e organizar o calendário: visões, filtros, cartões, bloqueios de horário; lista de espera e arrastar (depois) | as regras de um agendamento |
 | **Agendamento** (esta spec) | criar, remarcar, cancelar e mudar o status de **um** agendamento; a regra de conflito | desenhar o calendário |
 
-A Agenda abre o "Novo agendamento" e o painel do agendamento, e o arrastar da Agenda usa a regra de remarcar desta spec
+**Na grade:** quem desenha o agendamento é a Agenda (cartão com hora de início e fim, cliente, serviço e ícone de
+status; spec da Agenda §4, "Cartão do agendamento"); esta spec fornece a leitura dos agendamentos do dia para a grade
+(RF-16) e o que acontece ao tocar no cartão (abre o painel do agendamento). A Agenda abre o "Novo agendamento" e o painel do agendamento, e o arrastar da Agenda usa a regra de remarcar desta spec
 (RF-05 e RF-06). O "Bloqueio de horário" (`DESIGN.md` §5) é da Agenda e é sempre de uma profissional (RF-07 e RN-04 da spec da Agenda).
 O arrastar e a lista de espera ficam **depois** (a Agenda não os tem na primeira versão).
 
@@ -74,14 +78,16 @@ o botão de avançar etapa e o nome da ação de remarcar no ⋮.
 | RF-05 | **Remarcar:** muda profissional, data e hora, com a mesma regra de conflito (ignorando o próprio agendamento); só nos status Reservado e Confirmado; Confirmado volta a Reservado. | candidata; Assumption 3 |
 | RF-06 | Depois: quando a Agenda tiver o arrastar, ele chama a mesma regra do RF-05; não há segunda regra. | §1 |
 | RF-07 | **Status e transições** (status do `DESIGN.md` §5, menos "Bloqueio de horário"): o agendamento nasce Reservado; só valem as transições da tabela abaixo; Concluído, Ausência e Cancelado são finais na primeira versão. | `DESIGN.md` §5; Assumption 1 e 2 |
-| RF-08 | Troca para Cancelado ("Cancelar agendamento") ou Ausência pede a janelinha de confirmação; as outras trocas saem com aviso e "Desfazer", que só volta ao status imediatamente anterior. | `DESIGN.md` §6 e §8 |
+| RF-08 | Troca para Cancelado ("Cancelar agendamento") ou Ausência pede a janelinha de confirmação; as outras trocas saem com aviso e "Desfazer", que só volta ao status imediatamente anterior. Quanto tempo o aviso fica à vista: o `DESIGN.md` não diz, vai à ficha visual (etapa 6). | `DESIGN.md` §6 e §8 |
 | RF-09 | Toda troca de status grava histórico: status, quem e quando. | candidata (linha do tempo) |
 | RF-10 | Toda criação, remarcação e troca de status passa pelas 6 portas e fica no registro (porta 6), sem nome, telefone ou dado de saúde no texto. | `ARCHITECTURE.md` §4 e §7 |
 | RF-11 | Permissão por papel: dona e recepção em todos os agendamentos do estúdio; a profissional conforme a E26·1 e a E26·2 da Agenda. | `ARCHITECTURE.md` §6; E26·1; E26·2 |
 | RF-12 | Horários no fuso do estúdio; o estúdio vem da sessão, nunca do pedido. | `ARCHITECTURE.md` §4 e §11 |
 | RF-13 | Não se cria nem se remarca para início já passado (na primeira versão). | Assumption 5 |
-| RF-14 | Cliente nova na etapa 1 conforme E27·1. | E27·1 |
+| RF-14 | Cliente nova na etapa 1 conforme E27·1. A busca da etapa 1 mostra só clientes ativas: cliente arquivada não aparece ao agendar, e os agendamentos que ela já tem continuam como estão. | E27·1; Assumption 8 |
 | RF-15 | **Plano B:** enquanto Clientes ou Catálogo não existirem, a etapa correspondente aparece "em desenvolvimento" (`DESIGN.md` §8) e os testes usam dados de exemplo locais, fictícios, escritos do zero (RG-07). | `DESIGN.md` §8; item 3 RG-07 |
+| RF-16 | A Agenda lê, pela camada de serviço, os agendamentos do dia à vista (paginados, só do estúdio da sessão e conforme E26·1), para desenhar os cartões. | spec da Agenda §4; `ARCHITECTURE.md` §4 |
+| RF-17 | Hora que não existe no dia da troca para o horário de verão (no fuso do estúdio) é recusada, com mensagem que diz que essa hora não existe nesse dia; hora que se repete na volta do horário fica com a primeira. | Assumption 9 |
 
 **Transições (RF-07):**
 
@@ -126,7 +132,9 @@ teste de isolamento em cada tabela. Como garantir o RNF-02 no banco é decisão 
 |---|---|---|
 | CA-01 | Cada transição da tabela do RF-07 é aceita, e cada par fora dela é recusado. | unidade (`src/domain`) |
 | CA-02 | Conflito: cruzamento de intervalos recusado; encostar (fim = início do outro) aceito; Cancelado e Ausência não ocupam; bloqueio ocupa; remarcar ignora o próprio. | unidade |
-| CA-03 | Fim = início + soma das durações; início no passado recusado; fuso do estúdio respeitado (inclui troca de horário de verão). | unidade |
+| CA-03 | Fim = início + soma das durações; início no passado recusado; fuso do estúdio respeitado (inclui troca de horário de verão: hora que não existe recusada com mensagem, RF-17). | unidade |
+| CA-03b | Cliente arquivada não aparece na busca da etapa 1; seus agendamentos antigos continuam abertos e intactos. | unidade e e2e |
+| CA-03c | A Agenda recebe os agendamentos do dia e o toque no cartão abre o painel (RF-16). | e2e |
 | CA-04 | Duas gravações simultâneas no mesmo horário: só uma grava. | teste de banco na CI |
 | CA-05 | O estúdio A não lê, cria, altera nem apaga agendamento, item ou histórico do estúdio B; sem login ou sem papel, nada. | teste de isolamento na CI (molde do item 3) |
 | CA-06 | Permissão por papel conforme RF-11, E26·1 e E26·2 (cada papel × cada ação). | teste de servidor e de banco |
@@ -140,6 +148,8 @@ teste de isolamento em cada tabela. Como garantir o RNF-02 no banco é decisão 
 | CA-14 | Revisores do tipo sem "Bloqueia", veredito do QA e conferência do dono na prévia. | relatórios no PR |
 
 ## 9. Dependências
+- **Spec "Entrar e camada de serviço"** (E36·A do dono, 28/11/2026; branch `feat/entrar-servico`): login, sessão, as
+  6 portas e o registro (porta 6) que toda ação do Agendamento usa.
 - **Item 2** (CI, app vazio, Spec Kit) · **item 3** (estúdio, membros, papéis, função de checagem, molde do teste de
   isolamento) · **item 4** (design system no código).
 - **Agenda:** quem é profissional (E26·3), acesso da profissional (E26·1, E26·2), bloqueios; o botão "Novo
@@ -159,8 +169,11 @@ O que a profissional pode fazer: respondido pela E26·1 e pela E26·2 da spec da
 
 **E27·2 · Horário ocupado** (tela e acesso)
 - **E27·2·A:** o sistema sempre impede marcar em horário ocupado ou bloqueado.
-- **E27·2·B:** avisa, e dona e recepção podem marcar mesmo assim (encaixe), com registro.
-- **Recomendo A na primeira versão:** regra simples e testável; o B entra depois sem mudar os dados.
+- **E27·2·B:** avisa, e dona e recepção podem marcar mesmo assim (encaixe), com registro. **Muda os dados:** o
+  agendamento ganha a marca "encaixe" (só dona e recepção gravam), a trava de horário ocupado no banco passa a ignorar
+  os encaixes e o encaixe tem registro próprio (`plan.md` §12).
+- **Recomendo A na primeira versão:** regra simples e testável. Desfaz-se depois com uma mudança de banco por spec
+  (a marca nova e a trava ajustada); os agendamentos já gravados não mudam.
 
 ## 11. Assumptions (decisões do papel, à vista na aprovação; recuse pelo número)
 1. Todo agendamento nasce **Reservado** (o status "Agendado" do antigo não existe no `DESIGN.md`).
@@ -170,6 +183,8 @@ O que a profissional pode fazer: respondido pela E26·1 e pela E26·2 da spec da
 5. Início no passado é recusado na primeira versão (o balcão sem reserva entra depois).
 6. Intervalos [início, fim): encostar não é conflito.
 7. Tabelas: as sugestões do §7 são do Engenheiro de dados decidir no plano, com ADR.
+8. Cliente arquivada fica fora da busca ao agendar; os agendamentos dela não mudam (RF-14).
+9. Troca de horário de verão: hora que não existe é recusada com mensagem; hora repetida fica com a primeira (RF-17).
 
 ## 12. Fora de escopo
 - Cobrança à cliente, sinal, multa de cancelamento ou falta, preço, desconto e gorjeta (E21·3; Checkout).
