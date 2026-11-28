@@ -84,7 +84,7 @@ Sugestões do Arquiteto, por cima das do Analista (spec §7). Nada se copia: "re
 | # | Nome | Conteúdo (sugestão; forma final do Engenheiro de dados) |
 |---|---|---|
 | M1 | `agenda_nome_exibicao` | só se a T3 escolher a coluna: `nome_exibicao text` em `public.membros`, com tamanho máximo; grava só a dona do estúdio (privilégio por coluna) ou tarefa interna |
-| M2 | `agenda_bloqueios` | tabela, RLS ligada, `revoke all` de `anon` e `authenticated`, `grant` por coluna, políticas, índices e restrições do §4.3 |
+| M2 | `agenda_bloqueios` | tabela, RLS ligada, `revoke all` de `anon` e `authenticated`, `grant` por coluna, políticas, índices e restrições do §4.3, e o gatilho genérico de registro (molde do ADR 0019, da `feat/entrar-servico`) |
 
 ### 4.3 `public.bloqueios` (sugestão)
 | Coluna | Tipo e regra |
@@ -126,20 +126,24 @@ valer também para `bloqueios`.
 
 ## 5. Código por camada (regra de dependência do `ARCHITECTURE.md` §3, já travada pelo lint do item 2)
 
-### 5.1 Contrato que a Agenda usa da spec "Entrar e camada de serviço" (E36·A, `feat/entrar-servico`)
-A Agenda **não** escreve as portas. Usa (de `src/server/portas/`, daquela spec) uma função que monta a ação:
-recebe a permissão pedida, o esquema da entrada e o trabalho; antes do trabalho resolve as portas 1 a 4 e entrega um
-contexto com `usuarioId`, `orgId` e `papel` (lidos da sessão; o `orgId` nunca vem da entrada), e o acesso ao banco
-com a sessão da pessoa (porta 5); depois grava o registro (porta 6) com nome do evento e identificadores, sem texto
-livre. Erros saem como **códigos** (ex.: `sem_login`, `sem_permissao`, `entrada_invalida`, `conflito`), nunca com dado.
-O formato que vale é o do plano daquela spec; se for outro, só `ler-dia.ts` e `bloqueios.ts` se ajustam.
-
-**Sugestão para o plano daquela spec (decide quem a planejar; não decidido aqui, sem ADR):** ligar o servidor ao banco pelo `@supabase/supabase-js`
-2.119.2 com `@supabase/ssr` 0.12.7 (MIT; o `ssr` pede `supabase-js ^2.114.0`), com a sessão da pessoa em cookie que o
-navegador não lê e **nenhum cliente do banco no navegador**, para que a regra "o navegador nunca fala com o banco"
-(`ARCHITECTURE.md` §4) valha de fato; validação por `zod` 4.6.7 (MIT; Standard Schema, aceito pelo `.validator` do
-TanStack Start). Alternativa: ligação direta ao Postgres por transação com o papel e o token da pessoa (como os
-testes pgTAP fazem), sem a API do Supabase exposta. Versões lidas por `npm view` em 28/11 (todas com mais de 3 dias).
+### 5.1 Contrato da camada de serviço (fixo: `feat/entrar-servico`, `plan.md` §4 de lá e ADR 0018)
+A Agenda **não** escreve as portas. Toda ação dela é declarada só por `acao(...)` de `src/server/portas/acao.ts`:
+`acao({ nome, metodo, sessao, permissao, entrada, grava, trabalho })` → `{ ok: true, valor } | { ok: false, codigo }`.
+- `nome`: `agenda.dia.ler`, `agenda.bloqueio.criar`, `agenda.bloqueio.alterar`, `agenda.bloqueio.excluir` (catálogo
+  único); `metodo`: `GET` para ler, `POST` para gravar; `sessao: 'estudio'` em todas.
+- `permissao`: a regra pura de `src/domain/agenda/acesso.ts` (E26·2), passada como função do papel.
+- `entrada`: `z.strictObject(...)`, sem campo de estúdio; campo a mais → `entrada_invalida` (ADR 0018 · D13). A porta 4
+  roda no molde, depois das portas 1 a 3; não se usa o `.validator` do TanStack Start.
+- `trabalho(ctx, dados)`: `ctx` traz `usuarioId`, `orgId`, `papel`, `idioma`, `fuso`, `moeda` e `banco` (token da pessoa;
+  trava RLS e pré-pedido da sessão e do estúdio valem em cada pedido). `src/domain` recebe só valores, nunca `ctx.banco`.
+- **Uma transação por ação** (ADR 0018 · D3): no máximo **um pedido de gravação** à Data API por ação; o `banco` recusa o
+  segundo. Cada gravação da Agenda toca uma tabela só (`bloqueios`), então **não precisa de função `security invoker`**;
+  se uma gravação futura tocar mais de uma tabela, ela vira uma função `public.agenda_<acao>(...)`, `security invoker`.
+- **Registro (porta 6):** o gatilho genérico de registro do ADR 0018 · D7 (molde do ADR 0019), ligado em `bloqueios`
+  pela migration M2, grava na mesma transação, com o `nome` da ação e só identificadores; o código da Agenda não grava
+  registro.
+- **Erros:** só os códigos da lista fechada; a exclusão do banco (`23P01`) vira `conflito` pelo mapa de `src/data/erros.ts`
+  (de lá). A tela manda `estudioDaTela`; recebeu `estudio_trocado` → recarrega.
 
 ### 5.2 `src/domain/agenda/` (TypeScript puro, com teste; Engenheiro de software)
 | Arquivo | O que tem | Regras |
@@ -160,17 +164,20 @@ testes pgTAP fazem), sem a API do Supabase exposta. Versões lidas por `npm view
 ### 5.3 `src/server/agenda/` (Engenheiro de software)
 | Arquivo | O que tem |
 |---|---|
-| `esquemas.ts` | esquemas de entrada: `dia` (`AAAA-MM-DD`), bloqueio (profissional `uuid`, data, início, fim em passos do dia, motivo opcional ≤ 200), `id` do bloqueio. **Sem campo de estúdio**; chave desconhecida é descartada (CA-04) |
-| `ler-dia.ts` | ação de leitura (`GET`): estúdio, fuso e idioma da sessão → limites do dia (`dia.ts`) → colunas → bloqueios do dia com teto (`limit` teto + 1) → máscara de `acesso.ts` → resposta. **No máximo 3 idas ao banco** (ADR 0006 · D3) |
-| `bloqueios.ts` | `criarBloqueio`, `alterarBloqueio`, `excluirBloqueio` (`POST`): porta 3 por `acesso.ts`; regras de `bloqueio.ts` com os ocupados da profissional naquele dia; gravação; registro `agenda.bloqueio.criado`, `.alterado`, `.excluido` com `bloqueio_id` e `profissional_id`, **sem o motivo** (RF-09). Violação da exclusão do banco volta como `conflito` |
-| `ler-dia.test.ts`, `bloqueios.test.ts` | com o acesso ao banco trocado por um falso: estúdio no pedido ignorado (CA-04); sem login e sem papel, nada lido nem gravado (CA-03); profissional não grava na coluna de outra (E26·2·A); motivo mascarado nas outras colunas (E26·1·B); motivo nunca no registro nem no erro (CA-09); número de idas ao banco ≤ 3 (RNF-02) |
+| `esquemas.ts` | `z.strictObject` de cada ação: `dia` (`AAAA-MM-DD`); bloqueio (profissional `uuid`, data, início, fim em passos do dia, motivo opcional ≤ 200); `id` do bloqueio. **Sem campo de estúdio**: um estúdio no pedido é recusado (`entrada_invalida`) e nunca usado (CA-04; ver nota abaixo) |
+| `ler-dia.ts` | `acao({ nome: 'agenda.dia.ler', metodo: 'GET', grava: false, ... })`: fuso e idioma vêm do `ctx` → limites do dia (`dia.ts`) → colunas → bloqueios do dia com teto (`limit` teto + 1) → máscara de `acesso.ts` → `valor`. **No máximo 2 pedidos de leitura** (ADR 0006 · D3) |
+| `bloqueios.ts` | três `acao(...)` com `metodo: 'POST'`, `grava: true`: lê os ocupados da profissional naquele dia (1 leitura) → regras de `bloqueio.ts` (falhou: `entrada_invalida` ou `conflito`, sem gravar) → **um** pedido de gravação (insert, update ou delete por `id`). Corrida entre duas pessoas: a exclusão do banco recusa e volta `conflito` |
+| `ler-dia.test.ts`, `bloqueios.test.ts` | testam o `trabalho` e a `permissao` com `ctx` falso (o molde e as portas são testados na spec Entrar): estúdio no pedido recusado pelo esquema (CA-04); profissional não grava na coluna de outra (E26·2·A); motivo mascarado nas outras colunas (E26·1·B); motivo nunca no `valor` de erro (CA-09); ≤ 2 leituras no dia e ≤ 1 leitura + 1 gravação por ação (RNF-02, ADR 0018 · D3) |
+
+**Nota para o Analista (CA-04):** a spec diz "estúdio vindo no pedido é **ignorado**"; pelo contrato fixo ele é
+**recusado** (`entrada_invalida`). A intenção (o estúdio nunca vem do pedido) fica igual e mais forte; ajustar a palavra.
+"Sem login e sem papel, nada" (CA-03) é provado pelo teste do catálogo da spec Entrar (todas as ações) e pelo pgTAP 110.
 
 ### 5.4 `src/data/agenda/` (Engenheiro de software; consultas conferidas pelo Engenheiro de dados)
 | Arquivo | O que tem |
 |---|---|
-| `estudio.ts` | fuso, idioma e moeda do estúdio da sessão (uma ida) |
 | `colunas.ts` | membros ativos que são coluna (E26·3·A), com o nome de exibição (L-2), ordenados por nome (uma ida) |
-| `bloqueios.ts` | bloqueios que cruzam `[inicioDoDia, fimDoDia)` das colunas pedidas, com `limit`; criar, alterar, apagar por `id` (a trava faz o resto). Nenhum filtro por `org_id` vindo de fora: a RLS decide |
+| `bloqueios.ts` | por `ctx.banco`: bloqueios que cruzam `[inicioDoDia, fimDoDia)` das colunas pedidas, com `limit`; ocupados de uma profissional num dia; criar, alterar, apagar por `id` (um pedido cada; a trava faz o resto). Nenhum filtro por `org_id` vindo de fora: a RLS decide. Fuso, idioma e moeda não se leem aqui: vêm do `ctx` |
 
 Sem teste de unidade próprio (são consultas); a prova é o pgTAP (§4.4) e o e2e (§7).
 
@@ -204,12 +211,13 @@ Sem teste de unidade próprio (são consultas); a prova é o pgTAP (§4.4) e o e
 
 ## 6. Desfazer, tetos e estados (decisões técnicas, ADR 0006)
 - **Desfazer a exclusão:** o aviso guarda na memória da tela os dados do bloqueio excluído; "Desfazer" chama
-  `criarBloqueio` com eles (mesmas portas, mesmo conflito; novo `id`; registro de criação). Se outro item ocupou o
+  a ação `agenda.bloqueio.criar` com eles (mesmas portas, mesmo conflito; novo `id`; registro de criação pelo gatilho). Se outro item ocupou o
   horário no meio, a tela diz o conflito. Nada fica guardado no banco depois de excluído (D4).
 - **Teto de itens por dia:** 500 itens na consulta do dia (todas as colunas à vista); passou, a tela avisa e sugere
   esconder colunas (RN-08) (D3).
-- **Teto de idas ao banco por tela:** 3 na leitura do dia (estúdio, colunas, bloqueios) e 3 numa gravação (ocupados
-  da profissional, gravar, registro), além do que a camada de serviço fizer para a sessão (D3).
+- **Teto de idas ao banco por tela:** 2 pedidos na leitura do dia (colunas, bloqueios) e, numa gravação, 1 leitura
+  (ocupados da profissional) + 1 pedido de gravação, que já leva o registro pelo gatilho; além do que a camada de
+  serviço fizer para a sessão (D3; ADR 0018 · D3).
 - **Estado de erro:** "Tentar de novo" refaz o `loader`. Carregando: o componente de estados do item 4 (atraso de 0,3 s).
 
 ## 7. Testes de tela (Playwright, projetos `celular` 390 e `computador` 1440 do item 2)
@@ -250,7 +258,7 @@ M1) · `docs/adr/0007-agenda-tabelas-do-antigo.md`.
 
 **Servidor:** `src/server/agenda/{esquemas,ler-dia,bloqueios}.ts` e `{ler-dia,bloqueios}.test.ts`.
 
-**Dados:** `src/data/agenda/{estudio,colunas,bloqueios}.ts`.
+**Dados:** `src/data/agenda/{colunas,bloqueios}.ts`.
 
 **Telas:** `src/app/routes/agenda.tsx` · `src/app/routeTree.gen.ts` (gerado) · `src/app/navegacao.ts` ·
 `src/app/paginas/agenda/{agenda,barra,grade,cartao,bloqueio-painel,filtros,equipe}.tsx` ·
@@ -287,7 +295,7 @@ plano), `src/server/portas/**`, `src/data/cliente.ts`, a tabela do registro, a t
 | CA-01 | `src/domain/agenda/*.test.ts` verdes (23 h, 25 h, meia-noite que não existe, cruzar a meia-noite, encostar, teto) | QA |
 | CA-02 | pgTAP 110 e 120 verdes | Engenheiro de dados revisor; QA |
 | CA-03 | pgTAP 110 e 130; `ler-dia.test.ts` e `bloqueios.test.ts` | QA; Engenheiro de segurança |
-| CA-04 | `ler-dia.test.ts` e `bloqueios.test.ts` (estúdio no pedido ignorado) | Revisor de código |
+| CA-04 | `ler-dia.test.ts` e `bloqueios.test.ts` (estúdio no pedido recusado e nunca usado; nota do §5.3) | Revisor de código |
 | CA-05, CA-06 | `e2e/agenda.spec.ts` e `e2e/agenda-estados.spec.ts` verdes nos 2 projetos | QA |
 | CA-07 | checklist `DESIGN.md` §10 sobre as capturas 390 e 1440 | Revisor de design |
 | CA-08 | `e2e/agenda-acessibilidade.spec.ts` verde nos 2 projetos | QA |

@@ -37,10 +37,10 @@
 - [ ] **T10** · Apagar `src/domain/exemplo.ts` e `exemplo.test.ts`.
 
 ## Fase 4 · Dados e servidor (Engenheiro de software)
-- [ ] **T11** · `src/data/agenda/{estudio,colunas,bloqueios}.ts` pelo contrato da camada de serviço (`plan.md` §5.1);
+- [ ] **T11** · `src/data/agenda/{colunas,bloqueios}.ts` por `ctx.banco` (contrato fixo, `plan.md` §5.1);
   o Engenheiro de dados confere as consultas.
-- [ ] **T12** · `src/server/agenda/esquemas.ts` e `ler-dia.ts` + teste (CA-03, CA-04, máscara E26·1, ≤ 3 idas).
-- [ ] **T13** · `src/server/agenda/bloqueios.ts` + teste (criar, alterar, excluir; conflito; registro sem motivo; CA-09).
+- [ ] **T12** · `src/server/agenda/esquemas.ts` e `ler-dia.ts` + teste (`acao(...)`, CA-04, máscara E26·1, ≤ 2 leituras).
+- [ ] **T13** · `src/server/agenda/bloqueios.ts` + teste (três `acao(...)`; ≤ 1 leitura + 1 gravação; `23P01` → `conflito`; CA-09).
 
 ## Fase 5 · Telas (Engenheiro de software, pela ficha aprovada)
 - [ ] **T14** · Bloco `agenda` em `src/app/i18n/{pt,es,en}.ts` (base da `feat/entrar-servico`); `i18n.test.ts` dela verde.
