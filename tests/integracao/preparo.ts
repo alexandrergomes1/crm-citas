@@ -72,7 +72,7 @@ let alvoLocalConferido = false
 
 /**
  * Antes da primeira consulta, confere pela própria CLI que o alvo é o banco local (`supabase status -o json`, campo
- * DB_URL em 127.0.0.1 ou localhost); qualquer outra coisa recusa e nenhuma consulta sai (revisão de segurança R2;
+ * DB_URL em 127.0.0.1, localhost ou ::1); qualquer outra coisa recusa e nenhuma consulta sai (revisão de segurança R2;
  * AGENTS.md §1: a IA nunca mexe no banco remoto). A saída tem chaves locais: fica só em memória, nunca impressa.
  */
 function conferirAlvoLocal(): void {
@@ -105,17 +105,30 @@ export function sql<T = Record<string, unknown>>(consulta: string): T[] {
 }
 
 /**
+ * Etiqueta do comando que a CLI responde, em vez de JSON, a instrução de escrita sem linhas de volta. Conferido rodando
+ * `supabase db query --output-format json` (CLI 3.4.0) nos dois modos (com e sem `AI_AGENT`/`CLAUDECODE`): a saída é
+ * igual, só a etiqueta (`INSERT 0 1`, `INSERT 0 0`, `UPDATE 2`, `UPDATE 0`, `DELETE 0`). Só estas três contam.
+ */
+const ETIQUETA_SEM_LINHAS = /^(?:INSERT 0|UPDATE|DELETE) \d+$/
+
+/**
  * Linhas da saída de `supabase db query --output-format json` (CLI 3.4.0). A forma muda com quem roda, conferido
  * rodando o comando: com `AI_AGENT` ou `CLAUDECODE` no ambiente (sessão de IA) vem `{"boundary", "rows", "warning"}`;
- * sem elas (CI, terminal comum) vem só a lista `[...]`. Instrução sem linhas (ex.: update) responde só a etiqueta do
- * comando ("UPDATE 1"), não JSON. Outra forma → exceção (nunca uma lista vazia por engano). Exportada para o teste.
+ * sem elas (CI, terminal comum) vem só a lista `[...]`. Insert, update ou delete sem linhas de volta respondem só a
+ * etiqueta do comando (`ETIQUETA_SEM_LINHAS`) → lista vazia. Qualquer outra coisa (aviso em texto, JSON de outra forma,
+ * saída vazia) → exceção, nunca uma lista vazia por engano (ADR 0018 · D22). Exportada para o teste.
  */
 export function linhasDaSaida<T = Record<string, unknown>>(saida: string): T[] {
   const texto = saida.trim()
-  if (!texto.startsWith('[') && !texto.startsWith('{')) return []
-  const dados: unknown = JSON.parse(texto)
+  if (ETIQUETA_SEM_LINHAS.test(texto)) return []
+  let dados: unknown
+  try {
+    dados = JSON.parse(texto)
+  } catch {
+    throw new Error('saída da consulta em forma desconhecida')
+  }
   if (Array.isArray(dados)) return dados as T[]
-  const linhas = (dados as { rows?: unknown }).rows
+  const linhas = dados !== null && typeof dados === 'object' ? (dados as { rows?: unknown }).rows : undefined
   if (Array.isArray(linhas)) return linhas as T[]
   throw new Error('saída da consulta em forma desconhecida')
 }

@@ -57,14 +57,33 @@ describe('leitura da saída das consultas diretas', () => {
     expect(linhasDaSaida(JSON.stringify({ boundary: 'b', rows: [], warning: 'w' }))).toEqual([])
   })
 
-  it('instrução sem linhas: só a etiqueta do comando', () => {
-    expect(linhasDaSaida('UPDATE 1\n')).toEqual([])
-    expect(linhasDaSaida('CREATE TABLE\n')).toEqual([])
+  // Etiquetas como a CLI 3.4.0 respondeu, nos dois modos de ambiente (ADR 0018 · D22).
+  it.each(['UPDATE 1\n', 'UPDATE 0\n', 'INSERT 0 1\n', 'INSERT 0 0\n', 'DELETE 0\n', 'DELETE 2\n'])(
+    'insert, update ou delete sem linhas: só a etiqueta do comando (%#)',
+    (saida) => {
+      expect(linhasDaSaida(saida)).toEqual([])
+    },
+  )
+
+  it.each([
+    'Aviso: nova versão da CLI disponível\n',
+    'WARNING: algo mudou\n',
+    'UPDATE\n',
+    'UPDATE 1 a mais\n',
+    'INSERT 1\n',
+    'CREATE TABLE\n',
+    '',
+    '\n',
+  ])('texto que não é etiqueta de escrita → exceção, nunca lista vazia (%#)', (saida) => {
+    expect(() => linhasDaSaida(saida)).toThrow('forma desconhecida')
   })
 
-  it('outra forma de JSON → exceção, nunca lista vazia', () => {
-    expect(() => linhasDaSaida('{"resultado": []}')).toThrow('forma desconhecida')
-  })
+  it.each(['{"resultado": []}', 'null', '1', '"texto"', '{"rows": null}'])(
+    'outra forma de JSON → exceção, nunca lista vazia (%#)',
+    (saida) => {
+      expect(() => linhasDaSaida(saida)).toThrow('forma desconhecida')
+    },
+  )
 })
 
 const def = (nome: string) => acoesDoCatalogo().find((d) => d.nome === nome)!
