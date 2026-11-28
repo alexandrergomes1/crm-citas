@@ -73,8 +73,27 @@ test('escolher, carregando, erro, trocar e sair, com o idioma de cada estúdio (
   await expect(page.getByRole('button', { name: 'Sair' })).toBeVisible()
   await capturar(page, info, 'escolher-estudio-erro')
   expect(await violacoes(page)).toEqual([])
-  await page.unroute(SERVIDOR)
+  // O erro é anunciado (role="alert"; WCAG 4.1.3) e, tentando de novo sem sucesso, o foco volta a "Tentar de novo"
+  // (WCAG 2.4.3; revisão de design R4)
+  await expect(page.getByRole('alert')).toHaveText('Não foi possível carregar')
   await page.getByRole('button', { name: 'Tentar de novo' }).click()
+  await expect(page.getByRole('alert')).toHaveText('Não foi possível carregar')
+  await expect(page.getByRole('button', { name: 'Tentar de novo' })).toBeFocused()
+  await page.unroute(SERVIDOR)
+  // Com a lista de volta, o foco fica no título (o botão tocado sumiu), não perdido na página
+  await page.keyboard.press('Enter')
+  await expect(lista.locator('.ds-linha__titulo')).toHaveText([lirio, nube])
+  await expect(page.getByRole('heading', { name: 'Escolher estúdio' })).toBeFocused()
+  await page.keyboard.press('Tab')
+  await expect(lista.getByRole('button', { name: lirio })).toBeFocused()
+
+  // Escolher falha na rede: o erro é anunciado e o foco vai a "Tentar de novo" (a linha tocada sumiu)
+  await page.route(SERVIDOR, (rota) => (rota.request().method() === 'POST' ? rota.abort() : rota.fallback()))
+  await page.keyboard.press('Enter')
+  await expect(page.getByRole('alert')).toHaveText('Não foi possível carregar')
+  await expect(page.getByRole('button', { name: 'Tentar de novo' })).toBeFocused()
+  await page.unroute(SERVIDOR)
+  await page.keyboard.press('Enter')
   await expect(lista.locator('.ds-linha__titulo')).toHaveText([lirio, nube])
 
   // Escolher o estúdio em espanhol: a área com sessão passa a espanhol (RF-35, CA-20)

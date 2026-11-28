@@ -58,8 +58,18 @@ describe('Escolher estúdio · carregando e erro', () => {
     const html = vista({ tipo: 'erro' })
     expect(html).not.toMatch(/<p[^>]*>\s*<\/p>/)
     expect(html).not.toContain('ds-estado__frase')
-    expect(html).toContain('<p class="ds-estado__titulo">Não foi possível carregar</p>')
+    expect(html).toContain('<p class="ds-estado__titulo" role="alert">Não foi possível carregar</p>')
     expect(html).toContain('ds-estado__icone--erro')
+  })
+
+  it('erro anunciado ao leitor de tela, uma vez só (WCAG 4.1.3; revisão de design R4)', () => {
+    const html = vista({ tipo: 'erro' })
+    expect(html.match(/role="alert"/g)).toHaveLength(1)
+    expect(vista({ tipo: 'lista', estudios })).not.toContain('role="alert"')
+  })
+
+  it('o título recebe foco por programa, fora da ordem do Tab (WCAG 2.4.3; revisão de design R4)', () => {
+    expect(vista({ tipo: 'carregando' })).toMatch(/<h1 class="tela-sem-menu__titulo" tabindex="-1">/i)
   })
 })
 

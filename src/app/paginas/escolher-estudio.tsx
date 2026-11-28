@@ -1,7 +1,7 @@
 // Tela Escolher estúdio (spec RF-11 a RF-14, RF-30; ficha E41·4·A; DESIGN.md §8, §8b "Tela sem menu").
 // A lista é a ação (sem botão preto); "Sair" claro no fim. O estúdio nunca vai ao endereço (RF-33).
 // Carrega só ao abrir a tela e ao tocar "Tentar de novo": nenhuma consulta automática (ADR 0018 · D5).
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState, type Ref } from 'react'
 import { contar } from '@/app/i18n/formatar'
 import type { Textos } from '@/app/i18n/textos'
 import { Bloco } from '@/app/ui/bloco-lista'
@@ -27,6 +27,10 @@ export interface EscolherEstudioVistaProps {
   onEscolher: (orgId: string) => void
   onTentar: () => void
   onSair: () => void
+  /** título da tela: recebe o foco quando o conteúdo some por um pedido da pessoa (WCAG 2.4.3) */
+  refTitulo?: Ref<HTMLHeadingElement>
+  /** "Tentar de novo": recebe o foco quando o erro volta depois de um pedido da pessoa */
+  refTentar?: Ref<HTMLButtonElement>
 }
 
 /** Primeira letra do nome do estúdio, para o quadrado dourado (DESIGN.md §3 · --brand). */
@@ -40,14 +44,22 @@ function inicialDe(nome: string): string {
  * `frase=""` ficava um <p> vazio no leitor de tela e no espaço da tela). Tornar a frase opcional lá é a correção de
  * fundo, mas o arquivo está fora da lista do plan.md §10.
  */
-function ErroSemFrase({ titulo, rotuloTentar, onTentar }: Readonly<{ titulo: string; rotuloTentar: string; onTentar: () => void }>) {
+function ErroSemFrase({
+  titulo,
+  rotuloTentar,
+  onTentar,
+  refTentar,
+}: Readonly<{ titulo: string; rotuloTentar: string; onTentar: () => void; refTentar?: Ref<HTMLButtonElement> }>) {
   return (
     <div className="ds-estado">
       <span className="ds-estado__icone ds-estado__icone--erro">
         <Icone nome="circle-alert" />
       </span>
-      <p className="ds-estado__titulo">{titulo}</p>
-      <Botao variante="claro" onClick={onTentar}>
+      {/* role="alert": o erro que aparece é anunciado ao leitor de tela sem mover o foco (WCAG 4.1.3) */}
+      <p className="ds-estado__titulo" role="alert">
+        {titulo}
+      </p>
+      <Botao ref={refTentar} variante="claro" onClick={onTentar}>
         {rotuloTentar}
       </Botao>
     </div>
@@ -55,14 +67,26 @@ function ErroSemFrase({ titulo, rotuloTentar, onTentar }: Readonly<{ titulo: str
 }
 
 /** O desenho da tela, sem estado próprio (testado por renderToString). */
-export function EscolherEstudioVista({ textos, idioma, estado, escolhendo = false, onEscolher, onTentar, onSair }: Readonly<EscolherEstudioVistaProps>) {
+export function EscolherEstudioVista({
+  textos,
+  idioma,
+  estado,
+  escolhendo = false,
+  onEscolher,
+  onTentar,
+  onSair,
+  refTitulo,
+  refTentar,
+}: Readonly<EscolherEstudioVistaProps>) {
   const t = textos.escolherEstudio
   return (
     <main className="tela-sem-menu">
       <div className="tela-sem-menu__bloco escolher">
         <Bloco semFolga>
           <div className="escolher__topo">
-            <h1 className="tela-sem-menu__titulo">{t.titulo}</h1>
+            <h1 ref={refTitulo} className="tela-sem-menu__titulo" tabIndex={-1}>
+              {t.titulo}
+            </h1>
             {estado.tipo === 'lista' ? <p className="escolher__sub">{contar(idioma, t.quantos, estado.estudios.length)}</p> : null}
           </div>
           {estado.tipo === 'carregando' ? (
@@ -70,7 +94,7 @@ export function EscolherEstudioVista({ textos, idioma, estado, escolhendo = fals
               <Carregando rotulo={t.carregando} linhas={2} />
             </div>
           ) : null}
-          {estado.tipo === 'erro' ? <ErroSemFrase titulo={t.erroTitulo} rotuloTentar={textos.comum.tentarDeNovo} onTentar={onTentar} /> : null}
+          {estado.tipo === 'erro' ? <ErroSemFrase titulo={t.erroTitulo} rotuloTentar={textos.comum.tentarDeNovo} onTentar={onTentar} refTentar={refTentar} /> : null}
           {estado.tipo === 'lista' ? (
             <ul className="ds-lista escolher__lista" aria-label={t.titulo}>
               {estado.estudios.map((estudio) => (
@@ -127,6 +151,12 @@ export interface EscolherEstudioProps {
 export function EscolherEstudio({ textos, idioma, listar, escolher, aoEscolher, aoPerderSessao, onSair }: Readonly<EscolherEstudioProps>) {
   const [estado, setEstado] = useState<EstadoEscolher>({ tipo: 'carregando' })
   const [escolhendo, setEscolhendo] = useState(false)
+  const refTitulo = useRef<HTMLHeadingElement>(null)
+  const refTentar = useRef<HTMLButtonElement>(null)
+  // Foco (WCAG 2.4.3): depois de um pedido da pessoa ("Tentar de novo" ou escolher sem sucesso), o botão tocado some.
+  // O foco vai ao título enquanto carrega e fica nele com a lista; se o erro voltar, vai a "Tentar de novo".
+  // Na abertura da tela o foco não se move (a carga não foi um gesto da pessoa).
+  const focoPedido = useRef(false)
 
   // As funções recebidas ficam numa ref: trocar a função não dispara nova carga (só a abertura e "Tentar de novo")
   const recebidas = useRef({ listar, aoPerderSessao })
@@ -143,6 +173,19 @@ export function EscolherEstudio({ textos, idioma, listar, escolher, aoEscolher, 
       setEstado({ tipo: 'erro' })
     }
   }, [])
+
+  useEffect(() => {
+    if (!focoPedido.current || estado.tipo === 'carregando') return
+    focoPedido.current = false
+    if (estado.tipo === 'erro') refTentar.current?.focus()
+  }, [estado])
+
+  /** Carga pedida pela pessoa: o foco sai do botão que vai sumir e vai ao título. */
+  function recarregarPelaPessoa() {
+    focoPedido.current = true
+    refTitulo.current?.focus()
+    return carregar()
+  }
 
   // Uma vez, ao abrir a tela (carga pedida pela pessoa); sem recarga periódica nem ao focar (ADR 0018 · D5)
   useEffect(() => {
@@ -163,9 +206,10 @@ export function EscolherEstudio({ textos, idioma, listar, escolher, aoEscolher, 
       }
       // sem vínculo ativo (sem_permissao) ou falha: a lista volta do servidor
       setEscolhendo(false)
-      await carregar()
+      await recarregarPelaPessoa()
     } catch {
       setEscolhendo(false)
+      focoPedido.current = true
       setEstado({ tipo: 'erro' })
     }
   }
@@ -177,8 +221,10 @@ export function EscolherEstudio({ textos, idioma, listar, escolher, aoEscolher, 
       estado={estado}
       escolhendo={escolhendo}
       onEscolher={(orgId) => void aoTocar(orgId)}
-      onTentar={() => void carregar()}
+      onTentar={() => void recarregarPelaPessoa()}
       onSair={onSair}
+      refTitulo={refTitulo}
+      refTentar={refTentar}
     />
   )
 }
