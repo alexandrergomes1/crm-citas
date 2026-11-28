@@ -96,16 +96,19 @@ nunca "estúdio" nem "clínica" (E47·1·A, `DESIGN.md` §6). Nesta spec, "estú
 
 **Tela Agenda** (título "Agenda", `DESIGN.md` §6; módulo sem seções, §7).
 - **Computador (1440):** barra do topo: título e subtítulo (data do dia) · busca geral · Opções (o que fica dentro sai
-  da ficha nova) · **+ Novo** (preto, única ação principal; abre as opções "Novo agendamento" e "Bloquear horário",
-  E55·4 trocada, §16) · ajuda · Notificações · Sua conta. Barra da
-  grade: Hoje · seta de dia anterior e seguinte · data em pílula com calendário · **Dia ▾** · **Equipe N de M** ·
-  **Filtros ▾** · **Lista de espera** ("em desenvolvimento").
+  da ficha nova) · **+ Adicionar ▾** (preto, única ação principal; abre as opções "Novo agendamento" e "Bloquear
+  horário", E55·4 trocada, E60·1·A e E60·5, §18; nome do `DESIGN.md` §6, "Novo" não é nome de botão) · ajuda ·
+  Notificações · Sua conta. Barra da
+  grade: Hoje · seta de dia anterior e seguinte · data em pílula com calendário · **Dia ▾** · **Equipe N de M** (ícone
+  de pessoas, E60·4, §18) · **Filtros ▾** · **Lista de espera** ("em desenvolvimento").
 - **Celular (390):** cabeçalho com ☰ (abre as visões da Agenda), data, **lupa** ("em desenvolvimento"; a busca vai
   para a spec seguinte, E57·B), funil, sininho e Sua conta (nível 1); faixa da grade com ‹ Hoje › · Equipe N de M · ⋮ (E55·3·A: Hoje sai do cabeçalho); barra de baixo
-  com a peça preta no meio, Agenda atual em azul. Filtros em folha de baixo. Duas colunas à vista e as outras rolando
-  para o lado (E55·3·A). Se o **Agendar** da barra de baixo vira o "+ Novo" no celular: sai da ficha nova (Designer).
+  com o botão do meio **só com ícone, sem nome** (E60·2, §18), Agenda atual em azul. Filtros em folha de baixo. Duas
+  colunas à vista e as outras rolando para o lado (E55·3·A). A forma do botão do meio e a do "Adicionar" do topo nas
+  telas do celular (com nome ou só "+"), a partir das imagens do dono, o Designer avalia e mostra na ficha (§18).
 - **Topo de cada coluna:** o **nome de exibição** da pessoa e as iniciais (E55·1·A, RF-21).
-- **Grade:** o dia do estúdio (RN-01), com rolagem (Assumption 1). Grade só no horário de funcionamento: spec seguinte
+- **Grade:** faixa de **08:00 a 20:00** que se alarga quando há item fora dela e, no dia de hoje, até a hora atual
+  (E59·A, RN-11, §18; ADR 0006 · D17), com rolagem (Assumption 1). Grade no horário de funcionamento: spec seguinte
   (E57·B, §17).
 - **Cartão do agendamento:** hora de início e fim, nome da cliente, serviço, ícone de status (no cartão pequeno só o
   ícone, com o nome no leitor de tela; ícones Lucide do `DESIGN.md` §5). Tocar abre o agendamento (spec do
@@ -114,9 +117,8 @@ nunca "estúdio" nem "clínica" (E47·1·A, `DESIGN.md` §6). Nesta spec, "estú
 - **Bloqueio · criar e alterar:** campos profissional*, data*, início*, fim*, motivo, com os atalhos **Almoço · Folga ·
   Reunião · Curso · Pessoal** que preenchem o motivo (E54·3, RF-22); Salvar · Cancelar. **Início e
   fim só por seletor de horários predefinidos, nunca digitados** (E54·5 trocada, RN-09). Novo bloqueio nasce com 1 h
-  (E54·4, RN-10). Excluir no ⋮, em vermelho, com janelinha de confirmação e aviso depois. Entradas: "+ Novo" ›
-  "Bloquear horário" e o toque num horário vazio (E54·1, RF-13); se o bloqueio terá também botão próprio, o Designer
-  avalia na ficha nova (pedido do dono, §16). Com alcance "próprios", o campo profissional fica só com a própria
+  (E54·4, RN-10). Excluir no ⋮, em vermelho, com janelinha de confirmação e aviso depois. Entradas: "+ Adicionar ▾" ›
+  "Bloquear horário" e o toque num horário vazio (E54·1, RF-13); sem botão próprio de bloqueio (E60·1·A, §18). Com alcance "próprios", o campo profissional fica só com a própria
   pessoa.
 
 **Estados (`DESIGN.md` §8):** carregando (linhas cinza só depois de 0,3 s, anunciado ao leitor de tela) · vazio (dia
@@ -131,18 +133,18 @@ novo") · sucesso (aviso depois de salvar ou excluir bloqueio, com "Desfazer" no
 |---|---|---|
 | RF-01 | A Agenda abre no dia de hoje, no fuso do estúdio. | `ARCHITECTURE.md` §11 |
 | RF-02 | A pessoa troca de dia (anterior, seguinte, calendário) e volta com **Hoje**. | `DESIGN.md` §6 e §7 |
-| RF-03 | Há uma coluna para cada pessoa ativa com papel profissional e para a dona; a recepção não é coluna (E26·3·A). **Equipe N de M** escolhe quais aparecem; N é o número à vista e M o total **das colunas que a pessoa pode ver** (§3: a profissional tem só a dela). | `DESIGN.md` §6 e §7; E26·3·A; ordem de 28/11 |
+| RF-03 | Há uma coluna para cada pessoa ativa com papel profissional e para a dona; a recepção não é coluna (E26·3·A). **Equipe N de M** escolhe quais aparecem; N é o número à vista e M o total **das colunas que a pessoa pode ver** (§3: a profissional tem só a dela). O botão usa o ícone de pessoas (E60·4); a profissional não o vê (Assumption 6). | `DESIGN.md` §6 e §7; E26·3·A; ordem de 28/11; E60·4 (§18) |
 | RF-04 | A grade mostra os agendamentos e os bloqueios do dia de cada coluna à vista. | `docs/produto/agenda.md` |
 | RF-05 | O cartão mostra o status com o ícone do `DESIGN.md` §5 e o nome acessível. | `DESIGN.md` §5 e §9 |
 | RF-06 | **Filtros** por status e por bloqueio (mostrar ou esconder), com a pílula de contador de filtros ligados e "Limpar filtros". | `DESIGN.md` §5 e §7 |
 | RF-07 | Criar, alterar e excluir bloqueio único de uma profissional, com início e fim no mesmo dia. | `docs/produto/agenda.md` |
-| RF-08 | **+ Novo** (peça preta) abre as opções: "Novo agendamento" (leva ao fluxo do Agendamento) e "Bloquear horário" (abre o bloqueio); nenhuma outra opção sem pedido do dono. Tocar num cartão abre o agendamento. Sem a spec do Agendamento construída, "Novo agendamento" e o toque no cartão aparecem como "em desenvolvimento". | `DESIGN.md` §5 e §8; E55·4 trocada (§16) |
+| RF-08 | **+ Adicionar ▾** (peça preta; E60·5, §18) abre as opções: "Novo agendamento" (leva ao fluxo do Agendamento) e "Bloquear horário" (abre o bloqueio); nenhuma outra opção sem pedido do dono. Tocar num cartão abre o agendamento. Sem a spec do Agendamento construída, "Novo agendamento" e o toque no cartão aparecem como "em desenvolvimento". O bloqueio não tem botão próprio (E60·1·A). | `DESIGN.md` §5 e §8; E55·4 trocada (§16); E60·1·A e E60·5 (§18) |
 | RF-09 | Toda ação passa pelas 6 portas e declara a chave da §3 (`agenda.ver`, `.criar`, `.editar`, `.remover`); a porta 3 confere a chave e entrega o alcance; criar, alterar e excluir bloqueio fica no registro (porta 6), sem dado pessoal nem o texto do motivo. | `ARCHITECTURE.md` §4; E42·A, ADR 0020 |
 | RF-10 | Com `agenda.ver` "próprios", a pessoa vê só a própria coluna; as outras não aparecem nem saem do servidor, nem como "Ocupado" (§3). Com alcance "próprios" de gravar, grava só bloqueio da própria coluna. | ordem de 28/11 (substitui a E26·1·B); E58·A; E26·2·A |
 | RF-11 | A tela recebe as chaves que a pessoa tem só para esconder o que ela não pode usar (ex.: o ⋮ e a entrada de bloqueio nas colunas das outras); quem decide é a porta 3 e o banco. | ADR 0020 · D9; E43·A (`permissoes-e-pin.md` #11) |
 | RF-12 | Entrar no sistema (endereço `/`) abre a Agenda. | E55·2·A |
 | RF-13 | Tocar ou dar Enter num horário vazio de uma coluna abre um menu com "Novo agendamento" e "Bloquear horário", já com a hora e a pessoa da coluna; quem não pode gravar naquela coluna não vê o menu. | E54·1 (§16); E26·2·A; WCAG 2.1.1 |
-| RF-14 | Na coluna de hoje, uma linha marca a hora atual, no fuso do estúdio, com a hora na coluna das horas; a cor vem do `DESIGN.md` (Designer). | E54·2 (§16) |
+| RF-14 | Na coluna de hoje, uma linha marca a hora atual, no fuso do estúdio, com a hora na coluna das horas, em **azul** (E60·3·A; o tom exato vem do `DESIGN.md`, Designer). Se a hora atual está fora de 08:00–20:00, a grade se alarga até ela (RN-11). | E54·2 (§16); E60·3·A e E59·A (§18); ADR 0006 · D17 |
 | RF-15 | No bloqueio, início e fim se escolhem só num seletor de horários predefinidos (RN-09); novo bloqueio nasce com 1 h e o fim anda junto quando o início passa dele (RN-10). | E54·4, E54·5 trocada (§16) |
 | RF-16 a RF-20 | **Saíram desta spec** (formatos de visão em cards e modo "Lista", resumo da coluna, dias marcados no calendário, grade no horário de funcionamento, lupa no celular): vão para a spec seguinte **"Agenda · visões e horário de funcionamento"**. Aqui, o "Dia ▾" (outros formatos) e a lupa do celular aparecem "em desenvolvimento" (`DESIGN.md` §7 e §8). Os IDs ficam reservados. | E57·B (§17) |
 | RF-21 | O topo de cada coluna mostra o **nome de exibição** da pessoa, campo novo só para isto; sem tela de edição na v1 (módulo Equipe); em desenvolvimento, nomes fictícios. Nunca o e-mail. | E55·1·A |
@@ -161,6 +163,7 @@ novo") · sucesso (aviso depois de salvar ou excluir bloqueio, com "Desfazer" no
 | RN-08 | A consulta de um dia traz só o dia e as colunas à vista, com teto de itens; passou do teto, a tela avisa em vez de cortar calado. |
 | RN-09 | O seletor de hora oferece só horários em passos fixos (15 min, Assumption 1) dentro do dia do estúdio; o servidor recusa hora fora do passo. Não há campo de digitar hora. |
 | RN-10 | Novo bloqueio: fim = início + 1 h. Se o início passa do fim, o fim vira início + 1 h. O fim nunca passa do fim do dia do estúdio (RN-03): se passaria, para no fim do dia, e a pessoa vê o fim mudado no seletor. |
+| RN-11 | A grade mostra de 08:00 a 20:00. Item que começa antes ou termina depois alarga a faixa até a hora cheia antes do primeiro ou depois do último; no dia de hoje, a hora atual fora da faixa também a alarga, até a hora cheia anterior ou seguinte. Nenhum item fica fora da tela, e a faixa nunca passa do dia do estúdio (RN-01). Em outro dia, a hora atual não conta. |
 
 ## 7. Tabelas
 Base da trava (estúdio, membros, papéis, função de checagem) vem do item 3. Cada linha abaixo é **sugestão** do
@@ -188,11 +191,11 @@ Analista; quem decide é o Engenheiro de dados no plano, com ADR e revisão de o
 ## 9. Critérios de aceite
 | ID | Critério | Prova |
 |---|---|---|
-| CA-01 | RN-01 a RN-06, RN-08, RN-09 e RN-10 têm teste em `src/domain`, inclusive dia de 23 h e de 25 h, meia-noite e sobreposição encostada. | unidade, CI verde |
+| CA-01 | RN-01 a RN-06 e RN-08 a RN-11 têm teste em `src/domain`, inclusive dia de 23 h e de 25 h, meia-noite, sobreposição encostada e a faixa 08:00–20:00 alargada por item antes, item depois e hora atual fora dela (só no dia de hoje). | unidade, CI verde |
 | CA-02 | O estúdio A não lê, cria, altera nem apaga bloqueio do estúdio B; bloqueio com profissional de outro estúdio é recusado. | isolamento, CI verde |
 | CA-03 | Sem login e sem papel no estúdio: nada é lido nem gravado; cada papel lê e grava só o que a §3 permite (ordem de 28/11 no lugar da E26·1·B, E26·2·A, E26·3·A), pela chave e pelo alcance, iguais no servidor e no banco (ADR 0020 · D7 e D8). | teste de banco e do servidor, CI verde |
 | CA-04 | Pedido que traz estúdio é recusado (`estudio_trocado`, contrato da camada de serviço, spec Entrar RF-15/CA-05), sem ler nem gravar nada. | teste do servidor |
-| CA-05 | Em 390 e 1440: `/` abre a Agenda em hoje; troca de dia e Hoje; Equipe N de M; filtros e "Limpar filtros"; "+ Novo" com as duas opções; menu do horário vazio por toque e por teclado; criar (só por seletor, nascendo com 1 h, atalho de motivo), alterar, conflito recusado e excluir bloqueio com "Desfazer"; nome de exibição no topo das colunas. | e2e, CI verde |
+| CA-05 | Em 390 e 1440: `/` abre a Agenda em hoje; troca de dia e Hoje; Equipe N de M com o ícone de pessoas, e a profissional sem esse botão; filtros e "Limpar filtros"; "+ Adicionar ▾" com as duas opções e nenhum botão com o nome "Novo"; botão do meio da barra do celular só com ícone e nome acessível; grade de 08:00 a 20:00 e alargada (RN-11); linha da hora atual em azul; menu do horário vazio por toque e por teclado; criar (só por seletor, nascendo com 1 h, atalho de motivo), alterar, conflito recusado e excluir bloqueio com "Desfazer"; nome de exibição no topo das colunas. | e2e, CI verde |
 | CA-06 | Em 390 e 1440: estados carregando, vazio, sem resultado, sem profissional e erro aparecem como na §4. | e2e |
 | CA-07 | Uma só peça preta de ação por tela; nenhuma peça, cor ou nome fora do `DESIGN.md`. | checklist §10 do `DESIGN.md`, Revisor de design |
 | CA-08 | Checagem automática de acessibilidade sem falha nas duas larguras e status com nome acessível. | e2e |
@@ -265,13 +268,19 @@ Texto das E56 como foi feito, para a spec seguinte (histórico; E56·1 e E56·2 
   livre. **Recomendo A:** menos digitação no balcão, combina com a troca da E54·5 (escolher em vez de digitar).
 
 ## 13. Assumptions (técnicas e de formato, à vista na aprovação)
-1. Grade com rolagem até a hora atual (ou ao primeiro item do dia); passos de 15 min no seletor de hora (RN-09). A
-   grade de 24 h vale nesta spec; a do horário de funcionamento vem na spec seguinte (E57·B).
+1. Grade de 08:00 a 20:00 que se alarga por item fora dela e, no dia de hoje, até a hora atual (E59·A, RN-11; ADR 0006
+   · D17), com rolagem até a hora atual (ou ao primeiro item do dia); passos de 15 min no seletor de hora (RN-09). A
+   grade de 24 h saiu (E59·A, §18); a do horário de funcionamento vem na spec seguinte (E57·B).
 2. A escolha do "Equipe N de M" fica guardada no aparelho da pessoa, só com identificadores, sem dado pessoal.
 3. Formulário de bloqueio em painel à direita (480 px) no computador e folha de baixo no celular (`DESIGN.md` §8).
 4. Ferramenta de acessibilidade automática, teto de itens por dia e teto de idas ao banco: o Arquiteto fixa no plano,
    depois de lida a documentação oficial.
 5. ADRs na numeração de `docs/adr/`; uma migration por tabela.
+6. **A profissional não vê o botão "Equipe N de M"** (leitura da E60·4·A: ela só tem a própria coluna). O dono
+   respondeu só o ícone ("bonequinhos"); a ficha mostra a tela da profissional sem o botão para o "sim" dele. Não é
+   acesso: o que ela vê já está fechado pela E58·A (RF-10); aqui é só esconder um botão sem escolha.
+7. O botão do meio da barra do celular tem nome para o leitor de tela (WCAG 2.2, 4.1.2), embora sem nome à vista
+   (E60·2).
 
 ## 14. Ajustes (28/11/2026, depois da aprovação)
 Aplicação de respostas já registradas do dono; nenhum requisito novo. Escrito pelo
@@ -309,6 +318,7 @@ com ADR e revisão de outro papel (E16·1); nada se copia do antigo.
 
 ## 16. Clarifications · ajustes 2 (28/11/2026, respostas à ficha E55 e às ideias E54)
 > Histórico. Onde esta seção fala de "Ocupado", liberação no perfil, RF-16 a RF-20 e E56, vale a §17 (E57·B, E58·A).
+> Onde fala de "+ Novo", "Agendar" e bloqueio "dentro ou separado", vale a §18 (E60·1·A, E60·2, E60·5).
 
 Escrito pelo Analista de requisitos (IEEE 29148 e BABOK). Resposta do dono, **28/11/2026**,
 https://claude.ai/code/session_018cV8b958nnbLyXPMKPeaNK, literal:
@@ -376,3 +386,39 @@ https://claude.ai/code/session_018cV8b958nnbLyXPMKPeaNK, literal:
 
 **Para o Arquiteto (`plan.md`, `tasks.md` e ADR não foram tocados):** sai do plano a chave de ocupação e o cartão
 "Ocupado" (§3, CA-13); sai tudo de RF-16 a RF-20; entra RF-22 (atalhos de motivo, só texto, sem tabela nova).
+
+## 18. Clarifications · ajustes 4 (28/11/2026, respostas E59 e E60·1 a E60·5 da ficha v3)
+Escrito pelo Analista de requisitos (IEEE 29148 e BABOK). Resposta do dono, **28/11/2026**,
+https://claude.ai/code/session_018cV8b958nnbLyXPMKPeaNK, literal:
+
+> "E59-A, E60-A, E60-2: imagem anexo. sem nome, apenas icone. E60-3A, E60-4: icone deve ser dos bonequinhos, E60-5:
+> pode ser adicionar ao inves de novo. fui pelo exemplo que tava na tela, vc que me induziu a isso. se tava adicionar
+> pra que colocou novo agendamento? se tava escrito uma coisa, era só vc seguir e nao mudar e me induzir a outra
+> decisao divergente. eu vou respondendo o que vc me mostra, se nao mostra, tas querendo me induzir ao erro. e as
+> imagens que mando sao pra te ajudar e nao pra vc fazer fiel de forma tendenciosa.. a ideia era vc criar a sua e ver o
+> fresha e agregar ao seu ou ver o que fica melhor.. e nao ser tendencioso.. se nao podes criar algo ruim no final e ter
+> de ficar remendando tdo depois com mil mudanças.. mas claro, o design anterior foi aprovado, e os do fresha é para
+> trazer toda customização e formas de ver algumas coisas pra agregar. mandei duas imagens exemplo sobre o "novo
+> agendamento" para avaliar.3 imagem sobre o fundo dos botoes.. ao inves de branco seco que fica feio.. isso ´ra pra
+> te ajudar e nao como regra.. tem de avaliar o que fica melhor. sao coisas simples de decidir."
+
+Três imagens anexas, do nosso canvas "Prova · Serviços no celular" (não ficam no repositório): (1) topo com "+
+Adicionar" e o botão do meio da barra só com o ícone de calendário com "+"; (2) topo com um botão redondo só com "+" e
+a barra só com ícone; (3) estados vazios com "+ Adicionar serviço" e "Limpar filtros" em fundo cinza claro, não branco.
+
+| Fala | Leitura registrada | O que muda | Tipo |
+|---|---|---|---|
+| "E59-A" | faixa de 08:00 a 20:00 que se alarga por item fora dela e, hoje, até a hora atual (ADR 0006 · D17); sai a grade de 24 h | §4, RF-14, RN-11, CA-01, CA-05, Assumption 1 | resposta |
+| "E60-A" | lido como **E60·1·A**: o bloqueio se cria dentro do botão de criar e tocando num horário vazio, sem botão próprio, fora de Opções | §4, RF-08, RF-13 | resposta |
+| "E60-2: imagem anexo. sem nome, apenas icone" | o botão do meio da barra do celular fica **só com ícone, sem nome à vista** (com nome para o leitor de tela, Assumption 7); a forma (preto ou claro) e o que ele abre o Designer avalia a partir das imagens 1 e 2 e mostra na ficha | §4, CA-05 | resposta; forma com o Designer |
+| "E60-3A" | linha da hora atual **azul** | RF-14, CA-05 | resposta |
+| "E60-4: icone deve ser dos bonequinhos" | o botão "Equipe N de M" usa o ícone de pessoas (Lucide, nome exato pelo Designer no `DESIGN.md` §5); a profissional não vê o botão: leitura, Assumption 6, à vista na ficha | §4, RF-03, CA-05 | resposta + leitura |
+| "E60-5: pode ser adicionar ao inves de novo" | o botão se chama **"+ Adicionar ▾"**, como o `DESIGN.md` §6 já manda; "Novo" sai como nome de botão; as opções seguem "Novo agendamento" e "Bloquear horário" | §4, RF-08, CA-05 | resposta |
+| "fui pelo exemplo que tava na tela, vc que me induziu..." | o que já está aprovado (`DESIGN.md`, ficha anterior) se segue; a pergunta mostra o que vale e não propõe mudar sem pedido; as referências (Fresha, imagens do dono) servem para avaliar e agregar, nunca para copiar | nenhum requisito; vale para as fichas e mensagens | orientação |
+| imagem 3 (fundo dos botões claros nos estados vazios) | ajuda, não regra: o Designer avalia o fundo dos botões claros | nenhum requisito aqui | referência |
+
+**Para o Designer (ficha e `DESIGN.md` não foram tocados):** forma do botão do meio e do "Adicionar" do topo no
+celular, a partir das imagens 1 e 2; ícone de pessoas no "Equipe"; fundo dos botões claros (imagem 3); a ficha mostra
+a profissional sem o "Equipe" (Assumption 6).
+**Para o Arquiteto (`plan.md`, `tasks.md` e ADR não foram tocados):** RN-11 é a regra do ADR 0006 · D17 e do
+alargamento por item, agora na spec; CA-01 a cobre.
