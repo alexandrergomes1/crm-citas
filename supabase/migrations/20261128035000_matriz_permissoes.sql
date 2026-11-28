@@ -18,6 +18,9 @@ create table app.matriz_permissoes (
   alcance text not null check (alcance in ('todos', 'proprios')),
   primary key (papel, chave)
 );
+-- A chave primária começa por papel: a chave estrangeira precisa de índice próprio em chave (apagar ou mudar uma
+-- chave do catálogo não varre a matriz inteira; guia de índices do Postgres, "Indexes and foreign keys").
+create index matriz_permissoes_chave_idx on app.matriz_permissoes (chave);
 
 -- Ninguém com login lê nem grava direto: RLS ligada e forçada, sem política, sem privilégio (ADR 0019 · D1).
 alter table app.chaves_permissao enable row level security;
@@ -59,5 +62,11 @@ as $$
   ), false)
 $$;
 
-revoke all on function app.pode(text, text) from public, anon;
+revoke all on function app.pode(text, text) from public, anon, authenticated, service_role;
 grant execute on function app.pode(text, text) to authenticated;
+-- service_role só executa o pré-pedido (ADR 0019 · D17): revoke explícito também nas 4 funções da trava do item 3,
+-- que nasceram com revoke só de public e anon (sem efeito se ela já não tinha; o teste 010_ confere a lista).
+revoke all on function app.estudio_da_sessao() from service_role;
+revoke all on function app.papel_da_sessao() from service_role;
+revoke all on function app.eh_dona() from service_role;
+revoke all on function app.escolher_estudio(uuid) from service_role;

@@ -5,7 +5,7 @@
 -- a linha D9 do ADR 0005): anon só as funções de entrar e o pré-pedido; authenticated só as da sessão e da trava,
 -- mais app.pode, a função da matriz de permissões (ADR 0020 · D7; ADR 0019 · D21).
 begin;
-select plan(24);
+select plan(25);
 
 -- Preparo (como postgres): pessoas e estúdios fictícios, escritos do zero (RG-07).
 -- A = ...0a · B = ...0b · a1 dona A · a2 recepção A · a3 profissional A · b1 dona B
@@ -111,6 +111,13 @@ select is(
         'contexto_da_sessao()', 'encerrar_sessao(uuid)', 'escolher_estudio(uuid,uuid)', 'iniciar_sessao(uuid)',
         'meus_estudios()', 'registrar_recusa(text,text,uuid)'],
   'authenticated executa só as funções da trava, da sessão, da matriz e o pré-pedido');
+select is(
+  (select coalesce(array_agg(p.oid::regprocedure::text order by p.oid::regprocedure::text collate "C"), array[]::text[])
+     from pg_catalog.pg_proc p
+    where p.pronamespace in ('public'::regnamespace, 'app'::regnamespace)
+      and pg_catalog.has_function_privilege('service_role', p.oid, 'execute')),
+  array['app.antes_do_pedido()'],
+  'service_role executa só o pré-pedido (ADR 0019 · D17)');
 select is(
   (select coalesce(array_agg(p.oid::regprocedure::text order by p.oid::regprocedure::text collate "C"), array[]::text[])
      from pg_catalog.pg_proc p

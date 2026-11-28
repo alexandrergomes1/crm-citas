@@ -2,6 +2,7 @@
 -- Limite de tentativas de entrar (ADR 0018 · D8): contador fora do registro e fora da API, que expira sozinho.
 -- O banco nunca vê IP nem e-mail: só a chave HMAC-SHA-256 (32 bytes) calculada no servidor (RF-08, RGPD art. 5(1)(c), (e)).
 -- 10 por conta e 30 por IP em 15 min (janela fixa a partir da primeira tentativa); teto global de linhas.
+-- O IP é conferido antes: IP acima do limite não grava linha de conta (ADR 0019 · D11).
 
 create table app.tentativas_entrada (
   tipo          text        not null check (tipo in ('ip', 'conta')),
@@ -44,20 +45,33 @@ begin
   delete from app.tentativas_entrada t where t.janela_inicio <= now() - v_janela;
 
   select count(*) into v_linhas from app.tentativas_entrada;
-  if v_linhas + 2 > v_teto and (
-       not exists (select 1 from app.tentativas_entrada t where t.tipo = 'ip' and t.chave = p_chave_ip)
-       or not exists (select 1 from app.tentativas_entrada t where t.tipo = 'conta' and t.chave = p_chave_conta)) then
+
+  -- 1) IP primeiro. Chave nova com o contador cheio: limite. A contagem para em v_max_ip + 1 (não cresce sem fim).
+  if not exists (select 1 from app.tentativas_entrada t where t.tipo = 'ip' and t.chave = p_chave_ip) then
+    if v_linhas >= v_teto then
+      return false;
+    end if;
+    v_linhas := v_linhas + 1;
+  end if;
+  insert into app.tentativas_entrada as t (tipo, chave) values ('ip', p_chave_ip)
+  on conflict (tipo, chave) do update set contagem = least(t.contagem + 1, v_max_ip + 1)
+  returning t.contagem into v_ip;
+  -- IP acima do limite: false sem tocar na conta. Um IP não cria mais de v_max_ip linhas de conta por janela,
+  -- e não tranca a conta de outra pessoa (ASVS V2.2.1).
+  if v_ip > v_max_ip then
     return false;
   end if;
 
-  insert into app.tentativas_entrada as t (tipo, chave) values ('ip', p_chave_ip)
-  on conflict (tipo, chave) do update set contagem = t.contagem + 1
-  returning t.contagem into v_ip;
+  -- 2) Conta, só depois do IP aprovado.
+  if not exists (select 1 from app.tentativas_entrada t where t.tipo = 'conta' and t.chave = p_chave_conta)
+     and v_linhas >= v_teto then
+    return false;
+  end if;
   insert into app.tentativas_entrada as t (tipo, chave) values ('conta', p_chave_conta)
-  on conflict (tipo, chave) do update set contagem = t.contagem + 1
+  on conflict (tipo, chave) do update set contagem = least(t.contagem + 1, v_max_conta + 1)
   returning t.contagem into v_conta;
 
-  return v_conta <= v_max_conta and v_ip <= v_max_ip;
+  return v_conta <= v_max_conta;
 end;
 $$;
 

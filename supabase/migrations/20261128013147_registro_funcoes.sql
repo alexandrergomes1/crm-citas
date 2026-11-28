@@ -30,8 +30,11 @@ revoke all on table app.acoes_que_gravam from public, anon, authenticated, servi
 -- Argumentos: nomes das colunas uuid que identificam os objetos tocados (até 10), ex.:
 --   create trigger <tabela>_registro after insert or update or delete on public.<tabela>
 --     for each row execute function app.registrar_mudanca('id');
--- Sem x-acao da lista, sem x-pedido uuid, sem pessoa ou com org_id diferente do estúdio da sessão: recusa,
--- e a gravação inteira é desfeita (RF-27).
+-- Sem x-acao da lista, sem x-pedido uuid, sem pessoa, com org_id diferente do estúdio da sessão (na linha nova e,
+-- no update, na antiga) ou com argumento que não é coluna uuid da tabela: recusa, e a gravação inteira é desfeita
+-- (RF-27). O org_id é conferido aqui mesmo, sem depender da política da tabela.
+-- Update que não muda nada: passa pelas mesmas conferências, mas não grava linha. No update, a coluna colunas
+-- guarda só os nomes das colunas que mudaram (nunca os valores, RF-25).
 create function app.registrar_mudanca()
 returns trigger
 language plpgsql
@@ -44,7 +47,9 @@ declare
   v_usuario uuid := auth.uid();
   v_estudio uuid := app.estudio_da_sessao();
   v_linha   jsonb := case when tg_op = 'DELETE' then pg_catalog.to_jsonb(old) else pg_catalog.to_jsonb(new) end;
+  v_antiga  jsonb := case when tg_op = 'UPDATE' then pg_catalog.to_jsonb(old) end;
   v_objetos uuid[];
+  v_colunas text[];
 begin
   if v_acao is null or not exists (select 1 from app.acoes_que_gravam a where a.acao = v_acao)
      or not app.eh_uuid(v_pedido) or v_usuario is null or v_estudio is null
@@ -52,15 +57,36 @@ begin
     perform app.recusar('erro_interno');
   end if;
   if (v_linha ->> 'org_id') is distinct from v_estudio::text
-     or (tg_op = 'UPDATE' and (pg_catalog.to_jsonb(old) ->> 'org_id') is distinct from v_estudio::text) then
+     or (tg_op = 'UPDATE' and (v_antiga ->> 'org_id') is distinct from v_estudio::text) then
     perform app.recusar('erro_interno');
+  end if;
+  -- Cada argumento tem de ser coluna uuid viva da tabela do gatilho (erro de molde não some calado nem vira cast).
+  if exists (select 1 from pg_catalog.unnest(tg_argv) as c (nome)
+              where not exists (select 1 from pg_catalog.pg_attribute a
+                                 where a.attrelid = tg_relid and a.attname = c.nome
+                                   and a.attnum > 0 and not a.attisdropped
+                                   and a.atttypid = 'pg_catalog.uuid'::pg_catalog.regtype)) then
+    perform app.recusar('erro_interno');
+  end if;
+  if tg_op = 'UPDATE' then
+    -- jsonb compara qualquer tipo de coluna (o "old is distinct from new" falha em tipo sem igualdade, como json).
+    select pg_catalog.array_agg(n.key order by n.key collate "C")
+      into v_colunas
+      from pg_catalog.jsonb_each(v_linha) as n (key, value)
+     where n.value is distinct from (v_antiga -> n.key);
+    if v_colunas is null then
+      return null;
+    end if;
+    if exists (select 1 from pg_catalog.unnest(v_colunas) as c (nome) where c.nome !~ '^[a-z_][a-z0-9_]{0,62}$') then
+      perform app.recusar('erro_interno');
+    end if;
   end if;
   select pg_catalog.array_agg((v_linha ->> c.nome)::uuid order by c.ordem)
     into v_objetos
     from pg_catalog.unnest(tg_argv) with ordinality as c (nome, ordem)
    where v_linha ->> c.nome is not null;
-  insert into app.registro (evento, resultado, usuario_id, org_id, objetos, pedido_id)
-  values (v_acao, 'ok', v_usuario, v_estudio, v_objetos, v_pedido::uuid);
+  insert into app.registro (evento, resultado, usuario_id, org_id, objetos, colunas, pedido_id)
+  values (v_acao, 'ok', v_usuario, v_estudio, v_objetos, v_colunas, v_pedido::uuid);
   return null;
 end;
 $$;

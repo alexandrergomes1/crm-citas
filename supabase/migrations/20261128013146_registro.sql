@@ -51,10 +51,16 @@ create table app.registro (
   objetos    uuid[]      check (objetos is null or (cardinality(objetos) between 1 and 10
                                                      and array_position(objetos, null) is null)),
   pedido_id  uuid        not null,
+  -- Só no update pelo gatilho: os NOMES das colunas que mudaram, nunca os valores (RF-25). Nome de coluna do
+  -- Postgres (até 63, minúsculas, dígitos e _), de 1 a 1600 (o máximo de colunas de uma tabela), sem nulo.
+  colunas    text[]      check (colunas is null or (cardinality(colunas) between 1 and 1600
+                                                    and array_position(colunas, null) is null
+                                                    and array_to_string(colunas, ',')
+                                                        ~ '^[a-z_][a-z0-9_]{0,62}(,[a-z_][a-z0-9_]{0,62})*$')),
   -- Tentativa de entrar que falha: só evento, resultado, quando e pedido (RF-24a).
   constraint registro_falha_de_entrar_sem_pessoa check (
     evento <> 'sessao.entrar' or resultado = 'ok'
-    or (usuario_id is null and org_id is null and objetos is null))
+    or (usuario_id is null and org_id is null and objetos is null and colunas is null))
 );
 comment on table app.registro is 'Registro de auditoria (porta 6). Só identificadores; sem nome, e-mail, IP ou texto digitado (RF-25). Nenhuma linha é alterada nem apagada nesta spec; o prazo de guarda é decisão do dono.';
 

@@ -2,7 +2,7 @@
 -- Molde oficial: https://supabase.com/docs/guides/local-development/testing/overview
 -- Login simulado: set_config('request.jwt.claims') + set local role authenticated; cabeçalhos em request.headers.
 begin;
-select plan(28);
+select plan(36);
 
 -- Preparo (como postgres): dados fictícios, escritos do zero. A = ...0a · B = ...0b · a1 dona A · b1 dona B
 insert into auth.users (id, email) values
@@ -131,6 +131,62 @@ select results_eq(
   'a linha da recusa tem a pessoa e o estúdio da sessão');
 select is((select count(*)::int from app.registro where evento = 'registro.teto'), 1,
   'acima do teto, uma só linha de resumo (limite)');
+
+-- Update: só os nomes das colunas que mudaram, nunca os valores; update que não muda nada não grava (#42, #43)
+select results_eq(
+  $$select colunas from app.registro where evento = 'teste.registro.gravar' order by id$$,
+  $$values (null::text[]), (array['texto']::text[])$$,
+  'inserir não guarda colunas; alterar guarda só o nome da coluna que mudou');
+select is((select count(*)::int from app.registro r where pg_catalog.to_jsonb(r)::text like '%outro texto%'),
+  0, 'o valor novo não vai ao registro');
+select set_config('request.headers',
+  '{"x-acao":"teste.registro.gravar","x-pedido":"20000000-0000-0000-0000-000000000005"}', true);
+set local role authenticated;
+update public.teste_registro set texto = texto where id = '30000000-0000-0000-0000-000000000001';
+reset role;
+select is((select count(*)::int from app.registro where pedido_id = '20000000-0000-0000-0000-000000000005'),
+  0, 'update que não muda nada não grava linha');
+select throws_ok($$insert into app.registro (evento, resultado, colunas, pedido_id)
+                   values ('teste.linha', 'ok', array['Texto Livre'], gen_random_uuid())$$,
+  '23514', null, 'colunas só com nome de coluna');
+
+-- Defesa do org_id no próprio gatilho, sem política: tabela de faz de conta sem RLS (some no rollback)
+create table public.teste_registro_sem_trava (
+  org_id uuid not null,
+  id     uuid not null default gen_random_uuid() primary key
+);
+grant select, insert, update on table public.teste_registro_sem_trava to authenticated;
+create trigger teste_registro_sem_trava_registro after insert or update or delete on public.teste_registro_sem_trava
+  for each row execute function app.registrar_mudanca('id');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000b1","role":"authenticated"}', true);
+set local role authenticated;
+insert into public.teste_registro_sem_trava (org_id, id)
+  values ('00000000-0000-0000-0000-00000000000b', '30000000-0000-0000-0000-0000000000b1');
+reset role;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a1","role":"authenticated"}', true);
+set local role authenticated;
+select throws_ok($$insert into public.teste_registro_sem_trava (org_id) values ('00000000-0000-0000-0000-00000000000b')$$,
+  'PGRST', '{"code": "erro_interno", "message": "erro_interno"}', 'sem política: linha nova de outro estúdio recusada pelo gatilho');
+select throws_ok($$update public.teste_registro_sem_trava set org_id = '00000000-0000-0000-0000-00000000000a'
+                    where id = '30000000-0000-0000-0000-0000000000b1'$$,
+  'PGRST', '{"code": "erro_interno", "message": "erro_interno"}', 'sem política: puxar linha de outro estúdio recusado pelo gatilho');
+reset role;
+
+-- Argumento do gatilho que não é coluna uuid da tabela: recusa (nada de cast calado)
+create table public.teste_registro_coluna_texto (org_id uuid not null, texto text not null);
+create table public.teste_registro_coluna_ausente (org_id uuid not null, id uuid not null default gen_random_uuid());
+grant insert on table public.teste_registro_coluna_texto, public.teste_registro_coluna_ausente to authenticated;
+create trigger teste_registro_coluna_texto_registro after insert on public.teste_registro_coluna_texto
+  for each row execute function app.registrar_mudanca('texto');
+create trigger teste_registro_coluna_ausente_registro after insert on public.teste_registro_coluna_ausente
+  for each row execute function app.registrar_mudanca('nao_existe');
+set local role authenticated;
+select throws_ok($$insert into public.teste_registro_coluna_texto (org_id, texto)
+                   values ('00000000-0000-0000-0000-00000000000a', '30000000-0000-0000-0000-000000000009')$$,
+  'PGRST', '{"code": "erro_interno", "message": "erro_interno"}', 'argumento em coluna que não é uuid: recusa');
+select throws_ok($$insert into public.teste_registro_coluna_ausente (org_id) values ('00000000-0000-0000-0000-00000000000a')$$,
+  'PGRST', '{"code": "erro_interno", "message": "erro_interno"}', 'argumento em coluna que não existe: recusa');
+reset role;
 
 select * from finish();
 rollback;

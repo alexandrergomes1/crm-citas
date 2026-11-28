@@ -3,7 +3,7 @@
 -- Molde oficial: https://supabase.com/docs/guides/local-development/testing/overview
 -- Login simulado: set_config('request.jwt.claims') + set local role authenticated (é o que auth.uid() lê).
 begin;
-select plan(28);
+select plan(29);
 
 -- Matriz do código: JSON.stringify(exportarMatriz()) de src/domain/acesso/matriz.ts, gerado, nunca escrito à mão.
 -- supabase/matriz/matriz.test.ts (roda no `pnpm db:test`, antes do pgTAP) fica vermelho se esta linha não for
@@ -15,6 +15,8 @@ select set_config('teste.matriz', $json${"chaves":[],"linhas":[]}$json$, true);
 -- Estrutura (ADR 0019 · D1 e D21)
 select has_table('app', 'chaves_permissao', 'existe app.chaves_permissao');
 select has_table('app', 'matriz_permissoes', 'existe app.matriz_permissoes');
+select has_index('app', 'matriz_permissoes', 'matriz_permissoes_chave_idx', array['chave'],
+  'a chave estrangeira da matriz para o catálogo tem índice próprio');
 select is(
   (select count(*)::int from pg_catalog.pg_class c
     where c.oid in ('app.chaves_permissao'::regclass, 'app.matriz_permissoes'::regclass)
@@ -38,7 +40,7 @@ select set_eq(
   'catálogo de chaves do banco = catálogo do código');
 select set_eq(
   $$select papel, chave, alcance from app.matriz_permissoes$$,
-  $$select l ->> 'papel', l ->> 'chave', l ->> 'alcance'
+  $$select l ->> 'papel' as papel, l ->> 'chave' as chave, l ->> 'alcance' as alcance
       from jsonb_array_elements(current_setting('teste.matriz')::jsonb -> 'linhas') l$$,
   'matriz do banco = matriz do código (papel, chave, alcance)');
 select is(

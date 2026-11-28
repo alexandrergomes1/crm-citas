@@ -2,7 +2,7 @@
 -- Molde oficial: https://supabase.com/docs/guides/local-development/testing/overview
 -- Chaves de teste: SHA-256 de textos fictícios (no servidor é HMAC-SHA-256; o banco só vê os 32 bytes).
 begin;
-select plan(22);
+select plan(26);
 
 create function pg_temp.k(p text) returns bytea language sql immutable as $$ select pg_catalog.sha256(convert_to(p, 'UTF8')) $$;
 grant execute on function pg_temp.k(text) to anon;
@@ -22,6 +22,22 @@ select is(
   (select count(*)::int from generate_series(1, 31) i
     where public.conferir_tentativa(pg_temp.k('ip-unico'), pg_temp.k('conta-ip-' || i))),
   30, '31ª tentativa do mesmo IP passa do limite');
+select ok(not public.conferir_tentativa(pg_temp.k('ip-unico'), pg_temp.k('conta-ip-nova')),
+  'IP acima do limite recebe limite também com conta nova');
+reset role;
+select is((select count(*)::int from app.tentativas_entrada
+            where tipo = 'conta' and chave in (pg_temp.k('conta-ip-31'), pg_temp.k('conta-ip-nova'))),
+  0, 'IP acima do limite não cria linha de conta (ASVS V2.2.1)');
+-- Um IP com contas sempre novas não enche o teto global: no máximo 30 linhas de conta por janela
+set local role anon;
+select is((select count(*)::int from generate_series(1, 200) i
+            where public.conferir_tentativa(pg_temp.k('ip-enchedor'), pg_temp.k('enchedor-conta-' || i))),
+  30, 'IP com contas sempre novas para no limite');
+reset role;
+select is((select count(*)::int from app.tentativas_entrada t
+            where t.tipo = 'conta' and t.chave in (select pg_temp.k('enchedor-conta-' || i) from generate_series(1, 200) i)),
+  30, 'teto global não é enchido por um IP: só 30 linhas de conta dele');
+set local role anon;
 select ok(public.conferir_tentativa(pg_temp.k('ip-outro'), pg_temp.k('conta-outra')), 'outra conta e outro IP seguem');
 select throws_ok($$select public.conferir_tentativa('\x01'::bytea, pg_temp.k('conta-1'))$$,
   'PGRST', '{"code": "entrada_invalida", "message": "entrada_invalida"}', 'chave fora de 32 bytes é recusada');
