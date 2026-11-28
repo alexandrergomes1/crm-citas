@@ -3,7 +3,9 @@
 > Aprovado pelo dono em 27/11/2026 (E18). Escrito por: Documentador · Revisado por: Gerente de projeto
 
 ## Onde estamos
-- **Fase:** base de regras na `previas` (PR #1, E19); item 1 da fila (módulos em `docs/produto/`) em revisão. Ainda não há código.
+- **Fase:** base de regras (PR #1, E19) e item 2 da fila, fundação técnica (PR #4, E37·A, 28/11/2026), juntados na `previas`.
+  Item 1 (PR #2, merge autorizado no E33) e ordem E21·1 (PR #3, merge autorizado) aguardam a CI. Itens 3 e 4 em PRs
+  de rascunho (#5 e #6).
 - **Branch:** `docs/produto-modulos`.
 - **Respostas do dono:** `docs/decisoes/2026-11-27-fundacao.md`.
 
@@ -36,23 +38,32 @@
 | E21·2 | a ficha de saúde fica dentro de Formulários |
 | E21·3 | cobrança à cliente e vale-presente entram depois do núcleo |
 
+## Item 2 da fila · fundação técnica
+- **Situação:** feito, PR #4 juntado na `previas` (E37·A, 28/11/2026).
+- **Spec:** `specs/20261128-005000-fundacao-tecnica/`.
+- **Pendente do dono** (vindo do PR #4):
+  1. Responder E23·2 (prévia online na Cloudflare) e E23·3 (custo).
+  2. D2 (PRs do Dependabot e a `main`) e D3 (proteção de branch): pedido separado, com os cliques exatos.
+  3. Autorizar gravar em `.claude/` para ligar as travas do Claude Code, hoje só propostas
+     (`specs/20261128-005000-fundacao-tecnica/travas-claude-propostas/`, ADR 0003).
+
 ## Falta na base
-- Pendências: e-mail de segurança quando houver domínio (E14·1); gitleaks e Dependabot (E14·3); travas automáticas do projeto antigo (item 2 da fila).
+- Pendências: e-mail de segurança quando houver domínio (E14·1); travas do Claude Code em `.claude/` (ver item 2).
 - Apagar a branch `chore/base-fundacao`: o acesso da IA foi recusado; o dono apaga no PR #1 (E19·1).
-- Corrigir `ARCHITECTURE.md` §2 (ordem, E21·1) e `SECURITY.md` §1 ("privado", E19·1 troca) no PR `docs/ordem-e21`.
+- Corrigir `ARCHITECTURE.md` §2 (ordem, E21·1) e `SECURITY.md` §1 ("privado", E19·1 troca): PR #3 (`docs/ordem-e21`),
+  merge autorizado, aguardando a CI.
 - E22·B: pacote da madrugada em PRs de rascunho.
 
 ## Como continuar numa conversa nova
 
 **Onde estão as coisas**
-- Repositório `alexandrergomes1/crm-citas`: a base está na `previas` (PR #1); o item 1 está na branch `docs/produto-modulos`.
+- Repositório `alexandrergomes1/crm-citas`: a base (PR #1) e o item 2 (PR #4) estão na `previas`; o item 1 está na branch `docs/produto-modulos` (PR #2).
 - Respostas do dono: `docs/decisoes/2026-11-27-fundacao.md`.
 - Histórico anterior ao projeto novo: repositório `crm-agenda`, branches `chore/reorganizacao-base` (pasta `docs/reorganizacao/`) e `feat/ds-premium` (spec do design). **Só se lê com autorização do dono, item por item** (`AGENTS.md` §3 regra 4; pedido (c) em `docs/decisoes/2026-11-27-fundacao.md`).
 
 **Próximo passo**
-1. Revisão do PR do item 1 (`docs/produto-modulos` → `previas`) e pedido de merge ao dono no molde (`docs/moldes/pergunta.md`).
-2. PR `docs/ordem-e21` (`ARCHITECTURE.md` §2 e `SECURITY.md` §1).
-3. Item 2 da fila (`docs/BACKLOG.md`).
+1. CI verde e merge dos PRs #2 (item 1, E33) e #3 (ordem E21·1), já autorizados.
+2. Itens 3 e 4 da fila: PRs de rascunho #5 e #6, à espera da aprovação das specs pelo dono.
 
 **Prompt pronto para o dono colar**
 
