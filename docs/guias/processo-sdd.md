@@ -58,9 +58,12 @@ O QA dá o veredito em todos os tipos.
 ## 5. O Spec Kit
 - Ordem oficial: criar a spec → esclarecer dúvidas → planejar → gerar tarefas → analisar → implementar → convergir
   (implementar e convergir se repetem até a ferramenta dizer que convergiu).
-- Na instalação: pastas com data e hora (`feature_numbering: timestamp`) e o nome da branch fixado no padrão
-  `tipo/area-assunto`, porque o Spec Kit sozinho usa outro padrão.
-- Os nomes exatos dos comandos entram aqui depois de instalada a versão, lida a documentação oficial dela.
+- Na instalação (Spec Kit 1.4.5): pastas com data e hora (`feature_numbering: timestamp`). O Spec Kit não cria a
+  branch: o modelo de branch dele não gera `tipo/area-assunto`, por isso a branch é aberta pelo Engenheiro de DevOps
+  na etapa 2, nesse padrão.
+- Comandos, no chat do Claude Code: `/speckit-specify` e `/speckit-clarify` (etapa 3) · `/speckit-plan`,
+  `/speckit-checklist` e `/speckit-tasks` (etapa 4) · `/speckit-analyze` (etapa 5) · `/speckit-implement` e
+  `/speckit-converge` (etapa 8, repetidos até "Converged") · `/speckit-constitution` só aponta para o `AGENTS.md`.
 - A constituição do Spec Kit só aponta para o `AGENTS.md`.
 
 ## 6. Lacuna

@@ -1,0 +1,27 @@
+# dependências
+node_modules/
+
+# saídas de build
+dist/
+.output/
+.tanstack/
+.vinxi/
+.nitro/
+
+# relatórios de teste
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+coverage/
+
+# variáveis de ambiente e segredos (nunca no repositório)
+.env
+.env*
+
+# banco local
+supabase/.temp/
+
+# sistema
+.DS_Store
+*.log

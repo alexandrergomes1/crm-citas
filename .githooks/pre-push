@@ -1,0 +1,4 @@
+#!/bin/sh
+# Gancho de git (pre-push) para Cursor, Codex e pessoas: regras de envio do AGENTS.md §8 (ADR 0003 · T6).
+# Liga-se na máquina com: git config core.hooksPath .githooks
+exec node "$(dirname "$0")/pre-push.mjs" "$@"
