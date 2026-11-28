@@ -93,7 +93,7 @@ de permissões), `org_profiles` e `org_profile_permissions` (perfis de acesso cr
 | CA-10 | Nenhum segredo, seed ou dado do antigo no PR. | gitleaks verde (item 2 da fila) e revisão |
 | CA-11 | O projeto existente foi tratado exatamente como E24·2. | revisão do Auditor de risco |
 | CA-12 | Revisão do tipo Banco e de acesso sem "Bloqueia" e veredito do QA. | relatórios no PR |
-| CA-13 | Todo estúdio tem moeda, idioma padrão e fuso horário preenchidos; idioma fora de português, espanhol e inglês é recusado. | teste automático na CI |
+| CA-13 | Todo estúdio tem moeda, idioma padrão e fuso horário preenchidos; idioma fora de português, espanhol e inglês é recusado; a moeda segue a regra escolhida em E24·3. | teste automático na CI |
 
 ## 8. Fora de escopo
 - As tabelas de cada módulo do núcleo (Agenda, Agendamento, Clientes, Formulários, Catálogo, Checkout, Caixa):
@@ -123,6 +123,15 @@ de permissões), `org_profiles` e `org_profile_permissions` (perfis de acesso cr
 - **E24·2·B:** o existente fica intocado para o antigo; o crm-citas usa um projeto novo de desenvolvimento na UE.
 - **Recomendo A:** os dados são fictícios (fala do dono) e um projeto só evita custo e confusão.
   **Desfaz-se assim:** o esquema antigo se recria pelas migrations do antigo, mas **os dados fictícios não voltam**.
+
+**E24·3 · Moeda do estúdio** (dinheiro; RF-09)
+- Todo preço, comanda e caixa do estúdio usa a moeda dele; a regra de troca define o que acontece com os valores já gravados.
+- **E24·3·A:** escolhida no cadastro e fixa depois do primeiro serviço com preço (trocar exige suporte); casas
+  decimais pela ISO 4217 (EUR e BRL: 2).
+- **E24·3·B:** a dona pode trocar quando quiser; os preços não são convertidos.
+- **E24·3·C:** uma moeda só para toda a plataforma (EUR).
+- **Recomendo A:** evita valores gravados com a moeda trocada; casas decimais pela norma ISO 4217.
+  **Desfaz-se assim:** antes do primeiro preço, troca-se livremente; depois, só pelo suporte.
 
 ## 11. Assumptions (decisões técnicas do papel, à vista na aprovação)
 1. Uma migration por tabela, com data e hora no nome, na pasta de migrations do Supabase em `supabase/` (caminho exato após ler a documentação oficial).
