@@ -1,0 +1,167 @@
+/*
+ * Tokens do design system (spec 20261128-010500-design-system-codigo, RT-1 a RT-8; plan.md §4; ADR 0004 · D1).
+ * Fonte única: DESIGN.md. É o ÚNICO arquivo com cor ou medida escrita (RT-9): os componentes só usam var(--...).
+ * Valor diferente do DESIGN.md é defeito (o teste src/app/ui/tokens.test.ts lê a tabela do DESIGN.md §3).
+ */
+:root {
+  /* RT-1 · Cores (DESIGN.md §3), nome e valor exatos */
+  --page: #ECEBE6;
+  --card: #FFFFFF;
+  --btn: #F2F1ED;
+  --track: #F2F1ED;
+  --line: #EAE9E4;
+  --ink: #16181D;
+  --ink2: #4A4F57;
+  --ink3: #5E636B;
+  --field: #8C9098;
+  --id: #3E5C76;
+  --brand: #7A5A22;
+  --warn: #9A5B06;
+  --warnSoft: #FBEFD9;
+  --ok: #1F6B45;
+  --okInk: #17583A;
+  --okSoft: #E3F0E8;
+  --danger: #B3261E;
+  --dangerSoft: #FBEAE8;
+  --c1: #7D5A8C;
+  --c2: #B0583A;
+  --c3: #A07A2C;
+  --c4: #5C7F6A;
+
+  /* RT-2 · Cores citadas fora da tabela (DESIGN.md §5 e §8b) */
+  --pillSoft: rgba(22,24,29,.07);
+  --warnInk: #8A5205;
+  --selRing: #D8D7D1;
+
+  /* RT-3 · Tipografia (DESIGN.md §4).
+   * PONTO A MUDAR (E25·2, em aberto; segue a recomendação A, canvas aprovado): --fw-forte, --lh-titulo, --lh-texto. */
+  --font: 'Geist Variable', system-ui, sans-serif;
+  --fs-20: 20px;
+  --fs-18: 18px;
+  --fs-16: 16px;
+  --fs-15: 15px;
+  --fs-14: 14px;
+  --fs-13: 13px;
+  --fs-12: 12px;
+  --fs-11: 11px;
+  --fs-texto: var(--fs-15);
+  --fw-normal: 400;
+  --fw-medio: 500;
+  --fw-forte: 600;
+  --lh-titulo: 1.2;
+  --lh-texto: 1.4;
+
+  /* RT-3b · Ícones Lucide. PONTO A MUDAR (E25·2, em aberto; recomendação A, canvas aprovado). */
+  --ic-14: 14px;
+  --ic-16: 16px;
+  --ic-18: 18px;
+  --ic-20: 20px;
+  --ic-24: 24px;
+  --ic-traco: 1.75;
+
+  /* RT-4 · Espaços (DESIGN.md §4) */
+  --sp-4: 4px;
+  --sp-8: 8px;
+  --sp-12: 12px;
+  --sp-16: 16px;
+  --sp-20: 20px;
+  --sp-24: 24px;
+  --sp-32: 32px;
+  --margem: 16px;
+  --entre-blocos: 12px;
+
+  /* RT-5 · Raios (DESIGN.md §4, §8b) */
+  --r-pilula: 999px;
+  --r-bloco: 20px;
+  --r-campo-multi: 16px;
+  --r-menu-recolhido: 16px;
+  --r-janelinha: 24px;
+  --r-folha: 28px;
+  --r-inicial: 10px;
+  --r-caixinha: 7px;
+  --r-contador: 10px;
+
+  /* RT-6 · Sombras e linha (DESIGN.md §8b) */
+  --sombra-flutua: 0 16px 40px rgba(22,24,29,.18);
+  --sombra-escolhido: 0 0 0 1px var(--selRing), 0 1px 3px rgba(22,24,29,.14);
+  --sombra-cabecalho: 0 1px 0 var(--line), 0 6px 14px -10px rgba(22,24,29,.25);
+  --borda: 1px;
+
+  /* RT-7 · Alturas e larguras (DESIGN.md §4, §8b) */
+  --h-controle: 44px;
+  --toque: 44px;
+  --h-campo: 44px;
+  --h-linha-lista: 64px;
+  --h-barra-baixo: 72px;
+  --h-cabecalho: 64px;
+  --h-linha-tabela: 40px;
+  --h-cab-tabela: 36px;
+  --h-barra-topo: 64px;
+  --w-menu-aberto: 232px;
+  --w-menu-recolhido: 84px;
+  --w-submenu: 216px;
+  --h-seletor: 44px;
+  --h-seletor-item: 36px;
+  --folga-seletor: 4px;
+  --d-agendar: 52px;
+  --h-status: 36px;
+  --d-caixinha: 22px;
+  --w-interruptor: 44px;
+  --h-interruptor: 26px;
+  --h-contador: 20px;
+  --w-contador-min: 20px;
+  --folga-contador: 7px;
+  --folga-btn-ic-esq: 12px;
+  --folga-btn-ic-dir: 10px;
+  --espaco-ic: 6px;
+  --w-titulo-barra: 280px;
+  --w-busca-geral: 320px;
+  --w-busca-tela: 280px;
+  --w-menu-flutua: 240px;
+  --w-janelinha: 340px;
+  --w-painel: 480px;
+  --d-bolinha: 40px;
+  --d-bolinha-tabela: 24px;
+  --d-bolinha-tempo: 36px;
+  --d-ponto: 8px;
+  --w-faixa: 4px;
+  --w-linha-tempo: 2px;
+
+  /* RT-8 · Foco e estados (DESIGN.md §8, §8b) */
+  --foco-cor: var(--ink3);
+  --foco-largura: 2px;
+  --foco-afastado: 2px;
+  --opac-desativado: .6;
+  --atraso-carregando: 300ms;
+  --dur-interruptor: 150ms;
+
+  /* Desenho de celular × computador: os componentes que mudam de desenho (RC-18 × RC-19) leem estes dois. */
+  --mostra-celular: flex;
+  --mostra-computador: none;
+  --w-busca-tela-atual: 100%;
+}
+
+/*
+ * Ponto único de troca celular → computador (plan.md §4).
+ * PONTO A MUDAR (E25·3, em aberto; segue a recomendação A: 840 px, classe "expanded" do Material Design 3).
+ */
+@media (min-width: 840px) {
+  :root {
+    --fs-texto: var(--fs-14);
+    --margem: 24px;
+    --h-controle: 40px;
+    --toque: 40px;
+    --mostra-celular: none;
+    --mostra-computador: flex;
+    --w-busca-tela-atual: var(--w-busca-tela);
+  }
+}
+
+/*
+ * Tokens fora da lista do plan.md §4 (registro no plano e no ADR 0004 pedido ao Arquiteto; revisão de código do item 4).
+ * Só estes 5; o tokens.test.ts reprova qualquer outro não previsto.
+ * - --fs-texto: texto corrido, 15 no celular e 14 no computador (DESIGN.md §4).
+ * - --mostra-celular / --mostra-computador: trocam o desenho (RC-18 × RC-19) sem escrever a largura fora daqui.
+ * - --w-busca-tela-atual: busca da tela cheia no celular e 280 no computador (DESIGN.md §8b).
+ * - --dur-interruptor: duração do movimento do interruptor; só vale sem "movimento reduzido" (RA-6).
+ */
