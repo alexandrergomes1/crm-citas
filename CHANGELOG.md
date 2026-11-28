@@ -3,7 +3,13 @@
 
 ## Ainda não lançado
 
-### Em revisão (PR #4, rascunho) · item 2 da fila, fundação técnica
+### Em revisão (PR #5, rascunho) · item 3 da fila, ligar o banco
+Spec `specs/20261128-010000-banco-ligacao/` ainda sem aprovação do dono; nada foi juntado.
+- Fase A: migrations de estúdios, membros, trava por estúdio e políticas base (ADR 0005), com 77 testes de banco.
+- Nada aplicado em banco remoto. Fase B (aplicar no banco de desenvolvimento pela CI) espera E24·1, E24·2 e a
+  aprovação da spec.
+
+### Juntado (PR #4, E37·A) · item 2 da fila, fundação técnica
 Spec `specs/20261128-005000-fundacao-tecnica/` ainda sem aprovação do dono; nada foi juntado.
 - App vazio (TanStack Start) com as quatro camadas, lint de camadas, Vitest e Playwright (390 e 1440 px).
 - Banco local do Supabase com migration vazia e teste pgTAP; nada liga a banco remoto.
