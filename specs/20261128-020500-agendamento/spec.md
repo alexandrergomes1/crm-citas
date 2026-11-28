@@ -88,6 +88,7 @@ o botão de avançar etapa e o nome da ação de remarcar no ⋮.
 | RF-15 | **Plano B:** enquanto Clientes ou Catálogo não existirem, a etapa correspondente aparece "em desenvolvimento" (`DESIGN.md` §8) e os testes usam dados de exemplo locais, fictícios, escritos do zero (RG-07). | `DESIGN.md` §8; item 3 RG-07 |
 | RF-16 | A Agenda lê, pela camada de serviço, os agendamentos do dia à vista (paginados, só do estúdio da sessão e conforme E26·1), para desenhar os cartões. | spec da Agenda §4; `ARCHITECTURE.md` §4 |
 | RF-17 | Hora que não existe no dia da troca para o horário de verão (no fuso do estúdio) é recusada, com mensagem que diz que essa hora não existe nesse dia; hora que se repete na volta do horário fica com a primeira. | Assumption 9 |
+| RF-18 | Serviço usado em algum agendamento não pode ser excluído, só arquivado: o banco recusa a exclusão (chave estrangeira com `on delete restrict`); o arquivado some da escolha e continua pelo nome nos agendamentos que já o têm. | spec do Catálogo RF-03 (branch `feat/catalogo`) |
 
 **Transições (RF-07):**
 

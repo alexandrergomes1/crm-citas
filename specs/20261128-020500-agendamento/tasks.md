@@ -6,10 +6,10 @@
   `pnpm db:test` se mexeu em `supabase/` e `pnpm test:e2e` se mexeu em tela. Commits pequenos, Conventional Commits,
   citando a spec. Nada no banco remoto (`AGENTS.md` §1). Teste antes do código no domínio.
 
-## Antes de construir (portão)
-- [ ] **T0** · Gerente de projeto e Analista de requisitos: E27·1 e E27·2 respondidas e gravadas (E26 vêm da Agenda);
-  lacunas L-1 a L-6 do `plan.md` §2 resolvidas; spec "Approved" com a linha "Aprovação do dono". Com E27·2·B ou
-  E26·3·C, o plano volta à 5b (§12).
+## Antes de construir
+- [ ] **T0** · Gerente de projeto e Analista de requisitos: a construção em PR de rascunho pode começar (E22·B), com as
+  recomendações das dúvidas em aberto (E26, E27, E30·3); quando o dono responder, a resposta é gravada e, se diferente,
+  aplica-se o `plan.md` §12 (com E27·2·B ou E26·3·C, o plano volta à 5b). O portão "Approved" fica no pedido de merge (T25).
 - [ ] **T1** · Engenheiro de DevOps: merge, nesta ordem, de `feat/banco-ligacao`, `feat/design-system-codigo`, da
   branch da spec "Entrar e camada de serviço" (E36·A), de `feat/agenda`, `feat/clientes` e `feat/catalogo` na
   `feat/agendamento`; regenerar `routeTree.gen.ts`; conferir que os arquivos das bases do cabeçalho do plano estão lá;
@@ -69,5 +69,6 @@
 - [ ] **T23** · Analista de requisitos: confere o pedido item por item (etapa 10).
 - [ ] **T24** · Documentador: `docs/STATUS.md`, `docs/BACKLOG.md`, `CHANGELOG.md`, `docs/decisoes/` no mesmo PR;
   confere a numeração dos ADRs 0009 e 0010.
-- [ ] **T25** · Gerente de projeto: base do PR na `previas`; pedido de merge no molde, com o commit, a CI verde e o link
+- [ ] **T25** · Gerente de projeto: **portão** — spec "Approved" com a linha "Aprovação do dono" e as respostas E26, E27
+  e E30·3 gravadas; base do PR na `previas`; pedido de merge no molde, com o commit, a CI verde e o link
   da prévia; aviso no celular.

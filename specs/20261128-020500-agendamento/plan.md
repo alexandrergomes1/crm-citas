@@ -20,7 +20,9 @@
   - Clientes (`feat/clientes`): `plan.md` (`unique (org_id, id)` em `clientes`; `app.cliente_visivel` a substituir;
     `ultima_visita` mantida pelo Agendamento; `adicionarCliente` serve à E27·1·A);
   - Catálogo (`feat/catalogo`): `spec.md` (RF-02: a duração gravada no agendamento não muda; RF-08: leitura dos serviços
-    ativos pela camada de serviço). Ainda sem plano: o nome da tabela de serviços vem de lá;
+    ativos pela camada de serviço), `plan.md` e ADR 0012 (`public.servicos` com `unique (org_id, id)`, alvo das chaves
+    compostas do Agendamento; `servicosAtivosParaAgendar` em `src/server/catalogo/consultas.ts`; com E30·3·B,
+    `public.servicos_profissionais`);
   - Checkout (`feat/checkout`): `spec.md` RF-17 e CA-02b (com checkout Pago ou Sem valor, nada vai a Cancelado nem Ausência).
 - **Conferido na documentação oficial (28/11/2026):** Postgres 17 `btree_gist` (traz classe de operador GiST para
   `uuid`; extensão "trusted"); `CREATE TABLE ... EXCLUDE ... WHERE (predicado)`; código `23P01` (`exclusion_violation`);
@@ -111,16 +113,17 @@ Sugestões do Arquiteto por cima das do Analista (spec §7). Nada se copia: "ree
   tstzrange(inicio, fim, '[)') with &&) where (status not in ('cancelado','ausencia'))`. Encostar não cruza (`[)`);
   Cancelado e Ausência não ocupam; dois pedidos ao mesmo tempo: o segundo espera o primeiro e recebe `23P01`
   (a exclusão funciona como o `unique` sob concorrência, doc do Postgres). Precisa de `btree_gist` para o `uuid with =`.
-- As ligações compostas usam `NO ACTION` (conferido no fim do comando): apagar o estúdio leva tudo em cascata pelo
-  `org_id`; apagar um membro ou uma cliente com agendamento é recusado (o histórico fica).
+- As ligações compostas a membro e cliente usam `NO ACTION` (conferido no fim do comando): apagar o estúdio leva tudo
+  em cascata pelo `org_id`; apagar um membro ou uma cliente com agendamento é recusado (o histórico fica). A ligação do
+  item ao serviço é `on delete restrict` (abaixo): serviço já agendado não se exclui (o Catálogo oferece Arquivar).
 - **Índices:** `(org_id, inicio)` (dia da Agenda), `(org_id, profissional_id, inicio)` (ocupados), `(org_id, cliente_id,
   inicio desc)` (atendimentos da cliente e `cliente_visivel`); o índice da exclusão.
 
 **`public.agendamento_itens`**: `org_id uuid not null`, `agendamento_id uuid not null`, `ordem smallint not null check
 (ordem between 1 and 10)` (ADR 0010 · D4), `servico_id uuid not null`, `duracao_min int not null`, `primary key (org_id,
 agendamento_id, ordem)`; `foreign key (org_id, agendamento_id) references public.agendamentos (org_id, id) on delete
-cascade`; `foreign key (org_id, servico_id) references <serviços do Catálogo> (org_id, id)` (o Catálogo precisa de
-`unique (org_id, id)`, como Clientes). `duracao_min` é **gravada pelo gatilho** a partir do Catálogo, nunca pelo pedido.
+cascade`; `foreign key (org_id, servico_id) references public.servicos (org_id, id) on delete restrict` (o `unique (org_id, id)`
+já está no plano do Catálogo; `restrict` casa com o `23503` → `servico_em_uso` de lá). `duracao_min` é **gravada pelo gatilho** a partir do Catálogo, nunca pelo pedido.
 
 **`public.agendamento_historico`**: `id uuid primary key default gen_random_uuid()`, `org_id uuid not null`,
 `agendamento_id uuid not null` (ligação composta como acima, `on delete cascade`), `de text null` (nulo na criação),
@@ -343,6 +346,7 @@ entrarem na `previas`, a base do PR passa à `previas`, antes do pedido de merge
 | **E26·2·B** | criar e alterar só `dona` e `recepcao`; a profissional não vê "Novo agendamento" nem o ⋮; muda 250 e o e2e |
 | **E26·2·C** | criar e alterar para os 3 papéis em qualquer profissional; muda 250 |
 | **E26·3·B** | gatilho e `acesso.ts`: só papel `profissional` |
+| **E30·3·B** (Catálogo: quem faz cada serviço) | a etapa 3 só oferece profissionais ligadas a **todos** os serviços escolhidos em `public.servicos_profissionais` (lista vazia = quem atende, pela E26·3); regra em `horario.ts` ou `acesso.ts` com teste; o servidor lê a ligação pela consulta do Catálogo (dentro do teto de criar, ADR 0010 · D4); o gatilho do `before insert` de `agendamento_itens` e o de remarcar recusam profissional não ligada; testes 210 e 250 e um passo do e2e; mais nenhum arquivo |
 | **E26·3·C** | **para**: a ligação da profissional muda para a tabela nova da Equipe; plano refeito e nova 5b |
 
 ## 13. Riscos e não verificado
