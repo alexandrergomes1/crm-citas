@@ -16,7 +16,9 @@ Versões e bibliotecas extras entram por spec (`ARCHITECTURE.md` §12).
 `packageManager`) e Docker (só para o banco local). Nenhuma senha ou chave é necessária.
 
 1. Instalar as dependências: `pnpm install`
-2. Rodar o app: `pnpm dev` e abrir `http://localhost:3000`
+2. Ligar a trava de envio (uma vez por cópia do repositório): `git config core.hooksPath .githooks`. Ela barra o
+   envio direto à `previas` ou à `main` e nome de branch fora de `tipo/area-assunto` (`AGENTS.md` §8)
+3. Rodar o app: `pnpm dev` e abrir `http://localhost:3000`
 
 **Comandos fixos** (scripts do `package.json`):
 
