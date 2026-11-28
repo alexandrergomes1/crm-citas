@@ -101,10 +101,23 @@ export function sql<T = Record<string, unknown>>(consulta: string): T[] {
     stdio: ['ignore', 'pipe', 'pipe'],
   })
   if (r.status !== 0 || r.stdout.includes('"_tag":"Error"')) throw new Error('consulta ao banco local falhou')
-  // Instrução sem linhas (ex.: update) responde só a etiqueta do comando ("UPDATE 1"), não JSON.
-  if (!r.stdout.trimStart().startsWith('{')) return []
-  const dados = JSON.parse(r.stdout) as { rows?: T[] }
-  return dados.rows ?? []
+  return linhasDaSaida<T>(r.stdout)
+}
+
+/**
+ * Linhas da saída de `supabase db query --output-format json` (CLI 3.4.0). A forma muda com quem roda, conferido
+ * rodando o comando: com `AI_AGENT` ou `CLAUDECODE` no ambiente (sessão de IA) vem `{"boundary", "rows", "warning"}`;
+ * sem elas (CI, terminal comum) vem só a lista `[...]`. Instrução sem linhas (ex.: update) responde só a etiqueta do
+ * comando ("UPDATE 1"), não JSON. Outra forma → exceção (nunca uma lista vazia por engano). Exportada para o teste.
+ */
+export function linhasDaSaida<T = Record<string, unknown>>(saida: string): T[] {
+  const texto = saida.trim()
+  if (!texto.startsWith('[') && !texto.startsWith('{')) return []
+  const dados: unknown = JSON.parse(texto)
+  if (Array.isArray(dados)) return dados as T[]
+  const linhas = (dados as { rows?: unknown }).rows
+  if (Array.isArray(linhas)) return linhas as T[]
+  throw new Error('saída da consulta em forma desconhecida')
 }
 
 /** Cliente de administração local; manda a chave do servidor (o pré-pedido exige em todo pedido, D16). */

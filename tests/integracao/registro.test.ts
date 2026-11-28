@@ -13,6 +13,7 @@ import {
   criarPessoa,
   ehBancoLocal,
   emailFicticio,
+  linhasDaSaida,
   sql,
   ultimoPedido,
   uuid,
@@ -39,6 +40,30 @@ describe('alvo das consultas diretas', () => {
     null,
   ])('recusa o que não é local ou não se lê (%#)', (endereco) => {
     expect(ehBancoLocal(endereco)).toBe(false)
+  })
+})
+
+// Formas da saída de `supabase db query --output-format json` (CLI 3.4.0), copiadas de execuções reais: a CI recebe a
+// lista pura; a sessão de IA (AI_AGENT ou CLAUDECODE) recebe o envelope com "rows". Não precisa do banco de pé.
+describe('leitura da saída das consultas diretas', () => {
+  it('lista pura (CI, terminal comum)', () => {
+    expect(linhasDaSaida('[\n  {\n    "n": 1\n  }\n]\n')).toEqual([{ n: 1 }])
+    expect(linhasDaSaida('[]\n')).toEqual([])
+  })
+
+  it('envelope com "rows" (sessão de IA)', () => {
+    const envelope = JSON.stringify({ boundary: 'b', rows: [{ t: '{x}', z: null }], warning: 'w' })
+    expect(linhasDaSaida(envelope)).toEqual([{ t: '{x}', z: null }])
+    expect(linhasDaSaida(JSON.stringify({ boundary: 'b', rows: [], warning: 'w' }))).toEqual([])
+  })
+
+  it('instrução sem linhas: só a etiqueta do comando', () => {
+    expect(linhasDaSaida('UPDATE 1\n')).toEqual([])
+    expect(linhasDaSaida('CREATE TABLE\n')).toEqual([])
+  })
+
+  it('outra forma de JSON → exceção, nunca lista vazia', () => {
+    expect(() => linhasDaSaida('{"resultado": []}')).toThrow('forma desconhecida')
   })
 })
 
