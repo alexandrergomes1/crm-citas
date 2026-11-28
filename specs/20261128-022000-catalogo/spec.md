@@ -109,7 +109,7 @@ nomes da gestão de categorias; os ícones das seções no nível 1 do celular; 
 | ID | Regra | Fonte |
 |---|---|---|
 | RN-01 | **Preço** guardado como número inteiro em centavos (a menor unidade da moeda), nunca número com vírgula; o servidor recusa fração de centavo. Limites e tipo de preço: E30·2. | ASVS V5.1.4 (tipo e faixa); precisão de dinheiro |
-| RN-02 | **Moeda** é a do estúdio (código ISO 4217, vinda do item 3), não do serviço; o preço é mostrado no formato do idioma da pessoa e na moeda do estúdio (ex.: "230,00 €"). | `ARCHITECTURE.md` §11 |
+| RN-02 | **Moeda** é a do estúdio (código ISO 4217, vinda do item 3), não do serviço; o preço é mostrado no formato do idioma da pessoa e na moeda do estúdio (ex.: "230,00 €"). Depende do item 3 (moeda do estúdio, `ARCHITECTURE.md`:117); a construção da regra de preço espera isso existir. | `ARCHITECTURE.md` §11 |
 | RN-03 | **Duração** em minutos inteiros, **maior que zero**, entre 5 e 720 e múltipla de 5; mostrada como "45 min", "1 h 30 min". | pedido do Agendamento (RF-02 dele); Assumption 1 |
 | RN-04 | **Nome** do serviço: obrigatório, sem espaços nas pontas, de 1 a 120 caracteres, único entre os serviços não excluídos do estúdio (sem diferença de maiúsculas e acentos). Nome da categoria: mesma regra, até 60 caracteres. | ASVS V5.1.3; Assumption 2 |
 | RN-05 | **Categoria** obrigatória e do mesmo estúdio do serviço. | `ARCHITECTURE.md` §5; Assumption 3 |
@@ -125,7 +125,7 @@ quem decide é o Engenheiro de dados, com ADR e revisão de outro papel (E16·1)
 |---|---|---|
 | `service_categories` | **reescrever** | ficam `org_id`, nome, criação e o número de ordem da cor (RN-06); saem `color` (cor fora do `DESIGN.md`, `#F43F5E`), `icon`, `position` e `active` (fora da v1) |
 | `services` | **reescrever** | ficam `org_id`, categoria (chave estrangeira do mesmo estúdio), nome, duração, **preço em centavos** (o antigo usa `numeric(10,2)`), arquivado, criação e alteração; saem `price_type` (E30·2), `description`, `cost_amount`, `commission_pct`, `buffer_minutes`, `requires_anamnese`, `anamnese_template_id`, `online_booking`, `position`, `result_months`, `retouch_included_days`, `deposit_type`, `deposit_value` (todos "depois", §2); a duração 0 do antigo não vale (RN-03) |
-| `service_staff` | **reescrever** só se E30·3·B, ligando ao membro do item 3 (não a `staff_members`); **adiada** se E30·3·A | quem faz cada serviço |
+| `service_staff` | **reescrever** só se E30·3·B, ligando a quem atende, pela E26·3 (não a `staff_members`); **adiada** se E30·3·A | quem faz cada serviço |
 | `staff_services` | **descartar** | mesmo fim de `service_staff`, nasce sem `org_id` (achado do item 3) |
 | `products` | **adiada** (Estoque) | §2 |
 | `service_packages`, `service_package_items`, `package_services`, `service_bundles`, `service_bundle_items`, `subscription_plans` | **adiada** | §2; `package_services` e `service_package_items` nascem sem `org_id` |
@@ -161,8 +161,8 @@ teste de isolamento em cada tabela. RN-01, RN-03 a RN-05 também como regra (CHE
 ## 10. Dependências
 - **Item 2** (fundação técnica): app, pnpm, Vitest, Playwright, CI, banco local, Spec Kit.
 - **Item 3** (banco): estúdio, membros, papéis, função de checagem, molde do teste de isolamento e **a moeda e o
-  idioma do estúdio**. A spec do item 3 hoje não cita a moeda: o Arquiteto confirma no plano onde ela mora; sem ela,
-  o RN-02 não se cumpre e o trabalho para.
+  idioma do estúdio**. Depende do item 3 (moeda do estúdio, `ARCHITECTURE.md`:117); a construção da regra de preço
+  espera isso existir.
 - **Item 4** (design system no código): componentes do `DESIGN.md`.
 - **Agenda:** quem é profissional (E26·3), só se E30·3·B.
 - **Agendamento:** consome o RF-08 e leva o estado vazio para cá; usa os dados de exemplo enquanto o Catálogo não
@@ -193,8 +193,9 @@ O que a profissional vê e faz na Agenda e nos agendamentos é a E26·1 e a E26�
   Checkout. Desfaz-se mudando a regra; nenhum preço gravado se perde.
 
 **E30·3 · Quem faz cada serviço** (tela)
-- **E30·3·A:** na primeira versão, toda profissional pode fazer todo serviço; o Agendamento mostra todas.
-- **E30·3·B:** o serviço tem a lista de quem faz (vazia = todas); o Agendamento só oferece essas, e o filtro
+- **E30·3·A:** na primeira versão, quem atende, pela E26·3, pode fazer todo serviço; o Agendamento mostra
+  quem atende, pela E26·3.
+- **E30·3·B:** o serviço tem a lista de quem faz, entre quem atende pela E26·3 (vazia = quem atende, pela E26·3); o Agendamento só oferece essas, e o filtro
   "profissional" funciona.
 - **Recomendo A:** primeira versão mínima e sem depender da Equipe; o B entra depois sem mudar os serviços gravados
   (o Agendamento já prevê a regra, RF-03 dele). Desfaz-se ligando a lista.
