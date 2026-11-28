@@ -3,32 +3,28 @@
 > Aprovado pelo dono em 27/11/2026 (E18). Escrito por: Documentador · Revisado por: Gerente de projeto
 
 ## Onde estamos (28/11, noite)
-- **Na `previas`:** PRs #1 a #4. A branch `chore/base-fundacao` está toda na `previas`; o dono autorizou apagar, mas
-  o acesso desta sessão recusou: **o dono apaga** em https://github.com/alexandrergomes1/crm-citas/branches (lixeira).
-- **Respostas do relatório gravadas** (`docs/decisoes/2026-11-27-fundacao.md`) e **as 10 specs aprovadas**. Só a spec
-  do Entrar já tem a linha "Aprovação do dono" (esta branch); as outras 9 recebem a linha quando a branch de cada uma
-  for trabalhada (esta sessão só envia à `feat/entrar-servico`). Respostas com ajuste ou pedido junto (E29·1, E31·1,
-  E31·2, E32·1, E39·2, E39·3) entram no texto de cada spec pelo Analista de requisitos nessa hora.
-- **PR #7 (`feat/entrar-servico`), item 4a: em pedido de merge (PR #7)** (tarefa F3, Gerente de projeto).
-  CI 5/5 verde no `13d6b9d`. Revisores (código, segurança, design, dados, auditor de risco): todos "Libera com
-  ressalvas". QA: "Libera com ressalvas". **CA-22 depende do dono:** conferir as telas na prévia (E23·2·A).
-  Depois do `13d6b9d` entraram `afc5198` (texto da spec) e `6b1f3a2` (teste de pedido forjado, RF-10) e este
-  registro; o pedido de merge cita o último commit do PR, com a CI verde nele.
-  [Spec](https://github.com/alexandrergomes1/crm-citas/tree/feat/entrar-servico/specs/20261128-030000-entrar-servico) ·
-  [como rodar](https://github.com/alexandrergomes1/crm-citas/blob/feat/entrar-servico/CONTRIBUTING.md#9-como-rodar).
-- **Avaliação do antigo** (só leitura, nada copiado; E43·A autorizou as ideias): `docs/produto/avaliacao-crm-agenda/`
-  `regras-do-banco.md` (74 regras, 2 leituras), `seguranca-do-banco.md` (25) e `permissoes-e-pin.md`. Banco do antigo
-  **esgotado** para o núcleo. As ideias entram em cada spec quando a branch dela for trabalhada.
-- **Matriz de permissões (ADR 0020, E42·A):** porta 3 por chave `modulo.acao`; S7 (`bfbb9b9`) e B7 (`8fd1a24`);
-  385 testes de unidade; `pnpm db:test` não rodou (sem Docker). Personalização: item 6a da fila.
-- **Specs revisadas, sem código** (aprovadas): agenda, agendamento, clientes, formulários, catálogo, checkout, caixa.
+- **Na `previas`:** PRs #1 a #4 e o **PR #7 (Entrar e camada de serviço, item 4a), juntado** no commit `2dad348`
+  (E49·A, "E49a juntar"). Os PRs #5 (trava por estúdio no banco) e #6 (design system no código) entraram dentro
+  do #7 e **seguem abertos sem uso**. A branch `chore/base-fundacao` está toda na `previas`; **o dono apaga** em
+  https://github.com/alexandrergomes1/crm-citas/branches (lixeira).
+- **Agenda (item 5), em planejamento na `feat/agenda`** (a branch já existia; pedido do dono "pode criar a branch da
+  Agenda"). [Spec](https://github.com/alexandrergomes1/crm-citas/blob/feat/agenda/specs/20261128-020000-agenda/spec.md) com "Status: Approved" e os ajustes E54 a E58;
+  plano e [ficha visual](https://github.com/alexandrergomes1/crm-citas/tree/feat/agenda/specs/20261128-020000-agenda/ficha) sendo atualizados pelo Arquiteto e pelo Designer.
+  **Espera a E59 do dono.** Sem código ainda.
+- **Ordem da fila (E57·B):** a Agenda sai antes sem as visões, que aparecem "em desenvolvimento"; a spec
+  "Agenda · visões e horário de funcionamento" vem logo depois ([fila](https://github.com/alexandrergomes1/crm-citas/blob/feat/agenda/docs/BACKLOG.md), item 5).
+- **Avaliação do antigo** (só leitura, nada copiado; E43·A autorizou as ideias): `docs/produto/avaliacao-crm-agenda/`.
+  As ideias entram em cada spec quando a branch dela for trabalhada (E44).
+- **Matriz de permissões (ADR 0020, E42·A):** porta 3 por chave `modulo.acao`. Personalização: item 6a da fila.
+- **Specs revisadas, sem código** (aprovadas): agendamento, clientes, formulários, catálogo, checkout, caixa. Cada uma
+  recebe a linha "Aprovação do dono" e os ajustes (E29·1, E31·1, E31·2, E32·1, E39·2, E39·3) quando a branch dela
+  for trabalhada.
 
 ## Esperando o dono
-1. **E38·A1:** travas em `.claude/` depois do merge do Entrar (PR #7), numa conversa nova, num PR só para elas.
+1. **E59:** resposta sobre a Agenda (plano e ficha atualizados).
+2. **E38·A1:** travas em `.claude/` agora que o Entrar entrou, numa conversa nova, num PR só para elas.
    **D2:** PRs do Dependabot e a `main`.
-2. Apagar `chore/base-fundacao` (o dono, na página de branches).
-3. Item 4a em pedido de merge (PR #7): autorização do merge (F3, Gerente de projeto) e conferência das telas na
-   prévia (CA-22).
+3. Apagar `chore/base-fundacao` (o dono, na página de branches). Fechar ou não os PRs #5 e #6 (abertos sem uso).
 
 **Respondidas em 28/11 e ainda por aplicar nas specs (Analista, quando cada branch for trabalhada):** E29·1 (PIN),
 E29·3 (troca), E31·1 (caixa opcional), E32·1 (aviso de caixa aberto), E40·B, E45·A (Checkout e Caixa), E46·A
@@ -73,12 +69,14 @@ E29·3 (troca), E31·1 (caixa opcional), E32·1 (aviso de caixa aberto), E40·B,
 | E38·A1 | travas do Claude depois do merge do Entrar, conversa nova, PR próprio (troca o "pendente" da E38·A) |
 | E47·1·A, E47·2·A, E47·3·A | ajustes das telas do Entrar; termo neutro no lugar de "estúdio": "empresa" (pt, es), "business" (en) |
 | E48·A | a IA pode enviar à `feat/entrar-servico` (PR #7) |
+| E49·A | merge do PR #7 (item 4a) na `previas`, commit `2dad348` |
+| E54–E58 | ajustes da spec da Agenda; E57·B: visões da Agenda em spec própria, logo depois |
 | E24–E41 | respostas do relatório de 28/11 e aprovação das 10 specs (detalhe e falas em `docs/decisoes/`) |
 
 ## Pendências técnicas para a próxima conversa
-1. **Ressalvas do Entrar, em dívida** (aceitas para o merge; o dono decide se viram item da fila):
+1. **Pendências que ficaram do Entrar (dívidas a–f)**, aceitas no merge do PR #7; o dono decide se viram item da fila:
    (a) cópias de peças do design system em
-   [`src/app/paginas/`](https://github.com/alexandrergomes1/crm-citas/tree/feat/entrar-servico/src/app/paginas),
+   [`src/app/paginas/`](https://github.com/alexandrergomes1/crm-citas/tree/previas/src/app/paginas),
    porque `src/app/ui` estava fora dos arquivos permitidos (plano §10); (b) seta para cima do menu;
    (c) barra provisória N1/N2; (d) o endereço `/escolher-estudio` ainda mostra "estudio";
    (e) **R-A: `cf-connecting-ip` a corrigir antes de qualquer publicação**; (f) relatório público do Playwright
@@ -98,12 +96,12 @@ E29·3 (troca), E31·1 (caixa opcional), E32·1 (aviso de caixa aberto), E40·B,
 ## Como continuar numa conversa nova
 
 **Onde estão as coisas**
-- Repositório `alexandrergomes1/crm-citas`; trabalho em curso na branch `feat/entrar-servico` (PR #7).
+- Repositório `alexandrergomes1/crm-citas`; trabalho em curso na branch `feat/agenda` (Agenda, item 5).
 - Respostas do dono: `docs/decisoes/2026-11-27-fundacao.md`.
 - Projeto antigo (`crm-agenda`): **só se lê com autorização do dono, item por item** (`AGENTS.md` §3 regra 4).
 
 **Prompt pronto para o dono colar**
 
 ```
-Leia AGENTS.md do repositório alexandrergomes1/crm-citas (branch feat/entrar-servico). Estado: docs/STATUS.md. Decisões: docs/decisoes/2026-11-27-fundacao.md. Use os papéis de .claude/agents e as skills de .claude/skills em tudo, declarando papel e norma. Minhas respostas do relatório: <cole aqui a resposta copiada da página>. Grave as respostas e aprovações, depois siga as pendências do STATUS (revisões do Entrar, telas, módulos). Nada se copia do projeto antigo sem a minha autorização item por item.
+Leia AGENTS.md do repositório alexandrergomes1/crm-citas (branch feat/agenda). Estado: docs/STATUS.md. Decisões: docs/decisoes/2026-11-27-fundacao.md. Use os papéis de .claude/agents e as skills de .claude/skills em tudo, declarando papel e norma. Minhas respostas do relatório: <cole aqui a resposta copiada da página>. Grave as respostas e aprovações, depois siga as pendências do STATUS (Agenda, travas E38·A1, dívidas do Entrar). Nada se copia do projeto antigo sem a minha autorização item por item.
 ```
