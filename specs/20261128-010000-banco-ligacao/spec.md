@@ -34,7 +34,7 @@ A IA nunca aplica nada no remoto: só a CI, depois da "Aprovação do merge" gra
 tabela (§5). As tabelas de cada módulo do núcleo (E3·2) entram na spec daquele módulo, com as dúvidas dela (até 3).
 
 ## 3. Escopo desta spec: a base da trava
-1. **Estúdio** (o inquilino; dono do `org_id`).
+1. **Estúdio** (o inquilino; dono do `org_id`), com moeda, idioma padrão e fuso horário (RF-09).
 2. **Membros:** a pessoa ligada a um estúdio.
 3. **Papéis e permissões:** o papel da pessoa em cada estúdio (dona, recepção, profissional; `ARCHITECTURE.md` §6).
 4. **Função de checagem de acesso:** diz, a partir da sessão, de qual estúdio a pessoa é e o que o papel dela pode;
@@ -56,6 +56,7 @@ de permissões), `org_profiles` e `org_profile_permissions` (perfis de acesso cr
 | RF-06 | Os papéis iniciais são dona, recepção e profissional; papéis configuráveis só se o Engenheiro de dados mantiver as tabelas de perfil, e o que o estúdio vê disso vai à spec do módulo que tiver a tela. | `ARCHITECTURE.md` §6; `AGENTS.md` §5 |
 | RF-07 | O que o crm-citas faz com o esquema antigo e os dados fictícios do projeto existente segue E24·2. | `AGENTS.md` §5 |
 | RF-08 | O app lê endereço e chaves do banco do ambiente, guardadas só nos cofres; a chave de serviço só em tarefas internas listadas. | `SECURITY.md` §2; Twelve-Factor III |
+| RF-09 | Cada estúdio guarda a sua moeda, o seu idioma padrão (português, espanhol ou inglês) e o seu fuso horário; a coluna exata o Engenheiro de dados decide no plano, com ADR. | `ARCHITECTURE.md` §11 ("Idiomas, fuso horário e moeda por estúdio"); E3·1 |
 
 ## 5. Regras gerais para trazer cada tabela (valem para as specs dos módulos)
 | ID | Regra | Fonte |
@@ -90,6 +91,7 @@ de permissões), `org_profiles` e `org_profile_permissions` (perfis de acesso cr
 | CA-10 | Nenhum segredo, seed ou dado do antigo no PR. | gitleaks verde (item 2 da fila) e revisão |
 | CA-11 | O projeto existente foi tratado exatamente como E24·2. | revisão do Auditor de risco |
 | CA-12 | Revisão do tipo Banco e de acesso sem "Bloqueia" e veredito do QA. | relatórios no PR |
+| CA-13 | Todo estúdio tem moeda, idioma padrão e fuso horário preenchidos; idioma fora de português, espanhol e inglês é recusado. | teste automático na CI |
 
 ## 8. Fora de escopo
 - As tabelas de cada módulo do núcleo (Agenda, Agendamento, Clientes, Formulários, Catálogo, Checkout, Caixa):
