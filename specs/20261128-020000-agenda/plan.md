@@ -1,13 +1,22 @@
 # Plano · Agenda (primeira versão, item 5 da fila)
 
-- **Spec:** `specs/20261128-020000-agenda/spec.md` (Approved; ajustes 2 e 3 nos commits `217a715` e `a0159f6`)
+- **Spec:** `specs/20261128-020000-agenda/spec.md` (Approved; ajustes 2, 3 e 4 nos commits `217a715`, `a0159f6` e
+  `de894bf`)
 - **Escrito por:** Arquiteto de software · **Norma:** modelo C4 e ADR (mais Clean Architecture, Twelve-Factor, WCAG 2.2,
   OWASP ASVS 4.0.3 V4 e boas práticas do Postgres e do Supabase) · **Revisão:** pendente (etapa 5 Analista de
   requisitos; 5b Gerente de projeto)
 - **Revisão de 28/11/2026 (spec §16 e §17):** sai o "Ocupado" e toda leitura de "ocupados" (E58·A); saem RF-16 a RF-20
   (E57·B, só "em desenvolvimento"); entram RF-12 a RF-15, RF-21 e RF-22 (E54·1, ·2, ·3, ·4, E54·5 trocada, E55·1·A a
-  E55·4); L-2 e L-4 resolvidas (E55·1·A, E55·2·A). **Ponto aberto:** grade da v1, E59 do dono (§3.2).
-- **Decisões técnicas deste plano:** `docs/adr/0006-agenda-tempo-idiomas-e-tetos.md` (D1 a D16; D17 só com E59·A). **Decisões de banco:**
+  E55·4); L-2 e L-4 resolvidas (E55·1·A, E55·2·A).
+- **Revisão de 28/11/2026 (spec §18, `DESIGN.md` nos commits `d3f9a43` e `e1ccf73`, ficha v4):** E59·A respondida
+  (grade 08:00–20:00 que se alarga, RN-11; sai a de 24 h); "+ Novo" vira **"+ Adicionar ▾"** (E60·5) e o bloqueio fica
+  dentro dele (E60·1·A); o `Agendar` da barra de baixo vira o **botão do meio só com ícone** que abre a folha
+  "Adicionar", em todo o app (E60·2); linha do agora em `--id` (E60·3·A); "Equipe" com ícone de pessoas (E60·4; qual
+  deles, **E63 do dono**) e escondido para a profissional (spec Assumption 6). **Ponto aberto:** só a E63 (uma linha a
+  trocar, §5.6).
+- **Decisões técnicas deste plano:** `docs/adr/0006-agenda-tempo-idiomas-e-tetos.md` (D1 a D18; D17 em vigor com a
+  E59·A) e `docs/adr/0021-agenda-profissional-so-a-propria-coluna.md` (substitui a linha `agenda.ver` da matriz do ADR
+  0020). **Decisões de banco:**
   `docs/adr/0007-agenda-tabelas-do-antigo.md`, do Engenheiro de dados na tarefa T3 (não neste plano).
 - **Lido no código da `previas` em 28/11/2026 (nada editado):** `src/server/portas/{acao,tipos,catalogo,executar,erros}.ts`
   e `molde.test.ts`; `src/domain/acesso/{chaves,matriz}.ts` e `matriz.test.ts`; `src/data/{cliente,erros,sessao}.ts`;
@@ -17,8 +26,14 @@
   `20261128002042_membros.sql` e `20261128002045_politicas_base.sql`: `membros` sem nome, `grant update (papel, ativo)`,
   `membros_ler` para todo membro do estúdio); `supabase/moldes/*`; `supabase/tests/database/010_` e `110_`;
   `supabase/matriz/matriz.test.ts`; `e2e/preparo-global.ts`; `tests/integracao/preparo.ts`; `playwright.config.ts`;
-  `package.json`; `eslint.config.mjs`; ADR 0004, 0018 (D18, D24), 0019 e 0020. A `ficha-visual.md` está em mudança
-  pelo Designer: não é fonte deste plano.
+  `package.json`; `eslint.config.mjs`; ADR 0004, 0018 (D18, D24), 0019 e 0020. **Também lidos em 28/11 (revisão §18):**
+  `src/app/ui/estrutura.tsx` e `.css` (`Agendar`, `BarraBaixo`), `src/app/ui/estados.tsx` (`SemResultado` e `Erro` já
+  usam o botão `claro`; `EstadoVazio` usa `contorno`), `src/app/ui/icone.tsx`, `src/app/paginas/vitrine.tsx` (quadro
+  "RC-5 · Agendar" e a barra de baixo), `e2e/vitrine.spec.ts` (linhas do RC-5), `src/app/estilos/tokens.css`
+  (`--d-agendar`, `--id`) e `node_modules/lucide-react` 1.79.0 (tem `users` e `user-group`).
+- **Fontes de tela:** `DESIGN.md` (inteiro, §5, §6, §7, §7b, §8, §8b) e a **ficha v4**
+  (`specs/20261128-020000-agenda/ficha-visual.md`), que passa a ser fonte deste plano. Em conflito, vale o
+  `DESIGN.md` (ele diz que o texto vale sobre a imagem).
 
 ## 1. Resumo (C4)
 **Contexto:** dona, recepção e profissional usam a tela Agenda; nenhum sistema externo novo.
@@ -48,7 +63,7 @@ E58·A). Em `src/domain/acesso/matriz.ts`, `MATRIZ_PADRAO` ganha 8 linhas, com a
 
 | Chave | Recepção | Profissional | Resposta |
 |---|---|---|---|
-| `agenda.ver` | `todos` | `proprios` | E26·1·B lida pela ordem de 28/11 e pela E58·A (só a própria coluna) |
+| `agenda.ver` | `todos` | `proprios` | ordem do dono de 28/11 e E58·A (só a própria coluna, sem "ocupado"); ADR 0021 substitui a linha do ADR 0020 |
 | `agenda.criar`, `agenda.editar`, `agenda.remover` | `todos` | `proprios` | E26·2·A |
 
 A dona tem tudo por regra fixa (ADR 0020 · D4): não tem linha. A cópia no banco é a migration M2 (§4.2), e a linha do
@@ -97,7 +112,9 @@ do papel, só `ehColuna` e a condição do banco mudam, com pergunta ao dono na 
 ### 2.6 O que a tela recebe para esconder botões (RF-11; ADR 0020 · D9) · ADR 0006 · D11
 O `ContextoEstudio` ganha `alcances` (só leitura): o alcance de cada chave do módulo da ação, pela mesma fonte da porta
 3 (`infra.alcanceDe`; falha fechada). `agenda.dia.ler` devolve esses alcances; a tela esconde o ⋮, o "Bloquear
-horário" do "+ Novo" e o menu do horário vazio (RF-13) onde a pessoa não grava. Esconder não protege: quem decide é a
+horário" do "+ Adicionar ▾" (computador) e da folha "Adicionar" do botão do meio (celular) e o menu do horário vazio
+(RF-13) onde a pessoa não grava. O botão "Equipe N de M" some quando a pessoa vê uma coluna só (spec Assumption 6;
+regra de tela, não de acesso: o que ela vê já está fechado pela E58·A). Esconder não protege: quem decide é a
 porta 3 e o banco. **Revisores de D10/D11:** Revisor de código, Engenheiro de segurança e Auditor de risco, ninguém que
 construiu o Entrar.
 
@@ -113,25 +130,30 @@ construiu o Entrar.
 - **L-4 · Tela inicial:** E55·2·A (RF-12): `/` redireciona para `/agenda` (§5.6).
 - **L-3 · Peças que o `DESIGN.md` não tem** (grade de horas, cabeçalho de coluna com nome e iniciais, cartão do
   agendamento, bloqueio na grade, linha do "agora", data em pílula com calendário, escolha do "Equipe N de M",
-  atalhos de motivo): seguem pela ficha visual (T2), com o dono, antes da construção da tela. Reuso antes de criar:
-  `MenuAcoes` para "+ Novo" e para o menu do horário vazio; `CampoSelecao` para o seletor de horários (D15), se a ficha
-  não pedir outra peça.
+  atalhos de motivo): **desenhadas na ficha v4 e gravadas no `DESIGN.md` §7b**; a construção segue o §7b. Reuso antes
+  de criar: `MenuAcoes` para "+ Adicionar ▾" (computador) e para o menu do horário vazio; `Folha` para a folha
+  "Adicionar" do botão do meio e para o menu do horário vazio no celular; `CampoSelecao` para o seletor de horários
+  (D15), se a lista de horários do §7b (itens 44, atual com `--btn`, forte e `check`) couber nele; senão, peça nova em
+  `src/app/ui/`, com teste e vitrine.
 - **Para o Designer (não decido):** texto que aparece quando a pessoa ainda não tem nome de exibição (D14); como o
-  seletor mostra a hora repetida no dia de 25 h (D15); se o "Agendar" da barra de baixo vira "+ Novo" (spec §4).
+  seletor mostra a hora repetida no dia de 25 h (D15). O "Agendar" da barra de baixo está resolvido (E60·2, §5.6).
 
-### 3.2 Grade da v1 · espera a E59 do dono
-A spec (RN-01, Assumption 1) e este plano seguem com **24 h e rolagem** até o dono responder. O que muda em cada opção:
-
-| | E59·A · 08:00 a 20:00, que se alarga para caber item fora | E59·B · 24 h com rolagem |
-|---|---|---|
-| Spec | o Analista muda a Assumption 1 e acrescenta a regra da faixa (RN nova, com teste no CA-01) | nada muda |
-| Domínio | função nova `faixaVisivel(dia, itens, agora)` em `grade.ts`: começa em `min(08:00, início do primeiro item, agora se o dia é hoje; arredondado para baixo na hora)` e termina em `max(20:00, fim do último item, agora se o dia é hoje; arredondado para cima)`, cortada no dia do estúdio (RN-01, 23 h e 25 h); teste a mais | nada a mais |
-| Tela | a grade desenha só a faixa; o menu do horário vazio (RF-13) só existe dentro dela; **no dia de hoje, se a hora atual está fora da faixa, a faixa se alarga até ela** (hora cheia anterior ou seguinte), e a linha do "agora" em `--id` (ficha, decisão 4) sempre aparece (ADR 0006 · D17) | rolagem até a hora atual ou ao primeiro item |
-| Seletor de horários | **não muda**: continua o dia inteiro (RN-09), para poder bloquear fora da faixa | igual |
-| Banco, servidor, tetos | nada muda | nada muda |
-| Risco | 08–20 é fixo, não é o horário de funcionamento (que foi para a spec seguinte, E57·B); estúdio que abre às 07:00 vê a grade começar às 08:00 até ter item cedo | grade longa no celular; a rolagem até o "agora" esconde as horas vazias |
-
-Arquivos: os de A já estão na lista do §10 (`grade.ts`, `grade.test.ts`, `grade.tsx`, `grade-agenda`); nenhum novo.
+### 3.2 Grade da v1 · E59·A respondida (spec §18, RN-11; ADR 0006 · D17)
+Sai a grade de 24 h. Vale a faixa de **08:00 a 20:00 que se alarga**:
+- **Domínio:** `faixaVisivel(dia, itens, agora)` em `grade.ts`, função pura com teste: começa em `min(08:00, início do
+  primeiro item, agora se o dia é hoje)` arredondado para baixo na hora cheia e termina em `max(20:00, fim do último item,
+  agora se o dia é hoje)` arredondado para cima; cortada no dia do estúdio (RN-01, 23 h e 25 h). Em outro dia, o
+  "agora" não conta (RN-11).
+- **Rolagem inicial** (ficha v4, `DESIGN.md` §7b·2): abre em 08:00 se a hora atual cabe na primeira tela; senão, rolada
+  com a hora atual a um terço do alto, sem passar do fim da grade. Cálculo puro em `grade.ts` (`rolagemInicial(faixa,
+  agora, alturaVisivel)`), a tela só aplica.
+- **Tela:** o "agora" da faixa e da linha vem do relógio do navegador, relido a cada minuto (a faixa do
+  servidor sai sem o "agora" e a tela a alarga depois de montar, sem pular a rolagem); `grade.tsx` desenha só a faixa; o menu do horário vazio (RF-13) só existe dentro dela; a linha do "agora" em
+  `--id` aparece sempre que o dia é hoje (D17).
+- **Seletor de horários:** não muda; continua o dia inteiro (RN-09), para poder bloquear fora da faixa (aí a faixa se
+  alarga ao salvar).
+- **Banco, servidor e tetos:** nada muda; a faixa sai dos itens que a leitura do dia já traz.
+- **Risco aceito na resposta:** 08–20 é fixo, não é o horário de funcionamento (spec seguinte, E57·B).
 
 ### 3.3 Pessoa que deixou de ser coluna
 Pendência da spec da Equipe (spec §12); defesa: a ligação sem apagar em cascata (§4.3).
@@ -140,7 +162,7 @@ Pendência da spec da Equipe (spec §12); defesa: a ligação sem apagar em casc
 | Ideia | Situação | Onde entra |
 |---|---|---|
 | E54·1 menu no horário vazio | aprovada (RF-13) | `grade.tsx` e a peça de grade em `src/app/ui/`; abre por toque, Enter e Espaço (WCAG 2.1.1); escondido pela RF-11 |
-| E54·2 linha do "agora" | aprovada (RF-14) | `dia.ts` (`posicaoDoAgora(dia, fuso, agora)`, nulo fora do dia) e a peça de grade; cor do `DESIGN.md` (Designer) |
+| E54·2 linha do "agora" | aprovada (RF-14) | `dia.ts` (`posicaoDoAgora(dia, fuso, agora)`, nulo fora do dia) e a peça de grade; 2 px `--id`, atrás dos cartões, hora em pílula `--id` com texto branco (E60·3·A, `DESIGN.md` §7b·12) |
 | E54·3 atalhos de motivo | aprovada (RF-22) | lista fixa de 5 chaves de texto em `bloqueio-painel.tsx`, textos no bloco `agenda` dos 3 idiomas; o atalho só preenche o campo motivo (RN-03); sem tabela, sem "Médico" |
 | E54·4 1 h e fim que acompanha | aprovada (RF-15, RN-10) | `horarios.ts` (`fimSugerido`, função pura com teste) e `bloqueio-painel.tsx` |
 | E54·5 | **trocada** pelo seletor de horários (RF-15, RN-09) | `horarios.ts` (opções do seletor) e `esquemas.ts` + `bloqueios.ts` (recusa no servidor); ADR 0006 · D15 |
@@ -237,15 +259,16 @@ Pendência da spec da Equipe (spec §12); defesa: a ligação sem apagar em casc
 | `dia.ts` | limites do dia no fuso, hoje no fuso, dia anterior e seguinte, corte do item na borda, `posicaoDoAgora` | RN-01, RN-02, RF-01, RF-02, RF-14 |
 | `horarios.ts` | `PASSO_MINUTOS = 15`; `horariosDoDia(dia, fuso)` (instantes do início ao fim do dia em passos de 15 min, com o rótulo local, inclusive 23 h e 25 h); `estaNoPasso(instante, dia)`; `fimSugerido(inicio, fimAtual, dia)` | RN-09, RN-10, RF-15 |
 | `bloqueio.ts` | validar (fim > início, ≥ 5 min, mesmo dia, no passo, motivo ≤ 200) e achar conflito `[início, fim)` na mesma coluna, ignorando Cancelado, Ausência e o próprio item ao alterar | RN-03, RN-04, RN-09 |
-| `grade.ts` | itens sobrepostos lado a lado; filtros (status, bloqueio; Cancelado escondido por padrão); contador; teto; (`faixaVisivel` só se E59·A, §3.2) | RN-05, RN-06, RN-08, RF-06 |
+| `grade.ts` | itens sobrepostos lado a lado (no máximo 3, o 3º vira "+N"); filtros (status, bloqueio; Cancelado escondido por padrão); contador; teto; `faixaVisivel` e `rolagemInicial` (§3.2) | RN-05, RN-06, RN-08, RN-11, RF-06 |
 | `acesso.ts` | `ehColuna`, `colunasVisiveis`, `podeGravarNa`, só por alcance e `usuarioId` | RN-07, RF-10, §2.3 a §2.5 |
 
 - Fuso e "agora" por parâmetro; cálculo do dia só com `Intl.DateTimeFormat` (ADR 0006 · D2).
 - Testes (CA-01, CA-15): `Europe/Lisbon` e `America/New_York` em dia de 23 h e de 25 h; meia-noite que não existe
   (`America/Santiago`; `America/Sao_Paulo` em 04/11/2018); cruzar a meia-noite; encostar; Cancelado e Ausência; teto;
   `horariosDoDia` com 92, 96 e 100 opções nos dias de 23, 24 e 25 h (mais a borda final); `estaNoPasso` recusa :07 e
-  segundos; `fimSugerido` (1 h, acompanha, para no fim do dia); `acesso.test.ts`: `todos`/`proprios` × própria
-  coluna/outra, ao criar e ao alterar.
+  segundos; `fimSugerido` (1 h, acompanha, para no fim do dia); `faixaVisivel` (sem item = 08–20; item às 06:30 abre às 06:00;
+  item até 21:15 fecha às 22:00; hoje às 21:40 fecha às 22:00; outro dia às 21:40 fica 08–20; nunca passa do dia de 23 h
+  nem de 25 h); `acesso.test.ts`: `todos`/`proprios` × própria coluna/outra, ao criar e ao alterar.
 - `src/domain/exemplo.ts` e `exemplo.test.ts` **saem**.
 
 ### 5.3 `src/server/agenda/` (Engenheiro de software)
@@ -279,29 +302,55 @@ na própria (CA-03); hora fora do passo recusada (CA-15).
   `e2e/inicio.spec.ts` passa a provar o redirecionamento. A linha "tela inicial até a Agenda existir" do `DESIGN.md`
   §8b é do Designer.
 - **Estrutura** `src/app/routes/_app.tsx` e `src/app/navegacao.ts`: menu principal (1440) e barra de baixo (390) pelo
-  mapa do `DESIGN.md` §7, Agenda ligada e os outros "em desenvolvimento".
-- **Peças novas do `DESIGN.md` (L-3) em `src/app/ui/`** (ADR 0006 · D12): `grade-agenda.tsx` e `.css` (grade,
-  cabeçalho de coluna com nome e iniciais, cartões do agendamento e do bloqueio, linha do "agora", horário vazio que
-  abre menu), `seletor-data.tsx` e `.css`, com `componentes.test.tsx`, `@import` em `app.css` e a vitrine. Ajustes em
-  peça existente só se a ficha pedir (`campos`, `estrutura`, `camadas`, `estados`, `icone`, `botao`).
+  mapa do `DESIGN.md` §7 e §8b, Agenda ligada e os outros "em desenvolvimento". O `_app.tsx` guarda o estado da folha
+  "Adicionar" e a desenha (ADR 0006 · D18).
+- **Botão do meio da barra, em todo o app (E60·2; `DESIGN.md` §5, §8b; ADR 0006 · D18):** em `src/app/ui/estrutura.tsx`
+  o `Agendar` (círculo 52 com o nome "Agendar" escrito) **sai** e entra `BotaoAdicionar`: círculo 52 `--ink`, só o
+  ícone `calendar-plus` branco, **sem nome escrito**, `aria-label="Adicionar"` (o texto vem do arquivo de idioma),
+  `aria-haspopup="dialog"` e `aria-expanded`; área de toque ≥ 44 (WCAG 2.5.8). `BarraBaixo` troca a propriedade
+  `agendar` por `adicionar` (`{ rotulo, aberto, onClick }`). Em `estrutura.css`, `.ds-agendar` e `.ds-agendar__nome`
+  saem, e o círculo fica centrado na barra de 72. O token `--d-agendar` **não muda de nome** (nome técnico, ninguém o
+  vê; renomear mexeria em `tokens.css`, `tokens.test.ts` e `vitrine.css` sem ganho). Na vitrine, o quadro "RC-5 ·
+  Agendar" vira "RC-5 · Adicionar" e a barra de exemplo usa o `BotaoAdicionar`; `e2e/vitrine.spec.ts` acompanha
+  (círculo 52, nenhum texto visível, nome acessível "Adicionar"). Comentário do `icone.tsx` ("Agendar") passa a
+  "botão do meio".
+- **Folha "Adicionar"** (`src/app/paginas/adicionar.tsx`, ADR 0006 · D18): `Folha` com o título "Adicionar" e as opções
+  **Novo agendamento · Bloquear horário** (`DESIGN.md` §6), as mesmas do "+ Adicionar ▾" do computador. A tela que está
+  aberta entrega as opções e o que cada uma faz por um contexto do `_app.tsx`; a Agenda entrega as dela ("Novo
+  agendamento" em desenvolvimento, RF-08; "Bloquear horário" escondido sem `agenda.criar`, RF-11). Fora da Agenda (hoje
+  nenhuma outra tela usa a barra), a folha mostra as mesmas duas opções, e "Bloquear horário" leva à `/agenda` e abre o
+  painel por um pedido guardado na memória do `_app.tsx` (nada na URL, RNF-04).
+- **Peças novas do `DESIGN.md` §7b em `src/app/ui/`** (ADR 0006 · D12): `grade-agenda.tsx` e `.css` (grade com a faixa,
+  coluna das horas 56/44, cabeçalho de coluna 44 com bolinha 24 e nome de exibição, cartões do agendamento e do
+  bloqueio em `--btn` canto 10 com os três conteúdos por duração, altura mínima 44/40, no máximo 3 lado a lado e o
+  "+N", linha do "agora" em `--id`, horário vazio escolhido com 1 h em `--btn` e o anel do escolhido), `seletor-data.tsx`
+  e `.css`, com `componentes.test.tsx`, `@import` em `app.css` e a vitrine. Ajustes em peça existente só se o §7b pedir
+  (`campos`: campo só leitura e lista de horários; `estrutura`; `camadas`; `estados`; `icone`; `botao`: atalhos de
+  motivo de 36).
+- **Ícone do botão Equipe (E60·4) · espera a E63 do dono:** uma linha só a trocar. Em `src/app/paginas/agenda/barra.tsx`
+  (e no estado "sem profissional"), o ícone vem de uma constante única `ICONE_EQUIPE`; hoje `'users'` (o que o
+  `DESIGN.md` §5 diz), e com E63·B vira `'user-group'`, que existe no `lucide-react` 1.79.0 instalado e entra no
+  `icone.tsx` nesse caso. Nenhum outro arquivo muda com a resposta.
 - **Tela** em `src/app/paginas/agenda/`:
 
 | Arquivo | O que tem |
 |---|---|
-| `agenda.tsx` | composição: barra do topo com **+ Novo** (1440) ou cabeçalho e barra de baixo (390), barra da grade, grade, estados |
-| `barra.tsx` | Hoje, setas, data, Dia ▾ (só Dia; os outros "em desenvolvimento", CA-16), Equipe N de M, Filtros ▾ com contador, Lista de espera e Opções "em desenvolvimento"; no celular, a lupa "em desenvolvimento" |
-| `novo.tsx` | **+ Novo** pelo `MenuAcoes`: "Novo agendamento" ("em desenvolvimento" até o Agendamento) e "Bloquear horário" (escondido sem `agenda.criar`) |
-| `grade.tsx` | grade pela peça `grade-agenda` (24 h com rolagem até o "agora" ou o primeiro item; faixa da E59·A se aprovada); linha do "agora" na coluna de hoje (RF-14); horário vazio com menu por toque e teclado (RF-13), escondido onde a pessoa não grava; ⋮ escondido pelos `alcances` |
+| `agenda.tsx` | composição: barra do topo com **+ Adicionar ▾** (1440) ou cabeçalho e barra de baixo com o botão do meio (390; **sem "+ Adicionar" no topo do celular na Agenda**, `DESIGN.md` §5), barra da grade, grade, estados; entrega as opções da folha "Adicionar" ao contexto do `_app.tsx`; estado "sem profissional" com "Ver equipe" em botão claro `--btn` (`Botao variante="claro"`, `DESIGN.md` §8); "Limpar filtros" e "Tentar de novo" já são claros em `SemResultado` e `Erro`; "Bloquear horário" do vazio segue com contorno (`EstadoVazio`) |
+| `barra.tsx` | Hoje, setas, data, Dia ▾ (só Dia; os outros "em desenvolvimento", CA-16), **Equipe N de M com `ICONE_EQUIPE` e o nome, só quando a pessoa vê mais de uma coluna** (spec Assumption 6, `DESIGN.md` §6), Filtros ▾ com contador, Lista de espera e Opções (Exportar e Imprimir "em desenvolvimento"); no celular, a lupa esmaecida tocável "em desenvolvimento" |
+| `adicionar.tsx` | **+ Adicionar ▾** do computador pelo `MenuAcoes` (`aria-haspopup="menu"`): "Novo agendamento" ("em desenvolvimento" até o Agendamento) e "Bloquear horário" (escondido sem `agenda.criar`); a mesma lista de opções vai à folha "Adicionar" do celular. Nenhum botão com o nome "Novo" (E60·5) |
+| `grade.tsx` | grade pela peça `grade-agenda` na **faixa 08:00–20:00 que se alarga** (`faixaVisivel`) e com a `rolagemInicial` (§3.2); linha do "agora" em `--id` na coluna de hoje (RF-14, D17); horário vazio com menu por toque e teclado (RF-13), "HH:MM · nome" no topo, escondido onde a pessoa não grava; ⋮ escondido pelos `alcances` |
 | `bloqueio-painel.tsx` | criar e alterar: `Painel` (1440) ou `Folha` (390); início e fim por seletor de horários (`horariosDoDia`), sem campo de digitar; nasce com 1 h e o fim acompanha (`fimSugerido`); atalhos Almoço · Folga · Reunião · Curso · Pessoal preenchem o motivo; com `proprios`, profissional só a própria pessoa; Excluir no ⋮ com `Janelinha` e `Aviso` com "Desfazer" |
 | `filtros.tsx` | `Painel`/`Folha`: status e bloqueio; "Limpar filtros" |
 | `equipe.tsx`, `equipe-guardada.ts` | escolha de colunas (M = colunas que a pessoa vê); guarda no aparelho só os identificadores escondidos, por estúdio (D5) |
 | `agenda.css` | só `var(--...)` |
-| `agenda.test.tsx` | `renderToString`: uma só ação preta ("+ Novo"); status com nome acessível; nenhum campo de digitar hora; nenhum texto fixo fora do arquivo de idioma; nome de exibição no topo da coluna, nunca o e-mail |
+| `agenda.test.tsx` | `renderToString`: uma só ação preta ("+ Adicionar ▾" ou o botão do meio); nenhum botão com o nome "Novo" sozinho nem "Agendar"; "Equipe" ausente com uma coluna só; status com nome acessível; nenhum campo de digitar hora; nenhum texto fixo fora do arquivo de idioma; nome de exibição no topo da coluna, nunca o e-mail |
 
 - **Idiomas (RNF-05):** bloco `agenda` em `src/app/i18n/{pt,es,en}.ts` (textos, atalhos de motivo, frases dos códigos
-  de erro, "empresa"/"business"); `textos.ts`, `formatar.ts` e `i18n.test.ts` intactos.
-- **Agendamento ainda não construído (RF-08):** "Novo agendamento" (no "+ Novo" e no menu do horário vazio) e o toque
-  no cartão ficam "em desenvolvimento"; a grade mostra só bloqueios.
+  de erro, "empresa"/"business"); os nomes da barra e da folha "Adicionar", que valem em todo o app (Adicionar, Novo
+  agendamento, Bloquear horário, os itens da barra), entram num bloco `navegacao` novo nos três arquivos (o `comum` não
+  muda); `textos.ts`, `formatar.ts` e `i18n.test.ts` intactos.
+- **Agendamento ainda não construído (RF-08):** "Novo agendamento" (no "+ Adicionar ▾", na folha "Adicionar" e no menu
+  do horário vazio) e o toque no cartão ficam "em desenvolvimento"; a grade mostra só bloqueios.
 
 ## 6. Desfazer, tetos e estados (ADR 0006)
 - **Desfazer a exclusão (D4):** "Desfazer" chama `agenda.bloqueio.criar` com os dados guardados na memória da tela.
@@ -315,7 +364,7 @@ fictício) no `e2e/preparo-global.ts`; os bloqueios são criados pelos testes, p
 
 | Arquivo | Prova |
 |---|---|
-| `e2e/agenda.spec.ts` | CA-05: `/` abre a Agenda em hoje; troca de dia e Hoje; Equipe N de M; filtros e "Limpar filtros"; "+ Novo" com as duas opções; menu do horário vazio por toque e por teclado; criar (só seletor, 1 h, atalho), alterar, conflito recusado, excluir com "Desfazer"; nome de exibição nas colunas. CA-13: como profissional, só a própria coluna. CA-15: nenhum campo de digitar hora. CA-16: outros formatos do "Dia ▾" e lupa "em desenvolvimento". CA-09: a URL só tem `dia` |
+| `e2e/agenda.spec.ts` | CA-05: `/` abre a Agenda em hoje; troca de dia e Hoje; Equipe N de M com o ícone de pessoas, e a profissional sem o botão; filtros e "Limpar filtros"; "+ Adicionar ▾" (1440) e a folha "Adicionar" do botão do meio (390) com as duas opções, e nenhum botão "Novo" nem "Agendar"; botão do meio sem texto visível e com o nome acessível "Adicionar"; grade de 08:00 a 20:00 e alargada por item e pela hora atual (relógio do navegador fixado com `page.clock.setFixedTime`, lido nos tipos do Playwright 1.65.1 instalado); linha do agora com a cor de `--id`; menu do horário vazio por toque e por teclado; criar (só seletor, 1 h, atalho), alterar, conflito recusado, excluir com "Desfazer"; nome de exibição nas colunas. CA-13: como profissional, só a própria coluna. CA-15: nenhum campo de digitar hora. CA-16: outros formatos do "Dia ▾" e lupa "em desenvolvimento". CA-09: a URL só tem `dia` |
 | `e2e/agenda-estados.spec.ts` | CA-06: carregando, vazio, sem resultado, sem profissional, erro |
 | `e2e/agenda-acessibilidade.spec.ts` | CA-08: `AxeBuilder` com `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`, `wcag22aa`, com painel, folha, menus e janelinha abertos; grade e menu do horário vazio por teclado |
 
@@ -323,7 +372,7 @@ fictício) no `e2e/preparo-global.ts`; os bloqueios são criados pelos testes, p
 | Etapa | Papel |
 |---|---|
 | Branch e PR de rascunho (T1) | Engenheiro de DevOps |
-| Ficha visual e peças novas do `DESIGN.md` (T2) | Designer de produto; confere o Revisor de design; aprova o dono |
+| Ficha visual e peças novas do `DESIGN.md` (T2; v4 feita, falta a revisão da v4 e a E63) | Designer de produto; confere o Revisor de design; aprova o dono |
 | Decisão por tabela, migrations, pgTAP (T3 a T5) | Engenheiro de dados |
 | Matriz, domínio, servidor, dados, telas, idiomas, e2e (T6 a T22) | Engenheiro de software |
 | Revisar código | Revisor de código |
@@ -368,16 +417,20 @@ contas, se o teste pedir).
 
 **Telas:** `src/app/routes/_app/agenda.tsx` · `src/app/routes/_app/index.tsx` (redirecionar, RF-12) ·
 `src/app/routes/_app.tsx` · `src/app/routes/__root.tsx` (só o `SEM_SESSAO`) · `src/app/routeTree.gen.ts` (gerado) ·
-`src/app/navegacao.ts` · `src/app/paginas/agenda/{agenda,barra,novo,grade,bloqueio-painel,filtros,equipe}.tsx` ·
-`src/app/paginas/agenda/equipe-guardada.ts` · `agenda.css` · `agenda.test.tsx` · `src/app/i18n/{pt,es,en}.ts` (só o
-bloco `agenda`) · `src/app/paginas/inicio.tsx` e `inicio.test.tsx` (apagar; hoje só `_app/index.tsx` os usa) ·
+`src/app/navegacao.ts` · `src/app/paginas/adicionar.tsx` (folha "Adicionar" e o contexto, D18) ·
+`src/app/paginas/agenda/{agenda,barra,adicionar,grade,bloqueio-painel,filtros,equipe}.tsx` ·
+`src/app/paginas/agenda/equipe-guardada.ts` · `agenda.css` · `agenda.test.tsx` · `src/app/i18n/{pt,es,en}.ts` (só os
+blocos `agenda` e `navegacao`) · `src/app/paginas/inicio.tsx` e `inicio.test.tsx` (apagar; hoje só `_app/index.tsx` os usa) ·
 `e2e/inicio.spec.ts`.
 
-**Design system (só peças aprovadas na ficha):** `src/app/ui/grade-agenda.tsx` e `.css` · `src/app/ui/seletor-data.tsx`
-e `.css` · `src/app/ui/componentes.test.tsx` · `src/app/estilos/app.css` (só os `@import`) ·
-`src/app/paginas/vitrine.tsx` · `vitrine-dados.ts` · `vitrine.css` (se a vitrine pedir) · `e2e/vitrine.spec.ts` ·
-(se a ficha pedir) `src/app/ui/{campos,estrutura,camadas,estados,icone,botao}.tsx` com os `.css` de cada uma ·
-`src/app/estilos/tokens.css` e `src/app/ui/tokens.test.ts` (se token novo aprovado, ex.: cor da linha do "agora") ·
+**Design system (só peças do `DESIGN.md` §5, §7b e §8b):** `src/app/ui/grade-agenda.tsx` e `.css` ·
+`src/app/ui/seletor-data.tsx` e `.css` · `src/app/ui/componentes.test.tsx` · `src/app/estilos/app.css` (só os
+`@import`) · **botão do meio em todo o app (E60·2, D18):** `src/app/ui/estrutura.tsx` e `estrutura.css` (`Agendar` sai,
+`BotaoAdicionar` entra, `BarraBaixo` com `adicionar`) · `src/app/ui/icone.tsx` (comentário do botão do meio; `user-group`
+só com E63·B) · `src/app/paginas/vitrine.tsx` (quadro RC-5 e barra de exemplo) · `vitrine-dados.ts` · `vitrine.css`
+(se a vitrine pedir) · `e2e/vitrine.spec.ts` (linhas do RC-5) · (se o §7b pedir) `src/app/ui/{campos,camadas,estados,botao}.tsx`
+com os `.css` de cada uma · `src/app/estilos/tokens.css` e `src/app/ui/tokens.test.ts` (só se o `DESIGN.md` ganhar token
+novo; `--id` e `--d-agendar` já existem e não mudam) ·
 `src/app/paginas/sua-conta.tsx` e `sua-conta.css` (se a ficha mudar o lugar de Sua conta).
 
 **Testes de tela:** `e2e/preparo-global.ts` (só as contas da Agenda e o nome de exibição) · `e2e/agenda.spec.ts` ·
@@ -389,17 +442,19 @@ e `.css` · `src/app/ui/componentes.test.tsx` · `src/app/estilos/app.css` (só 
 `docs/BACKLOG.md`, `CHANGELOG.md`, `docs/decisoes/` (Documentador).
 
 **Processo:** `specs/20261128-020000-agenda/{spec.md,plan.md,tasks.md,ideias-do-antigo.md}` ·
-`docs/adr/0006-agenda-tempo-idiomas-e-tetos.md`.
+`docs/adr/0006-agenda-tempo-idiomas-e-tetos.md` · `docs/adr/0021-agenda-profissional-so-a-propria-coluna.md`.
 
 **Saiu desta lista (28/11):** tudo de "Ocupado" (peça, ícone, leitura e função de "ocupados") e tudo de RF-16 a RF-20
-(`lista.ts`, `agenda.mes.ler`, resumo da coluna, horário de funcionamento, busca da lupa).
+(`lista.ts`, `agenda.mes.ler`, resumo da coluna, horário de funcionamento, busca da lupa). Na revisão §18: `novo.tsx`
+(virou `agenda/adicionar.tsx`) e a grade de 24 h.
 
 **Intactos:** `src/server/portas/{acao,catalogo,erros}.ts` e `molde.test.ts`, `src/server/http/**`,
 `src/data/{cliente,erros,sessao,ambiente}.ts`, `src/app/i18n/{textos,formatar}.ts` e `i18n.test.ts`,
 `src/app/estilos/base.css`, as migrations e os testes do banco já existentes (menos `110_` e `010_` como acima),
 `supabase/moldes/**`, `supabase/matriz/**`, `supabase/config.jsonc`, `supabase/seed.sql`, `scripts/**`,
 `src/*/AGENTS.md`, `src/*/CLAUDE.md`, `package.json`, `pnpm-lock.yaml`, `eslint.config.mjs`, `playwright.config.ts`,
-`.github/**`, `ARCHITECTURE.md`, `AGENTS.md`.
+`.github/**`, `ARCHITECTURE.md`, `AGENTS.md`, `docs/adr/0020-permissao-por-chave-modulo-acao.md` (a linha substituída
+fica como está; vale o ADR 0021).
 
 ## 11. Critério → prova
 | CA | Prova | Quem confere |
@@ -428,8 +483,16 @@ e `.css` · `src/app/ui/componentes.test.tsx` · `src/app/estilos/app.css` (só 
   se usa); `redirect` no `beforeLoad` da rota `/_app/` com a versão do TanStack Router instalada (ler a documentação
   antes da T19); que todo fuso aceito por `estudios_conferir_fuso` tenha deslocamento múltiplo de 15 min (D15; o teste
   de `horarios.ts` confere os fusos usados, não todos).
-- **E59 sem resposta:** a grade segue 24 h; se vier A, entram `faixaVisivel` e a mudança da Assumption 1 (§3.2), sem
-  arquivo novo.
+- **E63 sem resposta:** o ícone do Equipe fica `users` (o que o `DESIGN.md` §5 diz hoje); com B, troca-se a constante
+  `ICONE_EQUIPE` e entra `UserGroup` no `icone.tsx` (§5.6). Nada mais muda.
+- **Spec Assumption 6** (profissional sem o botão Equipe) se confirma no pedido de merge; se o dono disser não, o botão
+  volta só em `barra.tsx` ("Equipe 1 de 1").
+- **Botão do meio em todo o app (D18):** muda uma peça já juntada (`Agendar`, item 4); nenhuma tela juntada a usa
+  (`_app.tsx` ainda não desenha a barra), só a vitrine e o `e2e/vitrine.spec.ts`. Não verificado: se quem usa entende o
+  botão sem nome escrito (ficha v4, não verificado).
+- **Não verificado:** a forma do contexto da folha "Adicionar" no `_app.tsx` com a versão instalada do TanStack Router
+  (ler a documentação de layout e `Outlet` antes da T20); o salto de rolagem quando o "agora" do navegador alarga a
+  faixa vinda do servidor.
 - O §2.6 e o §2.7 tocam arquivos do Entrar já juntados: se os revisores de D10/D11 recusarem, RF-11 e o envelope ficam
   sem caminho e o plano volta à 5b.
 - `membros_ler` deixa todo membro ler o nome de exibição das colegas direto no banco; hoje a API direta está barrada

@@ -1,9 +1,10 @@
 # Tarefas · Agenda (primeira versão)
 
-- **Spec:** `spec.md` (Approved; ajustes 2 e 3, commits `217a715` e `a0159f6`) · **Plano:** `plan.md` · **ADR:** 0006
-  (Arquiteto), 0007 (Engenheiro de dados, na T3)
+- **Spec:** `spec.md` (Approved; ajustes 2, 3 e 4, commits `217a715`, `a0159f6` e `de894bf`) · **Plano:** `plan.md` ·
+  **ADR:** 0006 e 0021 (Arquiteto), 0007 (Engenheiro de dados, na T3) · **Tela:** `DESIGN.md` (inteiro; §5, §6, §7b,
+  §8, §8b) e a ficha v4 (`ficha-visual.md`), que é fonte: quem constrói lê os dois antes de cada tarefa de tela
 - **Escrito por:** Arquiteto de software · **Norma:** modelo C4 e ADR · **Revisão:** pendente (etapa 5 e 5b, refeitas
-  depois dos ajustes 2 e 3 de 28/11/2026)
+  depois dos ajustes 2, 3 e 4 de 28/11/2026)
 - Só os arquivos do `plan.md` §10. Cada tarefa termina com `pnpm typecheck`, `pnpm lint` e `pnpm test`; mais
   `pnpm db:test` se mexeu em `supabase/` ou na matriz, `pnpm test:integracao` se mexeu em servidor ou dados e
   `pnpm test:e2e` se mexeu em tela. Commits pequenos, Conventional Commits, citando a spec. Nada no banco remoto
@@ -11,18 +12,19 @@
 - **Fora desta spec (E57·B, E58·A):** "Ocupado", chave de ocupação e RF-16 a RF-20. Nenhuma tarefa os constrói.
 
 ## Antes de construir (portão)
-- [ ] **T0** · Gerente de projeto: **a E59 vai na mensagem da ficha (T2)**, não em pergunta separada (grade
-  08:00–20:00 que se alarga, ou 24 h com rolagem; `plan.md` §3.2). Sem resposta, vale 24 h; com "A", o Analista muda a Assumption 1 da spec antes da T9. Pessoa que deixou de ser
-  coluna: pendência da Equipe (spec §12).
+- [x] **T0** · E59 respondida (E59·A, spec §18): grade 08:00–20:00 que se alarga; a Assumption 1 e a RN-11 já estão
+  na spec. Pessoa que deixou de ser coluna: pendência da Equipe (spec §12).
+- [ ] **T0a** · Gerente de projeto: a **E63** (ícone do Equipe: A `users` · B `user-group`) segue com o dono. Não para
+  a construção: o ícone é uma constante só (`plan.md` §5.6); sem resposta, fica `users`.
 - [ ] **T1** · Engenheiro de DevOps: conferir que a `feat/agenda` está em dia com a `previas` e abrir o PR de rascunho
   com base na `previas`.
 
 ## Fase 1 · Ficha visual (etapa 6)
-- [ ] **T2** · Designer de produto: ficha em 390 e 1440 com "+ Novo" (duas opções), menu do horário vazio, linha do
-  "agora", nome de exibição e iniciais no topo da coluna (e o texto de quem ainda não tem nome), seletor de horários
-  (e a hora repetida no dia de 25 h), atalhos de motivo, profissional só com a própria coluna, "Dia ▾" e lupa "em
-  desenvolvimento", os seis estados; peças da L-3. Revisor de design confere; o dono aprova; o Designer grava no
-  `DESIGN.md` só as linhas aprovadas (e a da tela inicial, §8b).
+- [ ] **T2** · Designer de produto: **ficha v4 feita** (390 e 1440) com "+ Adicionar ▾" (Novo agendamento · Bloquear
+  horário), botão do meio só com ícone e a folha "Adicionar", menu do horário vazio, linha do agora em `--id`, grade
+  08–20 alargada, profissional sem "Equipe", botões claros `--btn` nos estados, os seis estados; `DESIGN.md` §7b gravado.
+  **Falta:** Revisor de design rever a v4 e o `DESIGN.md`; o dono responder a E63; o texto de quem ainda não tem nome de
+  exibição e a hora repetida no dia de 25 h (D14, D15), se a v4 não os mostra.
 
 ## Fase 2 · Banco (Engenheiro de dados)
 - [ ] **T3** · **Decide** tabela por tabela (`plan.md` §4.1), a forma de `nome_exibicao` em `public.membros` (ADR 0006
@@ -44,8 +46,9 @@
 - [ ] **T8** · `horarios.ts` + `horarios.test.ts` (RN-09, RN-10: opções em passos de 15 min nos dias de 23, 24 e 25 h,
   `estaNoPasso`, `fimSugerido` com 1 h, acompanhar e parar no fim do dia).
 - [ ] **T9** · `bloqueio.ts` + teste (RN-03, RN-04, passo; encostar; Cancelado e Ausência; alterar ignora o próprio).
-- [ ] **T10** · `grade.ts` + teste (RN-05, RN-06, RN-08, contador; `faixaVisivel` só se E59·A, alargando até o
-  "agora" no dia de hoje, ADR 0006 · D17).
+- [ ] **T10** · `grade.ts` + teste (RN-05, RN-06, RN-08, RN-11, contador; no máximo 3 lado a lado e o "+N";
+  `faixaVisivel` 08:00–20:00 que se alarga por item e, só no dia de hoje, até a hora atual, ADR 0006 · D17;
+  `rolagemInicial`; casos do `plan.md` §5.2).
 - [ ] **T11** · `acesso.ts` + teste: `ehColuna`, `colunasVisiveis`, `podeGravarNa` (linha antiga e nova); só alcance e
   `usuarioId`, nunca papel.
 - [ ] **T12** · Apagar `src/domain/exemplo.ts` e `exemplo.test.ts`.
@@ -63,18 +66,32 @@
 - [ ] **T17** · `tests/integracao/agenda.test.ts` (CA-03, CA-04, CA-13, CA-15) com o banco local.
 
 ## Fase 5 · Telas (Engenheiro de software, pela ficha aprovada)
-- [ ] **T18** · Bloco `agenda` em `src/app/i18n/{pt,es,en}.ts` (com os 5 atalhos de motivo); `i18n.test.ts` verde.
-- [ ] **T19** · Peças aprovadas na T2 em `src/app/ui/` (`grade-agenda`, `seletor-data` e ajustes pedidos), com
-  `componentes.test.tsx`, `app.css`, vitrine e `e2e/vitrine.spec.ts`.
-- [ ] **T20** · `src/app/navegacao.ts`, `src/app/routes/_app.tsx`, `src/app/routes/_app/agenda.tsx` (`validateSearch`
-  só `dia`; `loader` com `estudioDaTela`) e `src/app/routes/_app/index.tsx` redirecionando para `/agenda` (RF-12;
+- [ ] **T18** · Blocos `agenda` (com os 5 atalhos de motivo e os nomes do `DESIGN.md` §7b) e `navegacao` (Adicionar,
+  Novo agendamento, Bloquear horário, itens da barra) em `src/app/i18n/{pt,es,en}.ts`; `i18n.test.ts` verde.
+- [ ] **T19** · Peças do `DESIGN.md` §7b em `src/app/ui/` (`grade-agenda` com a faixa e a linha do agora em `--id`,
+  `seletor-data` e os ajustes que o §7b pede), com `componentes.test.tsx`, `app.css`, vitrine e `e2e/vitrine.spec.ts`.
+- [ ] **T19a** · **Botão do meio em todo o app (E60·2; `plan.md` §5.6; ADR 0006 · D18):** em `src/app/ui/estrutura.tsx`
+  e `estrutura.css`, trocar o `Agendar` pelo `BotaoAdicionar`: círculo 52 `--ink`, só o ícone `calendar-plus`, sem nome
+  escrito, `aria-label="Adicionar"` (texto do bloco `navegacao`), `aria-haspopup="dialog"`, `aria-expanded`; `BarraBaixo`
+  com `adicionar` no lugar de `agendar`. Vitrine: quadro "RC-5 · Adicionar" e barra de exemplo (`vitrine.tsx`,
+  `vitrine-dados.ts`, `vitrine.css` se preciso); `e2e/vitrine.spec.ts` prova círculo 52, nenhum texto visível e o nome
+  acessível; `componentes.test.tsx` prova os atributos. Comentário do `icone.tsx`. `--d-agendar` não muda de nome.
+  Folha "Adicionar" em `src/app/paginas/adicionar.tsx` (Novo agendamento · Bloquear horário; contexto do `_app.tsx`),
+  com teste.
+- [ ] **T20** · `src/app/navegacao.ts`, `src/app/routes/_app.tsx` (menu, barra de baixo com o `BotaoAdicionar` e a
+  folha "Adicionar"; contexto lido na documentação do TanStack Router antes), `src/app/routes/_app/agenda.tsx`
+  (`validateSearch` só `dia`; `loader` com `estudioDaTela`) e `src/app/routes/_app/index.tsx` redirecionando para `/agenda` (RF-12;
   `redirect` lido na documentação do TanStack Router antes); apagar `src/app/paginas/inicio.tsx` e `inicio.test.tsx`;
   `e2e/inicio.spec.ts` prova o redirecionamento.
-- [ ] **T21** · `src/app/paginas/agenda/*` + `agenda.test.tsx`: "+ Novo" (RF-08), menu do horário vazio (RF-13), linha do
-  "agora" (RF-14), seletor de horários sem campo de digitar e 1 h (RF-15), atalhos (RF-22), nome de exibição (RF-21),
-  "Dia ▾" e lupa "em desenvolvimento" (CA-16), ⋮ e entradas de bloqueio pelos `alcances` (RF-11).
-- [ ] **T22** · `e2e/preparo-global.ts` (contas com nome fictício), `e2e/agenda.spec.ts` (CA-05, CA-09, CA-13, CA-15,
-  CA-16), `e2e/agenda-estados.spec.ts` (CA-06), `e2e/agenda-acessibilidade.spec.ts` (CA-08); verdes em 390 e 1440.
+- [ ] **T21** · `src/app/paginas/agenda/*` + `agenda.test.tsx`: "+ Adicionar ▾" em `adicionar.tsx` (Novo agendamento ·
+  Bloquear horário; RF-08, E60·1·A, E60·5) e as mesmas opções entregues à folha "Adicionar"; sem "+ Adicionar" no topo
+  do celular; grade na faixa 08–20 que se alarga (RN-11); linha do agora em `--id` (RF-14); menu do horário vazio
+  (RF-13); seletor de horários sem campo de digitar e 1 h (RF-15); atalhos (RF-22); nome de exibição (RF-21); "Equipe
+  N de M" com `ICONE_EQUIPE` (`users` até a E63) e **escondido para quem vê uma coluna só** (spec Assumption 6);
+  "Ver equipe", "Limpar filtros" e "Tentar de novo" em botão claro `--btn`; "Dia ▾" e lupa "em desenvolvimento"
+  (CA-16); ⋮ e entradas de bloqueio pelos `alcances` (RF-11). Nenhum botão "Novo" sozinho nem "Agendar".
+- [ ] **T22** · `e2e/preparo-global.ts` (contas com nome fictício), `e2e/agenda.spec.ts` (CA-05 inteiro como no
+  `plan.md` §7, com `page.clock.setFixedTime` para a hora atual; CA-09, CA-13, CA-15, CA-16), `e2e/agenda-estados.spec.ts` (CA-06), `e2e/agenda-acessibilidade.spec.ts` (CA-08); verdes em 390 e 1440.
 - [ ] **T23** · Conferir o escopo: `git diff --name-only origin/previas...HEAD` contra o `plan.md` §10; todos os
   comandos verdes; CI verde no PR de rascunho.
 
@@ -84,11 +101,12 @@
   coluna `nome_exibicao`, ADR 0007 item por item (E16·1, CA-10, CA-11, CA-14).
 - [ ] **T26** · Engenheiro de segurança e Auditor de risco: chaves e alcance, só a própria coluna nas duas camadas,
   `alcances` e `orgId` na tela, nome de exibição (nunca e-mail), CA-03, CA-09, CA-13.
-- [ ] **T27** · Revisor de design: capturas 390 e 1440 contra a ficha aprovada e o `DESIGN.md` §10 (CA-07).
+- [ ] **T27** · Revisor de design: capturas 390 e 1440 contra a ficha v4 e o `DESIGN.md` §10 (CA-07), inclusive a
+  vitrine com o botão do meio novo.
 - [ ] **T28** · QA: veredito CA-01 a CA-16, com os links da CI.
 
 ## Fase 7 · Fechar
 - [ ] **T29** · Analista de requisitos: confere o pedido item por item (etapa 10).
 - [ ] **T30** · Documentador: `docs/STATUS.md`, `docs/BACKLOG.md`, `CHANGELOG.md`, `docs/decisoes/` no mesmo PR.
-- [ ] **T31** · Gerente de projeto: pedido de merge no molde, com o commit, a CI verde e o link da prévia; aviso no
-  celular.
+- [ ] **T31** · Gerente de projeto: pedido de merge no molde, com o commit, a CI verde e o link da prévia, e a
+  confirmação da spec Assumption 6 (profissional sem "Equipe"); aviso no celular.
