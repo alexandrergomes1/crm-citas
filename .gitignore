@@ -1,0 +1,29 @@
+# dependências
+node_modules/
+
+# saídas de build
+dist/
+.output/
+.tanstack/
+.vinxi/
+.nitro/
+
+# relatórios de teste
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+coverage/
+
+# variáveis de ambiente e segredos (nunca no repositório)
+.env
+.env*
+
+# banco local
+supabase/.temp/
+# chave de assinatura local, gerada a cada pnpm db:start (ADR 0018 · D17)
+supabase/signing_keys.json
+
+# sistema
+.DS_Store
+*.log

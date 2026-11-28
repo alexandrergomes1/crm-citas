@@ -7,7 +7,8 @@
 
 ## 1. Como avisar uma falha de segurança (E14·1)
 - Avise diretamente o dono do projeto, em particular. Quando o sistema tiver domínio próprio, um e-mail de segurança
-  entra aqui. (O aviso privado do GitHub só existe em repositório público, e este é privado.)
+  entra aqui. (Este repositório é público, então o aviso privado de falha do GitHub pode ser ligado nas configurações do
+  GitHub, mas não está em uso; o jeito de avisar continua o desta seção, E14·1.)
 - Não abra issue pública, não comente em PR e não publique a falha antes de ela ser corrigida.
 - No aviso, nunca coloque dado pessoal, dado de saúde, senha, chave ou token.
 
@@ -52,6 +53,12 @@ Valem como estão; não se corrigem nem se contornam sem nova decisão do dono (
 - Risco aceito pelo dono: a ASVS e o dever de prova do RGPD (art. 5(2)) pedem registro de acesso a dado sensível;
   o estúdio pode atribuir a uma funcionária uma mudança feita pelo suporte, e não há prova de acesso à ficha de saúde
   nesse modo (`ARCHITECTURE.md` §6).
+- **E39·3·B (ajuste):** a sessão cai depois de **1 h parada** (máximo de 12 h). Resposta: "E39·3·B (1hr parado)".
+  Fica abaixo da ASVS V3.3.2 nível 2 só na parada (a norma pede 30 min). Risco: aparelho dividido na recepção fica
+  aberto até 1 h. Risco aceito pelo dono: "E39·3·i" (28/11/2026).
+- **E40·B:** a chave que cifra as fichas de saúde fica como segredo da Cloudflare, não num cofre que cifra sozinho (KMS).
+  Resposta: "E40·B". Fica abaixo da ASVS V6.4.2 nível 3 (cumpre a cifra da V6.1.2). Risco: quem tiver acesso ao
+  servidor pode ler a chave; ela nunca vai ao repositório, ao chat, a registro nem ao banco.
 
 ## 6. Incidente e prazos de aviso
 - Roteiro de incidente escrito (`ARCHITECTURE.md` §9).

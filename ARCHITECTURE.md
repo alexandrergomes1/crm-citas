@@ -15,16 +15,17 @@ celular em primeiro lugar. Idiomas de uso: português, espanhol e inglês. Idiom
 | Parte | Quem usa | Quando entra |
 |---|---|---|
 | App do estúdio | dona, recepção, profissionais | primeira versão (núcleo) |
-| Painel admin da plataforma | o dono do sistema | depois do núcleo |
+| Painel admin da plataforma | o dono do sistema | depois dos outros módulos (um por vez) |
 | Cadastro de estúdio e cobrança da assinatura | estúdios novos | depois do painel admin |
 | Portal público do estúdio (reserva online) | clientes do estúdio | depois da cobrança |
 | Marketplace (encontrar estúdios) | público em geral | depois da reserva online |
-| API pública | marketplace e parceiros que chamam o sistema | só quando precisarem (E4·1) |
+| API pública | marketplace e parceiros que chamam o sistema | depois do marketplace, só quando precisarem (E4·1) |
 
 **Sistemas externos** que o sistema chama: WhatsApp, e-mail, pagamentos, cópia do banco, monitoramento.
 
-Ordem de entrada: decisão E4·3. Núcleo da primeira versão (E3·2): Agenda, Agendamento, Clientes, Formulários,
-Catálogo, Checkout e Caixa. Os outros módulos entram depois, um por vez.
+Ordem de entrada: decisão E21·1. Núcleo da primeira versão (E3·2): Agenda, Agendamento, Clientes, Formulários,
+Catálogo, Checkout e Caixa. Os outros módulos entram depois, um por vez. As partes novas da tabela (painel admin,
+cadastro e cobrança, portal público, marketplace e API pública) entram depois dos outros módulos, nessa ordem.
 
 ## 3. Camadas do código
 

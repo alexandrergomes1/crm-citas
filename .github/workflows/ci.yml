@@ -1,0 +1,176 @@
+# CI do crm-citas (spec specs/20261128-005000-fundacao-tecnica, plano §8; ADR 0002 · D5 a D7; ADR 0003).
+# Roda em todo PR para previas e main e depois do merge nelas. Sem segredo, sem banco remoto, sem publicar.
+# Ações fixadas pelo commit completo (a versão fica no comentário); a imagem do gitleaks, pelo digest.
+name: CI
+
+on:
+  pull_request:
+    branches: [previas, main]
+  push:
+    branches: [previas, main]
+
+# Menor privilégio: só leitura do código (OWASP ASVS 4.0.3 V14.2; boas práticas do GitHub Actions).
+permissions:
+  contents: read
+
+# Só o PR cancela a execução anterior; envio à previas e à main roda até o fim (o verde fica registrado).
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  verificar:
+    name: verificar
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1 (lê packageManager)
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm test
+      - run: pnpm build
+      # CA-03 (specs/20261128-030000-entrar-servico, plan.md §8): o pacote do navegador (dist/client) sem supabase,
+      # sem o endereço e sem a chave. Sem pacote, falha.
+      - run: pnpm pacote:conferir
+
+  telas:
+    name: telas
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1 (lê packageManager)
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      # Banco local para as telas que entram (specs/20261128-030000-entrar-servico, plan.md §8). Só o banco local,
+      # em Docker. Proibido aqui: supabase link, db push, --remote, --linked (AGENTS.md §1). Nenhum segredo: as
+      # chaves são geradas a cada execução por scripts/banco-local.mjs e nunca impressas.
+      - run: pnpm exec supabase telemetry disable
+      - run: pnpm db:start
+      - run: pnpm test:e2e
+      # Relatório só quando falha e por 7 dias: o repositório é público e o espaço grátis é curto (plano §9).
+      - if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: relatorio-playwright
+          path: playwright-report/
+          retention-days: 7
+      # CA-7 do item 4 (specs/20261128-010500-design-system-codigo, plano §8): capturas da vitrine SEMPRE, por 7 dias.
+      # O teste grava em testInfo.outputPath('vitrine-*.png'), dentro de test-results/ (padrão do Playwright).
+      # Repositório público: a vitrine só tem dados fictícios (RV-2). Sem captura: o passo falha.
+      - if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: capturas-vitrine
+          path: test-results/**/vitrine-*.png
+          if-no-files-found: error
+          retention-days: 7
+      - if: always()
+        run: pnpm db:stop
+
+  banco:
+    name: banco
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1 (lê packageManager)
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # Só o banco local, em Docker. Proibido aqui: supabase link, db push, --remote, --linked (AGENTS.md §1).
+      - run: pnpm exec supabase telemetry disable
+      - run: pnpm db:start
+      - run: pnpm db:test
+      # Integração com o banco local (plan.md §8 e §9): o script já roda por scripts/banco-local.mjs.
+      - run: pnpm test:integracao
+      - if: always()
+        run: pnpm db:stop
+
+  segredos:
+    name: segredos
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      # gitleaks 8.30.1 pela linha de comando (MIT, sem token), toda a história de HEAD a cada execução.
+      # --log-opts=HEAD: todo commit que chega a HEAD (no PR, o commit de merge = base + PR), não as outras
+      # branches que o fetch-depth 0 também baixa (ADR 0003 · S1). --redact: o log é público, o segredo sai
+      # mascarado. Achou: saída 1, CI vermelha. -u: o git aceita a pasta montada (plano §10, R-7).
+      # A imagem não é vista pelo Dependabot (está dentro de run:): troca à mão, por PR (ADR 0002).
+      - name: gitleaks em toda a história de HEAD (não varre as outras branches)
+        run: >-
+          docker run --rm -u "$(id -u):$(id -g)" -v "$GITHUB_WORKSPACE:/repo"
+          zricethezav/gitleaks:v8.30.1@sha256:c00b6bd0aeb3071cbcb79009cb16a60dd9e0a7c60e2be9ab65d25e6bc8abbb7f
+          git --redact --verbose --no-banner --no-color --log-opts=HEAD /repo
+
+  # Testes das travas automáticas (ADR 0003; R17). As travas do Claude Code moram em .claude/ e entram
+  # quando o dono aprovar a cópia; até lá, as propostas são testadas na pasta da spec.
+  travas:
+    name: travas
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+      - name: Gancho de envio (.githooks/pre-push)
+        run: node .githooks/pre-push.test.mjs
+      - name: Testes das travas do Claude Code e das propostas
+        run: |
+          set -eu
+          achou=0
+          for t in .claude/hooks/*.test.mjs specs/*/travas-claude-propostas/*.test.mjs; do
+            [ -f "$t" ] || continue
+            achou=1
+            echo "== $t"
+            node "$t"
+          done
+          [ "$achou" = 1 ] || { echo "nenhum teste de trava do Claude Code achado"; exit 1; }
+      - name: .claude/settings.json é JSON válido
+        run: |
+          set -eu
+          for f in .claude/settings.json specs/*/travas-claude-propostas/settings.json; do
+            [ -f "$f" ] || continue
+            node -e 'JSON.parse(require("node:fs").readFileSync(process.argv[1], "utf8"))' "$f"
+            echo "ok $f"
+          done
+          [ -f .claude/settings.json ] || echo "::warning::.claude/settings.json ainda não existe (pendente da aprovação do dono, ADR 0003)"
+      - name: Aprovações com prova (specs e docs/decisoes)
+        if: github.event_name == 'pull_request'
+        env:
+          BASE: ${{ github.base_ref }}
+        run: |
+          set -eu
+          git fetch --no-tags origin "+refs/heads/$BASE:refs/remotes/origin/$BASE"
+          for f in .claude/hooks/decisao-com-prova.mjs specs/*/travas-claude-propostas/decisao-com-prova.mjs; do
+            [ -f "$f" ] || continue
+            node "$f" "origin/$BASE"
+            exit 0
+          done
+          echo "nenhuma decisao-com-prova.mjs achada"; exit 1

@@ -1,0 +1,29 @@
+# Dependabot (spec specs/20261128-005000-fundacao-tecnica, R12; plano §8; ADR 0002 · D8; ADR 0003 · T10).
+# Só atualizações de versão, semanais, com PR para a previas (nunca direto à main, AGENTS.md §8).
+# Atualização de segurança vai sempre à branch padrão do repositório (doc oficial): ver plano §10, D2.
+# Opções lidas em https://docs.github.com/en/code-security/dependabot/working-with-dependabot/dependabot-options-reference
+version: 2
+updates:
+  - package-ecosystem: npm # cobre o pnpm
+    directory: /
+    target-branch: previas
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    cooldown:
+      default-days: 3
+    # Menores e correções num PR só; versão maior vem separada, para revisar uma a uma.
+    groups:
+      dependencias:
+        update-types: [minor, patch]
+  - package-ecosystem: github-actions
+    directory: /
+    target-branch: previas
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    cooldown:
+      default-days: 3
+    groups:
+      acoes:
+        patterns: ['*']
