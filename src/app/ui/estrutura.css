@@ -1,0 +1,288 @@
+/* Estrutura (RC-5, RC-18, RC-19; DESIGN.md §2, §4, §5, §8b). Só var(--...). */
+
+/* Agendar: círculo 52 preto, ícone branco, nome 11 forte */
+.ds-agendar {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-4);
+  min-width: var(--toque);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-size: var(--fs-11);
+  font-weight: var(--fw-forte);
+  line-height: var(--lh-titulo);
+}
+
+.ds-agendar__circulo {
+  display: grid;
+  place-items: center;
+  width: var(--d-agendar);
+  height: var(--d-agendar);
+  border-radius: var(--r-pilula);
+  background: var(--ink);
+  color: var(--card);
+}
+
+/* Barra do topo do computador: 64, separada por linha de 1 px */
+.ds-barra-topo {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-16);
+  height: var(--h-barra-topo);
+  padding: 0 var(--margem);
+  border-bottom: var(--borda) solid var(--line);
+  background: var(--card);
+}
+
+.ds-barra-topo__titulo {
+  display: flex;
+  flex-direction: column;
+  width: var(--w-titulo-barra);
+  min-width: 0;
+}
+
+.ds-barra-topo__nome {
+  overflow: hidden;
+  font-size: var(--fs-20);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ds-barra-topo__sub {
+  font-size: var(--fs-13);
+  color: var(--ink2);
+}
+
+.ds-barra-topo__acoes {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-8);
+  margin-left: auto;
+}
+
+.ds-barra-topo__divisor {
+  width: var(--borda);
+  height: var(--sp-24);
+  margin: 0 var(--sp-4);
+  background: var(--line);
+}
+
+/* Menu principal do computador */
+.ds-menu-principal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-8);
+  width: var(--w-menu-aberto);
+  padding: var(--sp-12);
+  background: var(--card);
+}
+
+.ds-menu-principal--recolhido {
+  width: var(--w-menu-recolhido);
+  align-items: center;
+}
+
+.ds-menu-principal__lista {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-menu-principal__lista--fixo {
+  margin-top: auto;
+  padding-top: var(--sp-8);
+  border-top: var(--borda) solid var(--line);
+}
+
+.ds-menu-principal__item,
+.ds-submenu__item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-12);
+  width: 100%;
+  min-height: var(--h-controle);
+  padding: 0 var(--sp-12);
+  border: 0;
+  border-radius: var(--r-pilula);
+  background: transparent;
+  color: var(--ink);
+  font-size: var(--fs-14);
+  font-weight: var(--fw-medio);
+  text-align: left;
+}
+
+.ds-menu-principal__item[aria-current='page'],
+.ds-submenu__item[aria-current='page'] {
+  background: var(--btn);
+  font-weight: var(--fw-forte);
+}
+
+.ds-menu-principal__item[aria-current='page'] .ds-ic {
+  color: var(--id);
+}
+
+.ds-menu-principal__nome {
+  flex: 1;
+}
+
+/* Recolhido: ícone e nome 11 embaixo, item com canto 16 */
+.ds-menu-principal--recolhido .ds-menu-principal__item {
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--sp-4);
+  padding: var(--sp-8) var(--sp-4);
+  border-radius: var(--r-menu-recolhido);
+  font-size: var(--fs-11);
+  text-align: center;
+}
+
+.ds-menu-principal--recolhido .ds-menu-principal__lista {
+  width: 100%;
+}
+
+.ds-submenu {
+  width: var(--w-submenu);
+  padding: var(--sp-12);
+  background: var(--card);
+}
+
+/* Cabeçalho do celular: 64, sombra de borda */
+.ds-cabecalho {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-8);
+  height: var(--h-cabecalho);
+  padding: 0 var(--sp-8) 0 var(--margem);
+  background: var(--card);
+  box-shadow: var(--sombra-cabecalho);
+}
+
+.ds-cabecalho__titulo {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.ds-cabecalho__nome {
+  overflow: hidden;
+  font-size: var(--fs-20);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ds-cabecalho__sub {
+  overflow: hidden;
+  font-size: var(--fs-13);
+  color: var(--ink2);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ds-cabecalho__fim {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+}
+
+/* Barra de baixo do celular: 72; atual em --id com ponto */
+.ds-barra-baixo {
+  height: var(--h-barra-baixo);
+  border-top: var(--borda) solid var(--line);
+  background: var(--card);
+}
+
+.ds-barra-baixo__lista {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-barra-baixo__celula {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ds-barra-baixo__item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-4);
+  width: 100%;
+  height: 100%;
+  min-height: var(--toque);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink3);
+  font-size: var(--fs-11);
+  font-weight: var(--fw-medio);
+}
+
+.ds-barra-baixo__item[aria-current='page'] {
+  color: var(--id);
+  font-weight: var(--fw-forte);
+}
+
+.ds-barra-baixo__item[aria-current='page']::after {
+  content: '';
+  position: absolute;
+  bottom: var(--sp-4);
+  width: var(--sp-4);
+  height: var(--sp-4);
+  border-radius: var(--r-pilula);
+  background: var(--id);
+}
+
+.ds-barra-baixo__sem-icone {
+  width: var(--ic-20);
+  height: var(--ic-20);
+}
+
+/* Lista de seções (nível 1) */
+.ds-secao + .ds-secao {
+  border-top: var(--borda) solid var(--line);
+}
+
+.ds-secao__botao {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-12);
+  width: 100%;
+  min-height: var(--h-linha-lista);
+  padding: 0 var(--sp-12) 0 var(--sp-16);
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-weight: var(--fw-medio);
+  text-align: left;
+}
+
+.ds-secao__botao > .ds-ic:first-child {
+  color: var(--ink2);
+}
+
+.ds-secao__nome {
+  flex: 1;
+}
+
+/* Desenho de celular × computador: o ponto de troca mora só no tokens.css (E25·3) */
+.ds-so-celular {
+  display: var(--mostra-celular);
+}
+
+.ds-so-computador {
+  display: var(--mostra-computador);
+}
