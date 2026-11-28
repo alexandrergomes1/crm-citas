@@ -21,7 +21,7 @@
 | P1 | Juntar por merge na `feat/entrar-servico` a `feat/banco-ligacao` e a `feat/design-system-codigo`; resolver os conflitos do `plan.md` §12 sem mudar o conteúdo deles | Engenheiro de DevOps | árvore limpa; `pnpm install`, `typecheck`, `lint`, `test`, `db:start`, `db:test` verdes como nos itens 3 e 4 |
 | P2 | Abrir o PR de rascunho empilhado (base: a branch do item 3, ou a `previas` se 3 e 4 já entraram) | Engenheiro de DevOps | PR em rascunho, CI rodando |
 | P3 | Ficha visual: Entrar (vazio, carregando, erro, limite), Escolher estúdio (lista, carregando, erro), Sua conta (com e sem troca), em 390 e 1440, lado a lado com o `DESIGN.md`; lista dos nomes e peças novos (`plan.md` §7 e L-4) | Designer de produto | `ficha-visual.md` e `ficha/` prontos |
-| P4 | Conferir a ficha pelo `DESIGN.md` §10 e ajustar até não haver "Bloqueia". O "sim" do dono à ficha vem junto da aprovação da spec (etapas 6 e 7); com ele, o Designer grava os nomes e peças no `DESIGN.md` antes do pedido de merge | Revisor de design; Designer de produto | ficha conferida; depois do "sim", resposta gravada pelo Documentador e `DESIGN.md` atualizado |
+| P4 | **Feita (28/11/2026).** Conferir a ficha pelo `DESIGN.md` §10 e ajustar até não haver "Bloqueia". O "sim" do dono à ficha vem junto da aprovação da spec (etapas 6 e 7); com ele, o Designer grava os nomes e peças no `DESIGN.md` antes do pedido de merge | Revisor de design; Designer de produto | ficha conferida; depois do "sim", resposta gravada pelo Documentador e `DESIGN.md` atualizado |
 
 ## Construção · Banco (Engenheiro de dados)
 

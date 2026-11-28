@@ -2,15 +2,18 @@
 
 - **Spec:** `spec.md` (RF-30 a RF-33) · **Plano:** `plan.md` §7 e L-4 · **Tarefa:** P3 do `tasks.md`
 - **Escrito por:** Designer de produto · **Norma:** WCAG 2.2, Material Design, Apple HIG · **Fonte:** só o `DESIGN.md`
-- **Conferência:** Revisor de design (P4), 1ª rodada: aprovada com ressalvas; 2ª rodada (abaixo) **aguarda nova conferência**.
+- **Conferência:** Revisor de design (P4), 1ª rodada: aprovada com ressalvas; 2ª rodada: **aprovada com ressalvas,
+  resolvidas** (ver "Ressalvas da 2ª rodada").
+- **"Sim" do dono:** "E41·1·A E41·2·A E41·3·A E41·4·A", 28/11/2026,
+  https://claude.ai/code/session_018cV8b8F1poNHjA4eEd3VyN. Nomes e peças gravados no `DESIGN.md` §5, §6, §8 e §8b.
 - **Protótipo:** HTML estático fora do repositório, com o `tokens.css`, o `base.css` e o CSS das peças do item 4
   (`botao`, `campos`, `bloco-lista`, `conteudo`); fonte Geist; ícones Lucide. Capturas com Playwright (Chromium),
   escala 2×. Dados fictícios: `pessoa@exemplo.com`, "Estúdio Aurora", "Estúdio Lírio".
 
 ---
 
-**E41 · Telas Entrar e Escolher estúdio** (fala o Designer de produto · norma WCAG 2.2; 1ª rodada conferida pelo
-Revisor de design com ressalvas; 2ª rodada aguarda conferência)
+**E41 · Telas Entrar e Escolher estúdio** (fala o Designer de produto · norma WCAG 2.2; 1ª e 2ª rodadas conferidas pelo
+Revisor de design, aprovadas com ressalvas; respondida pelo dono: E41·1·A a E41·4·A)
 
 **Antes:** as duas telas não existem (são novas); não há imagem de antes.
 
@@ -42,7 +45,10 @@ As 8 primeiras são da 1ª rodada; as 12 seguintes, da 2ª (pedido do Revisor de
   nem texto próprio, para não dizer o motivo.
 - **Escolher estúdio:** o nome acessível de cada linha é o nome do estúdio ("Estúdio Aurora"); o quadrado da inicial e
   a seta › são enfeite (`aria-hidden`). Carregando: linhas cinza do §8 (depois de 0,3 s), anunciadas como
-  "Carregando estúdios". Erro: estado de erro do §8 ("Não foi possível carregar", "Tentar de novo"), com "Sair" embaixo.
+  "Carregando estúdios". Erro: estado de erro do §8, só o título do erro ("Não foi possível carregar") e "Tentar de novo", com "Sair"
+  embaixo; sem frase de detalhe.
+- **Para a T2 (campos):** e-mail com `autocomplete="email"` e Senha com `autocomplete="current-password"` (WCAG 1.3.5).
+  O botão do olho muda o nome ("Mostrar senha" / "Esconder senha") e **não** usa `aria-pressed` (WCAG 4.1.2).
 - **Sua conta:** itens na ordem do §8b; Minha conta, Preferências e Meu faturamento esmaecidos com "em
   desenvolvimento" ao lado (celular) ou embaixo (computador, porque 240 não cabe numa linha), com `aria-disabled`;
   "Trocar de estúdio" só com mais de um estúdio. Bolinha com a inicial "P" = primeira letra do e-mail da própria
@@ -86,6 +92,13 @@ Botão **Entrar** · rótulos **E-mail** e **Senha** · título **Escolher estú
 - **E41·4·B:** o mesmo, com o nome do sistema acima do bloco (texto a definir pelo dono; entra no `DESIGN.md`).
 - **Recomendo A:** usa só medidas que já existem e não inventa marca. Entra no `DESIGN.md` como "tela sem menu".
 
+### Ressalvas da 2ª rodada (Revisor de design) · resolvidas
+- Tirada a frase "Verifique a conexão e tente de novo." do erro de Escolher estúdio: fica só o título do erro e
+  "Tentar de novo" (§8). As imagens `ficha/escolher-estudio-erro-390.png` e `-1440.png` ainda mostram a frase; não
+  foram refeitas, **vale o texto desta ficha**.
+- Anotados para a T2: `autocomplete` nos campos (WCAG 1.3.5) e o nome do botão do olho sem `aria-pressed` (WCAG 4.1.2).
+- Em aberto, sem mudança: folha Sua conta sem véu no celular (ver "Não verificado").
+
 **Desfaz-se assim:** mudar o texto ou a peça no `DESIGN.md` e no arquivo de idioma; as telas leem dali.
 **Responda:** os códigos, por exemplo "E41·1·A E41·2·A E41·3·A E41·4·A". O "sim" vem junto da aprovação da spec
 (`tasks.md` P4); com ele, o Designer grava os nomes e as peças no `DESIGN.md`.
@@ -93,10 +106,10 @@ Botão **Entrar** · rótulos **E-mail** e **Senha** · título **Escolher estú
 ---
 
 ## Não verificado
-- **Conferência do Revisor de design (P4):** ainda não feita.
 - **Limite de tentativas:** sem imagem própria; usa o mesmo desenho do erro genérico (descrito acima).
 - **Folha Sua conta no celular:** sem véu escuro atrás, porque o `DESIGN.md` não define um (igual ao componente do item
-  4); o Revisor deve dizer se a tela de trás fica clara demais.
+  4). Assunto em aberto, sem mudança nesta tarefa.
+- **Imagens do erro de Escolher estúdio:** mostram a frase de detalhe que saiu; não refeitas.
 - **Fundo das telas de Sua conta:** só a barra com a bolinha; a página inicial real é do item 2 e não foi desenhada.
 - **Acessibilidade:** axe (wcag2a, wcag2aa, wcag21aa, wcag22aa) deu 0 violações no protótipo, nas 20 capturas; não é o
   app real. Não conferi com leitor de tela de verdade nem foco por teclado. O texto "Entrando…" esmaecido (60 %) fica
