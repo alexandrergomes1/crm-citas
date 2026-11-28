@@ -42,14 +42,14 @@ A tela **Agenda** mostra **um dia** do estúdio em grade de horas, com uma colun
 profissionais ver (**Equipe N de M**), filtrar e criar, alterar e excluir um **bloqueio de horário único**.
 Marcar, abrir e mudar um agendamento é do módulo Agendamento (spec própria); a Agenda só mostra e leva até ele.
 
-**Ampliação de escopo pedida pelo dono em 28/11 (§16):** formatos de visão configuráveis, com prioridade em cards
-(RF-18), e grade só no horário de funcionamento (RF-19). O escopo exato da RF-18 vem com a ficha visual nova; a RF-19
-depende da dúvida E56·1 (§12).
+**Ampliação de escopo pedida pelo dono em 28/11 (§16) foi para a spec seguinte (E57·B, §17):** formatos de visão em
+cards, resumo da coluna, dias marcados no calendário, grade no horário de funcionamento e lupa no celular ficam na spec
+**"Agenda · visões e horário de funcionamento"**. Nesta, onde houver botão deles, aparece "em desenvolvimento".
 
 ### 2.1 Recursos da lista candidata (`docs/produto/agenda.md`)
 | Recurso | Primeira versão | Motivo |
 |---|---|---|
-| visões dia, 3 dias, semana e mês | **Dia, mais os formatos que a ficha nova trouxer** (ampliação, RF-18) | ordem do dono de 28/11 (E54·6/7/8, §16): formatos configuráveis, prioridade em cards; o que a ficha não cobrir fica "em desenvolvimento" no "Dia ▾" |
+| visões dia, 3 dias, semana e mês | **só Dia**; os outros formatos ficam "em desenvolvimento" no "Dia ▾" | E57·B (§17): formatos em cards e modo "Lista" (E54·6/7/8) vão para a spec seguinte |
 | status no cartão | **sim** | sem ele a grade não diz o que está acontecendo |
 | bloqueio de horário | **só único** | repetido depois |
 | conflito de horário | **sim, para bloqueio** | o conflito ao marcar agendamento é da spec do Agendamento |
@@ -57,7 +57,7 @@ depende da dúvida E56·1 (§12).
 | altura das horas | depois | ajuste de conforto |
 | lista de espera | depois | botão aparece como "em desenvolvimento" (`DESIGN.md` §7 e §8) |
 | arrastar para remarcar | depois | remarcar é do Agendamento |
-| resumo do dia | **só o resumo por coluna, sem valores** (RF-16, E54·6); o do dia inteiro fica depois | o resumo do dia pode envolver valores (dinheiro) |
+| resumo do dia | depois | o resumo por coluna (E54·6) vai para a spec seguinte (E57·B, §17); o do dia inteiro pode envolver valores (dinheiro) |
 | exportar e imprimir | depois | "Opções" aparece como "em desenvolvimento" |
 | aviso no sininho | depois | depende de notificações e da fila de envios |
 | ligação com Google Agenda | depois | integração externa, spec própria |
@@ -67,7 +67,7 @@ depende da dúvida E56·1 (§12).
 |---|---|---|
 | Dona | a agenda inteira do seu estúdio | criar, alterar e excluir bloqueio de qualquer coluna (tem tudo, ADR 0020 · D4) |
 | Recepção | a agenda inteira do seu estúdio | criar, alterar e excluir bloqueio de qualquer coluna (E26·2·A) |
-| Profissional | **por padrão, só a própria coluna**; as outras não aparecem. Só vê as outras, completas ou como "Ocupado", se o perfil dela liberar (ordem do dono de 28/11, §16, que substitui a E26·1·B) | criar, alterar e excluir só os bloqueios da própria coluna (E26·2·A) |
+| Profissional | **só a própria coluna**; as outras não aparecem, nem como "Ocupado" (ordem do dono de 28/11, §16, que substitui a E26·1·B; E58·A, §17) | criar, alterar e excluir só os bloqueios da própria coluna (E26·2·A) |
 | Sem papel no estúdio ou sem login | nada | nada |
 
 Nenhum papel vê dado de outro estúdio (`ARCHITECTURE.md` §5). O cartão nunca mostra dado de saúde.
@@ -78,23 +78,16 @@ como dona (E42·A); a personalização vem no item 6a sem mudar a Agenda.
 
 | Chave | Recepção | Profissional | Resposta |
 |---|---|---|---|
-| `agenda.ver` | todos | próprios | E26·1·B, lida pela ordem de 28/11 (§16) |
+| `agenda.ver` | todos | próprios | E26·1·B, lida pela ordem de 28/11 (§16) e pela E58·A (§17) |
 | `agenda.criar`, `agenda.editar`, `agenda.remover` (bloqueio) | todos | próprios | E26·2·A |
-| ver as outras colunas como "Ocupado" (nome da chave: Arquiteto, ex. `agenda.ver_ocupacao`) | — (já vê todas) | **ausente** (padrão) | ordem de 28/11 (§16) |
 
 Na Agenda, **"próprios"** quer dizer a coluna da própria pessoa: ver tudo dela; gravar só bloqueio com ela como
-profissional. Com `agenda.ver` "próprios" e **sem** a chave de ocupação, as colunas das outras **não aparecem** nem
-saem do servidor (nem como "Ocupado"). Ver as outras **completas** é `agenda.ver` "todos" (ver não dá gravar: gravar
-segue as chaves de criar, editar e remover). **"Ocupado"** (só com a chave de ocupação): nas colunas que a pessoa não
-vê completas, cada agendamento que ocupa horário (RN-04) e cada bloqueio aparece só como "Ocupado", com início e fim;
-sem cliente, serviço, status nem motivo; não abre, não tem ⋮, e os filtros não agem sobre essas colunas (senão
-mostrariam o status). Esses dados não saem do servidor.
+profissional. Com `agenda.ver` "próprios", as colunas das outras **não aparecem** nem saem do servidor. **Sem
+"Ocupado" nesta spec** (E58·A): nenhuma chave de ocupação, nenhum cartão "Ocupado".
 
-**Até o item 6a (E42·A):** não há tela para ajustar perfil; a profissional fica no padrão (só a própria coluna). A
-liberação ("ver" ou "ver ocupação") entra pela matriz do ADR 0020 sem mudar a Agenda (D10). Forma da chave nova e se
-o "Ocupado" se constrói já na v1 ou fica para o 6a: **para o Arquiteto**. O ADR 0020 · D2 fecha o catálogo em
-`ver`, `criar`, `editar`, `remover` e as sensíveis; a ação nova "ver ocupação" pede decisão dele (ADR). A ordem de
-28/11 é a palavra do dono sobre a regra. "Ver as outras completas" não pede chave nova: é `agenda.ver` "todos".
+**"Ver as outras" e "ver ocupação" entram com a tela de perfis (item 6a, E58·A).** Até lá não há tela para ajustar
+perfil e a profissional fica só com a própria coluna (E42·A). A forma de "ver ocupação" (chave nova; ADR 0020 · D2
+fecha o catálogo em `ver`, `criar`, `editar`, `remover` e as sensíveis) é decidida no item 6a, não aqui.
 
 ## 4. Telas e estados
 Só peças, nomes e medidas do `DESIGN.md`. Peça que faltar para no caminho e entra no `DESIGN.md` com o dono primeiro.
@@ -107,19 +100,19 @@ nunca "estúdio" nem "clínica" (E47·1·A, `DESIGN.md` §6). Nesta spec, "estú
   E55·4 trocada, §16) · ajuda · Notificações · Sua conta. Barra da
   grade: Hoje · seta de dia anterior e seguinte · data em pílula com calendário · **Dia ▾** · **Equipe N de M** ·
   **Filtros ▾** · **Lista de espera** ("em desenvolvimento").
-- **Celular (390):** cabeçalho com ☰ (abre as visões da Agenda), data, **lupa** (busca, RF-20), funil, sininho e Sua
-  conta (nível 1); faixa da grade com ‹ Hoje › · Equipe N de M · ⋮ (E55·3·A: Hoje sai do cabeçalho); barra de baixo
+- **Celular (390):** cabeçalho com ☰ (abre as visões da Agenda), data, **lupa** ("em desenvolvimento"; a busca vai
+  para a spec seguinte, E57·B), funil, sininho e Sua conta (nível 1); faixa da grade com ‹ Hoje › · Equipe N de M · ⋮ (E55·3·A: Hoje sai do cabeçalho); barra de baixo
   com a peça preta no meio, Agenda atual em azul. Filtros em folha de baixo. Duas colunas à vista e as outras rolando
   para o lado (E55·3·A). Se o **Agendar** da barra de baixo vira o "+ Novo" no celular: sai da ficha nova (Designer).
 - **Topo de cada coluna:** o **nome de exibição** da pessoa e as iniciais (E55·1·A, RF-21).
-- **Grade:** só as horas do horário de funcionamento (RF-19), não 24 h.
+- **Grade:** o dia do estúdio (RN-01), com rolagem (Assumption 1). Grade só no horário de funcionamento: spec seguinte
+  (E57·B, §17).
 - **Cartão do agendamento:** hora de início e fim, nome da cliente, serviço, ícone de status (no cartão pequeno só o
   ícone, com o nome no leitor de tela; ícones Lucide do `DESIGN.md` §5). Tocar abre o agendamento (spec do
   Agendamento).
-- **Cartão "Ocupado"** (só para quem tem a liberação de ocupação, §3): a palavra "Ocupado" e o horário; nada mais,
-  como na ficha (E55·3·A).
 - **Bloqueio na grade:** ícone `lock` e a palavra "Bloqueio", com o motivo se houver.
-- **Bloqueio · criar e alterar:** campos profissional*, data*, início*, fim*, motivo; Salvar · Cancelar. **Início e
+- **Bloqueio · criar e alterar:** campos profissional*, data*, início*, fim*, motivo, com os atalhos **Almoço · Folga ·
+  Reunião · Curso · Pessoal** que preenchem o motivo (E54·3, RF-22); Salvar · Cancelar. **Início e
   fim só por seletor de horários predefinidos, nunca digitados** (E54·5 trocada, RN-09). Novo bloqueio nasce com 1 h
   (E54·4, RN-10). Excluir no ⋮, em vermelho, com janelinha de confirmação e aviso depois. Entradas: "+ Novo" ›
   "Bloquear horário" e o toque num horário vazio (E54·1, RF-13); se o bloqueio terá também botão próprio, o Designer
@@ -138,25 +131,22 @@ novo") · sucesso (aviso depois de salvar ou excluir bloqueio, com "Desfazer" no
 |---|---|---|
 | RF-01 | A Agenda abre no dia de hoje, no fuso do estúdio. | `ARCHITECTURE.md` §11 |
 | RF-02 | A pessoa troca de dia (anterior, seguinte, calendário) e volta com **Hoje**. | `DESIGN.md` §6 e §7 |
-| RF-03 | Há uma coluna para cada pessoa ativa com papel profissional e para a dona; a recepção não é coluna (E26·3·A). **Equipe N de M** escolhe quais aparecem; N é o número à vista e M o total **das colunas que a pessoa pode ver** (§3: a profissional no padrão tem só a dela). | `DESIGN.md` §6 e §7; E26·3·A; ordem de 28/11 |
+| RF-03 | Há uma coluna para cada pessoa ativa com papel profissional e para a dona; a recepção não é coluna (E26·3·A). **Equipe N de M** escolhe quais aparecem; N é o número à vista e M o total **das colunas que a pessoa pode ver** (§3: a profissional tem só a dela). | `DESIGN.md` §6 e §7; E26·3·A; ordem de 28/11 |
 | RF-04 | A grade mostra os agendamentos e os bloqueios do dia de cada coluna à vista. | `docs/produto/agenda.md` |
 | RF-05 | O cartão mostra o status com o ícone do `DESIGN.md` §5 e o nome acessível. | `DESIGN.md` §5 e §9 |
 | RF-06 | **Filtros** por status e por bloqueio (mostrar ou esconder), com a pílula de contador de filtros ligados e "Limpar filtros". | `DESIGN.md` §5 e §7 |
 | RF-07 | Criar, alterar e excluir bloqueio único de uma profissional, com início e fim no mesmo dia. | `docs/produto/agenda.md` |
 | RF-08 | **+ Novo** (peça preta) abre as opções: "Novo agendamento" (leva ao fluxo do Agendamento) e "Bloquear horário" (abre o bloqueio); nenhuma outra opção sem pedido do dono. Tocar num cartão abre o agendamento. Sem a spec do Agendamento construída, "Novo agendamento" e o toque no cartão aparecem como "em desenvolvimento". | `DESIGN.md` §5 e §8; E55·4 trocada (§16) |
 | RF-09 | Toda ação passa pelas 6 portas e declara a chave da §3 (`agenda.ver`, `.criar`, `.editar`, `.remover`); a porta 3 confere a chave e entrega o alcance; criar, alterar e excluir bloqueio fica no registro (porta 6), sem dado pessoal nem o texto do motivo. | `ARCHITECTURE.md` §4; E42·A, ADR 0020 |
-| RF-10 | Com `agenda.ver` "próprios", a pessoa vê só a própria coluna; as outras não aparecem nem saem do servidor, salvo com a liberação de ocupação, que as mostra só como "Ocupado" (§3). Com alcance "próprios" de gravar, grava só bloqueio da própria coluna. | ordem de 28/11 (substitui a E26·1·B); E26·2·A |
+| RF-10 | Com `agenda.ver` "próprios", a pessoa vê só a própria coluna; as outras não aparecem nem saem do servidor, nem como "Ocupado" (§3). Com alcance "próprios" de gravar, grava só bloqueio da própria coluna. | ordem de 28/11 (substitui a E26·1·B); E58·A; E26·2·A |
 | RF-11 | A tela recebe as chaves que a pessoa tem só para esconder o que ela não pode usar (ex.: o ⋮ e a entrada de bloqueio nas colunas das outras); quem decide é a porta 3 e o banco. | ADR 0020 · D9; E43·A (`permissoes-e-pin.md` #11) |
 | RF-12 | Entrar no sistema (endereço `/`) abre a Agenda. | E55·2·A |
 | RF-13 | Tocar ou dar Enter num horário vazio de uma coluna abre um menu com "Novo agendamento" e "Bloquear horário", já com a hora e a pessoa da coluna; quem não pode gravar naquela coluna não vê o menu. | E54·1 (§16); E26·2·A; WCAG 2.1.1 |
 | RF-14 | Na coluna de hoje, uma linha marca a hora atual, no fuso do estúdio, com a hora na coluna das horas; a cor vem do `DESIGN.md` (Designer). | E54·2 (§16) |
 | RF-15 | No bloqueio, início e fim se escolhem só num seletor de horários predefinidos (RN-09); novo bloqueio nasce com 1 h e o fim anda junto quando o início passa dele (RN-10). | E54·4, E54·5 trocada (§16) |
-| RF-16 | No topo de cada coluna **completa**, o resumo da pessoa no dia ("3 atendimentos · 4 h 50 min"), sem valores; nunca nas colunas "Ocupado". Forma e lugar: da ficha nova, junto da RF-18. | E54·6, respondida junto da RF-18 (§16) |
-| RF-17 | O calendário da data marca os dias que têm agendamento ou bloqueio, só das colunas que a pessoa vê completas. Forma: da ficha nova, junto da RF-18. | E54·7, respondida junto da RF-18 (§16) |
-| RF-18 | **Ampliação de escopo.** A Agenda tem formatos de visão configuráveis, com prioridade em cards; inclui o modo "Lista" do dia no celular (E54·8). Quais formatos, o que se configura e onde: da ficha visual nova, com o "sim" do dono; até lá, nenhum formato além do Dia é construído. | E54·6/7/8 (§16); arquivo de exemplos do dono |
-| RF-19 | **Ampliação de escopo.** A grade mostra só as horas do horário de funcionamento da empresa ou da colaboradora, não 24 h. De onde vem o horário e o que acontece com item fora dele: dúvida E56·1 (§12); até a resposta, não se constrói. | ordem de 28/11 (§16) |
-| RF-20 | **Ampliação de escopo.** No celular, a Agenda tem a lupa de busca, como a busca do computador. O que a busca acha: dúvida E56·2 (§12); até a resposta, a lupa aparece "em desenvolvimento". | ordem de 28/11 (§16); `DESIGN.md` §5 (lupa sozinha, exceção da Agenda no celular) |
+| RF-16 a RF-20 | **Saíram desta spec** (formatos de visão em cards e modo "Lista", resumo da coluna, dias marcados no calendário, grade no horário de funcionamento, lupa no celular): vão para a spec seguinte **"Agenda · visões e horário de funcionamento"**. Aqui, o "Dia ▾" (outros formatos) e a lupa do celular aparecem "em desenvolvimento" (`DESIGN.md` §7 e §8). Os IDs ficam reservados. | E57·B (§17) |
 | RF-21 | O topo de cada coluna mostra o **nome de exibição** da pessoa, campo novo só para isto; sem tela de edição na v1 (módulo Equipe); em desenvolvimento, nomes fictícios. Nunca o e-mail. | E55·1·A |
+| RF-22 | No bloqueio, os atalhos **Almoço · Folga · Reunião · Curso · Pessoal** preenchem o motivo com um toque; o texto continua editável (RN-03). Nenhum atalho de saúde (sem "Médico"). Textos dos atalhos nos três idiomas (RNF-05). | E54·3 aprovada (§17) |
 
 ## 6. Regras de negócio (verificáveis)
 | ID | Regra |
@@ -202,7 +192,7 @@ Analista; quem decide é o Engenheiro de dados no plano, com ADR e revisão de o
 | CA-02 | O estúdio A não lê, cria, altera nem apaga bloqueio do estúdio B; bloqueio com profissional de outro estúdio é recusado. | isolamento, CI verde |
 | CA-03 | Sem login e sem papel no estúdio: nada é lido nem gravado; cada papel lê e grava só o que a §3 permite (ordem de 28/11 no lugar da E26·1·B, E26·2·A, E26·3·A), pela chave e pelo alcance, iguais no servidor e no banco (ADR 0020 · D7 e D8). | teste de banco e do servidor, CI verde |
 | CA-04 | Pedido que traz estúdio é recusado (`estudio_trocado`, contrato da camada de serviço, spec Entrar RF-15/CA-05), sem ler nem gravar nada. | teste do servidor |
-| CA-05 | Em 390 e 1440: `/` abre a Agenda em hoje; troca de dia e Hoje; Equipe N de M; filtros e "Limpar filtros"; "+ Novo" com as duas opções; menu do horário vazio por toque e por teclado; criar (só por seletor, nascendo com 1 h), alterar, conflito recusado e excluir bloqueio com "Desfazer"; nome de exibição no topo das colunas. | e2e, CI verde |
+| CA-05 | Em 390 e 1440: `/` abre a Agenda em hoje; troca de dia e Hoje; Equipe N de M; filtros e "Limpar filtros"; "+ Novo" com as duas opções; menu do horário vazio por toque e por teclado; criar (só por seletor, nascendo com 1 h, atalho de motivo), alterar, conflito recusado e excluir bloqueio com "Desfazer"; nome de exibição no topo das colunas. | e2e, CI verde |
 | CA-06 | Em 390 e 1440: estados carregando, vazio, sem resultado, sem profissional e erro aparecem como na §4. | e2e |
 | CA-07 | Uma só peça preta de ação por tela; nenhuma peça, cor ou nome fora do `DESIGN.md`. | checklist §10 do `DESIGN.md`, Revisor de design |
 | CA-08 | Checagem automática de acessibilidade sem falha nas duas larguras e status com nome acessível. | e2e |
@@ -210,9 +200,9 @@ Analista; quem decide é o Engenheiro de dados no plano, com ADR e revisão de o
 | CA-10 | Cada tabela da §7 tem ADR com saída, motivo, norma e quem conferiu; migration só para as copiadas ou reescritas. | `docs/adr/` × PR |
 | CA-11 | Nada aplicado no banco remoto; banco só local até a "Aprovação do merge". | histórico da CI |
 | CA-12 | Revisores sem "Bloqueia", veredito do QA e conferência do dono na prévia. | relatórios no PR |
-| CA-13 | Como profissional no padrão: a resposta do servidor não traz as colunas das outras (nem como "Ocupado"), nem resumo ou dias marcados delas, e a tela mostra só a coluna dela. Com a liberação de ocupação (em teste, pela matriz): as colunas das outras vêm sem cliente, serviço, status nem motivo; a tela mostra só "Ocupado", sem ⋮, e os filtros não mudam essas colunas. | teste do servidor e e2e, CI verde |
+| CA-13 | Como profissional: a resposta do servidor não traz as colunas das outras (nem como "Ocupado"), e a tela mostra só a coluna dela. | teste do servidor e e2e, CI verde |
 | CA-15 | Hora fora do passo, ou digitada, é recusada pelo servidor; a tela não tem campo de digitar hora. | unidade e teste do servidor |
-| CA-16 | RF-18, RF-19 e RF-20 só têm CA depois da ficha nova e das respostas E56·1 e E56·2; até lá, nada deles é construído. | spec × PR |
+| CA-16 | Nada de RF-16 a RF-20 é construído nesta spec; em 390 e 1440, os outros formatos do "Dia ▾" e a lupa do celular aparecem "em desenvolvimento". | spec × PR; e2e |
 | CA-14 | Cada regra do bloqueio no banco (RN-03, RN-04, RN-07, chave e alcance) é testada ao criar **e** ao alterar. | teste de banco, CI verde (E43·A, `regras-do-banco.md` #54) |
 
 ## 10. Dependências
@@ -228,9 +218,10 @@ Analista; quem decide é o Engenheiro de dados no plano, com ADR e revisão de o
 
 ## 11. Fora de escopo
 Os recursos "depois" da §2.1; marcar, remarcar, mudar status e cancelar agendamento (Agendamento); cadastro de
-profissional e expediente (Equipe), salvo o que a E56·1 decidir; tela de editar o nome de exibição (Equipe); tela de
-ajustar perfil (item 6a); unidades (`locations`); portal público; banco de produção e publicação. (A busca na Agenda
-saiu daqui: RF-20.)
+profissional e expediente (Equipe); tela de editar o nome de exibição (Equipe); tela de ajustar perfil, "ver as
+outras" e "ver ocupação" (item 6a, E58·A); unidades (`locations`); portal público; banco de produção e publicação.
+Formatos de visão em cards, resumo da coluna, dias marcados, grade no horário de funcionamento e busca pela lupa no
+celular: spec seguinte "Agenda · visões e horário de funcionamento" (E57·B).
 
 ## 12. Dúvidas ao dono (máx. 3)
 **Respondidas em 28/11/2026** (`docs/decisoes/2026-11-27-fundacao.md`, link
@@ -248,8 +239,14 @@ Equipe, fora de escopo, §11), e durante o desenvolvimento só o dono usa (E42·
 `papel` e `ativo` (`supabase/migrations/20261128002045_politicas_base.sql`, política `membros_alterar`), mas nenhum
 caminho do app usa isso. A pergunta vai ao dono na spec da Equipe; a Agenda não para.
 
-**Abertas em 28/11/2026 (ajustes 2, §16), juntas, cada uma com recomendação** (códigos E56, livres na `feat/agenda` em
-28/11; o Gerente de projeto confere antes de mandar):
+**Situação em 28/11/2026, depois da resposta do dono (§17):** nenhuma dúvida aberta nesta spec.
+- **E56·1 e E56·2:** saíram junto com RF-19 e RF-20 para a spec seguinte "Agenda · visões e horário de funcionamento"
+  (E57·B). O dono disse que não entendeu "grade só no horário de funcionamento"; o Gerente de projeto explica, e a
+  pergunta volta lá, não aqui.
+- **E56·3:** respondida pela aprovação da E54·3 ("E54·3: OK"): atalhos Almoço · Folga · Reunião · Curso · Pessoal, sem
+  "Médico" (RF-22). O "não entendi" do dono sobre a E56·3 fica coberto por essa resposta.
+
+Texto das E56 como foi feito, para a spec seguinte (histórico; E56·1 e E56·2 não valem como decisão aqui):
 - **E56·1 · De onde vem o horário de funcionamento (RF-19).** Hoje **não existe** no sistema: a tabela `estudios` tem
   só nome, moeda, idioma e fuso; `membros` não tem expediente; o expediente do antigo (`staff_shifts`) está adiado
   (§7, módulo Equipe), e "horário" é recurso do módulo Ajustes, que vem depois do núcleo.
@@ -269,7 +266,7 @@ caminho do app usa isso. A pergunta vai ao dono na spec da Equipe; a Agenda não
 
 ## 13. Assumptions (técnicas e de formato, à vista na aprovação)
 1. Grade com rolagem até a hora atual (ou ao primeiro item do dia); passos de 15 min no seletor de hora (RN-09). A
-   grade de 24 h vale só até a RF-19 ser construída (E56·1).
+   grade de 24 h vale nesta spec; a do horário de funcionamento vem na spec seguinte (E57·B).
 2. A escolha do "Equipe N de M" fica guardada no aparelho da pessoa, só com identificadores, sem dado pessoal.
 3. Formulário de bloqueio em painel à direita (480 px) no computador e folha de baixo no celular (`DESIGN.md` §8).
 4. Ferramenta de acessibilidade automática, teto de itens por dia e teto de idas ao banco: o Arquiteto fixa no plano,
@@ -307,10 +304,12 @@ sem motivo nas colunas das outras (§3) e trata as E26 como em aberto; precisa s
 Lista em [`ideias-do-antigo.md`](ideias-do-antigo.md): 8 ideias (E54·1 a E54·8; A = aprovar, B = não aprovar) e as descartadas, cada uma com o
 risco de vício. Só entram com a autorização do dono, item por item (`AGENTS.md` §3 regra 4). **Em 28/11 (§16):**
 E54·1, ·2 e ·4 aprovadas, com as travas fixadas na lista; E54·5 trocada (seletor, não digitação); E54·6, ·7 e ·8
-respondidas dentro da ampliação "formatos de visão" (RF-16 a RF-18, forma pela ficha nova); E54·3 sem resposta (E56·3). Cada aprovada é **reescrita** do nosso jeito,
+respondidas dentro da ampliação "formatos de visão", que foi para a spec seguinte (E57·B, §17); E54·3 aprovada em 28/11 (§17, RF-22). Cada aprovada é **reescrita** do nosso jeito,
 com ADR e revisão de outro papel (E16·1); nada se copia do antigo.
 
 ## 16. Clarifications · ajustes 2 (28/11/2026, respostas à ficha E55 e às ideias E54)
+> Histórico. Onde esta seção fala de "Ocupado", liberação no perfil, RF-16 a RF-20 e E56, vale a §17 (E57·B, E58·A).
+
 Escrito pelo Analista de requisitos (IEEE 29148 e BABOK). Resposta do dono, **28/11/2026**,
 https://claude.ai/code/session_018cV8b958nnbLyXPMKPeaNK, literal:
 
@@ -357,5 +356,23 @@ e de E56·1 e E56·2.
 **Para o Designer:** ficha nova com "+ Novo" (e se o bloqueio fica dentro ou separado), lupa no celular, se o
 "Agendar" da barra de baixo vira "+ Novo", cor da linha do "agora", formatos de visão (cards), resumo por coluna e dias
 marcados; a ficha atual cita Opções com "Bloquear horário" (E55·4·A), que deixou de valer.
-**Ampliação de escopo:** RF-18, RF-19 e RF-20 crescem a v1 da Agenda. O Gerente de projeto avalia se ficam nesta spec
-ou viram spec própria antes da construção.
+**Ampliação de escopo:** decidida pelo dono na §17 (E57·B): RF-16 a RF-20 vão para a spec seguinte.
+
+## 17. Clarifications · ajustes 3 (28/11/2026, respostas E54·3, E57 e E58)
+Escrito pelo Analista de requisitos (IEEE 29148 e BABOK). Resposta do dono, **28/11/2026**,
+https://claude.ai/code/session_018cV8b958nnbLyXPMKPeaNK, literal:
+
+> "E54·3: OK / E57: NAO entendi sobre "grade so no horario de funcionamento" / E57-B / E56-3: nao entendi como ficara
+> isso / E58-A / segue os exemplos fresha para ajudar a enriquecer o nosso."
+
+| Fala | Leitura registrada | O que muda | Tipo |
+|---|---|---|---|
+| "E54·3: OK" | E54·3 **aprovada**: atalhos Almoço · Folga · Reunião · Curso · Pessoal; sem "Médico" (dado de saúde) | §4, RF-22, CA-05, §15 | resposta |
+| "E56-3: nao entendi como ficara isso" | coberta pela E54·3 aprovada (E56·3·A); não volta como pergunta | §12 | resposta |
+| "E57-B" | RF-16 a RF-20 (formatos em cards e "Lista", resumo da coluna, dias marcados, grade no horário de funcionamento, lupa no celular) e as dúvidas E56·1 e E56·2 **saem desta spec** e vão para a spec seguinte **"Agenda · visões e horário de funcionamento"**; aqui, onde houver botão, "em desenvolvimento" | §2, §2.1, §4, §5, CA-16, §11, §12, Assumption 1 | resposta (escopo) |
+| "E57: NAO entendi sobre grade so no horario de funcionamento" | o assunto ficou para a spec seguinte; o Gerente de projeto explica ao dono | §12 | registro |
+| "E58-A" | a profissional vê **só a própria coluna**; "ver as outras" e "ver ocupação" entram com a tela de perfis (item 6a); **sem "Ocupado" nesta spec** | §3, §4, RF-10, CA-13, §11 | acesso (dono decidiu) |
+| "segue os exemplos fresha" | material de referência para a spec seguinte (visões); não chegou a esta conversa, não lido | nenhum requisito aqui | referência |
+
+**Para o Arquiteto (`plan.md`, `tasks.md` e ADR não foram tocados):** sai do plano a chave de ocupação e o cartão
+"Ocupado" (§3, CA-13); sai tudo de RF-16 a RF-20; entra RF-22 (atalhos de motivo, só texto, sem tabela nova).
