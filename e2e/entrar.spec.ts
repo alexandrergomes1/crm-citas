@@ -128,6 +128,54 @@ test('entrar com senha errada: frase única, senha limpa, foco na Senha (CA-19 e
   expect(await violacoes(page)).toEqual([])
 })
 
+test('Sua conta: aria-expanded fechado e aberto, Esc devolve o foco, setas e menu dentro da tela (revisão de código 1 e 2)', async ({
+  page,
+}, info) => {
+  const c = conta(info, 'um')
+  const celular = ehCelular(info)
+  await entrar(page, c)
+  await esperarPagina(page)
+  const botao = page.getByRole('button', { name: 'Sua conta' })
+  const caixa = celular ? page.getByRole('dialog', { name: 'Sua conta' }) : page.getByRole('menu', { name: 'Sua conta' })
+  await expect(botao).toHaveAttribute('aria-haspopup', celular ? 'dialog' : 'menu')
+  await expect(botao).toHaveAttribute('aria-expanded', 'false')
+
+  // Aberto por toque: aria-expanded true; Esc fecha, aria-expanded volta a false e o foco volta ao botão
+  await botao.click()
+  await expect(caixa).toBeVisible()
+  await expect(botao).toHaveAttribute('aria-expanded', 'true')
+  await page.keyboard.press('Escape')
+  await expect(caixa).toBeHidden()
+  await expect(botao).toHaveAttribute('aria-expanded', 'false')
+  await expect(botao).toBeFocused()
+  if (celular) return
+
+  // Computador: seta para baixo no botão abre o menu no primeiro item; as setas andam entre os itens
+  const itens = caixa.getByRole('menuitem')
+  await page.keyboard.press('ArrowDown')
+  await expect(caixa).toBeVisible()
+  await expect(botao).toHaveAttribute('aria-expanded', 'true')
+  await expect(itens.first()).toBeFocused()
+  await page.keyboard.press('ArrowUp')
+  await expect(itens.last()).toBeFocused()
+
+  // O menu fica dentro da tela, a --margem das bordas (DESIGN.md §4)
+  const caixaNaTela = (await caixa.boundingBox())!
+  const largura = await page.evaluate(() => document.documentElement.clientWidth)
+  const margem = await page.evaluate(() => Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--margem')))
+  expect(caixaNaTela.x).toBeGreaterThanOrEqual(margem - 0.5)
+  expect(caixaNaTela.x + caixaNaTela.width).toBeLessThanOrEqual(largura - margem + 0.5)
+
+  await page.keyboard.press('Escape')
+  await expect(caixa).toBeHidden()
+  await expect(botao).toBeFocused()
+  // Seta para cima no botão também abre o menu
+  await page.keyboard.press('ArrowUp')
+  await expect(itens.first()).toBeFocused()
+  await capturar(page, info, 'sua-conta-teclado')
+  expect(await violacoes(page)).toEqual([])
+})
+
 test('sair: volta a Entrar, o cookie some e voltar no navegador não mostra dado (CA-13, CA-19 sair)', async ({
   page,
   context,

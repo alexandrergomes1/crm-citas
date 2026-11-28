@@ -1,7 +1,7 @@
 // Sua conta (spec RF-14, RF-30; ficha E41; DESIGN.md §6, §8, §8b "Sua conta"): a barra com a bolinha da pessoa e o
 // menu (computador) ou a folha (celular). Itens na ordem do §8b; Minha conta, Preferências e Meu faturamento
 // esmaecidos com "em desenvolvimento" (aria-disabled); "Trocar de estúdio" só com mais de um estúdio.
-import { useEffect, useId, useRef, useState, type KeyboardEvent } from 'react'
+import { useEffect, useId, useLayoutEffect, useRef, useState, type KeyboardEvent } from 'react'
 import type { Textos } from '@/app/i18n/textos'
 import { Folha } from '@/app/ui/camadas'
 import { SuaConta } from '@/app/ui/conteudo'
@@ -47,6 +47,7 @@ export function MenuSuaConta({ textos, inicial, quantosEstudios, onTrocar, onSai
   const botao = useRef<HTMLButtonElement>(null)
   const raiz = useRef<HTMLDivElement>(null)
   const refs = useRef<Array<HTMLButtonElement | null>>([])
+  const lista = useRef<HTMLDivElement>(null)
   const idMenu = useId()
   const itens = itensDaConta(textos, quantosEstudios)
   const nome = textos.suaConta.nome
@@ -60,6 +61,37 @@ export function MenuSuaConta({ textos, inicial, quantosEstudios, onTrocar, onSai
     if (aberto === 'menu') el.setAttribute('aria-controls', idMenu)
     else el.removeAttribute('aria-controls')
   }, [aberto, idMenu])
+
+  // O menu aberto fica dentro da tela, a --margem de cada borda (DESIGN.md §4), como o MenuAcoes de
+  // src/app/ui/camadas.tsx: desloca só o que sobrar (revisão de código 2)
+  useLayoutEffect(() => {
+    const el = lista.current
+    if (aberto !== 'menu' || !el) return
+    el.style.setProperty('--desloca-menu', '0')
+    const margem = Number.parseFloat(getComputedStyle(el).getPropertyValue('--margem')) || 0
+    const r = el.getBoundingClientRect()
+    const largura = document.documentElement.clientWidth
+    let desloca = 0
+    if (r.right > largura - margem) desloca = largura - margem - r.right
+    if (r.left + desloca < margem) desloca = margem - r.left
+    el.style.setProperty('--desloca-menu', `${desloca}px`)
+  }, [aberto])
+
+  // Seta para baixo ou para cima no botão abre o menu no primeiro item (padrão Menu Button do APG; igual ao
+  // MenuAcoes). A peça SuaConta (item 4) não recebe onKeyDown: a escuta vai direto no botão. No celular o botão
+  // abre uma folha (diálogo), que não usa setas.
+  useEffect(() => {
+    const el = botao.current
+    if (!el) return
+    function tecla(evento: globalThis.KeyboardEvent) {
+      if ((evento.key === 'ArrowDown' || evento.key === 'ArrowUp') && ehComputador()) {
+        evento.preventDefault()
+        setAberto('menu')
+      }
+    }
+    el.addEventListener('keydown', tecla)
+    return () => el.removeEventListener('keydown', tecla)
+  }, [])
 
   useEffect(() => {
     if (aberto !== 'menu') return
@@ -116,6 +148,7 @@ export function MenuSuaConta({ textos, inicial, quantosEstudios, onTrocar, onSai
         onClick={() => setAberto((a) => (a ? null : ehComputador() ? 'menu' : 'folha'))}
       />
       <div
+        ref={lista}
         id={idMenu}
         role="menu"
         aria-label={nome}
