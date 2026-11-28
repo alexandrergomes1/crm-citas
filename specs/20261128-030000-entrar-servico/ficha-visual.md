@@ -105,7 +105,25 @@ Botão **Entrar** · rótulos **E-mail** e **Senha** · título **Escolher estú
 
 ---
 
+### Respostas E47 (dono, 28/11/2026) · o texto vale sobre a imagem
+Fala literal: "e471a (recomendo trocar por outro nome e não estúdio ou clínica pq isso incha o produto a um mercado e não
+é isso. Não sei se empresa X seinla, avalie o mercado faz), e472a, e47-3a" ·
+https://claude.ai/code/session_018cV8b958nnbLyXPMKPeaNK. Gravado no `DESIGN.md` §5, §6 e §8b.
+- **E47·1·A + pedido:** a palavra visível "estúdio" sai das telas; no lugar, **empresa** (pt, es) e **business** (en),
+  escolhida pelo Designer por delegação do dono (motivo e fontes no `DESIGN.md` §6). A tela passa a se chamar
+  **Escolher empresa**; "Trocar de empresa", "Carregando empresas", "2 empresas". A letra do quadradinho pula a palavra
+  genérica do começo ("Estúdio Aurora" → A, "Estúdio Lírio" → L; regra exata no §8b).
+- **E47·2·A:** bolinha de Sua conta sem e-mail mostra o ícone `user`.
+- **E47·3·A:** a tela inicial fica só com a barra do topo, sem o texto "crm-citas".
+- **Imagens:** as capturas acima são de antes do E47 e mostram "estúdio", a letra "E" no quadradinho e "Estúdio Aurora"/
+  "Estúdio Lírio"; não foram refeitas. **Vale este texto e o `DESIGN.md`.** Onde a ficha acima diz "estúdio" como nome
+  visível, leia "empresa".
+
+---
+
 ## Não verificado
+- **E47:** as imagens não foram refeitas com "empresa", com a letra nova nem com o ícone `user`; o termo não foi testado
+  com quem usa o sistema; o título da aba do navegador ("crm-citas") não faz parte do E47·3·A e continua como está.
 - **Limite de tentativas:** sem imagem própria; usa o mesmo desenho do erro genérico (descrito acima).
 - **Folha Sua conta no celular:** sem véu escuro atrás, porque o `DESIGN.md` não define um (igual ao componente do item
   4). Assunto em aberto, sem mudança nesta tarefa.
