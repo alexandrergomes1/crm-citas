@@ -7,8 +7,11 @@
 Sistema de gestão (SaaS) para estúdios de estética. Como é montado: `ARCHITECTURE.md`. Aparência: `DESIGN.md`.
 Respostas do dono: `docs/decisoes/`. Idioma de desenvolvimento: português.
 
-**Comandos:** entram com a spec da fundação (ainda não há código). Já fixo: antes de enviar, a IA roda a
-checagem de tipos, o lint e os testes. **A IA nunca publica e nunca aplica mudança no banco remoto** (nem por linha
+**Comandos** (scripts do `package.json`): `pnpm install` · `pnpm dev` (app local) · `pnpm build` · `pnpm typecheck`
+(checagem de tipos) · `pnpm lint` · `pnpm test` (testes de unidade) · `pnpm test:e2e` (telas em 390 e 1440 px) ·
+`pnpm db:start` e `pnpm db:stop` (banco local) · `pnpm db:test` (testes do banco local). Antes de enviar, a IA roda
+`pnpm typecheck`, `pnpm lint` e `pnpm test`; mais `pnpm test:e2e` se mexeu em tela e `pnpm db:test` se mexeu em `supabase/`.
+**A IA nunca publica e nunca aplica mudança no banco remoto** (nem por linha
 de comando, nem por MCP): o banco só muda pela CI, e a publicação só com autorização do dono.
 
 ## 2. A equipe
