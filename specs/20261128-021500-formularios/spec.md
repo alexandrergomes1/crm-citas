@@ -83,7 +83,7 @@ Seções do módulo (`DESIGN.md` §7): Visão geral · Fichas · Modelos · Term
 **Estados de toda tela** (`DESIGN.md` §8): vazio ("Ainda não há fichas" · "Adicionar ficha"; "Ainda não há modelos" ·
 "Adicionar modelo") · sem resultado ("Limpar filtros") · carregando (depois de 0,3 s, anunciado ao leitor) · erro
 ("Tentar de novo"; a mensagem nunca mostra resposta da ficha) · sucesso (aviso embaixo).
-**Página da cliente:** link vencido, já usado ou inexistente mostram **a mesma** mensagem ("Este link não está mais
+**Página da cliente:** link vencido, de ficha já assinada, renovado ou inexistente mostram **a mesma** mensagem ("Este link não está mais
 disponível; fale com o estúdio"), para não revelar se a ficha existe; depois de assinar, "Ficha enviada" sem repetir as
 respostas.
 
@@ -101,31 +101,32 @@ fica para depois).
 | RF-03 | **Versão do modelo:** toda edição que muda título, perguntas ou termo cria uma nova versão; versões anteriores não mudam nunca. Cada ficha fica presa à versão com que foi criada e é mostrada sempre com as perguntas e o termo daquela versão. | candidata; RGPD art. 7(1) (provar o que a cliente aceitou) |
 | RF-04 | Modelo arquivado não serve para ficha nova; as fichas já feitas continuam. Excluir modelo só se nunca foi usado. | Assumption 3 |
 | RF-05 | Criar ficha: escolher uma cliente (de Clientes) e um modelo ativo; a ficha nasce "Aguardando a cliente". | candidata |
-| RF-06 | A cliente preenche e assina pelo meio da E29·1. Se E29·1·A: link individual, que só abre aquela ficha, vale 7 dias e uma vez só; "Copiar link" o entrega à equipe; o link pode ser renovado (o anterior deixa de valer). | E29·1 |
+| RF-06 | A cliente preenche e assina pelo meio da E29·1. Se E29·1·A: link individual, que só abre aquela ficha e vale 7 dias **até a assinatura** (antes de assinar, a cliente pode abrir de novo dentro do prazo; assinada, o link deixa de valer); "Copiar link" o entrega à equipe; o link pode ser renovado (o anterior deixa de valer). | E29·1 |
 | RF-07 | Ao assinar, o servidor confere: respostas obrigatórias preenchidas, tipos e tamanhos válidos, caixinha do termo marcada pela cliente (nunca marcada de início) e a assinatura da E29·3; falhando algo, nada se grava. | RGPD art. 7 e art. 9(2)(a); ASVS V5.1 |
 | RF-08 | **Prova do consentimento:** grava-se a versão do modelo e do termo aceito, a data e a hora do servidor e o meio (link ou estúdio). Endereço IP e dados do aparelho **não** se gravam. | RGPD art. 7(1) e art. 5(1)(c) |
-| RF-09 | Assinada, a ficha passa a "Concluída" e as respostas, o termo e a assinatura **não mudam e não se apagam** pelo app; erro se trata como manda a E29·3, sempre guardando a original. | integridade (ASVS V8; RGPD art. 5(1)(d) e art. 16); E29·3 |
+| RF-09 | Assinada, a ficha passa a "Concluída" e as respostas, o termo e a assinatura **não mudam e não se apagam** pelo app; erro se trata como manda a E29·3, sempre guardando a original. | integridade (RGPD art. 5(1)(d) e art. 16); E29·3 |
 | RF-10 | Ficha "Aguardando a cliente" pode ser excluída, com janelinha de confirmação; o link deixa de valer na hora. | `DESIGN.md` §6 e §8 |
 | RF-11 | Quem vê o quê (modelos, fichas, respostas) segue a E29·2; quem não pode ver as respostas recebe só a situação, também do banco (não só escondido na tela). | E29·2; ASVS V4.1.3; RGPD art. 9 |
 | RF-12 | **Registro de acesso (porta 6):** cada abertura das respostas de uma ficha, criação, exclusão, renovação de link e assinatura fica no registro com quem, qual ficha (pelo id) e quando, **sem** resposta, nome ou termo no texto. Exceção E6·1 e E6·2 como está: o dono no modo suporte não é registrado. | ASVS V8.3.5; RGPD art. 5(2); `ARCHITECTURE.md` §4 e §6 |
 | RF-13 | Busca da lista só por nome da cliente e título do modelo; as respostas nunca são buscáveis nem aparecem na lista. | `ARCHITECTURE.md` §7; RNF-01 |
-| RF-14 | Toda ação passa pelas 6 portas; o estúdio vem da sessão. Exceção só a página da cliente da E29·1·A: sem login, o link identifica uma única ficha e só permite ler as perguntas e assinar aquela ficha. | `ARCHITECTURE.md` §4; E29·1 |
+| RF-14 | Toda ação passa pelas 6 portas; o estúdio vem da sessão. Exceção só a página da cliente da E29·1·A: sem login, o link identifica uma única ficha e só permite ler as perguntas e assinar aquela ficha. **Caminho fixo:** o servidor chama uma função do banco que recebe o token, compara só o resumo (hash) dele e age numa única ficha (a do resumo), sem a chave de serviço do banco (`ARCHITECTURE.md` §4, porta 5); a função não aceita id de ficha nem de estúdio vindo do pedido. | `ARCHITECTURE.md` §4; E29·1 |
 
 ## 6. Requisitos não funcionais (segurança e privacidade)
 | ID | Requisito | Fonte |
 |---|---|---|
-| RNF-01 | **Cifra:** as respostas e a assinatura de toda ficha ficam cifradas no banco e em toda cópia dele; quem lê o banco direto (ou uma cópia) sem a chave não lê nenhuma resposta. Cifra com verificação de integridade (dado alterado no banco é recusado ao abrir). **Como cifrar é do plano**, decidido pelo Engenheiro de segurança e pelo Engenheiro de dados, com ADR. | E5·2; ASVS V6.1.2 e V6.2.7 (nível 3) |
-| RNF-02 | **Chave:** fora do banco, num cofre de segredo, nunca no repositório, no chat ou em registro; o código não a expõe; troca planejada, e fichas antigas continuam legíveis depois da troca. (Cofre que mora dentro do próprio banco não cumpre "fora do banco".) | `ARCHITECTURE.md` §7; `SECURITY.md` §2; ASVS V6.4.1 e V6.4.2 |
+| RNF-01 | **Cifra:** as respostas e a assinatura de toda ficha (inclusive o nome digitado na assinatura) ficam cifradas no banco e em toda cópia dele; quem lê o banco direto (ou uma cópia) sem a chave não lê nenhuma resposta. Cifra com verificação de integridade (dado alterado no banco é recusado ao abrir). **Como cifrar é do plano**, decidido pelo Engenheiro de segurança e pelo Engenheiro de dados, com ADR. | E5·2; ASVS V6.1.2 e V6.2.7 (nível 3) |
+| RNF-02 | **Chave:** fora do banco, num cofre externo de chaves (KMS) que **cifra e decifra ele mesmo**; o aplicativo nunca recebe nem segura a chave; nunca no repositório, no chat ou em registro; troca planejada, e fichas antigas continuam legíveis depois da troca. (Cofre que mora dentro do próprio banco não cumpre "fora do banco".) Se o plano não puder cumprir isso, a diferença e o motivo vão a ADR (CA-13), conferido pelo Auditor de risco. | `ARCHITECTURE.md` §7; `SECURITY.md` §2; ASVS V6.4.1 e V6.4.2 |
 | RNF-03 | Resposta de ficha nunca em endereço (URL), registro de erro, monitoramento, notificação ou armazenamento do navegador; páginas com resposta não ficam em cache. | `ARCHITECTURE.md` §7; ASVS V8.2.1, V8.2.2 e V8.3.1 |
-| RNF-04 | Página da cliente (E29·1·A): link impossível de adivinhar, guardado no banco de forma que o próprio banco não o revele; limite de tentativas por endereço e por estúdio. | ASVS V11.1.4; `ARCHITECTURE.md` §5 |
+| RNF-04 | Página da cliente (E29·1·A): (a) token com pelo menos 128 bits de fonte aleatória segura; no banco só o resumo (hash), nunca o token; (b) o token não fica no endereço que o servidor registra: vai depois do `#` ou é trocado na primeira requisição por cookie HttpOnly, Secure e SameSite, com redirecionamento para endereço limpo (o plano escolhe um dos dois, com ADR); (c) a página manda Referrer-Policy: no-referrer e Cache-Control: no-store e não carrega nenhum script de terceiros; (d) o token aparece mascarado em todo registro, inclusive de erro e de monitoramento. | ASVS V6.3.1, V8.2.1 e V8.3.1; `ARCHITECTURE.md` §7 |
+| RNF-04b | Limite de tentativas na página da cliente, por endereço e por estúdio. | ASVS V11.1.4; `ARCHITECTURE.md` §5 |
 | RNF-05 | Os demais requisitos de nível 3 da ASVS que valem para este módulo são listados pelo Engenheiro de segurança no plano, cada um com como se prova. | `ARCHITECTURE.md` §7; `SECURITY.md` |
 | RNF-06 | WCAG 2.2 AA também na página da cliente: rótulo em cada pergunta, erro com ícone e texto, toque 44, foco visível, situação nunca só por cor. | `DESIGN.md` §8 e §9 |
 | RNF-07 | Textos do sistema nos três idiomas de uso (pt, es, en); o conteúdo do modelo é escrito pelo estúdio no idioma dele. | E3·1; `ARCHITECTURE.md` §11 |
 | RNF-08 | Listas paginadas; limite de idas ao banco por tela. | `ARCHITECTURE.md` §5 e §11 |
 
 **Antes da produção (não bloqueia a construção no banco de desenvolvimento, que só tem dado fictício, E22·B):** DPIA
-(RGPD art. 35), contrato estúdio–plataforma (RGPD art. 28), retirada do consentimento (RGPD art. 7(3)) e o fluxo de
-"apagar os meus dados" (`SECURITY.md` §7). Nenhuma ficha real entra antes disso.
+(RGPD art. 35), contrato estúdio–plataforma (RGPD art. 28), retirada do consentimento (RGPD art. 7(3)), prazo de guarda das fichas (RGPD
+art. 5(1)(e)) e o fluxo de "apagar os meus dados" (`SECURITY.md` §7). Nenhuma ficha real entra antes disso.
 
 ## 7. Tabelas (do anexo A do item 3) · sugestão para o Engenheiro de dados decidir no plano (RG-02)
 Lido só para entender (E22·B, nada copiado): `crm-agenda/supabase/migrations/` (`20260610_004_anamnese.sql`,
@@ -150,16 +151,16 @@ Engenheiro de dados decide, com ADR.
 | CA-01 | Editar modelo cria versão nova; a ficha criada antes continua mostrando as perguntas e o termo da versão dela; versão antiga não se altera. | unidade (`src/domain`) e teste de banco |
 | CA-02 | Assinar sem obrigatória, com tipo inválido, com a caixinha do termo desmarcada ou sem a assinatura da E29·3 é recusado e nada se grava. | unidade e teste de servidor |
 | CA-03 | Ficha assinada: qualquer tentativa de alterar ou apagar respostas, termo ou assinatura é recusada pelo banco, não só pela tela. | teste de banco na CI |
-| CA-04 | **Cifra:** depois de assinar uma ficha com uma resposta conhecida, a leitura direta da tabela no banco (sem passar pelo app) não contém esse texto; sem a chave não se lê; com a chave trocada, a ficha antiga continua legível; dado alterado à mão no banco é recusado ao abrir. | teste automático na CI |
-| CA-05 | O estúdio A não lê, cria, altera nem apaga modelo, versão ou ficha do estúdio B; sem login ou sem papel, nada. | teste de isolamento na CI (molde do item 3) |
+| CA-04 | **Cifra:** depois de assinar uma ficha com uma resposta conhecida, a leitura direta da tabela no banco (sem passar pelo app) não contém esse texto; sem a chave não se lê; com a chave trocada, a ficha antiga continua legível; dado alterado à mão no banco é recusado ao abrir; o nome digitado na assinatura também não aparece em claro; o aplicativo não tem a chave (decifra só pelo cofre, RNF-02, ou a diferença está no ADR do CA-13). | teste automático na CI |
+| CA-05 | O estúdio A não lê, cria, altera nem apaga modelo, versão ou ficha do estúdio B; sem login ou sem papel, nada; o token de uma ficha não lê nem grava outra ficha, do mesmo estúdio ou de outro, e a função do link não usa a chave de serviço. | teste de isolamento na CI (molde do item 3) |
 | CA-06 | Cada papel × cada ação conforme E29·2; quem não pode ver respostas não as recebe nem pedindo direto ao servidor ou ao banco. | teste de servidor e de banco |
-| CA-07 | Link (E29·1·A): abre só a sua ficha; vencido, já usado, renovado ou excluído dá a mesma mensagem; nenhum dado da cliente no endereço nem na página; limite de tentativas age. | teste de servidor e e2e |
+| CA-07 | Link (E29·1·A): abre só a sua ficha; antes de assinar, abre de novo dentro do prazo; vencido, assinado, renovado ou excluído dá a mesma mensagem; token com ≥128 bits e só o resumo no banco; o endereço registrado pelo servidor não contém o token; a resposta tem Referrer-Policy: no-referrer e Cache-Control: no-store e nenhum script de terceiros; o token sai mascarado em todo registro, inclusive de erro; nenhum dado da cliente no endereço nem na página; limite de tentativas age. | teste de servidor e e2e |
 | CA-08 | Abrir respostas, criar, excluir, renovar link e assinar geram registro sem resposta, nome ou termo no texto. | teste automático e revisão do Engenheiro de segurança |
 | CA-09 | Nenhuma resposta em URL, registro de erro ou armazenamento do navegador; páginas com resposta sem cache. | teste e revisão do Engenheiro de segurança |
 | CA-10 | Ponta a ponta em 390 e 1440: criar modelo, editar (vira versão 2), criar ficha, a cliente preencher e assinar, ver a ficha (com e sem permissão), excluir pendente com janelinha. | Playwright (`e2e/`) |
 | CA-11 | Estados vazio, sem resultado, carregando, erro e sucesso presentes; checklist do `DESIGN.md` §10 sem falha. | e2e e Revisor de design |
 | CA-12 | Cada tabela do §7 tem ADR com saída, motivo, norma e o papel que conferiu; nada do antigo copiado sem ADR; nenhuma resposta do antigo trazida. | `docs/adr/` |
-| CA-13 | ADR da cifra e do cofre (onde fica a chave, como se troca), conferido pelo Auditor de risco. | `docs/adr/` e relatório |
+| CA-13 | ADR da cifra e do cofre (onde fica a chave, como se troca, quem cifra e decifra; qualquer diferença do RNF-02 com o motivo) e ADR da forma do token fora do endereço (RNF-04 b), conferidos pelo Auditor de risco. | `docs/adr/` e relatório |
 | CA-14 | Revisores do tipo sem "Bloqueia", veredito do QA e conferência do dono na prévia. | relatórios no PR |
 
 ## 9. Dependências
@@ -175,7 +176,7 @@ Engenheiro de dados decide, com ADR.
 ## 10. Dúvidas ao dono (máx. 3)
 **E29·1 · Como a cliente preenche a ficha** (acesso, dado de saúde)
 - **E29·1·A:** por link individual: a equipe copia o link e manda à cliente; ela preenche no próprio celular, sem login.
-  O link só abre aquela ficha, vale 7 dias e uma vez só.
+  O link só abre aquela ficha e vale 7 dias, até a cliente assinar.
 - **E29·1·B:** só no estúdio: a equipe abre a ficha no aparelho do estúdio e entrega à cliente; link fica para depois.
 - **Recomendo A:** a cliente nunca segura um aparelho com o sistema do estúdio aberto (menor acesso, ASVS V4.1.3) e o
   link é a forma da lista aprovada; o risco (link sem login) fica contido nas regras do RF-06 e RNF-04.
@@ -195,7 +196,7 @@ Engenheiro de dados decide, com ADR.
 - **E29·3·B:** como A, mais o traço da assinatura desenhado com o dedo (imagem guardada cifrada).
 - **E29·3·C:** como B, mais "corrigir ficha assinada" já nesta versão (a profissional corrige com motivo; a original
   fica guardada).
-- **Recomendo A:** assinatura eletrônica simples tem valor legal (eIDAS art. 25(1)), guarda menos dado (RGPD art.
+- **Recomendo A:** assinatura eletrônica simples tem valor legal (UE: eIDAS art. 25(1); Brasil: MP 2.200-2/2001, art. 10 §2º, não verificado no texto oficial), guarda menos dado (RGPD art.
   5(1)(c)) e a ficha nova cumpre o direito de correção (RGPD art. 16); B e C podem entrar depois sem perder fichas.
   **Desfaz-se** acrescentando B ou C em spec própria.
 
