@@ -151,12 +151,13 @@ reescrever.
   reabrindo a spec.
 
 **E39·2 · Dupla verificação (código do app autenticador) para a equipe do estúdio**
-- **E39·2·A:** agora não; só no painel admin (E4·2); a pergunta volta na spec da ficha de saúde (nível 3 da ASVS); exigir dupla verificação
-  da dona antes de dados reais.
+- **E39·2·A:** agora não; só no painel admin (E4·2); a pergunta volta na spec da ficha de saúde (nível 3 da ASVS);
+  a dupla verificação da dona é obrigatória antes de dados reais.
 - **E39·2·B:** opcional, cada pessoa liga se quiser (tela nova de configurar).
 - **E39·2·C:** obrigatória para a dona.
-- **Recomendo A:** menor escopo agora; o dado mais sensível (ficha) ainda não existe. Risco: conta só com senha.
-  Desfaz-se com spec nova.
+- **Recomendo A, com a condição:** a dupla verificação da dona é obrigatória antes de qualquer dado real. Motivo:
+  menor escopo agora; o dado mais sensível (ficha) ainda não existe. Risco até lá: conta só com senha. Desfaz-se com
+  spec nova.
 
 **E39·3 · Tempo da sessão**
 - **E39·3·A:** entra de novo a cada 12 h desde a entrada, sem corte por parada. Não cumpre sozinha a ASVS V3.3.2
