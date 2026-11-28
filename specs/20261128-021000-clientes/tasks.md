@@ -43,7 +43,7 @@
 |---|---|---|---|
 | 14 | `pnpm add` exato de `libphonenumber-js@1.13.17` (o `zod` vem da `feat/entrar-servico`) | Engenheiro de software | `package.json` e `pnpm-lock.yaml` só com ele |
 | 15 | `src/domain/clientes/*` e testes (§5): RN-01 a RN-04, RN-07, RN-08, busca, última visita, permissões, exportação, duplicado | Engenheiro de software | `pnpm test` verde (CA-01) |
-| 16 | Bloco `clientes` em `src/app/i18n/{pt,es,en}.ts` (pasta comum da Agenda, ADR 0006; R-9: se a pasta não existir, parar e relatar ao Gerente) | Engenheiro de software, com os textos da ficha | `i18n.test.ts` verde |
+| 16 | Só o bloco `clientes` em `src/app/i18n/{pt,es,en}.ts` (pasta comum que nasce na `feat/entrar-servico`, formato do ADR 0006; R-9: sem ela juntada, a tarefa espera) | Engenheiro de software, com os textos da ficha | teste de idiomas da pasta verde |
 | 17 | Rotas, páginas, `preferencias.ts`, `clientes.test.tsx`, pela ficha conferida; `src/data/clientes/exemplo-local.ts` para a tela rodar sem banco | Engenheiro de software | `pnpm typecheck`, `pnpm lint`, `pnpm test` verdes |
 | 18 | `e2e/clientes*.spec.ts` (§7.3) com o adaptador local; parte que depende de login marcada como pendente | Engenheiro de software | `pnpm test:e2e` verde em 390 e 1440 |
 

@@ -211,7 +211,7 @@ os campos, sem ganho para dado que não é de saúde na v1.
 `src/domain/clientes/*.test.ts` (um por arquivo do §5); `src/server/clientes/acoes.test.ts` (ordem das portas; 401 e 403;
 `org_id` no corpo recusado; profissional não recebe nome nem serviço que não vê; teto de idas; registro sem dado
 pessoal); `src/server/clientes/exportar.test.ts` (cabeçalhos, nome do arquivo, conteúdo só da cliente, nada gravado);
-`src/app/i18n/i18n.test.ts` (da Agenda, ADR 0006: pt, es, en com as mesmas chaves e marcadores, já cobre as chaves
+o teste de `src/app/i18n/` (da `feat/entrar-servico`, formato do ADR 0006: pt, es, en com as mesmas chaves e marcadores, já cobre as chaves
 novas de Clientes; não muda); `clientes.test.tsx`
 (`renderToString`, como no item 4).
 Varredura de dado pessoal (CA-08): os testes do servidor usam nome, telefone e e-mail fictícios marcados e conferem que
@@ -241,11 +241,11 @@ ficar vermelho; desfazer (como a tarefa 8 do item 3).
   adaptador de dados de exemplo local (como o RF-15 do Agendamento), e o e2e completo fica "não verificado".
 
 ## 8. Idiomas (RNF-04)
-Pasta comum `src/app/i18n/` da Agenda (ADR 0006 · D1; reuse, `AGENTS.md` §3 regra 6): Clientes só **acrescenta** o
+Pasta comum `src/app/i18n/`, que nasce na `feat/entrar-servico` no formato do ADR 0006 · D1 ( reuse, `AGENTS.md` §3 regra 6): Clientes só **acrescenta** o
 bloco de chaves `clientes` em `pt.ts` (fonte das chaves), `es.ts` e `en.ts`; usa `textos.ts` (escolha pelo idioma,
 marcadores, plural) e `formatar.ts` (data no idioma e no fuso do estúdio) como estão; o `i18n.test.ts` já confere as três.
 O idioma vem de `estudios.idioma`. Os textos em pt saem do `DESIGN.md` §6 e §8 e da spec; es e en, pelo Designer de
-produto, com revisão de outro papel. Dependência: a pasta só existe na `feat/agenda` (R-9).
+produto, com revisão de outro papel. Dependência: a `feat/entrar-servico` juntada (R-9).
 
 ## 9. Lista FECHADA de arquivos
 Fora desta lista nada muda (`AGENTS.md` §6). Arquivo novo que uma ferramenta crie fora daqui: parar e relatar.
@@ -286,7 +286,7 @@ perfil, botão de agendar daqui, "Exportar dados da cliente").
 `CHANGELOG.md`, `docs/decisoes/2026-11-27-fundacao.md` (respostas E28), pelo Documentador.
 
 **Intactos:** `src/*/AGENTS.md`, `src/*/CLAUDE.md`, `src/app/ui/**` e `src/app/estilos/**` (item 4), `src/server/portas/**`
-(E36·A), `src/app/i18n/{textos,formatar,i18n.test}.ts` (Agenda), as migrations e testes dos itens 2 e 3, `supabase/config.jsonc`, `eslint.config.mjs`, `src/domain/exemplo.ts`
+(E36·A), a base de `src/app/i18n/` (`feat/entrar-servico`), as migrations e testes dos itens 2 e 3, `supabase/config.jsonc`, `eslint.config.mjs`, `src/domain/exemplo.ts`
 (sai na spec que o Gerente indicar, para não haver conflito entre módulos paralelos), `ARCHITECTURE.md`, `SECURITY.md`,
 `.github/**`.
 
@@ -295,7 +295,7 @@ perfil, botão de agendar daqui, "Exportar dados da cliente").
 (item 4) e a `feat/entrar-servico` (E36·A), cada uma já com a `chore/fundacao-tecnica`; a Fase A espera só o item 3,
 a Fase B o item 4 e a Fase C a `feat/entrar-servico`; e junta de novo sempre que elas ganharem commit. PR de rascunho
 empilhado; nunca se junta nelas. Quando todas entrarem na `previas`, a base do PR passa à `previas`, antes do pedido de
-merge. A pasta `src/app/i18n/` vem da `feat/agenda` (R-9).
+merge. A pasta `src/app/i18n/` vem da `feat/entrar-servico` (R-9).
 
 ## 11. Papéis
 | Etapa | Papel |
@@ -359,6 +359,6 @@ merge. A pasta `src/app/i18n/` vem da `feat/agenda` (R-9).
   declarações por transação) é decisão de B-1; Clientes fica isolado disso atrás de `src/data/clientes/repositorio.ts`.
 - R-8 · Carimbo das migrations com 7 módulos em paralelo: conflito de ordem na hora do merge; o Engenheiro de dados
   regenera o carimbo se preciso (o ADR já tem o número 0008).
-- R-9 · A pasta `src/app/i18n/` só existe na `feat/agenda`, que não está nos merges de entrada. Se ela não estiver na
-  `previas` quando a tarefa 16 começar, parar e o Gerente decide: juntar a `feat/agenda` também, ou a pasta passar à
-  `feat/entrar-servico`. Clientes não cria a pasta.
+- R-9 · (decidido em 28/11 pelo Gerente) a pasta comum `src/app/i18n/` (carregamento, `pt.ts`, `es.ts`, `en.ts`, formato
+  do ADR 0006) nasce na `feat/entrar-servico`, que já precisa dela para a tela de entrar; Agenda e Clientes só acrescentam
+  o próprio bloco. Clientes não cria a pasta; se ela não estiver na branch quando a tarefa 16 começar, a tarefa espera.
