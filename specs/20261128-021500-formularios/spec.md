@@ -71,7 +71,7 @@ Seções do módulo (`DESIGN.md` §7): Visão geral · Fichas · Modelos · Term
 | Tela | Computador (1440) | Celular (390) |
 |---|---|---|
 | **Fichas** (lista) | barra do topo com "Adicionar" preto; barra da lista: "Buscar ficha" · "Modelo: Todos" · "Filtros ▾" (situação, data) · "Ordenar: …"; linha: bolinha da cliente, nome, modelo, situação (ícone + palavra), data; ⋮ da linha: "Ver ficha" · "Copiar link" (só pendente) · "Excluir" (só pendente, com janelinha) | "+ Adicionar" com contorno no topo; seletor de modelo; funil |
-| **Adicionar ficha** | painel à direita (480 px): cliente ("Buscar cliente"), modelo; "Salvar" cria a ficha "Aguardando a cliente" e mostra o próximo passo da E29·1 | folha de baixo, mesmo conteúdo |
+| **Adicionar ficha** | painel à direita (480 px): cliente ("Buscar cliente", só com as clientes que a pessoa pode ver, RF-05), modelo; "Salvar" cria a ficha "Aguardando a cliente" e mostra o próximo passo da E29·1 | folha de baixo, mesmo conteúdo |
 | **Ver ficha** | painel à direita: situação, modelo e versão, data; respostas e termo aceito **só para quem pode ver** (§3); para os outros, só a situação | tela de nível 2 com ‹ |
 | **Modelos** (lista) | "Adicionar" preto; linha: título, versão, nº de perguntas, ativo ou arquivado; ⋮: Editar · Duplicar · Arquivar · Excluir (`DESIGN.md` §6) | "+ Adicionar" com contorno |
 | **Editor de modelo** | título; perguntas (texto da pergunta, tipo, obrigatória, opções); termo de consentimento (obrigatório); "Salvar" e "Cancelar" | igual, uma coluna |
@@ -100,7 +100,7 @@ fica para depois).
 | RF-02 | Tipos de pergunta: texto curto, texto longo, sim/não, escolha única, escolha múltipla; cada pergunta pode ser obrigatória. | Assumption 1 |
 | RF-03 | **Versão do modelo:** toda edição que muda título, perguntas ou termo cria uma nova versão; versões anteriores não mudam nunca. Cada ficha fica presa à versão com que foi criada e é mostrada sempre com as perguntas e o termo daquela versão. | candidata; RGPD art. 7(1) (provar o que a cliente aceitou) |
 | RF-04 | Modelo arquivado não serve para ficha nova; as fichas já feitas continuam. Excluir modelo só se nunca foi usado. | Assumption 3 |
-| RF-05 | Criar ficha: escolher uma cliente (de Clientes) e um modelo ativo; a ficha nasce "Aguardando a cliente". | candidata |
+| RF-05 | Criar ficha: escolher uma cliente (de Clientes) e um modelo ativo; a ficha nasce "Aguardando a cliente". Em "Buscar cliente", cada papel acha só as clientes que pode ver em Clientes: a profissional, só as que a E28·2 lhe permite (filtro feito no servidor e no banco, não só na tela). | candidata |
 | RF-06 | A cliente preenche e assina pelo meio da E29·1. Se E29·1·A: link individual, que só abre aquela ficha e vale 7 dias **até a assinatura** (antes de assinar, a cliente pode abrir de novo dentro do prazo; assinada, o link deixa de valer); "Copiar link" o entrega à equipe; o link pode ser renovado (o anterior deixa de valer). | E29·1 |
 | RF-07 | Ao assinar, o servidor confere: respostas obrigatórias preenchidas, tipos e tamanhos válidos, caixinha do termo marcada pela cliente (nunca marcada de início) e a assinatura da E29·3; falhando algo, nada se grava. | RGPD art. 7 e art. 9(2)(a); ASVS V5.1 |
 | RF-08 | **Prova do consentimento:** grava-se a versão do modelo e do termo aceito, a data e a hora do servidor e o meio (link ou estúdio). Endereço IP e dados do aparelho **não** se gravam. | RGPD art. 7(1) e art. 5(1)(c) |
@@ -154,6 +154,7 @@ Engenheiro de dados decide, com ADR.
 | CA-04 | **Cifra:** depois de assinar uma ficha com uma resposta conhecida, a leitura direta da tabela no banco (sem passar pelo app) não contém esse texto; sem a chave não se lê; com a chave trocada, a ficha antiga continua legível; dado alterado à mão no banco é recusado ao abrir; o nome digitado na assinatura também não aparece em claro; o aplicativo não tem a chave (decifra só pelo cofre, RNF-02, ou a diferença está no ADR do CA-13). | teste automático na CI |
 | CA-05 | O estúdio A não lê, cria, altera nem apaga modelo, versão ou ficha do estúdio B; sem login ou sem papel, nada; o token de uma ficha não lê nem grava outra ficha, do mesmo estúdio ou de outro, e a função do link não usa a chave de serviço. | teste de isolamento na CI (molde do item 3) |
 | CA-06 | Cada papel × cada ação conforme E29·2; quem não pode ver respostas não as recebe nem pedindo direto ao servidor ou ao banco. | teste de servidor e de banco |
+| CA-06b | A profissional, em "Buscar cliente", não acha cliente que a E28·2 não lhe deixa ver, nem pedindo direto ao servidor. | teste de servidor e de banco |
 | CA-07 | Link (E29·1·A): abre só a sua ficha; antes de assinar, abre de novo dentro do prazo; vencido, assinado, renovado ou excluído dá a mesma mensagem; token com ≥128 bits e só o resumo no banco; o endereço registrado pelo servidor não contém o token; a resposta tem Referrer-Policy: no-referrer e Cache-Control: no-store e nenhum script de terceiros; o token sai mascarado em todo registro, inclusive de erro; nenhum dado da cliente no endereço nem na página; limite de tentativas age. | teste de servidor e e2e |
 | CA-08 | Abrir respostas, criar, excluir, renovar link e assinar geram registro sem resposta, nome ou termo no texto. | teste automático e revisão do Engenheiro de segurança |
 | CA-09 | Nenhuma resposta em URL, registro de erro ou armazenamento do navegador; páginas com resposta sem cache. | teste e revisão do Engenheiro de segurança |
@@ -166,8 +167,8 @@ Engenheiro de dados decide, com ADR.
 ## 9. Dependências
 - **Item 2** (CI, app vazio, Spec Kit) · **item 3** (estúdio, membros, papéis, função de checagem, molde do teste de
   isolamento) · **item 4** (design system no código).
-- **Clientes:** a tabela e a busca da cliente (RF-05). **Agendamento:** só se E29·2·A (a profissional vê as fichas das
-  clientes que têm agendamento com ela).
+- **Clientes:** a tabela, a busca da cliente e a regra da E28·2 (RF-05). **Agendamento:** só se E29·2·A (a profissional
+  vê as fichas das clientes que já atendeu ou tem marcadas com ela).
 - **Cofre de segredo** para a chave da cifra, fora do banco (RNF-02): escolhido no plano, confirmado com o dono se for
   ferramenta nova (`ARCHITECTURE.md` §12).
 - **E22·B:** leitura do antigo e ADR por tabela. A página da cliente (E29·1·A) é uma página só, não o Portal público
@@ -182,13 +183,18 @@ Engenheiro de dados decide, com ADR.
   link é a forma da lista aprovada; o risco (link sem login) fica contido nas regras do RF-06 e RNF-04.
   **Desfaz-se** desligando a página do link; as fichas já assinadas ficam.
 
-**E29·2 · Quem vê as respostas da ficha de saúde** (acesso, dado de saúde)
+**E29·2 · Quem vê as respostas da ficha de saúde** (acesso, dado de saúde) · **vai ao dono junto da E26·1 da Agenda**
+(o que a profissional vê na Agenda) **e da E28·2 de Clientes** (o que a profissional vê em Clientes); as três respostas
+têm de ser coerentes.
 - **E29·2·A:** dona vê tudo e é a única que cria e edita modelos; profissional cria ficha e vê as respostas só das
-  clientes que têm agendamento com ela (qualquer data); recepção cria ficha e copia o link, mas vê só a situação.
-- **E29·2·B:** como A, mas a profissional vê as respostas de todas as clientes do estúdio.
-- **E29·2·C:** todos os papéis veem tudo.
-- **Recomendo A:** mínimo necessário para dado de saúde (RGPD art. 5(1)(c) e art. 9; ASVS V4.1.3). **Desfaz-se**
-  mudando a permissão do papel. A E6·2 (dono no modo suporte) vale como está em todas as opções.
+  clientes que já atendeu ou tem marcadas com ela; recepção cria ficha e copia o link, mas vê só a situação.
+  Coerente com E26·1·B e E28·2·B.
+- **E29·2·B:** como A, mas a profissional vê as respostas de todas as clientes do estúdio. Choca com E28·2·B (veria a
+  ficha de saúde de cliente que nem vê em Clientes); só coerente com E28·2·A ou C.
+- **E29·2·C:** todos os papéis veem tudo. Choca com E28·2·B pelo mesmo motivo e expõe dado de saúde à recepção.
+- **Recomendo A, junto com E26·1·B e E28·2·B:** mínimo necessário para dado de saúde (RGPD art. 5(1)(c) e art. 9;
+  OWASP ASVS V4.1.3, menor acesso). **Desfaz-se** mudando a permissão do papel. A E6·2 (dono no modo suporte) vale
+  como está em todas as opções.
 
 **E29·3 · Assinatura e erro numa ficha assinada** (dado de saúde, tela)
 - **E29·3·A:** a cliente assina marcando a caixinha do termo e digitando o nome completo; ficha assinada não muda;
@@ -196,7 +202,7 @@ Engenheiro de dados decide, com ADR.
 - **E29·3·B:** como A, mais o traço da assinatura desenhado com o dedo (imagem guardada cifrada).
 - **E29·3·C:** como B, mais "corrigir ficha assinada" já nesta versão (a profissional corrige com motivo; a original
   fica guardada).
-- **Recomendo A:** assinatura eletrônica simples tem valor legal (UE: eIDAS art. 25(1); Brasil: MP 2.200-2/2001, art. 10 §2º, não verificado no texto oficial), guarda menos dado (RGPD art.
+- **Recomendo A:** assinatura eletrônica simples tem valor legal (UE: eIDAS art. 25(1); base legal no Brasil a confirmar), guarda menos dado (RGPD art.
   5(1)(c)) e a ficha nova cumpre o direito de correção (RGPD art. 16); B e C podem entrar depois sem perder fichas.
   **Desfaz-se** acrescentando B ou C em spec própria.
 
