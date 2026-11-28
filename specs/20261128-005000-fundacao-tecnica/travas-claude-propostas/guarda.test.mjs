@@ -99,6 +99,33 @@ const casos = [
   ['Read README passa', { tool_name: 'Read', tool_input: { file_path: '/p/README.md' } }, amb(), 'passa'],
   ['Write .dev.vars barra', { tool_name: 'Write', tool_input: { file_path: '/p/.dev.vars' } }, amb(), 'barra'],
   ['rm -rf / barra', bash('rm -rf /'), amb(), 'barra'],
+  ['cat .e* (curinga) barra', bash('cat .e*'), amb(), 'barra'],
+  ['cat .* (curinga) barra', bash('cat .*'), amb(), 'barra'],
+  ['cat *.ts (curinga sem segredo) passa', bash('cat src/*.ts'), amb(), 'passa'],
+  ['Glob **/.e* barra', { tool_name: 'Glob', tool_input: { pattern: '**/.e*' } }, amb(), 'barra'],
+  ['Grep com glob *.ts passa', { tool_name: 'Grep', tool_input: { pattern: 'x', glob: '*.ts' } }, amb(), 'passa'],
+  // A trava não se desliga sozinha
+  ['Edit .claude/settings.json barra', { tool_name: 'Edit', tool_input: { file_path: '/p/.claude/settings.json' } }, amb(), 'barra'],
+  ['Write .claude/settings.local.json barra', { tool_name: 'Write', tool_input: { file_path: '/p/.claude/settings.local.json' } }, amb(), 'barra'],
+  ['Write .claude/hooks/guarda.mjs barra', { tool_name: 'Write', tool_input: { file_path: '/p/.claude/hooks/guarda.mjs' } }, amb(), 'barra'],
+  ['Edit .githooks/pre-push.mjs barra', { tool_name: 'Edit', tool_input: { file_path: '/p/.githooks/pre-push.mjs' } }, amb(), 'barra'],
+  ['Edit .claude/agents/x.md passa (não é trava)', { tool_name: 'Edit', tool_input: { file_path: '/p/.claude/agents/x.md' } }, amb(), 'passa'],
+  ['echo > .claude/settings.json barra', bash('echo {} > .claude/settings.json'), amb(), 'barra'],
+  ['rm .githooks/pre-push barra', bash('rm .githooks/pre-push'), amb(), 'barra'],
+  ['rodar o teste do gancho com saída em arquivo passa', bash('node .githooks/pre-push.test.mjs > /tmp/saida.txt'), amb(), 'passa'],
+  ['MCP grava em .claude/hooks barra', { tool_name: 'mcp__github__create_or_update_file', tool_input: { owner: 'd', repo: 'r', branch: 'feat/agenda-filtro', path: '.claude/hooks/guarda.mjs' } }, amb(), 'barra'],
+  // Proteção de branch
+  ['gh api -X DELETE em rulesets barra', bash('gh api -X DELETE repos/dono/repo/rulesets/1'), amb(), 'barra'],
+  ['gh api PUT em branches/x/protection barra', bash('gh api --method PUT repos/dono/repo/branches/previas/protection --input p.json'), amb(), 'barra'],
+  ['gh api lendo rulesets passa', bash('gh api repos/dono/repo/rulesets'), amb(), 'passa'],
+  // MCP de Supabase e Vercel
+  ['Supabase deploy_edge_function barra', { tool_name: 'mcp__supabase__deploy_edge_function', tool_input: {} }, amb(), 'barra'],
+  ['Supabase create_branch barra', { tool_name: 'mcp__plugin_supabase_supabase__create_branch', tool_input: {} }, amb(), 'barra'],
+  ['Supabase merge_branch barra', { tool_name: 'mcp__supabase__merge_branch', tool_input: {} }, amb(), 'barra'],
+  ['Supabase list_tables passa', { tool_name: 'mcp__supabase__list_tables', tool_input: {} }, amb(), 'passa'],
+  ['Supabase search_docs passa', { tool_name: 'mcp__supabase__search_docs', tool_input: {} }, amb(), 'passa'],
+  ['Vercel ferramenta que não lê (promote) barra', { tool_name: 'mcp__Vercel__promote_deployment', tool_input: {} }, amb(), 'barra'],
+  ['Vercel list_deployments passa', { tool_name: 'mcp__Vercel__list_deployments', tool_input: {} }, amb(), 'passa'],
   // Migrations e workflows
   ['editar migration já na previas barra', { tool_name: 'Edit', tool_input: { file_path: '/p/supabase/migrations/1_a.sql' } },
     amb({ git: { 'rev-parse --verify --quiet origin/previas': 'abc', 'cat-file -e origin/previas:supabase/migrations/1_a.sql': '' } }), 'barra'],
@@ -131,7 +158,9 @@ const casos = [
 ];
 
 let falhas = 0;
+let total = 0;
 const conta = (nome, ok, detalhe = '') => {
+  total += 1;
   if (!ok) falhas += 1;
   console.log(`${ok ? 'ok   ' : 'FALHA'} ${nome}${ok ? '' : ` ${detalhe}`}`);
 };
@@ -150,12 +179,12 @@ const roda = (input, dir = raiz) => spawnSync(process.execPath, [join(aqui, 'gua
 }).status;
 conta('processo: push à main sai com 2', roda(bash('git push origin main')) === 2);
 conta('processo: ler o README sai com 0', roda({ tool_name: 'Read', tool_input: { file_path: 'README.md' } }) === 0);
-conta('processo: entrada ilegível comum sai com 0', roda('isto não é json') === 0);
-conta('processo: entrada ilegível de banco sai com 2', roda('execute_sql {') === 2);
+conta('processo: entrada que não é JSON sai com 2 (falha fechada)', roda('isto não é json') === 2);
+conta('processo: entrada vazia sai com 2', roda('') === 2);
+conta('processo: JSON que não é objeto sai com 2', roda('null') === 2);
 const vazia = mkdtempSync(join(tmpdir(), 'guarda sem regras-'));
 conta('processo: sem .githooks/pre-push.mjs, barra (saída 2)', roda({ tool_name: 'Read', tool_input: { file_path: 'README.md' } }, vazia) === 2);
 rmSync(vazia, { recursive: true, force: true });
 
-const total = casos.length + 5;
 console.log(`\n${total - falhas}/${total} casos certos`);
 process.exit(falhas ? 1 : 0);

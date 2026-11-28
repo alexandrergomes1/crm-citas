@@ -21,9 +21,31 @@ const MCP_GRAVA_BRANCH = /^mcp__.+__(push_files|create_or_update_file|delete_fil
 const MCP_ABRE_PR = /^mcp__.+__create_pull_request$/i;
 const MCP_FUNDE_PR = /^mcp__.+__merge_pull_request$/i;
 const MCP_MERGE_AUTOMATICO = /^mcp__.+__enable_pr_auto_merge$/i;
+// MCP do Supabase e da Vercel: só passa o que lê (lista fechada por prefixo); o resto barra, porque muda o
+// remoto ou publica. Barrados assim, entre outros (nomes lidos em supabase.com/docs/guides/getting-started/mcp
+// em 28/11/2026): deploy_edge_function, create_edge_function_secret, create/delete/merge/rebase/reset_branch,
+// create/pause/restore_project, update_storage_config, run_notebook, confirm_cost. Da Vercel, a doc oficial só
+// lista ferramentas de leitura; qualquer outra (publicar, promover, voltar versão, variável, domínio) barra.
+const MCP_SO_LEITURA = /^((get|list|search|query)_[a-z_]*|generate_typescript_types|web_fetch_vercel_url)$/i;
+// Nome MCP = mcp__<servidor>__<ferramenta>; o servidor pode ter "_" (ex.: plugin_supabase_supabase).
+export const mcpRemotoQueMuda = (tool) => {
+  const m = /^mcp__(.+)__([^_].*?)$/.exec(String(tool));
+  return Boolean(m && /supabase|vercel/i.test(m[1]) && !MCP_SO_LEITURA.test(m[2].split('__').pop()));
+};
 
 // Arquivo de segredos: .env, .env.<algo>, .envrc, .dev.vars (o .example não é segredo).
-export const ehSegredo = (a) => /(^|[/\\*{,])(\.env([.*]|$)|\.envrc$|\.dev\.vars([.*]|$))/.test(a) && !/\.example$/.test(a);
+const SEGREDOS = ['.env', '.envrc', '.dev.vars'];
+export const ehSegredo = (a) => {
+  const s = String(a);
+  if (/(^|[/\\*{,])(\.env([.*]|$)|\.envrc$|\.dev\.vars([.*]|$))/.test(s) && !/\.example$/.test(s)) return true;
+  // Curinga que pode casar um segredo (ex.: .e*, .*, .dev.v?): o trecho antes do curinga é começo de um nome.
+  const ultimo = s.split(/[/\\]/).pop() ?? '';
+  if (!/[*?[]/.test(ultimo)) return false;
+  const antes = ultimo.split(/[*?[]/)[0];
+  return antes.startsWith('.') && SEGREDOS.some((n) => n.startsWith(antes));
+};
+// A trava não se desliga sozinha: a IA não grava nas próprias travas nem nas regras de envio.
+export const ehTrava = (a) => /(^|[/\\])\.claude[/\\](settings[^/\\]*\.json$|hooks([/\\]|$))|(^|[/\\])\.githooks([/\\]|$)/.test(String(a));
 const WORKFLOW = /(^|[\\/])\.github[\\/]workflows[\\/]/;
 const relWorkflow = (f) => { const n = String(f).replace(/\\/g, '/'); return n.slice(n.indexOf('.github/workflows/')); };
 
@@ -162,6 +184,9 @@ function conferirBash(cmd, amb, regras, dec) {
     if (api && escreve && (/git\/refs|\/contents\/|\/merges\b/.test(parte) || new RegExp(`\\b(${PROT})\\b`).test(parte))) {
       barra('escrita direta pela API do GitHub numa branch (equivale a envio direto). Use branch de trabalho e PR.');
     }
+    if (api && escreve && /\/rulesets\b|\/branches\/[^/\s]+\/protection\b/.test(parte)) {
+      barra('mudar ou apagar a proteção de branch (ruleset) pela API. Configuração do repositório é do dono.');
+    }
     if (/\bgh\s+pr\s+create\b/.test(parte) && /--base[=\s]+["']?(main|master)\b/.test(parte) && !/--head[=\s]+["']?previas\b/.test(parte)) {
       barra('PR de branch de trabalho para a main. A base é a previas.');
     }
@@ -189,6 +214,12 @@ function conferirBash(cmd, amb, regras, dec) {
     if (/\.github\/workflows\//.test(parte) && gravaWorkflow.test(parte)) {
       for (const m of parte.matchAll(/\.github\/workflows\/[\w.\-/]*/g)) conferirWorkflow(m[0], amb, dec, amb.branch());
     }
+    // Gravar nas travas pela linha de comando: comando que grava citando a trava, ou redirecionamento para ela.
+    const gravaComando = /(^|\s)(tee|cp|mv|rm|install|truncate|ln|chmod)\s|\bsed\b[^|]*\s-i|\bgit\b.*\s(rm|mv|checkout|restore)\s/;
+    const alvosRedir = [...parte.matchAll(/>+\s*["']?([^\s"'>]+)/g)].map((m) => m[1]);
+    if ((gravaComando.test(parte) && parte.split(/[\s<>"'=]+/).some(ehTrava)) || alvosRedir.some(ehTrava)) {
+      barra('gravar nas travas do projeto (.claude/settings*.json, .claude/hooks, .githooks). Só o dono muda.');
+    }
   }
 }
 
@@ -200,6 +231,7 @@ export function conferir(input, amb, regras, dec) {
 
   if (MCP_BANCO.test(tool)) barra('gravação direta no banco pelo MCP. O banco só muda por migration aplicada pela CI (AGENTS.md §1).');
   if (MCP_CLOUDFLARE.test(tool)) barra('alteração na Cloudflare pelo MCP. A IA nunca publica (AGENTS.md §1).');
+  if (mcpRemotoQueMuda(tool)) barra(`${tool}: muda o remoto ou publica pelo MCP. A IA nunca publica nem muda o banco remoto (AGENTS.md §1).`);
   if (MCP_GRAVA_BRANCH.test(tool) && (ti.owner || ti.repo || ti.branch)) {
     const b = String(ti.branch ?? '').replace(/^refs\/heads\//, '');
     if (!b || PROT.test(b)) barra('gravação direta numa branch protegida pelo MCP do GitHub. Use branch de trabalho e PR.');
@@ -207,6 +239,7 @@ export function conferir(input, amb, regras, dec) {
     const caminhos = [ti.path, ...(Array.isArray(ti.files) ? ti.files.map((f) => f?.path) : [])].filter((c) => typeof c === 'string');
     for (const c of caminhos) {
       if (ehSegredo(c)) barra('arquivo de segredos (.env). Segredo nunca no repositório.');
+      if (ehTrava(c)) barra('gravar nas travas do projeto pelo MCP. Só o dono muda.');
       if (WORKFLOW.test(c)) conferirWorkflow(relWorkflow(c), amb, dec, b, `refs/remotes/origin/${b}`);
     }
   }
@@ -223,6 +256,7 @@ export function conferir(input, amb, regras, dec) {
   if (['Write', 'Edit', 'MultiEdit', 'NotebookEdit'].includes(tool)) {
     const file = String(ti.file_path ?? ti.notebook_path ?? '');
     if (ehSegredo(file)) barra('arquivo de segredos (.env). Segredo nunca no repositório.');
+    if (ehTrava(file)) barra('gravar nas travas do projeto (.claude/settings*.json, .claude/hooks, .githooks). A trava não se desliga sozinha: só o dono muda.');
     if (/supabase\/migrations\//.test(file.replace(/\\/g, '/')) && migrationIntegrada(file.replace(/\\/g, '/'), amb)) barra('edição de migration que já está na previas. Crie uma migration nova.');
     if (WORKFLOW.test(file)) conferirWorkflow(relWorkflow(file), amb, dec, amb.branch());
   }
@@ -259,10 +293,9 @@ if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1]
       sai(`a trava não conseguiu carregar as regras (${String(e?.message ?? e).slice(0, 100)}). Avise o dono.`);
     }
     let input;
-    try { input = JSON.parse(raw); } catch {
-      if (/apply_migration|execute_sql/.test(raw)) sai('entrada ilegível numa chamada de banco.');
-      process.exit(0);
-    }
+    // Entrada ilegível ou que não é objeto: barra (falhar fechado; ISO 31000).
+    try { input = JSON.parse(raw); } catch { sai('entrada ilegível; sem conferir, não deixo passar.'); }
+    if (input === null || typeof input !== 'object' || Array.isArray(input)) sai('entrada ilegível; sem conferir, não deixo passar.');
     try {
       conferir(input, ambienteReal(raiz), regras, dec);
     } catch (e) {
