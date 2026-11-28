@@ -36,9 +36,9 @@ reescrever.
 | RF-03 | A sessão fica em cookie que o JavaScript do navegador não lê (HttpOnly), só por HTTPS (Secure), com SameSite; o token nunca vai ao endereço (URL), ao armazenamento local ou a registro. | ASVS V3.4.1 a V3.4.3; `AGENTS.md` §6 |
 | RF-04 | O navegador não tem cliente do banco nem chave do banco: nenhuma chamada do navegador vai ao Supabase. | `ARCHITECTURE.md` §4; `SECURITY.md` §3 |
 | RF-05 | A cada entrada nasce uma sessão nova; a anterior do mesmo navegador não é reaproveitada. | ASVS V3.2.1 |
-| RF-06 | **Sair** (menu Sua conta) encerra a sessão no Supabase Auth e apaga o cookie; depois de sair, voltar no navegador não mostra dado e o token antigo não serve mais. | ASVS V3.3.1; `DESIGN.md` §8b (Sua conta) |
+| RF-06 | **Sair** (menu Sua conta) encerra a sessão no Supabase Auth e apaga o cookie. O token antigo é recusado: a porta 1 confere a sessão no Auth a cada pedido **ou** o token de acesso é curto; o plano escolhe um e prova (CA-13). Toda resposta com dado ou de quem tem sessão leva `Cache-Control: no-store`, para que voltar no navegador não mostre dado. | ASVS V3.3.1, V8.2.1; `DESIGN.md` §8b (Sua conta) |
 | RF-07 | A sessão termina no tempo decidido em E39·3; depois disso a pessoa volta à tela de entrar, sem perder o que já foi gravado. | ASVS V3.3.2; E39·3 |
-| RF-08 | Tentativas de entrar têm limite (por endereço de origem e por conta); passou do limite, a resposta é a mesma mensagem genérica de "tente mais tarde". Os números ficam no plano. | ASVS V2.2.1 |
+| RF-08 | Tentativas de entrar têm limite (por endereço de origem e por conta); passou do limite, a resposta é a mesma mensagem genérica de "tente mais tarde". O contador por endereço de origem fica fora do registro (RF-25) e expira sozinho. Os números ficam no plano. | ASVS V2.2.1; RGPD art. 5(1)(e) |
 | RF-09 | Ninguém cria conta pelo app: o cadastro aberto do Supabase Auth fica desligado. Conta só nasce pelo cadastro de estúdio ou pelo convite de equipe (fora, §6). | `ARCHITECTURE.md` §2; ADR 0005 (convite pelo servidor) |
 | RF-10 | Pedidos que gravam são protegidos contra envio forjado de outro site (CSRF). | ASVS V4.2.2 |
 
@@ -49,7 +49,7 @@ reescrever.
 | RF-12 | A escolha passa só por `app.escolher_estudio`, chamada pelo servidor com o token da pessoa e a chave pública do banco, por uma função de passagem no esquema `public`, `security invoker`. A chave de serviço nunca é usada para isso, nem no servidor. | recomendação do Engenheiro de segurança; ADR 0005 D1 e D2; `SECURITY.md` §2 |
 | RF-13 | A tela Escolher estúdio mostra só o nome dos estúdios em que a pessoa tem papel **ativo**; nada de estúdio em que ela não tem papel. | ADR 0005 (RF-04 do item 3) |
 | RF-14 | **Trocar de estúdio** (menu Sua conta, só com mais de um) abre a mesma tela. | `DESIGN.md` §8b |
-| RF-15 | Nenhuma ação usa estúdio vindo do pedido: o estúdio é o de `app.estudio_da_sessao()`. Se a tela que fez o pedido mostrava outro estúdio (troca feita em outro aparelho), a ação é recusada com o código `estudio_trocado` e a tela recarrega; o valor enviado só é comparado, nunca usado. | `ARCHITECTURE.md` §4 porta 2; ADR 0005 D2 (estúdio da sessão é por pessoa, não por aparelho) |
+| RF-15 | Nenhuma ação usa estúdio vindo do pedido: o estúdio é o de `app.estudio_da_sessao()`. Se a tela que fez o pedido mostrava outro estúdio (troca feita em outro aparelho), a ação é recusada com o código `estudio_trocado`, nada é lido nem gravado, e a tela recarrega; o valor enviado só é comparado, nunca usado. A comparação é feita na **mesma transação** da gravação (não antes, em pedido separado). | `ARCHITECTURE.md` §4 porta 2; ADR 0005 D2 (estúdio da sessão é por pessoa, não por aparelho) |
 
 ### 3.3 Camada única de serviço (`src/server`)
 | ID | Requisito | Fonte |
@@ -65,12 +65,13 @@ reescrever.
 ### 3.4 Registro (porta 6, auditoria)
 | ID | Requisito | Fonte |
 |---|---|---|
-| RF-23 | Toda ação que grava deixa uma linha de registro; leitura só registra quando a spec do módulo mandar (ex.: ficha de saúde). Entrar, sair, escolher e trocar de estúdio também registram (quando há pessoa identificada). | `ARCHITECTURE.md` §4 porta 6; ASVS V7.1.3, V7.2.1 |
+| RF-23 | Toda ação que grava deixa uma linha de registro; leitura só registra quando a spec do módulo mandar (ex.: ficha de saúde). Entrar (com e sem sucesso), sair, escolher e trocar de estúdio também registram, como em RF-24a. | `ARCHITECTURE.md` §4 porta 6; ASVS V7.1.3, V7.2.1 |
 | RF-24 | **O que se grava:** nome do evento (ex.: `bloqueio.criar`), resultado (`ok` ou o código de RF-22), quando (UTC), `usuario_id`, `org_id`, identificadores dos objetos tocados e um identificador do pedido. | ASVS V7.1.3; `ARCHITECTURE.md` §4 |
+| RF-24a | Linhas de antes do estúdio da sessão: **entrar com sucesso** grava `usuario_id` e `org_id` vazio; **escolher e trocar de estúdio** gravam o `org_id` do estúdio escolhido (o novo, na troca); **sair** grava o `org_id` da sessão, ou vazio se não havia; **tentativa de entrar que falha** grava só evento, resultado, quando e identificador do pedido: sem e-mail, sem IP, sem `usuario_id` e sem `org_id`. Quem grava essas linhas não usa a chave de serviço (o plano escolhe o meio, com ADR e teste). | ASVS V7.2.1; `SECURITY.md` §2 |
 | RF-25 | **O que nunca se grava:** nome, e-mail, telefone, texto digitado, conteúdo dos campos, respostas de ficha de saúde, senha, token, cookie, endereço IP, endereço (URL) com parâmetros. | `ARCHITECTURE.md` §4 e §7; ASVS V7.1.1, V7.1.2; RGPD art. 5(1)(c) |
-| RF-26 | Ninguém com login altera nem apaga uma linha do registro; cada pessoa só acrescenta a própria linha, no estúdio da sessão. Ler o registro fica para spec própria (nenhuma tela lê nesta spec). | `ARCHITECTURE.md` §4; ASVS V7.3.3 |
+| RF-26 | Ninguém com login altera nem apaga uma linha do registro; cada pessoa só acrescenta a própria linha, no estúdio da sessão (ou nas formas de RF-24a); a linha de tentativa que falha só aceita os campos de RF-24a. Ler o registro fica para spec própria (nenhuma tela lê nesta spec). | `ARCHITECTURE.md` §4; ASVS V7.3.3 |
 | RF-27 | Se o registro de uma ação que grava falha, a gravação é desfeita e a resposta é `erro_interno`. | `ARCHITECTURE.md` §4 ("quem fez o quê") |
-| RF-28 | Pedido recusado na porta 1 (sem login) não grava no banco (não há quem). | dedução de `ARCHITECTURE.md` §4 |
+| RF-28 | Pedido recusado na porta 1 (sem login) não grava no banco (não há quem), salvo a tentativa de entrar que falha (RF-24a). | dedução de `ARCHITECTURE.md` §4 |
 | RF-29 | Exceções E6·1 e E6·2 valem como estão: o modo "entrar como o estúdio" e o painel admin não entram nesta spec, e nada aqui os registra nem os impede. | `SECURITY.md` §5 |
 
 ### 3.5 Tela de entrar e idiomas
@@ -78,7 +79,7 @@ reescrever.
 |---|---|---|
 | RF-30 | Telas desta spec: **Entrar** (campos E-mail e Senha, uma ação preta), **Escolher estúdio** e os itens Trocar de estúdio e Sair do menu Sua conta; os outros itens do menu aparecem com "em desenvolvimento". | `DESIGN.md` §5, §8, §8b |
 | RF-31 | As telas seguem só o `DESIGN.md`. Nome ou peça que não está lá (ex.: o botão "Entrar", os rótulos "E-mail" e "Senha", o título "Escolher estúdio") entra no `DESIGN.md` primeiro, pela ficha visual (etapa 6), com aprovação do dono. | `DESIGN.md` cabeçalho e §10 item 8 |
-| RF-32 | Cada tela tem os estados carregando, erro (com "Tentar de novo" quando couber) e sucesso; senha com opção de mostrar e esconder; campos com rótulo e erro com ícone e texto. | `DESIGN.md` §8 e §9; ASVS V2.1.12 |
+| RF-32 | Cada tela tem os estados carregando, erro (com "Tentar de novo" quando couber) e sucesso; o campo Senha aceita ao menos 64 caracteres, sem cortar nem alterar o que foi digitado, com opção de mostrar e esconder; campos com rótulo e erro com ícone e texto. | `DESIGN.md` §8 e §9; ASVS V2.1.2, V2.1.3, V2.1.12 |
 | RF-33 | Nenhum dado de pessoa no endereço (URL): nem e-mail, nem estúdio, nem motivo do erro. | `ARCHITECTURE.md` §7 |
 | RF-34 | Nasce aqui a base comum de idiomas `src/app/i18n/` (pt, es, en), no formato do ADR 0006 D1; os módulos só acrescentam blocos. Todos os textos das telas desta spec existem nos três idiomas. | E3·1; decisão técnica do Arquiteto (28/11) |
 | RF-35 | Depois de escolhido o estúdio, as telas usam o idioma padrão do estúdio (`estudios.idioma`). | E3·1; item 3 RF-09 |
@@ -86,7 +87,7 @@ reescrever.
 ## 4. Requisitos não funcionais
 | ID | Requisito | Fonte |
 |---|---|---|
-| RNF-01 | ASVS 4.0.3 nível 2 nos capítulos V2 (autenticação), V3 (sessão), V4 (acesso), V5 (validação) e V7 (registro). | `ARCHITECTURE.md` §7 |
+| RNF-01 | ASVS 4.0.3 nível 2 nos capítulos V2 (autenticação), V3 (sessão), V4 (acesso), V5 (validação), V7 (registro) e V8 (proteção de dados, inclusive cache). | `ARCHITECTURE.md` §7 |
 | RNF-02 | Nenhum segredo no repositório; endereço e chave pública do banco só por variável de ambiente, guardada nos cofres. | `SECURITY.md` §2; Twelve-Factor III |
 | RNF-03 | WCAG 2.2 AA nas telas (contraste, toque 44/40, foco visível, erro anunciado ao leitor de tela, colar senha permitido). | `ARCHITECTURE.md` §11; `DESIGN.md` §9; WCAG 2.2 3.3.8 |
 | RNF-04 | Bibliotecas, versões e API só depois de lida a documentação oficial; cada escolha em ADR. | `AGENTS.md` §6 |
@@ -99,20 +100,22 @@ reescrever.
 | CA-02 | O cookie da sessão tem HttpOnly, Secure e SameSite; `document.cookie` não o mostra; nada no armazenamento local. | e2e |
 | CA-03 | O pacote do navegador não contém cliente do banco, endereço do banco nem chave; nenhuma ida do navegador ao Supabase durante o fluxo. | teste do build e e2e (rede observada) |
 | CA-04 | **Sem sessão, nada passa:** um teste percorre todas as ações declaradas e chama cada uma sem sessão e com sessão vencida → `sem_login`, nada gravado. | integração |
-| CA-05 | **Um estúdio não usa a sessão de outro:** pessoa de A e B com A escolhido manda `org_id` de B no pedido → é ignorado, só A é lido e gravado; pessoa só de A tenta escolher B → recusado, nada muda; pessoas de A e de B ao mesmo tempo nunca veem dado uma da outra. | integração e pgTAP |
+| CA-05 | **Um estúdio não usa a sessão de outro:** pessoa de A e B com A escolhido manda `org_id` de B no pedido → recusado com `estudio_trocado`, nada lido nem gravado em A ou B; pessoa só de A tenta escolher B → recusado, nada muda; pessoas de A e de B ao mesmo tempo nunca veem dado uma da outra. | integração e pgTAP |
 | CA-06 | Troca de estúdio feita em outro aparelho → a próxima ação da tela antiga recebe `estudio_trocado` e não grava. | integração |
 | CA-07 | As portas rodam na ordem; recusa numa porta impede as seguintes (inclusive o trabalho e o banco). | unidade |
 | CA-08 | Entrada fora do esquema (campo a mais, tipo, tamanho, vazio) → `entrada_invalida`, nenhuma ida ao banco. | unidade |
 | CA-09 | Ação que grava cria uma linha de registro com os campos de RF-24; busca no registro pelos e-mails, nomes e textos usados no teste não acha nada. | integração |
+| CA-09a | Entrar com sucesso, entrar que falha, escolher, trocar e sair gravam as linhas de RF-24a; a de falha não tem e-mail, IP, `usuario_id` nem `org_id`; o contador de tentativas não aparece no registro e expira. | integração |
 | CA-10 | Ninguém com login altera ou apaga o registro, nem grava linha de outra pessoa ou de outro estúdio; `anon` não toca o registro. | pgTAP (molde de isolamento do item 3) |
 | CA-11 | Registro que falha desfaz a gravação da ação. | integração |
 | CA-12 | Respostas de erro só com códigos de RF-22; nenhuma mensagem do banco nem pilha na resposta. | unidade e integração |
-| CA-13 | Depois de Sair, voltar no navegador não mostra dado e o token antigo é recusado. | e2e e integração |
+| CA-13 | Depois de Sair, o token antigo é recusado no pedido seguinte (pelo meio escolhido em RF-06); toda resposta com dado traz `Cache-Control: no-store`; voltar no navegador não mostra dado. | e2e e integração |
 | CA-14 | Passado o limite de tentativas, a entrada é recusada com a mensagem genérica. | integração |
 | CA-15 | Sessão expira conforme E39·3. | integração (relógio controlado) |
 | CA-16 | Não existe criação de conta pelo app; o cadastro aberto está desligado na configuração local. | integração e leitura de `supabase/config.jsonc` |
-| CA-17 | A função de passagem é `security invoker` e só funciona com o token da pessoa; nenhum uso da chave de serviço em `src/`. | pgTAP e checagem automática no código |
+| CA-17 | A função de passagem é `security invoker` e só funciona com o token da pessoa; `anon` e `public` não a executam (sem privilégio de execução); nenhum uso da chave de serviço em `src/`. | pgTAP e checagem automática no código |
 | CA-18 | Tela Escolher estúdio lista só estúdios com papel ativo da pessoa. | integração e e2e |
+| CA-18a | O campo Senha aceita e envia 64 caracteres ou mais sem cortar. | unidade e e2e |
 | CA-19 | Fluxos entrar, erro, carregando, escolher, trocar e sair passam em 390 px e 1440 px, com checagem automática de acessibilidade. | e2e (projetos `celular` e `computador` do item 2) |
 | CA-20 | Textos das telas existem em pt, es e en, com as mesmas chaves e sem texto vazio; após escolher o estúdio vale `estudios.idioma`. | checagem de tipos e unidade |
 | CA-21 | Ação declarada fora do molde de RF-16 é barrada. | lint ou teste automático na CI |
@@ -142,22 +145,27 @@ reescrever.
 **E39·1 · Recuperação de senha na primeira versão**
 - **E39·1·A:** entra agora: "Esqueci a senha" manda um link por e-mail, com resposta igual com ou sem conta; pede um
   serviço de e-mail na UE já nesta spec.
-- **E39·1·B:** fica para a spec do convite de equipe, antes de abrir a clientes; até lá só há contas de teste.
+- **E39·1·B:** fica para a spec do convite de equipe; até lá só há contas de teste. **Trava a abertura a clientes:**
+  sem recuperação de senha, o sistema não abre a estúdios reais (ASVS V2.5).
 - **Recomendo B:** não há estúdio real antes do cadastro e o serviço de e-mail ainda não foi escolhido. Desfaz-se
   reabrindo a spec.
 
 **E39·2 · Dupla verificação (código do app autenticador) para a equipe do estúdio**
-- **E39·2·A:** agora não; só no painel admin (E4·2); a pergunta volta na spec da ficha de saúde (nível 3 da ASVS).
+- **E39·2·A:** agora não; só no painel admin (E4·2); a pergunta volta na spec da ficha de saúde (nível 3 da ASVS); exigir dupla verificação
+  da dona antes de dados reais.
 - **E39·2·B:** opcional, cada pessoa liga se quiser (tela nova de configurar).
 - **E39·2·C:** obrigatória para a dona.
 - **Recomendo A:** menor escopo agora; o dado mais sensível (ficha) ainda não existe. Risco: conta só com senha.
   Desfaz-se com spec nova.
 
 **E39·3 · Tempo da sessão**
-- **E39·3·A:** entra de novo a cada 12 h desde a entrada (um dia de trabalho), sem corte por parada.
-- **E39·3·B:** 12 h no máximo e corte após 30 min parado (mais seguro na recepção com aparelho dividido).
+- **E39·3·A:** entra de novo a cada 12 h desde a entrada, sem corte por parada. Não cumpre sozinha a ASVS V3.3.2
+  nível 2 (12 h **ou** 30 min parado, as duas regras).
+- **E39·3·B:** 12 h no máximo e corte após 30 min parado.
 - **E39·3·C:** 30 dias, como app de celular; fica abaixo do nível 2 da ASVS e vira exceção declarada.
-- **Recomendo A:** cumpre a ASVS V3.3.2 nível 2 sem atrapalhar o atendimento. Desfaz-se mudando um valor de configuração.
+- **Recomendo B:** cumpre a ASVS V3.3.2 nível 2 e protege a recepção, onde o aparelho é dividido. Se o corte por
+  parada do Supabase exigir plano pago, o corte é feito pelo servidor; se nem assim der, o trabalho para e vira
+  pergunta ao dono (E23·3·A: só o gratuito). Desfaz-se mudando um valor de configuração.
 
 ## 9. Assumptions (decisões técnicas do papel, à vista na aprovação)
 1. Antes de entrar (sem estúdio), a tela usa o idioma do navegador entre pt, es e en; fora deles, pt.
