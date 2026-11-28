@@ -108,7 +108,7 @@ o módulo Caixa na tabela do §7 e no mapa da navegação; os botões Abrir caix
 |---|---|---|
 | RNF-01 | WCAG 2.2 AA: estado do caixa e diferença com palavra (Aberto, Fechado, Confere, Sobra, Falta), toque 44/40, foco visível, nada só por cor. | `DESIGN.md` §9 |
 | RNF-02 | **Idempotência:** cada pedido de abrir, sangria, suprimento e fechar leva uma chave presa a **estúdio + caixa + resumo do conteúdo** (ação, valor, contado; em abrir, o caixa é "nenhum aberto"). A mesma chave com o mesmo conteúdo devolve o mesmo resultado, sem gravar de novo; **a mesma chave com outro conteúdo é recusada**. Toque duplo, repetição de rede ou duas pessoas ao mesmo tempo: um caixa aberto, um fechamento, um movimento. Mesmo molde do RNF-02 do Checkout. | ASVS V11.1.6; `ARCHITECTURE.md` §10 |
-| RNF-03 | Fechar e gravar pagamento do Checkout ao mesmo tempo nunca deixam pagamento em caixa fechado nem fora da conta (RF-10). | ASVS V11.1.6 |
+| RNF-03 | Fechar e gravar pagamento do Checkout ao mesmo tempo nunca deixam pagamento em caixa fechado; o pagamento em dinheiro entra no caixa antes de fechar ou é recusado; cartão e Pix sem caixa aberto ficam registrados sem caixa (RF-10). | ASVS V11.1.6 |
 | RNF-04 | Nenhum dado pessoal ou de saúde em URL, registro de erro ou notificação; o caixa abre pelo id. | `ARCHITECTURE.md` §7 |
 | RNF-05 | Textos nos três idiomas (pt, es, en), pela estrutura de idiomas do item 4. | E3·1; `ARCHITECTURE.md` §11 |
 | RNF-06 | Listas do caixa aberto e do histórico paginadas; limite de idas ao banco por tela. | `ARCHITECTURE.md` §5 e §11 |
