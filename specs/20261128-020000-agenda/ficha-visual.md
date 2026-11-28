@@ -193,8 +193,8 @@ Reunião · Curso · Pessoal · "Preencher o motivo" (leitor) · "Fim mudou para
 desenvolvimento" (leitor) · "A busca na Agenda está em desenvolvimento." · Os demais nomes da versão 2 continuam
 (Bloqueio, Bloqueio de horário, Profissional, Data, Início, Fim, Motivo, "Exemplo: almoço", Bloqueio salvo, Bloqueio
 excluído, "Excluir este bloqueio?", Exportar, Imprimir, Modo de ver, Equipe, Status, Bloqueios, Mostrar N itens,
-estados e erros). **Saíram:** Ocupado, "Ocupado, HH:MM a HH:MM", "Os filtros valem só para a sua coluna.", e "Agendar"
-no celular (se a E60·2·A for aceita). Nenhum texto diz "estúdio" (E47).
+estados e erros). **Saíram:** Ocupado, "Ocupado, HH:MM a HH:MM", "Os filtros valem só para a sua coluna.", "Agendar"
+no celular e "Novo" sozinho (E60·2, E60·5). Nenhum texto diz "estúdio" (E47).
 
 ## Gravado no `DESIGN.md` nesta versão (ordem do dono: "toda decisao vai pros arquivos correspondentes")
 §3 `--id` (linha do agora, E60·3·A) · §5 Ação principal ("+ Adicionar ▾" da Agenda, botão do meio só ícone, "+"
@@ -215,8 +215,6 @@ redondo no "Nunca"; E60·1·A, E60·2, E60·5, decisão do Designer) · §5 Adic
   marcado "a confirmar pelo dono no pedido de merge".
 
 ## Para outros papéis (não toco nos arquivos deles)
-- **Analista de requisitos:** a spec §4 ainda pode dizer "Agendar" ou "Novo"; com a E60·2 e a E60·5, vira "Adicionar"
-  (botão ▾, folha e nome no leitor do botão do meio).
 - **Arquiteto de software:** a grade da E59·A precisa do primeiro e do último item do dia e da hora atual (D17); nada
   novo no banco.
 - **Revisor de design:** v4 e o `DESIGN.md` atualizado para revisar (imagens regeradas todas; novas: `agenda-adicionar-aberto`,

@@ -140,7 +140,7 @@ Belasis usam "estabelecimento"/"salão", que prendem a um mercado ou a um lugar 
 
 | Módulo | Ação principal | Seções | Categoria | Filtros (dentro do botão) | Modo de ver | Outros |
 |---|---|---|---|---|---|---|
-| Agenda | Adicionar ▾ (Novo agendamento · Bloquear horário; E60·5) | — | — | status, profissional, serviço, bloqueio, etiqueta | Dia ▾ | Hoje · Equipe N de M · Lista de espera · Opções |
+| Agenda | Adicionar ▾ (Novo agendamento · Bloquear horário; E60·5) | — | — | na v1 só status e bloqueio (spec da Agenda, RF-06); profissional, serviço e etiqueta entram depois, cada um com a sua spec | Dia ▾ | Hoje · Equipe N de M · Lista de espera · Opções |
 | Clientes | Adicionar | — | — | etiquetas, cadastro, saldo, última visita, aniversário, origem | — | Ordenar · Opções |
 | Catálogo | Adicionar | Serviços · Pacotes · Combos · Planos de assinatura · Produtos | Categoria | online, profissional, pede formulário | — | Ordenar · Opções |
 | Financeiro | Adicionar ▾ | Visão geral · Relatórios · DRE · Contas a pagar · Comissões | — | tipo, forma de pagamento, profissional | Mês ▾ | Opções |

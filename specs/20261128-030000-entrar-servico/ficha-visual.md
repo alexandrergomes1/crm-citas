@@ -8,7 +8,8 @@
   https://claude.ai/code/session_018cV8b8F1poNHjA4eEd3VyN. Nomes e peças gravados no `DESIGN.md` §5, §6, §8 e §8b.
 - **Protótipo:** HTML estático fora do repositório, com o `tokens.css`, o `base.css` e o CSS das peças do item 4
   (`botao`, `campos`, `bloco-lista`, `conteudo`); fonte Geist; ícones Lucide. Capturas com Playwright (Chromium),
-  escala 2×. Dados fictícios: `pessoa@exemplo.com`, "Estúdio Aurora", "Estúdio Lírio".
+  escala 2×. Dados fictícios: `pessoa@exemplo.com`, "Aurora Estética", "Lírio Beleza" (imagens refeitas com "empresa"
+  em 28/11, E47·1·A).
 
 ---
 
@@ -94,8 +95,8 @@ Botão **Entrar** · rótulos **E-mail** e **Senha** · título **Escolher estú
 
 ### Ressalvas da 2ª rodada (Revisor de design) · resolvidas
 - Tirada a frase "Verifique a conexão e tente de novo." do erro de Escolher estúdio: fica só o título do erro e
-  "Tentar de novo" (§8). As imagens `ficha/escolher-estudio-erro-390.png` e `-1440.png` ainda mostram a frase; não
-  foram refeitas, **vale o texto desta ficha**.
+  "Tentar de novo" (§8). As imagens `ficha/escolher-estudio-erro-390.png` e `-1440.png` foram refeitas em 28/11 sem a
+  frase.
 - Anotados para a T2: `autocomplete` nos campos (WCAG 1.3.5) e o nome do botão do olho sem `aria-pressed` (WCAG 4.1.2).
 - Em aberto, sem mudança: folha Sua conta sem véu no celular (ver "Não verificado").
 
@@ -115,19 +116,24 @@ https://claude.ai/code/session_018cV8b958nnbLyXPMKPeaNK. Gravado no `DESIGN.md` 
   genérica do começo ("Estúdio Aurora" → A, "Estúdio Lírio" → L; regra exata no §8b).
 - **E47·2·A:** bolinha de Sua conta sem e-mail mostra o ícone `user`.
 - **E47·3·A:** a tela inicial fica só com a barra do topo, sem o texto "crm-citas".
-- **Imagens:** as capturas acima são de antes do E47 e mostram "estúdio", a letra "E" no quadradinho e "Estúdio Aurora"/
-  "Estúdio Lírio"; não foram refeitas. **Vale este texto e o `DESIGN.md`.** Onde a ficha acima diz "estúdio" como nome
-  visível, leia "empresa".
+- **Imagens refeitas em 28/11 (Designer, auditoria do Gerente):** Escolher empresa (lista, carregando e erro) e Sua
+  conta com "Trocar de empresa", nas duas larguras, desenhadas com os componentes reais do app (`EscolherEstudioVista`,
+  `BarraSuaConta`), o texto real de `pt.ts` e o CSS real, no mesmo molde da maquete. Nomes fictícios sem a palavra
+  genérica: "Aurora Estética" → A, "Lírio Beleza" → L. Os nomes de arquivo (`escolher-estudio-*.png`) ficam como estão
+  para não quebrar os links. Onde a ficha acima diz "estúdio" como nome visível, leia "empresa".
 
 ---
 
 ## Não verificado
-- **E47:** as imagens não foram refeitas com "empresa", com a letra nova nem com o ícone `user`; o termo não foi testado
+- **E47:** imagem do ícone `user` (Sua conta sem e-mail) não feita; a letra com palavra genérica ("Estúdio Aurora" → A)
+  não aparece nas imagens, só no teste de unidade; o termo não foi testado
   com quem usa o sistema; o título da aba do navegador ("crm-citas") não faz parte do E47·3·A e continua como está.
 - **Limite de tentativas:** sem imagem própria; usa o mesmo desenho do erro genérico (descrito acima).
 - **Folha Sua conta no celular:** sem véu escuro atrás, porque o `DESIGN.md` não define um (igual ao componente do item
   4). Assunto em aberto, sem mudança nesta tarefa.
-- **Imagens do erro de Escolher estúdio:** mostram a frase de detalhe que saiu; não refeitas.
+- **Imagens refeitas:** o estado carregando foi desenhado com as linhas já à vista (o app só as mostra depois de 0,3 s) e
+  a folha e o menu foram abertos à mão na página; as imagens de Entrar e de Sua conta sem troca não mudaram (não têm
+  "estúdio").
 - **Fundo das telas de Sua conta:** só a barra com a bolinha; a página inicial real é do item 2 e não foi desenhada.
 - **Acessibilidade:** axe (wcag2a, wcag2aa, wcag21aa, wcag22aa) deu 0 violações no protótipo, nas 20 capturas; não é o
   app real. Não conferi com leitor de tela de verdade nem foco por teclado. O texto "Entrando…" esmaecido (60 %) fica
