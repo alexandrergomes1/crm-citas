@@ -194,10 +194,10 @@ Sem teste de unidade próprio (são consultas); a prova é o pgTAP (§4.4) e o e
 | `agenda.css` | só `var(--...)` do `tokens.css` (regra RT-9 do item 4) |
 | `agenda.test.tsx` | `renderToString`: uma só ação preta; status com nome acessível; nenhum texto fixo fora do arquivo de idioma |
 
-- **Idiomas (RNF-05)** em `src/app/i18n/`: `pt.ts` (fonte das chaves), `es.ts`, `en.ts`, `textos.ts` (escolha pelo
-  idioma do estúdio, troca de `{marcadores}`, plural por `Intl.PluralRules`), `formatar.ts` (data e hora por
-  `Intl.DateTimeFormat` no idioma e no fuso do estúdio), `i18n.test.ts` (as três têm as mesmas chaves, nenhuma vazia,
-  os mesmos marcadores). Código de erro do servidor vira texto aqui. Sem biblioteca (ADR 0006 · D1).
+- **Idiomas (RNF-05):** a base de `src/app/i18n/` (`pt.ts`, `es.ts`, `en.ts`, `textos.ts`, `formatar.ts`,
+  `i18n.test.ts`, no formato do ADR 0006 · D1) nasce na `feat/entrar-servico`. A Agenda só **acrescenta o bloco
+  `agenda`** nos três arquivos de idioma (textos da tela e dos códigos de erro dela); o teste da base já confere as
+  mesmas chaves, nenhuma vazia e os mesmos marcadores.
 - **Agendamento ainda não construído (RF-08):** "Novo agendamento", "Agendar" e o toque no cartão ficam "em
   desenvolvimento"; a grade mostra só bloqueios. Quando a spec do Agendamento entrar, ela acrescenta a leitura dos
   agendamentos em `src/data` e a terceira ida ao banco vira quarta (teto passa a 4, no ADR dela).
@@ -255,7 +255,7 @@ M1) · `docs/adr/0007-agenda-tabelas-do-antigo.md`.
 **Telas:** `src/app/routes/agenda.tsx` · `src/app/routeTree.gen.ts` (gerado) · `src/app/navegacao.ts` ·
 `src/app/paginas/agenda/{agenda,barra,grade,cartao,bloqueio-painel,filtros,equipe}.tsx` ·
 `src/app/paginas/agenda/equipe-guardada.ts` · `src/app/paginas/agenda/agenda.css` ·
-`src/app/paginas/agenda/agenda.test.tsx` · `src/app/i18n/{pt,es,en,textos,formatar}.ts` · `src/app/i18n/i18n.test.ts`.
+`src/app/paginas/agenda/agenda.test.tsx` · `src/app/i18n/{pt,es,en}.ts` (só o bloco `agenda`; `textos.ts`, `formatar.ts` e `i18n.test.ts` são da `feat/entrar-servico` e ficam intactos).
 
 **Testes de tela:** `e2e/preparo/agenda-dados.ts` · `e2e/agenda.spec.ts` · `e2e/agenda-estados.spec.ts` ·
 `e2e/agenda-acessibilidade.spec.ts`.

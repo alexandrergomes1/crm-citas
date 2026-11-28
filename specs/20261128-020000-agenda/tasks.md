@@ -43,7 +43,7 @@
 - [ ] **T13** · `src/server/agenda/bloqueios.ts` + teste (criar, alterar, excluir; conflito; registro sem motivo; CA-09).
 
 ## Fase 5 · Telas (Engenheiro de software, pela ficha aprovada)
-- [ ] **T14** · `src/app/i18n/*` + `i18n.test.ts` (pt, es, en).
+- [ ] **T14** · Bloco `agenda` em `src/app/i18n/{pt,es,en}.ts` (base da `feat/entrar-servico`); `i18n.test.ts` dela verde.
 - [ ] **T15** · `src/app/navegacao.ts` e `src/app/routes/agenda.tsx` (`validateSearch` só `dia`; `loader`).
 - [ ] **T16** · `src/app/paginas/agenda/*` + `agenda.test.tsx`, só com componentes do item 4 e as peças aprovadas na T2.
 - [ ] **T17** · `e2e/preparo/agenda-dados.ts`, `e2e/agenda.spec.ts` (CA-05, CA-09), `e2e/agenda-estados.spec.ts`

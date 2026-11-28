@@ -26,6 +26,8 @@ reusar antes de criar.
 
 ## Consequências
 - Texto novo de qualquer módulo entra nos três arquivos; a checagem de tipos falha se faltar um.
+- A base de `src/app/i18n/` neste formato nasce na `feat/entrar-servico` (antes do núcleo); cada módulo, a Agenda
+  inclusive, só acrescenta o próprio bloco nos três arquivos.
 - Outros módulos que precisem do dia do estúdio usam `src/domain/agenda/dia.ts`; se ele virar geral, muda de pasta
   num ADR novo.
 - A spec do Agendamento sobe o teto de idas para 4 no ADR dela.
