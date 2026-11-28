@@ -2,7 +2,7 @@
 
 - **Status:** Approved
 - **Aprovação do dono:** "Aprovo as specs: Entrar e camada de serviço, (...)", com "E39·1·B", "E39·2·A (avaliar depois em producao pra nao ficar mto burocratico. podemos ter o magic link tbm)", "E39·3·B (1hr parado)" e "E41·1·A E41·2·A E41·3·A E41·4·A" · 28/11/2026 · https://claude.ai/code/session_018cV8b8F1poNHjA4eEd3VyN
-- **Aprovação do merge:** (pendente)
+- **Aprovação do merge:** "E49a juntar" (E49·A: o dono confere as telas pelas capturas dos testes e autoriza o merge; a conferência na prévia fica para a spec da prévia, E23·2·A) · 28/11/2026 · https://claude.ai/code/session_018cV8b958nnbLyXPMKPeaNK · commit `f47837e` (PR #7), CI verde nos 5 jobs · gravado pelo Engenheiro de DevOps.
 - **Item da fila:** novo, por decisão do dono E36·A, logo antes do núcleo (depois dos itens 2 a 4 de `docs/BACKLOG.md`);
   o Documentador grava o item na fila
 - **Branch:** `feat/entrar-servico`, a partir da `previas` (já com o item 2: app, CI e Spec Kit)
