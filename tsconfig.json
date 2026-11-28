@@ -16,5 +16,5 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src", "e2e", "*.ts", "*.mjs"]
+  "include": ["src", "e2e", "tests", "*.ts", "*.mjs"]
 }

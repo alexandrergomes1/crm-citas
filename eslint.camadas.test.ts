@@ -67,4 +67,76 @@ describe('lint de camadas', () => {
   it('src/app/ui/icone.tsx importando lucide-react passa', async () => {
     expect(await erros("export { Clock } from 'lucide-react'\n", 'src/app/ui/icone.tsx')).toEqual([])
   })
+
+  // Entrar e camada de serviço (plan.md §8; CA-21; ADR 0018 · D9, D12)
+  it('createServerFn fora de acao.ts falha (src/server)', async () => {
+    expect(
+      await erros("import { createServerFn } from '@tanstack/react-start'\nexport const f = createServerFn\n", 'src/server/x.ts'),
+    ).toHaveLength(1)
+  })
+
+  it('createServerFn em src/app falha', async () => {
+    expect(
+      await erros("export { createServerFn } from '@tanstack/react-start'\n", 'src/app/routes/x.tsx'),
+    ).toHaveLength(1)
+  })
+
+  it('createServerFn pelo pacote interno também falha', async () => {
+    expect(
+      await erros("export { createServerFn } from '@tanstack/start-client-core'\n", 'src/server/x.ts'),
+    ).toHaveLength(1)
+  })
+
+  it('createServerFn em src/server/portas/acao.ts passa', async () => {
+    expect(
+      await erros("export { createServerFn } from '@tanstack/react-start'\n", 'src/server/portas/acao.ts'),
+    ).toEqual([])
+  })
+
+  it('outros nomes do @tanstack/react-start passam em src/server', async () => {
+    expect(
+      await erros("export { createMiddleware } from '@tanstack/react-start'\n", 'src/server/http/x.ts'),
+    ).toEqual([])
+  })
+
+  it('src/server importando o cliente do banco falha', async () => {
+    expect(await erros("export { createClient } from '@supabase/supabase-js'\n", 'src/server/x.ts')).toHaveLength(1)
+  })
+
+  it('src/server com import() dinâmico do cliente do banco falha', async () => {
+    expect(await erros("export const z = () => import('@supabase/ssr')\n", 'src/server/x.ts')).toHaveLength(1)
+  })
+
+  it('acao.ts importando o cliente do banco falha', async () => {
+    expect(
+      await erros("export { createClient } from '@supabase/supabase-js'\n", 'src/server/portas/acao.ts'),
+    ).toHaveLength(1)
+  })
+
+  it('src/server importando src/data passa', async () => {
+    expect(await erros("export { lerAmbiente } from '@/data/ambiente'\n", 'src/server/x.ts')).toEqual([])
+  })
+
+  it('src/data importando src/server falha', async () => {
+    expect(await erros("export { y } from '@/server/y'\n", 'src/data/x.ts')).toHaveLength(1)
+  })
+
+  it('src/data importando ../app falha', async () => {
+    expect(await erros("export { y } from '../app/y'\n", 'src/data/x.ts')).toHaveLength(1)
+  })
+
+  it('src/data importando createServerClient passa', async () => {
+    expect(await erros("export { createServerClient } from '@supabase/ssr'\n", 'src/data/x.ts')).toEqual([])
+  })
+
+  it('createBrowserClient falha em qualquer pasta', async () => {
+    expect(await erros("export { createBrowserClient } from '@supabase/ssr'\n", 'src/data/x.ts')).toHaveLength(1)
+    expect(await erros("export { createBrowserClient } from '@supabase/ssr'\n", 'tests/x.ts')).toHaveLength(1)
+  })
+
+  it('getSession() falha', async () => {
+    expect(
+      await erros('export const f = (c: { auth: { getSession(): void } }) => c.auth.getSession()\n', 'src/data/x.ts'),
+    ).toHaveLength(1)
+  })
 })

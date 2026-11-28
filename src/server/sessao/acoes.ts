@@ -1,0 +1,171 @@
+// Ações de sessão da lista fechada (plan.md §3.1 a §3.4; catalogo.ts · MODOS_SEM_ESTUDIO).
+// Erros só por código; "sem_login" é a frase única de entrar (e-mail errado, senha errada, sem conta, sem estúdio; RF-02).
+import { z } from 'zod'
+import { codigoDe } from '@/data/erros'
+import type { Idioma } from '@/domain/idioma'
+import { acao, acaoGet, acaoPost } from '../portas/acao'
+import { Recusa } from '../portas/erros'
+import type { ContextoSemSessao } from '../portas/tipos'
+import { chavesDaTentativa } from './tentativas'
+
+/** Para onde a tela vai depois de entrar (RF-11). */
+export type DestinoDepoisDeEntrar = 'inicio' | 'escolher_estudio'
+
+// Senha sem cortar nem alterar, até 1024 (RF-32, CA-18a; ASVS V2.1.2); e-mail até 254 (RFC 5321).
+export const entradaDeEntrar = z.strictObject({
+  email: z.string().min(1).max(254),
+  senha: z.string().min(1).max(1024),
+})
+
+/** Fluxo de entrar (plan.md §3.1), sem framework, para o teste de unidade. */
+export async function trabalhoDeEntrar(
+  ctx: ContextoSemSessao,
+  { email, senha }: z.output<typeof entradaDeEntrar>,
+): Promise<{ destino: DestinoDepoisDeEntrar }> {
+  const { conexao } = ctx
+
+  // RF-05: a sessão anterior deste navegador é encerrada antes de nascer outra.
+  if (ctx.temCookieDeSessao) {
+    if (await conexao.quemE()) {
+      try {
+        await conexao.encerrarSessao()
+      } catch {
+        // segue: signOut local e cookie apagado de qualquer jeito (ADR 0018 · D4)
+      }
+    }
+    await conexao.sairLocal()
+  }
+
+  // Limite (D8): chaves HMAC; o banco nunca vê IP nem e-mail.
+  const { chaveIp, chaveConta } = await chavesDaTentativa(ctx.segredoTentativas, ctx.ip, email)
+  let pode: boolean
+  try {
+    pode = await conexao.conferirTentativa(chaveIp, chaveConta)
+  } catch (erro) {
+    throw new Recusa(codigoDe(erro) === 'limite' ? 'limite' : 'erro_interno')
+  }
+  if (!pode) throw new Recusa('limite')
+
+  const senhaConferida = await conexao.entrarComSenha(email, senha)
+  if (!senhaConferida.ok) {
+    if (senhaConferida.codigo === 'sem_login') {
+      await conexao.registrarTentativaFalha()
+      throw new Recusa('sem_login')
+    }
+    throw new Recusa(senhaConferida.codigo === 'limite' ? 'limite' : 'erro_interno')
+  }
+
+  // Linha da sessão (D4): recusa session_id já visto e entrada por senha antiga; conta os estúdios ativos.
+  let estudios: number
+  try {
+    estudios = await conexao.iniciarSessao()
+  } catch (erro) {
+    await conexao.sairLocal()
+    throw new Recusa(codigoDe(erro) === 'sem_login' ? 'sem_login' : 'erro_interno')
+  }
+
+  // Sem estúdio ativo: mesma resposta de senha errada, sessão encerrada (RF-11).
+  if (estudios === 0) {
+    await conexao.sairLocal()
+    await conexao.registrarTentativaFalha()
+    throw new Recusa('sem_login')
+  }
+
+  if (estudios === 1) {
+    const [unico, ...outros] = await conexao.meusEstudios()
+    if (unico && outros.length === 0) {
+      await conexao.escolherEstudio(unico.orgId)
+      return { destino: 'inicio' }
+    }
+    return { destino: 'escolher_estudio' }
+  }
+
+  // Mais de um: já escolhido e ativo segue nele; senão, Escolher estúdio.
+  const sessao = await conexao.contexto()
+  return { destino: sessao.orgId ? 'inicio' : 'escolher_estudio' }
+}
+
+export const entrar = acaoPost.handler(
+  acao({
+    nome: 'sessao.entrar',
+    metodo: 'POST',
+    sessao: 'nenhuma',
+    permissao: 'qualquer',
+    entrada: entradaDeEntrar,
+    grava: true,
+    trabalho: trabalhoDeEntrar,
+  }),
+)
+
+/** O que a tela sabe da sessão (sem dado pessoal). */
+export type SessaoLida = {
+  readonly comSessao: boolean
+  readonly comEstudio: boolean
+  readonly idioma: Idioma
+}
+
+export const lerSessao = acaoGet.handler(
+  acao({
+    nome: 'sessao.ler',
+    metodo: 'GET',
+    sessao: 'opcional',
+    permissao: 'qualquer',
+    entrada: z.strictObject({}),
+    grava: false,
+    trabalho: async (ctx): Promise<SessaoLida> => ({
+      comSessao: ctx.sessao !== null,
+      comEstudio: ctx.sessao?.orgId != null,
+      idioma: ctx.sessao?.idioma ?? ctx.idiomaDoNavegador,
+    }),
+  }),
+)
+
+export const sair = acaoPost.handler(
+  acao({
+    nome: 'sessao.sair',
+    metodo: 'POST',
+    sessao: 'pessoa',
+    permissao: 'qualquer',
+    entrada: z.strictObject({}),
+    grava: true,
+    // Marca a sessão como encerrada (sem apagar) e chama signOut local MESMO se a marcação falhar (D4; R-16).
+    trabalho: async ({ conexao }) => {
+      try {
+        await conexao.encerrarSessao()
+      } catch {
+        // segue para o signOut
+      }
+      await conexao.sairLocal()
+      return null
+    },
+  }),
+)
+
+export const listarEstudios = acaoGet.handler(
+  acao({
+    nome: 'estudio.listar',
+    metodo: 'GET',
+    sessao: 'pessoa',
+    permissao: 'qualquer',
+    entrada: z.strictObject({}),
+    grava: false,
+    // Só estúdios com papel ativo da pessoa, por nome, até 50 (RF-13).
+    trabalho: async ({ conexao }) => conexao.meusEstudios(),
+  }),
+)
+
+export const escolherEstudio = acaoPost.handler(
+  acao({
+    nome: 'estudio.escolher',
+    metodo: 'POST',
+    sessao: 'pessoa',
+    permissao: 'qualquer',
+    entrada: z.strictObject({ orgId: z.uuid() }),
+    grava: true,
+    // Escolher e trocar (RF-12, RF-14): sem vínculo ativo → sem_permissao, nada muda (CA-05).
+    trabalho: async ({ conexao }, { orgId }) => {
+      await conexao.escolherEstudio(orgId)
+      return null
+    },
+  }),
+)
