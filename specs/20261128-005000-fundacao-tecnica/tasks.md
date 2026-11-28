@@ -2,7 +2,9 @@
 
 - **Spec:** `spec.md` · **Plano:** `plan.md` · **ADR:** `docs/adr/0002-fundacao-tecnica-ferramentas-e-versoes.md`
 - **Escrito por:** Arquiteto de software · Norma: modelo C4 e ADR · **Revisão:** pendente (etapas 5 e 5b)
-- **Começa só depois** da spec com "Status: Approved" e a linha "Aprovação do dono" (`AGENTS.md` §3 regra 1).
+- **Pode começar antes da aprovação**, só em PR de rascunho (E22·B, spec §5); nada é juntado sem a spec com "Status: Approved",
+  a linha "Aprovação do dono" e a autorização do merge (`AGENTS.md` §3 regra 1 e §8). Se a aprovação mudar a spec, o
+  construído se ajusta antes da revisão.
 - Só os arquivos do `plan.md` §3. Falhou: refaz e confere; o mesmo erro duas vezes, para e relata (`AGENTS.md` §6).
 - Commits pequenos, Conventional Commits, citando a spec (`CONTRIBUTING.md` §5). Ninguém revisa o que fez.
 
@@ -21,7 +23,7 @@
 | 9 | `.github/workflows/ci.yml` (4 jobs, gatilhos, permissões e ações fixadas por commit do `plan.md` §8); `.github/dependabot.yml`; apagar `.github/.gitkeep` | Engenheiro de DevOps | YAML válido; nenhum segredo, nenhum `pull_request_target` |
 | 10 | Rodar na máquina todos os scripts e o gitleaks em contêiner sobre o histórico inteiro | Engenheiro de DevOps | tudo verde; nenhum achado |
 | 10b | Travas do antigo (R17): para cada T1 a T18 do `plan.md` §13, decidir copiar, reescrever ou descartar (a sugestão do Arquiteto é ponto de partida, não ordem); registrar cada decisão e o motivo em `docs/adr/0003-travas-do-projeto-antigo.md`; construir só as que entram, com teste próprio, nos arquivos de destino do §3; o job `travas` no `ci.yml`; `groups` no `dependabot.yml`. Nada de dado real ou segredo do antigo; ler o antigo só em `/home/user/crm-agenda` (só leitura) | Engenheiro de DevOps (CI e ganchos); o papel da área se a trava for de banco ou tela | ADR 0003 completo; `node` nos testes das travas verde |
-| 11 | Texto: `AGENTS.md` §1 (exato do `plan.md` §6), `processo-sdd.md` §5 (exato do §7) e `README.md` "Como rodar" (os comandos do §5 e, se T6 entrar, `git config core.hooksPath .githooks`) | Documentador | igual ao plano, palavra por palavra |
+| 11 | Texto: `AGENTS.md` §1 (exato do `plan.md` §6), `processo-sdd.md` §5 linhas 61 a 63 (exato do §7) e `README.md` "Como rodar" (os comandos do §5 e, se T6 entrar, `git config core.hooksPath .githooks`) | Documentador | igual ao plano, palavra por palavra |
 | 12 | Abrir o PR `chore/fundacao-tecnica` → `previas` (rascunho permitido pelo E22·B); CI roda sozinha | Engenheiro de DevOps | todos os jobs verdes (CA7) |
 
 ## Revisão (etapa 9)
@@ -32,6 +34,7 @@
 | 14 | Revisar o banco local (migration, teste, scripts sem remoto) | Engenheiro de dados que **não** fez o passo 7, e Auditor de risco | relatório sem "Bloqueia" |
 | 15 | Revisar CI e segredos: permissões, gatilhos, ações por commit, `--redact`, Dependabot, `allowBuilds` (se houver), skills de terceiros do Spec Kit em `.claude/skills/speckit-*`; as travas trazidas e o `.claude/settings.json` | Engenheiro de segurança e Auditor de risco | relatórios sem "Bloqueia" |
 | 15b | Conferir as decisões do ADR 0003, trava por trava (E16·1: outro papel confere) | Auditor de risco | conferência registrada no ADR 0003 |
+| 15c | Revisar o ADR 0002 (D1 a D4, D9 a D11 pelo Revisor de código; D5 a D8 pelo Auditor de risco) e o ADR 0003 (Revisor de código no código das travas; Auditor de risco nas decisões) | Revisor de código e Auditor de risco | "Revisão" preenchida nos dois ADR, sem "Bloqueia" |
 | 16 | Prova do CA8 em branch descartável com token falso; apagar a branch | QA com o Engenheiro de segurança | job `segredos` vermelho, achado mascarado; branch apagada |
 | 17 | Veredito de CA1 a CA13 pelo `plan.md` §11, incluindo a prova manual do CA4 e o CA9 na aba do Dependabot | Analista de qualidade (QA) | veredito com links |
 | 18 | Revisar o texto do passo 11, incluindo o `README.md` (CA13) | Analista de requisitos | igual aos scripts |

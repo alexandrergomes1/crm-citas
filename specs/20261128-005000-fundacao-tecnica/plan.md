@@ -79,11 +79,11 @@ trava T5 do §13 o cria).
 `.claude/hooks/guarda.test.mjs`, `.claude/hooks/regras-de-envio.mjs`, `.claude/hooks/decisao-com-prova.mjs`,
 `.claude/hooks/decisao-com-prova.test.mjs`, `.claude/hooks/inicio-de-sessao.mjs`,
 `.claude/hooks/inicio-de-sessao.test.mjs`, `.githooks/pre-push`, `.githooks/pre-push.mjs`, `.githooks/pre-push.test.mjs`,
-`.github/pull_request_template.md`, o job `travas` no `.github/workflows/ci.yml`, a chave `groups` no
+o job `travas` no `.github/workflows/ci.yml`, a chave `groups` no
 `.github/dependabot.yml`, e `docs/adr/0003-travas-do-projeto-antigo.md`.
 
 **Texto (Documentador)**: `AGENTS.md` §1, só o parágrafo "Comandos" (§6 deste plano); `docs/guias/processo-sdd.md` §5,
-só a linha dos nomes dos comandos (§7 deste plano); `README.md`, só a seção "Como rodar" (R16 e CA13: os mesmos
+só as linhas 61 a 63 (texto exato do §7 deste plano, aprovado pelo dono junto com a spec); `README.md`, só a seção "Como rodar" (R16 e CA13: os mesmos
 comandos do §5); `docs/STATUS.md`, `docs/BACKLOG.md`, `CHANGELOG.md` (R16); `docs/decisoes/` (fala de 28/11 sobre
 repositório público e aprovação do R15).
 
@@ -154,11 +154,17 @@ roda a checagem de tipos, o lint e os testes." pelo texto abaixo; o resto do par
   continua sendo aberta pelo Engenheiro de DevOps na etapa 2, como o `processo-sdd.md` §2 já manda. Sem a extensão, o
   Spec Kit cria a pasta da spec e não cria branch (mesma fonte, "Graceful Degradation"). Ver §10 R-2 (CA11).
 - Constituição `.specify/memory/constitution.md`: só uma linha que aponta para o `AGENTS.md` (R9).
-- Texto para o `processo-sdd.md` §5 (troca a linha "Os nomes exatos dos comandos entram aqui..."):
-  > Comandos (Spec Kit 1.4.5, no chat do Claude Code): `/speckit-specify` e `/speckit-clarify` (etapa 3) ·
-  > `/speckit-plan`, `/speckit-checklist` e `/speckit-tasks` (etapa 4) · `/speckit-analyze` (etapa 5) ·
-  > `/speckit-implement` e `/speckit-converge` (etapa 8, repetidos até "Converged") · `/speckit-constitution` só aponta
-  > para o `AGENTS.md`. A branch é aberta na etapa 2, não pelo Spec Kit.
+- **Texto exato novo do `processo-sdd.md` §5, linhas 61 a 63** (o guia foi aprovado no E11; este texto vai à aprovação
+  do dono junto com a spec, como o do `AGENTS.md` §1 no R15). Substitui as duas frases "Na instalação: pastas com data e
+  hora (...) usa outro padrão." e "Os nomes exatos dos comandos entram aqui (...) oficial dela.":
+  > - Na instalação (Spec Kit 1.4.5): pastas com data e hora (`feature_numbering: timestamp`). O Spec Kit não cria a
+  >   branch: o modelo de branch dele não gera `tipo/area-assunto`, por isso a branch é aberta pelo Engenheiro de DevOps
+  >   na etapa 2, nesse padrão.
+  > - Comandos, no chat do Claude Code: `/speckit-specify` e `/speckit-clarify` (etapa 3) · `/speckit-plan`,
+  >   `/speckit-checklist` e `/speckit-tasks` (etapa 4) · `/speckit-analyze` (etapa 5) · `/speckit-implement` e
+  >   `/speckit-converge` (etapa 8, repetidos até "Converged") · `/speckit-constitution` só aponta para o `AGENTS.md`.
+- Motivo da troca: o texto aprovado diz que a instalação fixa o nome da branch; a ferramenta oficial não consegue
+  (fonte acima). A intenção do dono (branch `tipo/area-assunto`) fica igual; muda só quem a cria.
 
 ## 8. CI (R10, R11) · `.github/workflows/ci.yml`
 - **Quando roda:** `pull_request` para `previas` e `main`; `push` em `previas` e `main` (o verde fica registrado depois do
@@ -205,7 +211,8 @@ roda a checagem de tipos, o lint e os testes." pelo texto abaixo; o resto do par
 | Regras de branch (para o D3) | "Rulesets are available in public repositories with GitHub Free" (`https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets`) | D3 possível sem custo |
 | Supabase | roda local em Docker; nada de projeto remoto | sem custo |
 
-Nenhum custo ou limite que afete o projeto foi achado (R13 não para o trabalho; E23·3·A atendido).
+Nenhum custo ou limite que afete o projeto foi achado (R13 não para o trabalho). O plano segue só o gratuito, como recomenda a E23·3·A; a resposta da E23·3 é do dono e
+está pendente.
 
 ## 10. Riscos, com recomendação
 
@@ -255,7 +262,7 @@ público. Proposta para o pedido separado, com cliques exatos montados pelo Enge
   `data` dentro de `src/domain` daria falso alarme. Regra: entre camadas, importar sempre por `@/`. Se ficar curto,
   trocar por `eslint-plugin-boundaries` 7.4.5 (resolve o caminho real) num ADR novo.
 - R-9 · O teste de tela usa o servidor de desenvolvimento, não o build: o build de produção só existe com a spec da
-  Cloudflare (E23·2). A troca entra nela.
+  Cloudflare, se o dono escolher E23·2·A (pendente); com E23·2·B, a troca entra nesta spec e o plano é refeito.
 - R-10 · Telemetria do Supabase CLI: a página oficial de telemetria deu 404 em 27/11/2026; desligar só depois de ler a
   forma certa (tarefa 7).
 - R-11 · (resolvido em 28/11) o `README.md` "Como rodar" entrou no R16 e no CA13 da spec.
@@ -276,7 +283,7 @@ público. Proposta para o pedido separado, com cliques exatos montados pelo Enge
 | CA10 | §9 deste plano | Analista de requisitos |
 | CA11 | `git diff --stat` só com `.specify/**` e `.claude/skills/speckit-*`; criar spec de teste, conferir pasta com data e hora, apagar; constituição com uma linha | QA |
 | CA12 | `git diff --name-only previas...HEAD` comparado com o §3; job `segredos` verde | Revisor de código, Auditor de risco |
-| CA13 | §5 igual ao `package.json`; `AGENTS.md` §1 e `processo-sdd.md` §5 iguais ao §6 e §7; "Como rodar" do `README.md` com os mesmos comandos do §5 | outro papel que não o Documentador (Analista de requisitos) |
+| CA13 | §5 igual ao `package.json`; `AGENTS.md` §1 e `processo-sdd.md` §5 (linhas 61 a 63) iguais ao §6 e §7; "Como rodar" do `README.md` com os mesmos comandos do §5 | outro papel que não o Documentador (Analista de requisitos) |
 | R17 | cada trava do §13 com a decisão final no ADR 0003, conferida por outro papel; teste próprio verde no job `travas` | Engenheiro de DevOps decide; Engenheiro de segurança e Auditor de risco conferem |
 
 ## 12. Não verificado (nesta etapa)
@@ -312,7 +319,7 @@ mesma intenção, código novo, apontando para as regras **deste** projeto (`AGE
 | T9 | `.github/workflows/seguranca.yml` | gitleaks pela `gitleaks-action@v2` | **Descartar**: já coberto pelo job `segredos` (ADR 0002 · D5); a v2 para de funcionar em 16/09/2026 (README oficial da ação) |
 | T10 | `.github/dependabot.yml` | mensal, para a `previas`, junta menores e correções num PR só, no máximo 2 abertos | **Reescrever em parte**: trazer só `groups` (menos PRs); manter semanal (Assumption 7 da spec) |
 | T11 | `.github/workflows/ci.yml` e `e2e.yml` | checagens do app, teste de tela, `wrangler deploy --dry-run` | **Descartar**: substituídos pelo §8; usam ações sem fixar commit e Cloudflare (fora de escopo) |
-| T12 | `.github/pull_request_template.md` | molde do PR no formato do pedido de merge | **Reescrever** apontando para `docs/moldes/pergunta.md` (fonte única); não é trava, mas evita PR sem prova |
+| T12 | `.github/pull_request_template.md` | molde do PR no formato do pedido de merge | **Fora do item 2**: não é trava (só preenche o texto do PR; nada barra se o molde for ignorado). Se o dono quiser, entra numa spec de texto, apontando para `docs/moldes/pergunta.md` |
 | T13 | `.claude/rules/*.md` e `.cursor/rules/*.mdc` | regras por pasta (banco, servidor, tela) para Claude e Cursor | **Descartar**: duplicam os `src/*/AGENTS.md` (E15) e citam pastas do antigo; duas fontes da mesma regra divergem |
 | T14 | `migrations-dev.yml`, `scripts/db/apply-dev.sh`, `apply-migrations.sh` | aplica migrations no banco remoto de desenvolvimento pela CI | **Descartar agora**: banco remoto está fora desta spec; candidato do item 3 |
 | T15 | `backup-diario.yml`, `teste-restauracao.yml` | cópia cifrada do banco em R2 e B2 e teste mensal de restauração (desligados) | **Descartar agora**: usam segredos e banco remoto; candidatos da spec de recuperação (`ARCHITECTURE.md` §9) |

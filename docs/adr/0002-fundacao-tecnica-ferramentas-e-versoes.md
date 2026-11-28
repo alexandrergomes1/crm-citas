@@ -9,7 +9,8 @@
 
 ## Contexto
 A spec da fundação pede app vazio, camadas, testes, banco local, Spec Kit, CI, gitleaks e Dependabot, com versões lidas
-na fonte oficial (Assumptions 1 a 7). O repositório é público de propósito (fala do dono de 28/11/2026, a gravar).
+na fonte oficial (Assumptions 1 a 7). O repositório é público de propósito (fala do dono de 28/11/2026; o Documentador a grava em `docs/decisoes/` no PR
+desta spec, R16).
 
 ## Decisões
 
@@ -30,5 +31,6 @@ na fonte oficial (Assumptions 1 a 7). O repositório é público de propósito (
 ## Consequências
 - Atualizar Node, TypeScript ou ESLint vira PR do Dependabot para a `previas`, revisado como qualquer outro.
 - O TypeScript 7 espera o typescript-eslint; a imagem do gitleaks se atualiza à mão (o Dependabot não a vê dentro de `run:`).
-- O CA11 da spec precisa de nova redação (o Spec Kit não cria a branch); pedido ao Analista de requisitos.
+- O CA11 da spec foi reescrito pelo Analista em 28/11 (o Spec Kit cria a pasta e não cria a branch), e o `processo-sdd.md`
+  §5 linhas 61 a 63 ganha texto novo, aprovado pelo dono junto com a spec (`plan.md` §7).
 - Para desfazer qualquer decisão: ADR novo que substitui esta linha, com o motivo.

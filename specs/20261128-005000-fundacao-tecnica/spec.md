@@ -19,6 +19,9 @@
   GitHub Actions: "Eu deixei público o projeto para vc ter os actions pra usar se preciso pq no privado tá sem
   limite. Salvo se conseguires mudar entre público e privado qdo precisar ." (E19·1 troca, PR #2; ver §8, D1).
 - E22·B (28/11/2026): travas do antigo autorizadas e construção em PR de rascunho (ver §5).
+- Por que o item 2 anda com o item 1 ainda em revisão: o "Pedido (núcleo de uma vez)" ("veja se consegue construir
+  todo o núcleo com os devidos papéis rodando adequadamente nele (...) talvez pulando a regra de um item por vez") e a
+  resposta E22·B, que autoriza specs e construção em PRs de rascunho, sem merge sem o dono (`docs/decisoes/`, PR #2).
 
 ## 2. Objetivo
 Deixar o projeto pronto para construir com segurança: um app vazio que roda, as quatro camadas no lugar, testes e
@@ -42,7 +45,7 @@ checagens automáticas a cada PR, banco local para testes e o Spec Kit instalado
 | R12 | Dependabot ligado para as dependências do pnpm e para as ações do GitHub Actions. | E14·3; `SECURITY.md` §7 |
 | R13 | Gratuidade e limites de GitHub Actions, Dependabot e gitleaks em repositório público confirmados na documentação oficial, com link e data, no plano. Achou custo ou limite que afete o projeto: o trabalho para e vira pergunta ao dono. | E14·3 ("se for gratuito ver limites tbm") |
 | R14 | Testes e CI usam só dados fictícios; nenhum dado pessoal ou de saúde, nenhum segredo. | `AGENTS.md` §6; E5·1 |
-| R15 | `AGENTS.md` §1 recebe a lista de comandos do R7. O texto exato vai no plano e é aprovado pelo dono junto com esta spec; o Documentador registra a aprovação em `docs/decisoes/`. | `AGENTS.md` §1 e cabeçalho |
+| R15 | `AGENTS.md` §1 recebe a lista de comandos do R7. O texto exato vai no plano e é aprovado pelo dono junto com esta spec; o Documentador registra a aprovação em `docs/decisoes/`. Junto, vai à aprovação do dono a mudança de regra no `docs/guias/processo-sdd.md` §5 (linhas 61 a 63: o nome da branch não vem do Spec Kit; nomes dos comandos), com o texto exato no plano. | `AGENTS.md` §1 e cabeçalho; `processo-sdd.md` (aprovado no E11) |
 | R16 | Documentos de controle (`docs/STATUS.md`, `docs/BACKLOG.md`, `CHANGELOG.md`) e a seção "Como rodar" do `README.md` atualizados no mesmo PR, pelo Documentador. | `AGENTS.md` §9 |
 
 ## 4. Fora de escopo
