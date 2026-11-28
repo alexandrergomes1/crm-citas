@@ -2,8 +2,9 @@
 
 - **Pasta:** `specs/20261128-004500-ordem-e21/` · **Branch:** `docs/ordem-e21`
 - **Tipo:** texto e regras · **Escrita por:** Analista de requisitos · **Norma:** IEEE 29148 e BABOK
-- **Status:** Draft
-- **Aprovação do dono:** (pendente)
+- **Status:** Approved
+- **Aprovação do dono:** "E34a" (E34·A: aprovar a spec e juntar) · 28/11/2026 · https://claude.ai/code/session_018cV8b9epaQJNqguG5c5Aqb · gravado pelo Analista de requisitos (E16·3).
+- **Aprovação do merge:** "E34a" · 28/11/2026 · https://claude.ai/code/session_018cV8b9epaQJNqguG5c5Aqb · commit `21d2c38` (PR #3), com a exceção "sem CI" do E19; juntado depois do PR #2, com a branch atualizada pela `previas` · gravado pelo Engenheiro de DevOps.
 
 ## 1. Pedido literal do dono (28/11/2026, https://claude.ai/code/session_018cV8b9epaQJNqguG5c5Aqb)
 - **E21·1:** "E21-1: Módulos, inverta o partes do sistema pelo "depois um por vez". Pois esses do item 2(partes do
