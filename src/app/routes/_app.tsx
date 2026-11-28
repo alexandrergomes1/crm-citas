@@ -41,8 +41,8 @@ function AreaComSessao() {
     <>
       <BarraSuaConta
         textos={textosDe(sessao.idioma)}
-        // Inicial = primeira letra do e-mail (DESIGN.md §8b), vinda de sessao.ler. Sem ela, a bolinha fica vazia:
-        // a ficha (E41) não define um estado neutro (pendente, para o Designer de produto).
+        // Inicial = primeira letra do e-mail (DESIGN.md §8b), vinda de sessao.ler. Sem ela, a bolinha mostra o
+        // ícone `user` (E47·2·A).
         inicial={sessao.inicial ?? ''}
         quantosEstudios={quantosEstudios}
         onTrocar={() => void navegar({ to: '/escolher-estudio' })}

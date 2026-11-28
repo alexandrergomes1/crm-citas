@@ -1,10 +1,10 @@
 // Sua conta (spec RF-14, RF-30; ficha E41; DESIGN.md §6, §8, §8b "Sua conta"): a barra com a bolinha da pessoa e o
 // menu (computador) ou a folha (celular). Itens na ordem do §8b; Minha conta, Preferências e Meu faturamento
-// esmaecidos com "em desenvolvimento" (aria-disabled); "Trocar de estúdio" só com mais de um estúdio.
-import { useEffect, useId, useLayoutEffect, useRef, useState, type KeyboardEvent } from 'react'
+// esmaecidos com "em desenvolvimento" (aria-disabled); "Trocar de empresa" só com mais de uma empresa.
+import { useEffect, useId, useLayoutEffect, useRef, useState, type KeyboardEvent, type Ref } from 'react'
 import type { Textos } from '@/app/i18n/textos'
 import { Folha } from '@/app/ui/camadas'
-import { SuaConta } from '@/app/ui/conteudo'
+import { Icone } from '@/app/ui/icone'
 
 export type ItemSuaConta = {
   readonly id: 'minhaConta' | 'preferencias' | 'meuFaturamento' | 'trocarDeEstudio' | 'sair'
@@ -31,9 +31,30 @@ function ehComputador(): boolean {
   return getComputedStyle(document.documentElement).getPropertyValue('--mostra-computador').trim() !== 'none'
 }
 
+/**
+ * Bolinha 40 de Sua conta: a inicial da pessoa ou, sem ela, o ícone `user` (DESIGN.md §5 e §8b; E47·2·A). O nome no
+ * leitor é sempre "Sua conta" (aria-label); a letra e o ícone são enfeite. Mesmo desenho e classes da peça `SuaConta`
+ * de `src/app/ui/conteudo.tsx`, que só aceita a inicial em texto; aceitar o ícone lá é a correção de fundo, mas o
+ * arquivo está fora da lista do plan.md §10 (igual ao `ErroSemFrase` de escolher-estudio.tsx).
+ */
+export function BolinhaDaConta({
+  nome,
+  inicial,
+  onClick,
+  ref,
+}: Readonly<{ nome: string; inicial: string; onClick?: () => void; ref?: Ref<HTMLButtonElement> }>) {
+  return (
+    <button ref={ref} type="button" className="ds-sua-conta" aria-label={nome} onClick={onClick}>
+      <span className="ds-bolinha" aria-hidden="true">
+        {inicial === '' ? <Icone nome="user" /> : inicial}
+      </span>
+    </button>
+  )
+}
+
 export interface MenuSuaContaProps {
   textos: Textos
-  /** primeira letra do e-mail da própria pessoa (DESIGN.md §8b) */
+  /** primeira letra do e-mail da própria pessoa (DESIGN.md §8b); vazia → ícone `user` (E47·2·A) */
   inicial: string
   quantosEstudios: number
   onTrocar: () => void
@@ -52,7 +73,7 @@ export function MenuSuaConta({ textos, inicial, quantosEstudios, onTrocar, onSai
   const itens = itensDaConta(textos, quantosEstudios)
   const nome = textos.suaConta.nome
 
-  // A peça SuaConta (item 4) não recebe atributos ARIA: o estado do botão é posto aqui (padrão Menu Button do APG)
+  // A bolinha (desenho da peça SuaConta, item 4) não recebe atributos ARIA: o estado do botão é posto aqui (padrão Menu Button do APG)
   useEffect(() => {
     const el = botao.current
     if (!el) return
@@ -78,7 +99,7 @@ export function MenuSuaConta({ textos, inicial, quantosEstudios, onTrocar, onSai
   }, [aberto])
 
   // Seta para baixo ou para cima no botão abre o menu no primeiro item (padrão Menu Button do APG; igual ao
-  // MenuAcoes). A peça SuaConta (item 4) não recebe onKeyDown: a escuta vai direto no botão. No celular o botão
+  // MenuAcoes). A bolinha não recebe onKeyDown: a escuta vai direto no botão. No celular o botão
   // abre uma folha (diálogo), que não usa setas.
   useEffect(() => {
     const el = botao.current
@@ -141,7 +162,7 @@ export function MenuSuaConta({ textos, inicial, quantosEstudios, onTrocar, onSai
 
   return (
     <div className="ds-menu" ref={raiz}>
-      <SuaConta
+      <BolinhaDaConta
         ref={botao}
         nome={nome}
         inicial={inicial}

@@ -40,6 +40,7 @@ import {
   ShieldAlert,
   Tag,
   ThumbsUp,
+  User,
   UserPlus,
   UserX,
   Users,
@@ -48,7 +49,7 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 
-/** Ícones do DESIGN.md (§5 status, situação, etiquetas, senha; §8b menu principal e Agendar). */
+/** Ícones do DESIGN.md (§5 status, situação, etiquetas, senha, Sua conta; §8b menu principal e Agendar). */
 const nomeados = {
   clock: Clock,
   'thumbs-up': ThumbsUp,
@@ -81,6 +82,8 @@ const nomeados = {
   // Senha: Mostrar e Esconder (DESIGN.md §5; ficha E41·2·A)
   eye: Eye,
   'eye-off': EyeOff,
+  // Sua conta sem e-mail: na bolinha, no lugar da inicial (DESIGN.md §5 e §8b; E47·2·A)
+  user: User,
 } satisfies Record<string, LucideIcon>
 
 /**

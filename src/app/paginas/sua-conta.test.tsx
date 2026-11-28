@@ -48,6 +48,25 @@ describe('Menu Sua conta (computador)', () => {
   })
 })
 
+describe('Bolinha de Sua conta sem inicial (DESIGN.md §5 e §8b; E47·2·A)', () => {
+  const html = renderToString(<BarraSuaConta textos={t} inicial="" quantosEstudios={1} onTrocar={nada} onSair={nada} />)
+  const bolinha = /<span class="ds-bolinha" aria-hidden="true">(.*?)<\/span>/.exec(html)?.[1] ?? ''
+
+  it('mostra o ícone user (lucide), decorativo, no lugar da letra', () => {
+    expect(bolinha).toMatch(/^<svg[^>]*class="lucide lucide-user ds-ic"[^>]*aria-hidden="true"/)
+    expect(bolinha).toMatch(/<\/svg>$/)
+  })
+
+  it('o nome acessível continua "Sua conta"', () => {
+    expect(html).toMatch(/<button type="button" class="ds-sua-conta" aria-label="Sua conta">/)
+  })
+
+  it('com inicial, a letra e nenhum ícone na bolinha', () => {
+    const comLetra = renderToString(<BarraSuaConta textos={t} inicial="P" quantosEstudios={1} onTrocar={nada} onSair={nada} />)
+    expect(/<span class="ds-bolinha" aria-hidden="true">(.*?)<\/span>/.exec(comLetra)?.[1]).toBe('P')
+  })
+})
+
 describe('Sua conta · idiomas (CA-20)', () => {
   it.each(['es', 'en'] as const)('em %s', (idioma) => {
     const tt = textosDe(idioma)
