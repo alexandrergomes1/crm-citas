@@ -61,9 +61,8 @@ A Agenda passa a ler os agendamentos do dia (sua 4ª ida ao banco, ADR 0006 · D
   aceitam desfazer a **última** troca da **mesma pessoa** (ADR 0010 · D3), sem prazo. A duração vai à ficha visual (etapa 6).
 - **L-4 · Cliente arquivada.** A spec não diz se se agenda cliente arquivada. **Recomendo:** a busca da etapa 1 mostra só
   as ativas (a lista padrão de Clientes); o banco recusa só cliente apagada (sem nome).
-- **L-5 · Hora que não existe ou que se repete no dia da troca de horário** (CA-03). Regra técnica do ADR 0010 · D2
-  ("compatível": hora que não existe anda para a frente; hora repetida fica com a primeira). Aparece na conferência:
-  **recomendo** entrar como Assumption 8.
+- **L-5 · Hora que não existe ou que se repete no dia da troca de horário** (CA-03). **Resolvida pelo Analista** (RF-17
+  e Assumption 9 da spec): hora que não existe é recusada com mensagem; hora repetida fica com a primeira (ADR 0010 · D2).
 - **L-6 (só texto):** o cabeçalho diz "Branch: `feat/agendamento` (a partir da `previas`)", mas ela é empilhada (§11).
 
 ## 3. Dúvidas em aberto: o plano usa a recomendação
@@ -187,12 +186,12 @@ de agendamento, itens e histórico precisa ser uma só). Se o formato for outro,
 |---|---|---|
 | `tipos.ts` | `Status` (os 7), `Agendamento`, `Item`, `Troca` (de, para, origem, por) | — |
 | `status.ts` | tabela de transições; finais; `podeTrocar(de, para, { temCheckoutFechado })` (Cancelado e Ausência recusados com checkout fechado, RF-17); `podeDesfazer(ultimaTroca, quem, statusAtual)`; `podeRemarcar(status)` e o status depois de remarcar; o que pede janelinha (Cancelado, Ausência) e o que tem "Desfazer" | RF-05, RF-07, RF-08, Checkout RF-17 |
-| `horario.ts` | data e hora local → instante no fuso do estúdio (regra "compatível", ADR 0010 · D2, sobre `src/domain/agenda/dia.ts`); fim = início + soma das durações em minutos corridos; início no passado (o "agora" chega por parâmetro); conflito pela **mesma** regra de `src/domain/agenda/bloqueio.ts` (ADR 0010 · D5); tetos de 10 serviços e 24 h | RF-02, RF-04, RF-12, RF-13 |
+| `horario.ts` | data e hora local → instante no fuso do estúdio (ADR 0010 · D2, sobre `src/domain/agenda/dia.ts`): hora que não existe → `hora_inexistente`; hora repetida → a primeira; fim = início + soma das durações em minutos corridos; início no passado (o "agora" chega por parâmetro); conflito pela **mesma** regra de `src/domain/agenda/bloqueio.ts` (ADR 0010 · D5); tetos de 10 serviços e 24 h | RF-02, RF-04, RF-12, RF-13, RF-17 |
 | `acesso.ts` | quem cria, remarca e troca status (E26·2·A); o que sai do painel e da grade para a profissional em agendamento de outra (E26·1·B: só "ocupado"; a regra da grade continua em `src/domain/agenda/acesso.ts`) | RF-11 |
 
 - Testes obrigatórios: `status.test.ts` com os 49 pares (CA-01) e os casos de desfazer, remarcar e RF-17;
-  `horario.test.ts` com `Europe/Lisbon` em 29/03/2026 (01:30 não existe → 02:30; serviço de 120 min às 00:30 termina às
-  03:30) e 25/10/2026 (01:30 duas vezes → a primeira), `America/New_York` em 08/03/2026 e 01/11/2026, encostar, Cancelado
+  `horario.test.ts` com `Europe/Lisbon` em 29/03/2026 (01:30 não existe → recusada com `hora_inexistente`; serviço de 120 min às
+  00:30 termina às 03:30) e 25/10/2026 (01:30 duas vezes → a primeira), `America/New_York` em 08/03/2026 e 01/11/2026, encostar, Cancelado
   e Ausência, remarcar ignora o próprio, passado por 1 s (CA-02, CA-03); `acesso.test.ts` papel × ação (CA-06).
 
 ### 5.3 `src/server/agendamento/` (Engenheiro de software)
@@ -236,9 +235,10 @@ Leitura dos agendamentos do dia para a grade: **`src/data/agenda/agendamentos.ts
 
 - **Agenda (L-1):** `src/app/paginas/agenda/{agenda,barra,cartao}.tsx` e `src/app/navegacao.ts` trocam o "em
   desenvolvimento" de "Novo agendamento", "Agendar" e do toque no cartão pela abertura real.
-- **Idiomas (RNF-05):** chaves `agendamento.*` em `src/app/i18n/{pt,es,en}.ts` da Agenda (ADR 0006 · D1); códigos de
-  erro do servidor viram texto ali; datas e horas por `src/app/i18n/formatar.ts` no fuso do estúdio. O teste
-  `src/app/i18n/i18n.test.ts` da Agenda já confere as três (mesmas chaves, nenhuma vazia, mesmos marcadores).
+- **Idiomas (RNF-05):** chaves `agendamento.*` em `src/app/i18n/{pt,es,en}.ts`, a base comum que nasce na
+  `feat/entrar-servico` (molde do ADR 0006 · D1; Agenda e Clientes usam a mesma; ADR 0010 · D8); códigos de erro do
+  servidor (inclui `hora_inexistente`, RF-17) viram texto ali; datas e horas por `src/app/i18n/formatar.ts` no fuso do
+  estúdio. O teste `src/app/i18n/i18n.test.ts` da base confere as três (mesmas chaves, nenhuma vazia, mesmos marcadores).
 - Os nomes que faltam no `DESIGN.md` §6 (botão de avançar etapa, ação de remarcar no ⋮) entram pela ficha (etapa 6), nunca na construção.
 
 ## 6. Testes de tela (Playwright, projetos `celular` 390 e `computador` 1440 do item 2)
@@ -327,7 +327,7 @@ as migrations e testes dos itens 2 e 3 e dos outros módulos (inclusive `010_bas
 
 ## 11. Branch (decisão do Engenheiro de DevOps)
 `feat/agendamento` recebe, **por merge**, nesta ordem: `feat/banco-ligacao` e `feat/design-system-codigo` (as duas já
-com a `chore/fundacao-tecnica`), a branch da spec "Entrar e camada de serviço" (E36·A, nome dado pelo DevOps), e as dos
+com a `chore/fundacao-tecnica`), a branch da spec "Entrar e camada de serviço" (E36·A, `feat/entrar-servico`, que traz a base de `src/app/i18n/`), e as dos
 módulos de que depende: `feat/agenda`, `feat/clientes`, `feat/catalogo`; de novo sempre que elas ganharem commit. O
 Checkout **não** entra (ele depende do Agendamento). PR de rascunho empilhado; nunca se junta numa base. Quando as bases
 entrarem na `previas`, a base do PR passa à `previas`, antes do pedido de merge. Conflito esperado: `routeTree.gen.ts`

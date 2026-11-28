@@ -45,7 +45,7 @@
   E26·1·B, teto de 500).
 
 ## Fase 5 · Telas (Engenheiro de software, pela ficha aprovada)
-- [ ] **T12** · Chaves `agendamento.*` em `src/app/i18n/{pt,es,en}.ts` (o `i18n.test.ts` da Agenda fica verde).
+- [ ] **T12** · Chaves `agendamento.*` em `src/app/i18n/{pt,es,en}.ts` (base comum da `feat/entrar-servico`; o `i18n.test.ts` fica verde; inclui `hora_inexistente`).
 - [ ] **T13** · `src/app/routes/agendar.tsx`; `agenda.tsx` com o parâmetro `agendamento`; `navegacao.ts`.
 - [ ] **T14** · `src/app/paginas/agendamento/*` + `agendamento.test.tsx`, só com componentes do item 4 e as peças da T2.
 - [ ] **T15** · Agenda (L-1): `paginas/agenda/{agenda,barra,cartao}.tsx` abrem o Novo agendamento e o painel;
