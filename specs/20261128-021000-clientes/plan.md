@@ -9,8 +9,10 @@
   `eslint.config.mjs`, `src/`); item 3 (`feat/banco-ligacao`: `plan.md`, ADR 0005, as 4 migrations de rascunho da
   pasta de trabalho); item 4 (`feat/design-system-codigo`: `plan.md`, ADR 0004). Spec do Agendamento (`feat/agendamento`)
   só para o nome das ligações. Do antigo (só leitura, nada copiado): as migrations que a spec §8 lista.
-- **Decisões técnicas:** `docs/adr/<NNNN>-clientes-dados-busca-e-pedidos.md` (número: o próximo livre, dado pelo
-  Documentador ao abrir o PR; outros módulos planejam em paralelo). Escrito na tarefa 2, antes de qualquer migration.
+- **Decisões técnicas:** `docs/adr/0008-clientes-dados-busca-e-pedidos.md` (número dado na revisão 5b). Escrito na
+  tarefa 2, antes de qualquer migration.
+- **Base de entrada (E36·A, escolha do dono):** a spec "Entrar e camada de serviço" (branch `feat/entrar-servico`) traz
+  o login, o molde das 6 portas, a validação por esquema e a auditoria; Clientes só os usa.
 
 ## 1. Resumo (C4)
 **Contexto:** dona, recepção e profissional usam o app do estúdio; nenhum sistema externo novo. O arquivo exportado
@@ -34,9 +36,9 @@ A construção começa em PR de rascunho (E22·B), mas cada fase só começa qua
 
 | # | Falta | Bloqueia | Recomendação |
 |---|---|---|---|
-| B-1 | **Sessão e ligação do app ao banco**: login, cliente do banco no `src/data` com a sessão da pessoa, leitura do endereço e das chaves do ambiente (RF-08 do item 3 deixou "para a primeira spec que ligar `src/data`"). Nenhuma spec do núcleo cobre o login. | Fase C (servidor e dados reais) e o e2e com banco | spec própria, antes do primeiro módulo; a ordem da fila é do dono (`AGENTS.md` §5). Clientes **não** traz login |
-| B-2 | **Molde das 6 portas** (`src/server/portas/`): sessão, estúdio, papel, validação, banco, registro, iguais em todo módulo (`ARCHITECTURE.md` §4 "mesmo molde") | Fase C | entra com B-1 (mesma spec) para os 7 módulos não fazerem 7 moldes |
-| B-3 | **Auditoria (porta 6)**: o plano do item 3 §8 manda a spec dela entrar "antes do primeiro módulo que grava dado de cliente". Clientes é esse módulo | pedido de merge (RF-11) | spec própria antes do merge de Clientes |
+| B-1 | **Sessão e ligação do app ao banco**: login, cliente do banco no `src/data` com a sessão da pessoa, leitura do endereço e das chaves do ambiente (RF-08 do item 3) | Fase C (servidor e dados reais) e o e2e com banco | **resolvido pela E36·A:** vem da spec "Entrar e camada de serviço" (`feat/entrar-servico`). Clientes **não** traz login |
+| B-2 | **Molde das 6 portas** (`src/server/portas/`) e o esquema da porta 4, iguais em todo módulo (`ARCHITECTURE.md` §4 "mesmo molde") | Fase C | **E36·A:** mesma spec e branch; a biblioteca de esquema (`zod`) vem de lá |
+| B-3 | **Auditoria (porta 6)**: o plano do item 3 §8 manda entrar "antes do primeiro módulo que grava dado de cliente". Clientes é esse módulo | pedido de merge (RF-11) | **E36·A:** mesma spec; tem de estar juntada antes do pedido de merge de Clientes |
 | B-4 | **País do estúdio**: a spec pede o telefone "já preenchido com o país do estúdio", e `public.estudios` do item 3 não tem país (só fuso, moeda, idioma) | o campo telefone (RN-02) | o item 3 ganha a coluna `pais` (ISO 3166-1 alfa-2, `check ~ '^[A-Z]{2}$'`) no próprio plano; se não der a tempo, Clientes traz a migration M0 do §3 (já na lista fechada, condicional) |
 | B-5 | Itens 3 e 4 ainda sem construção na branch (as migrations do item 3 estão só na pasta de trabalho, sem commit; componentes do item 4 não existem) | Fases A e B | esperar os commits deles e juntar de novo (§10) |
 | B-6 | **Cópia diária** (E5·3): onde fica o diário de apagamentos fora do banco e o passo de restauração (DP-07, §6.3) | produção (não o merge na `previas`) | requisito escrito para a spec da cópia diária, já agora |
@@ -130,7 +132,7 @@ se o Engenheiro de dados provar no teste de volume (§7.2) que cabe.
 Cada ação é uma função de servidor do TanStack Start (nome e uso lidos na doc oficial ao construir, §13) que chama, nesta
 ordem, o molde de B-2: **1** sessão válida, senão 401 · **2** estúdio da sessão (o que vier no pedido é descartado pelo
 esquema: chave `org_id` ou parecida no corpo dá erro de validação, CA-04) · **3** `pode(papel, acao)` de
-`src/domain/clientes/permissoes.ts`, senão 403 · **4** esquema `zod` de `src/server/clientes/esquemas.ts` + regras de
+`src/domain/clientes/permissoes.ts`, senão 403 · **4** esquema (biblioteca da `feat/entrar-servico`) de `src/server/clientes/esquemas.ts` + regras de
 `src/domain` · **5** `src/data/clientes` com a sessão da pessoa (a RLS confere de novo) · **6** registro com `{acao,
 cliente_id, membro_id, org_id, quando}`, nunca nome, telefone, e-mail, nascimento ou texto buscado (RF-11).
 
@@ -209,7 +211,8 @@ os campos, sem ganho para dado que não é de saúde na v1.
 `src/domain/clientes/*.test.ts` (um por arquivo do §5); `src/server/clientes/acoes.test.ts` (ordem das portas; 401 e 403;
 `org_id` no corpo recusado; profissional não recebe nome nem serviço que não vê; teto de idas; registro sem dado
 pessoal); `src/server/clientes/exportar.test.ts` (cabeçalhos, nome do arquivo, conteúdo só da cliente, nada gravado);
-`src/app/paginas/clientes/textos.test.ts` (pt, es, en com as mesmas chaves, nenhuma vazia); `clientes.test.tsx`
+`src/app/i18n/i18n.test.ts` (da Agenda, ADR 0006: pt, es, en com as mesmas chaves e marcadores, já cobre as chaves
+novas de Clientes; não muda); `clientes.test.tsx`
 (`renderToString`, como no item 4).
 Varredura de dado pessoal (CA-08): os testes do servidor usam nome, telefone e e-mail fictícios marcados e conferem que
 nenhum aparece em URL, registro, mensagem de erro ou aviso.
@@ -234,14 +237,15 @@ ficar vermelho; desfazer (como a tarefa 8 do item 3).
 - `e2e/clientes-estados.spec.ts`: carregando (só depois de 0,3 s), vazio, sem resultado, aba vazia, erro.
 - `e2e/clientes-acessibilidade.spec.ts`: `@axe-core/playwright` (item 4) com as mesmas etiquetas WCAG, lista, perfil,
   painel e janelinha abertos; sem rolagem lateral.
-- Dados fictícios. Com B-1 pronto, contra o banco local com login de teste; antes dele, só a parte de tela roda, com um
+- Dados fictícios. Com a `feat/entrar-servico` juntada, contra o banco local com login de teste; antes dele, só a parte de tela roda, com um
   adaptador de dados de exemplo local (como o RF-15 do Agendamento), e o e2e completo fica "não verificado".
 
 ## 8. Idiomas (RNF-04)
-`src/app/paginas/clientes/textos/pt.ts`, `es.ts`, `en.ts`: o mesmo tipo de chaves (o TypeScript acusa chave faltando) e
-o teste de §7.1. O idioma vem de `estudios.idioma`; datas por `Intl.DateTimeFormat` com `timeZone` do estúdio (nativo,
-sem biblioteca; reuse). Os textos em pt saem do `DESIGN.md` §6 e §8 e da spec; es e en, pelo Designer de produto, com
-revisão de outro papel. Se uma spec de idiomas comum entrar antes, Clientes passa a usá-la (ADR novo).
+Pasta comum `src/app/i18n/` da Agenda (ADR 0006 · D1; reuse, `AGENTS.md` §3 regra 6): Clientes só **acrescenta** o
+bloco de chaves `clientes` em `pt.ts` (fonte das chaves), `es.ts` e `en.ts`; usa `textos.ts` (escolha pelo idioma,
+marcadores, plural) e `formatar.ts` (data no idioma e no fuso do estúdio) como estão; o `i18n.test.ts` já confere as três.
+O idioma vem de `estudios.idioma`. Os textos em pt saem do `DESIGN.md` §6 e §8 e da spec; es e en, pelo Designer de
+produto, com revisão de outro papel. Dependência: a pasta só existe na `feat/agenda` (R-9).
 
 ## 9. Lista FECHADA de arquivos
 Fora desta lista nada muda (`AGENTS.md` §6). Arquivo novo que uma ferramenta crie fora daqui: parar e relatar.
@@ -251,7 +255,7 @@ Fora desta lista nada muda (`AGENTS.md` §6). Arquivo novo que uma ferramenta cr
 - `supabase/migrations/<ts>_extensoes_busca.sql`, `<ts>_clientes.sql`, `<ts>_clientes_apagamentos.sql`,
   `<ts>_clientes_funcoes.sql`, `<ts>_clientes_politicas.sql`
 - `supabase/tests/database/clientes_100_isolamento_test.sql` a `clientes_150_volume_test.sql` (6 arquivos, §7.2)
-- `docs/adr/<NNNN>-clientes-dados-busca-e-pedidos.md` (decisões por tabela §3.6 e técnicas §13; conferência preenchida
+- `docs/adr/0008-clientes-dados-busca-e-pedidos.md` (decisões por tabela §3.6 e técnicas §13; conferência preenchida
   na revisão)
 
 **Regras (Engenheiro de software)**: `src/domain/clientes/{cliente,telefone,busca,ultima-visita,permissoes,exportacao,duplicado}.ts`
@@ -265,29 +269,33 @@ de tela, §7.3), `repositorio.test.ts`.
 **Telas (Engenheiro de software, pelo desenho do Designer de produto)**
 - `src/app/routes/clientes/index.tsx`, `src/app/routes/clientes/$clienteId.tsx`, `src/app/routeTree.gen.ts` (gerado)
 - `src/app/paginas/clientes/{lista,perfil,painel-cliente,filtros-ordem,confirmar-excluir}.tsx`, `clientes.css`,
-  `preferencias.ts`, `textos/{pt,es,en}.ts`, `textos.test.ts`, `clientes.test.tsx`
+  `preferencias.ts`, `clientes.test.tsx`
+- `src/app/i18n/pt.ts`, `es.ts`, `en.ts`: **só** o bloco `clientes` (as outras chaves e `textos.ts`, `formatar.ts`,
+  `i18n.test.ts` não mudam)
 - `e2e/clientes.spec.ts`, `e2e/clientes-estados.spec.ts`, `e2e/clientes-acessibilidade.spec.ts`
 
-**Raiz (Engenheiro de software)**: `package.json` e `pnpm-lock.yaml`, só `libphonenumber-js` 1.13.17 e `zod` 4.6.7
-(§13; `zod` sai daqui se B-2 já o trouxer).
+**Raiz (Engenheiro de software)**: `package.json` e `pnpm-lock.yaml`, só `libphonenumber-js` 1.13.17 (§13). O `zod`
+não entra aqui: vem da `feat/entrar-servico` (E36·A).
 
-**Ficha visual (Designer de produto)**: `specs/20261128-021000-clientes/ficha-visual.md` e `ficha/*.png` (390 e 1440,
-dados fictícios). **Texto (Designer de produto, só com o dono):** `DESIGN.md`, só as linhas aprovadas na ficha (título do
+**Ficha visual (Designer de produto; feita e conferida pelo Revisor de design ANTES de construir as telas)**:
+`specs/20261128-021000-clientes/ficha-visual.md` e `ficha/*.png` (desenho no canvas Design, 390 e 1440, dados
+fictícios). Depois da construção, o Revisor de design compara a tela com a ficha aprovada (tarefa 28). **Texto (Designer de produto, só com o dono):** `DESIGN.md`, só as linhas aprovadas na ficha (título do
 perfil, botão de agendar daqui, "Exportar dados da cliente").
 
 **Processo**: `specs/20261128-021000-clientes/{spec.md,plan.md,tasks.md}` · `docs/STATUS.md`, `docs/BACKLOG.md`,
 `CHANGELOG.md`, `docs/decisoes/2026-11-27-fundacao.md` (respostas E28), pelo Documentador.
 
 **Intactos:** `src/*/AGENTS.md`, `src/*/CLAUDE.md`, `src/app/ui/**` e `src/app/estilos/**` (item 4), `src/server/portas/**`
-(B-2), as migrations e testes dos itens 2 e 3, `supabase/config.jsonc`, `eslint.config.mjs`, `src/domain/exemplo.ts`
+(E36·A), `src/app/i18n/{textos,formatar,i18n.test}.ts` (Agenda), as migrations e testes dos itens 2 e 3, `supabase/config.jsonc`, `eslint.config.mjs`, `src/domain/exemplo.ts`
 (sai na spec que o Gerente indicar, para não haver conflito entre módulos paralelos), `ARCHITECTURE.md`, `SECURITY.md`,
 `.github/**`.
 
 ## 10. Branch (decisão do Engenheiro de DevOps)
-`feat/clientes` recebe por **merge** a `feat/banco-ligacao` e a `feat/design-system-codigo` (cada uma já com a
-`chore/fundacao-tecnica`), nessa ordem, antes da Fase A; e de novo sempre que elas ganharem commit. PR de rascunho
-empilhado; nunca se junta nelas. Quando os itens 2, 3 e 4 entrarem na `previas`, a base do PR passa à `previas`, antes
-do pedido de merge.
+`feat/clientes` recebe por **merge**, nesta ordem, a `feat/banco-ligacao` (item 3), a `feat/design-system-codigo`
+(item 4) e a `feat/entrar-servico` (E36·A), cada uma já com a `chore/fundacao-tecnica`; a Fase A espera só o item 3,
+a Fase B o item 4 e a Fase C a `feat/entrar-servico`; e junta de novo sempre que elas ganharem commit. PR de rascunho
+empilhado; nunca se junta nelas. Quando todas entrarem na `previas`, a base do PR passa à `previas`, antes do pedido de
+merge. A pasta `src/app/i18n/` vem da `feat/agenda` (R-9).
 
 ## 11. Papéis
 | Etapa | Papel |
@@ -316,14 +324,14 @@ do pedido de merge.
 | # | Decisão | Motivo e norma |
 |---|---|---|
 | D1 | Telefone por `libphonenumber-js` 1.13.17 (MIT, 19/11/2026, mais de 3 dias, regra do ADR 0002 · D4) | Assumption 3; biblioteca de mercado da numeração internacional (reuse, `AGENTS.md` §3 regra 6). Funções e conjunto de metadados lidos no README oficial ao construir (não lido nesta etapa) |
-| D2 | Esquema da porta 4 por `zod` 4.6.7 (MIT, 12/10/2026), salvo se B-2 escolher outro | `ARCHITECTURE.md` §4 porta 4 ("com esquema"); ASVS V5.1 |
+| D2 | Esquema da porta 4 pela biblioteca que a `feat/entrar-servico` fixar (E36·A); Clientes não escolhe outra | `ARCHITECTURE.md` §4 ("mesmo molde"); ASVS V5.1 |
 | D3 | Busca por `pg_trgm` com GIN sobre `nome_busca` (normalizado no domínio) e `telefone` | RNF-03 sem varrer a tabela; normalizar no domínio deixa a regra testável (CA-01) e evita `unaccent` em índice, que não é imutável (doc do Postgres) |
 | D4 | Página por cursor de id (50 itens), teto de 3 idas ao banco por ação | `ARCHITECTURE.md` §5 e §11; sem dado pessoal no cursor (DP-04) |
 | D5 | Apagar = anonimizar a linha + diário só de ids; arquivar e apagar só por funções com papel conferido | RN-07; histórico preservado; privilégio por coluna não distingue papéis (Postgres), a função sim (ASVS V4.1.3) |
 | D6 | Exportar em JSON montado em memória, `no-store`, nome com id e data | RGPD art. 20; ASVS V8.2.1, V8.3 |
 | D7 | `org_id` e `criada_por` com valor padrão da sessão e sem privilégio de gravação | RN-05; o pedido não consegue nem tentar (defesa em profundidade) |
 | D8 | `ultima_visita` guardada, mantida pela spec do Agendamento | §3.5 |
-| D9 | Textos por arquivo TS por idioma, datas por `Intl` | RNF-04; sem biblioteca nova |
+| D9 | Textos e datas pela pasta comum `src/app/i18n/` (ADR 0006 · D1), só com o bloco `clientes` novo | RNF-04; reuse |
 
 ## 14. Lacunas para o Analista de requisitos (não decido; `AGENTS.md` §4)
 - **L-1 · E28·2·B e a cliente recém-criada.** Pelo texto, a profissional vê só quem "já atendeu ou tem marcada com ela":
@@ -331,8 +339,8 @@ do pedido de merge.
   a opção B diz "e as que ela cadastrou". É acesso: muda o texto da E28·2·B antes de ir ao dono, sem virar 4ª dúvida.
 - **L-2 · País do estúdio (B-4):** a spec lista "estúdio com fuso e país" como entrega do item 3, que não o tem.
   Ajustar a dependência do item 3 ou aceitar a M0 aqui.
-- **L-3 · Auditoria (B-3):** a spec trata o registro como existente; o item 3 o empurra para spec própria. Fica explícito
-  na §11 da spec como dependência de merge.
+- **L-3 · Dependências (E36·A):** a spec §11 passa a citar a "Entrar e camada de serviço" (login, 6 portas,
+  auditoria) como dependência de construção da Fase C e do merge.
 
 ## 15. Riscos e não verificado
 - R-1 · Nada foi construído nem rodado. Bases dos itens 3 e 4 sem construção (B-5).
@@ -349,5 +357,8 @@ do pedido de merge.
   ficam alcançáveis pelo navegador com o token da pessoa, o que o `ARCHITECTURE.md` §4 proíbe ("navegador nunca fala
   direto com o banco"). A forma de ligar (REST com esquema fora da API, ou ligação direta ao Postgres com papel e
   declarações por transação) é decisão de B-1; Clientes fica isolado disso atrás de `src/data/clientes/repositorio.ts`.
-- R-8 · Numeração de ADR e de migrations com 7 módulos em paralelo: conflito de número na hora do merge; o Documentador
-  dá o número e o Engenheiro de dados regenera o carimbo da migration se preciso.
+- R-8 · Carimbo das migrations com 7 módulos em paralelo: conflito de ordem na hora do merge; o Engenheiro de dados
+  regenera o carimbo se preciso (o ADR já tem o número 0008).
+- R-9 · A pasta `src/app/i18n/` só existe na `feat/agenda`, que não está nos merges de entrada. Se ela não estiver na
+  `previas` quando a tarefa 16 começar, parar e o Gerente decide: juntar a `feat/agenda` também, ou a pasta passar à
+  `feat/entrar-servico`. Clientes não cria a pasta.
