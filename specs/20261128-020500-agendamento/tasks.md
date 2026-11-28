@@ -26,9 +26,10 @@
   (exclusão com `btree_gist`, trava por profissional para bloqueio × agendamento); confere no banco local que
   `btree_gist` e `dblink` existem. Escreve `docs/adr/0009-agendamento-tabelas-do-antigo.md` (leitura do antigo só das
   migrations citadas, E22·B, nada copiado).
-- [ ] **T4** · Migrations M1 a M6 (`plan.md` §4.2 a §4.5) com `pnpm exec supabase migration new`; carimbo depois das bases.
-- [ ] **T5** · pgTAP `agendamento_200` a `agendamento_260`; `pnpm db:start`, `pnpm db:test`, `pnpm db:stop` verdes,
-  incluindo o `010_` do item 3; prova de que os testes pegam erro (tirar o `where` da exclusão ou o `S`, ver vermelho, desfazer).
+- [ ] **T4** · Migrations M1 a M7 (`plan.md` §4.2 a §4.5a: inclui o gatilho de registro da spec Entrar e a função
+  `public.agendamento_criar`, `security invoker`) com `pnpm exec supabase migration new`; carimbo depois das bases.
+- [ ] **T5** · pgTAP `agendamento_200` a `agendamento_280`; a linha de `agendamento_criar` na lista do `010_`;
+  `pnpm db:start`, `pnpm db:test`, `pnpm db:stop` verdes, incluindo o `010_`; prova de que os testes pegam erro (tirar o `where` da exclusão ou o `S`, ver vermelho, desfazer).
 
 ## Fase 3 · Domínio (Engenheiro de software)
 - [ ] **T6** · `tipos.ts`, `status.ts` + `status.test.ts` (49 pares, desfazer, remarcar, RF-17).
@@ -39,8 +40,9 @@
 ## Fase 4 · Dados e servidor (Engenheiro de software; só com a spec Entrar na branch)
 - [ ] **T9** · `src/data/agendamento/{agendamentos,checkout,exemplo-local}.ts` pelo contrato do `plan.md` §5.1; o
   Engenheiro de dados confere as consultas.
-- [ ] **T10** · `src/server/agendamento/esquemas.ts` e `acoes.ts` + `acoes.test.ts` (portas pelo contrato, conflito sem
-  dado, registro sem dado pessoal, teto de idas, reuso de Clientes, Catálogo e Agenda).
+- [ ] **T10** · `src/server/agendamento/esquemas.ts` e `acoes.ts` + `acoes.test.ts` (ações por `acao(...)`, um pedido
+  de gravação por ação, recusas de regra em `valor`, conflito sem dado, registro sem dado pessoal, teto de idas, reuso de
+  Clientes, Catálogo e Agenda).
 - [ ] **T11** · Agenda (L-1): `src/data/agenda/agendamentos.ts`, `src/server/agenda/ler-dia.ts` e teste (4 idas, máscara
   E26·1·B, teto de 500).
 

@@ -41,7 +41,7 @@ src/app/paginas/agendamento/*  (etapas, painel, remarcar, status)
    │ chama (corpo do pedido; na URL só o id do agendamento)
    ▼
 src/server/agendamento/acoes.ts ── 6 portas da spec Entrar (E36·A): quem é · estúdio da sessão · papel · esquema ·
-   │                               banco com trava, numa transação · registro sem dado pessoal
+   │                               banco com trava, um pedido de gravação · registro pelo gatilho
    ├─► src/domain/agendamento/*  (status e transições, horário e fuso, acesso)  ─► reusa src/domain/agenda/{dia,bloqueio}.ts
    ├─► src/server/catalogo (serviços ativos e duração) · src/server/clientes (busca, adicionarCliente) · src/server/agenda (colunas)
    ▼
@@ -92,8 +92,9 @@ Sugestões do Arquiteto por cima das do Analista (spec §7). Nada se copia: "ree
 | M2 | `agendamentos` | tabela §4.3, exclusão, índices, `enable` e `force row level security`, `revoke all` de `anon` e `authenticated` |
 | M3 | `agendamento_itens` | idem |
 | M4 | `agendamento_historico` | idem |
-| M5 | `agendamento_regras` | funções de gatilho e gatilhos do §4.4, também em `public.bloqueios` (Agenda); `create or replace` de `app.cliente_visivel` (Clientes) |
+| M5 | `agendamento_regras` | funções de gatilho e gatilhos do §4.4, também em `public.bloqueios` (Agenda); `create or replace` de `app.cliente_visivel` (Clientes); o gatilho genérico de registro `app.registrar_mudanca()` (spec Entrar, ADR 0018 · D7) nas 3 tabelas, pelo molde do ADR 0019 |
 | M6 | `agendamento_politicas` | políticas e privilégios por coluna do §4.5 |
+| M7 | `agendamento_criar` | a função `public.agendamento_criar` do §4.5a |
 
 ### 4.3 Tabelas (sugestão)
 `S` = `org_id = (select app.estudio_da_sessao())`; `P` = `(select app.papel_da_sessao())`; `U` = `(select auth.uid())`.
@@ -155,9 +156,18 @@ Escrito só pelo gatilho (RF-09). Não é a auditoria (porta 6, spec Entrar).
 | `agendamento_itens` | `S and (P <> 'profissional' or` o agendamento é dela`)` | with check: o agendamento é do estúdio, ainda `reservado` e gravável por quem pede (mesma regra) | ninguém (v1) | ninguém | `select`; `insert (agendamento_id, ordem, servico_id)` |
 | `agendamento_historico` | como os itens | ninguém (só o gatilho) | ninguém | ninguém | `select` |
 
-- **Nenhuma função nova executável por `authenticated`** (ADR 0010 · D1): o teste `010_` do item 3 continua com a mesma
-  lista; os gatilhos não pedem `execute` de quem grava.
+- Os gatilhos não pedem `execute` de quem grava; a única função nova executável por `authenticated` é a do §4.5a.
 - `insert ... returning` exige passar também na política de leitura (Postgres): vale para os três papéis aqui.
+
+### 4.5a Função de criar (M7; ADR 0010 · D1, revisto pelo contrato da spec Entrar)
+Na Data API um pedido é uma transação, e a ação pode fazer **um** pedido de gravação (ADR 0018 · D3). Criar grava
+agendamento e itens, então usa `public.agendamento_criar(p_cliente uuid, p_profissional uuid, p_inicio timestamptz,
+p_fim timestamptz, p_servicos uuid[]) returns uuid`: `language plpgsql`, **`security invoker`**, `set search_path = ''`,
+nomes qualificados; insere o agendamento (o `org_id` vem do valor padrão da sessão; **nenhum parâmetro de estúdio**) e um
+item por serviço, na ordem do vetor (1 a 10, senão `22023`); devolve o id. RLS e privilégios por coluna valem lá dentro
+(é a pessoa que grava); os gatilhos do §4.4 também. `revoke all ... from public, anon`; `grant execute ... to
+authenticated`. Entra na lista de funções do `010_base_estrutura_test.sql` (que a spec Entrar já transforma em lista;
+ADR 0019). Remarcar, trocar status e desfazer são **um** `update` de `agendamentos` cada: sem função.
 
 ### 4.6 Testes pgTAP (`supabase/tests/database/`, banco local, `pnpm db:test`; dados fictícios escritos do zero, RG-07)
 | Arquivo | Prova |
@@ -169,20 +179,30 @@ Escrito só pelo gatilho (RF-09). Não é a auditoria (porta 6, spec Entrar).
 | `agendamento_240_concorrencia_test.sql` | duas ligações de verdade pela extensão `dblink` (criada só dentro do teste, no esquema `extensions`): a primeira grava sem confirmar, a segunda espera e, depois do `commit` da primeira, recebe `23P01`; o mesmo para agendamento × bloqueio. Limpa o que as ligações confirmaram (CA-04, RNF-02) |
 | `agendamento_250_papeis_test.sql` | E26·2·A: dona e recepção em qualquer profissional; profissional só nos próprios (criar, remarcar, status), não passa o agendamento para outra; E26·1·B: profissional lê a linha das outras, mas não os itens nem o histórico delas; `cliente_visivel` substituída (CA-06) |
 | `agendamento_260_historico_test.sql` | criar, cada troca, remarcar e desfazer geram uma linha cada, com `por` = quem gravou; ninguém com login grava ou altera o histórico; `ultima_visita` igual à regra de `src/domain/clientes/ultima-visita.ts` (mesmos casos, inclusive troca de horário) (CA-07, RF-09) |
+| `agendamento_270_criar_test.sql` | `agendamento_criar` é `security invoker` com `search_path` vazio; `anon` e `public` sem `execute`; grava agendamento e itens juntos ou nada (serviço de outro estúdio no meio do vetor → nada gravado); profissional não cria para outra pela função (a RLS vale); 0 e 11 serviços recusados (CA-04, CA-05, CA-06) |
+| `agendamento_280_registro_test.sql` | pelo molde `supabase/moldes/registro_tabela_test.sql` (spec Entrar) nas 3 tabelas: cada gravação gera uma linha de registro com o nome da ação, sem dado pessoal; falha do registro desfaz a gravação (RF-10, CA-07) |
 
-O `010_base_estrutura_test.sql` (item 3) passa a valer para as 3 tabelas novas (org_id, RLS forçada, índice por
-`org_id`, nenhum privilégio de `anon`). Prova de que os testes pegam erro: numa cópia local, tirar o `where` da exclusão
+O `010_base_estrutura_test.sql` (item 3, já em lista pela spec Entrar) passa a valer para as 3 tabelas novas (org_id,
+RLS forçada, índice por `org_id`, nenhum privilégio de `anon`) e **ganha uma linha**: `public.agendamento_criar(...)`
+na lista do que `authenticated` executa. Prova de que os testes pegam erro: numa cópia local, tirar o `where` da exclusão
 ou o `S` de uma política e ver o teste ficar vermelho; desfazer.
 
 ## 5. Código por camada (regra de dependência do `ARCHITECTURE.md` §3, já travada pelo lint do item 2)
 
 ### 5.1 Contrato que o Agendamento usa da spec "Entrar e camada de serviço" (E36·A)
-O Agendamento **não** escreve portas, sessão nem registro. Usa de `src/server/portas/` uma função que monta a ação
-(permissão pedida, esquema da entrada, trabalho) e entrega `usuarioId`, `orgId`, `papel` e **fuso e idioma do estúdio**
-da sessão, mais o acesso ao banco com a sessão da pessoa **dentro de uma transação por ação** (ADR 0010 · D1), e grava o
-registro (porta 6) com nome do evento e identificadores. Erros saem como códigos (`sem_login`, `sem_permissao`,
-`entrada_invalida`, `conflito`, ...). **Se aquela spec não der transação por ação**, este plano volta à 5b (a gravação
-de agendamento, itens e histórico precisa ser uma só). Se o formato for outro, só `acoes.ts` e `src/data/agendamento/*` se ajustam.
+Contrato fixado pela spec Entrar (`feat/entrar-servico`, plano §4, ADR 0018). O Agendamento **não** escreve portas,
+sessão nem registro. Cada ação é `acao({ nome, metodo, sessao: 'estudio', permissao, entrada, grava, trabalho })` de
+`src/server/portas/acao.ts`, que devolve `{ ok: true, valor } | { ok: false, codigo }`. O `trabalho` recebe
+`ctx` (`usuarioId`, `orgId`, `papel`, `idioma`, `fuso`, `moeda`, `banco`) e pode fazer **no máximo um pedido de
+gravação** por `ctx.banco` (o segundo é recusado). `permissao` é a regra pura de `src/domain/agendamento/acesso.ts`;
+`entrada` é `z.strictObject` (campo a mais → `entrada_invalida`, ADR 0018 · D13). O registro (porta 6) é feito pelo
+gatilho genérico em cada tabela, com o nome da ação vindo do cabeçalho `x-acao` (ADR 0018 · D7).
+- **Códigos de erro:** só a lista fechada do contrato (`sem_login`, `estudio_trocado`, `sem_estudio`, `sem_permissao`,
+  `entrada_invalida`, `conflito`, `limite`, `erro_interno`); `23P01` vira `conflito` em `src/data/erros.ts` (Entrar).
+- **Recusas de regra** que a tela precisa explicar não são erro do contrato: voltam em `valor` como `{ feito: false,
+  motivo }`, com `motivo` em `'hora_inexistente' | 'passado' | 'troca_invalida' | 'nao_remarca' | 'tem_checkout'`
+  (lista em `src/domain/agendamento/tipos.ts`; texto nos idiomas). Recusa do gatilho numa corrida (outra pessoa trocou o
+  status no meio) sai `erro_interno` e a tela oferece "Tentar de novo" (ADR 0010, Consequências).
 
 ### 5.2 `src/domain/agendamento/` (TypeScript puro, com teste; Engenheiro de software)
 | Arquivo | O que tem | Requisitos |
@@ -200,8 +220,8 @@ de agendamento, itens e histórico precisa ser uma só). Se o formato for outro,
 ### 5.3 `src/server/agendamento/` (Engenheiro de software)
 | Arquivo | O que tem |
 |---|---|
-| `esquemas.ts` | entradas: criar (cliente `uuid`, 1 a 10 serviços `uuid`, profissional `uuid`, data `AAAA-MM-DD`, hora `HH:MM` em passos de 15 min), remarcar (id, profissional, data, hora), trocar status (id, para), desfazer (id, id da troca), ver (id). **Sem estúdio, sem fim, sem duração** (vêm da sessão e do Catálogo); chave desconhecida descartada |
-| `acoes.ts` | `criarAgendamento`, `remarcarAgendamento`, `trocarStatus`, `desfazerStatus`, `verAgendamento`. Porta 3 por `acesso.ts`; serviços ativos e durações pela leitura do Catálogo (RF-08 de lá, pelo servidor); conferência pelo domínio com os ocupados da profissional naquele intervalo; gravação numa transação; `23P01` → `conflito` (mensagem sem nome de cliente); RF-17 por `src/data/agendamento/checkout.ts`. Registro: `agendamento.criado`, `.remarcado`, `.status_trocado`, `.status_desfeito`, só com ids, status e horários (RF-10) |
+| `esquemas.ts` | `z.strictObject` para: criar (cliente `uuid`, 1 a 10 serviços `uuid`, profissional `uuid`, data `AAAA-MM-DD`, hora `HH:MM` em passos de 15 min), remarcar (id, profissional, data, hora), trocar status (id, para), desfazer (id, id da troca), ver (id). **Sem estúdio, sem fim, sem duração** (vêm da sessão e do Catálogo); campo a mais → `entrada_invalida` |
+| `acoes.ts` | por `acao(...)`: `agendamento.criar` (`POST`, grava: **um** pedido, a função `agendamento_criar`), `agendamento.remarcar`, `agendamento.status.trocar`, `agendamento.status.desfazer` (`POST`, grava: **um** `update` cada), `agendamento.ver` (`GET`). Serviços ativos e durações pela leitura do Catálogo (`servicosAtivosParaAgendar`, pelo servidor); conferência pelo domínio com os ocupados da profissional naquele intervalo; recusas de regra em `valor` (§5.1); RF-17 por `src/data/agendamento/checkout.ts`. O registro é o gatilho genérico, com o nome da ação; nada de nome, telefone ou texto (RF-10) |
 | `acoes.test.ts` | com o banco trocado por um falso: estúdio no pedido ignorado; sem login e sem papel nada; profissional não grava na de outra (E26·2·A); profissional não recebe cliente nem serviço de agendamento alheio (E26·1·B); fim e duração do pedido ignorados; conflito vira código sem dado; registro e erro sem nome, telefone ou texto (CA-07, CA-10); idas ao banco dentro do teto (ADR 0010 · D4) |
 
 Cliente nova na etapa 1 (E27·1·A) chama a ação `adicionarCliente` de **Clientes** (plano dela, RF-09): nenhuma regra de
@@ -210,7 +230,7 @@ cliente repetida aqui. A busca da etapa 1 usa `listarClientes` de Clientes; a li
 ### 5.4 `src/data/agendamento/` (Engenheiro de software; consultas conferidas pelo Engenheiro de dados)
 | Arquivo | O que tem |
 |---|---|
-| `agendamentos.ts` | gravar agendamento e itens na transação da ação; ler um por id (com itens e última troca); ocupados de uma profissional num intervalo; trocar status; remarcar. Nenhum filtro por `org_id` vindo de fora: a RLS decide |
+| `agendamentos.ts` | criar pela função `agendamento_criar` (um pedido); ler um por id (com itens e última troca); ocupados de uma profissional num intervalo; trocar status; remarcar. Nenhum filtro por `org_id` vindo de fora: a RLS decide |
 | `checkout.ts` | `temCheckoutFechado(id)`: devolve "não" até a spec do Checkout trocar este arquivo pela consulta real (encaixe do RF-17) |
 | `exemplo-local.ts` | dados fictícios, escritos do zero, só para o teste de tela enquanto Clientes ou Catálogo não existem (RF-15, CA-13) |
 
@@ -294,8 +314,9 @@ Fora desta lista nada muda (`AGENTS.md` §6). Arquivo que uma ferramenta crie fo
 
 **Banco (Engenheiro de dados):** `supabase/migrations/<ts>_agendamento_extensoes.sql`, `<ts>_agendamentos.sql`,
 `<ts>_agendamento_itens.sql`, `<ts>_agendamento_historico.sql`, `<ts>_agendamento_regras.sql`,
-`<ts>_agendamento_politicas.sql` · `supabase/tests/database/agendamento_200_isolamento_test.sql` a
-`agendamento_260_historico_test.sql` (7 arquivos, §4.6) · `docs/adr/0009-agendamento-tabelas-do-antigo.md`.
+`<ts>_agendamento_politicas.sql`, `<ts>_agendamento_criar.sql` · `supabase/tests/database/agendamento_200_isolamento_test.sql` a
+`agendamento_280_registro_test.sql` (9 arquivos, §4.6) · `supabase/tests/database/010_base_estrutura_test.sql` (**só**
+a linha de `public.agendamento_criar` na lista de funções) · `docs/adr/0009-agendamento-tabelas-do-antigo.md`.
 
 **Domínio:** `src/domain/agendamento/{tipos,status,horario,acesso}.ts` e `{status,horario,acesso}.test.ts`.
 
@@ -306,7 +327,7 @@ Fora desta lista nada muda (`AGENTS.md` §6). Arquivo que uma ferramenta crie fo
 **Telas:** `src/app/routes/agendar.tsx` · `src/app/routeTree.gen.ts` (gerado) ·
 `src/app/paginas/agendamento/{novo,etapa-cliente,etapa-servicos,etapa-horario,etapa-conferencia,painel,status,remarcar}.tsx` ·
 `src/app/paginas/agendamento/agendamento.css` · `src/app/paginas/agendamento/agendamento.test.tsx` ·
-`src/app/i18n/{pt,es,en}.ts` (só chaves `agendamento.*` e os códigos de erro novos).
+`src/app/i18n/{pt,es,en}.ts` (só chaves `agendamento.*`, inclusive os motivos de recusa do §5.1).
 
 **Agenda (só com L-1 aceita):** `src/app/routes/agenda.tsx` (parâmetro `agendamento`) · `src/app/navegacao.ts` ·
 `src/app/paginas/agenda/{agenda,barra,cartao}.tsx` · `src/server/agenda/ler-dia.ts` e `ler-dia.test.ts` ·
@@ -324,7 +345,8 @@ Fora desta lista nada muda (`AGENTS.md` §6). Arquivo que uma ferramenta crie fo
 
 **Intactos:** `src/app/ui/**`, `src/app/estilos/**`, `src/server/portas/**` e o cliente do banco (spec Entrar),
 `src/domain/agenda/**` (reusado, não alterado), `src/domain/clientes/**`, `src/server/clientes/**`, `src/server/catalogo/**`,
-as migrations e testes dos itens 2 e 3 e dos outros módulos (inclusive `010_base_estrutura_test.sql`),
+`src/data/erros.ts` e os moldes de `supabase/moldes/` (spec Entrar), as migrations e testes dos itens 2 e 3 e dos outros
+módulos (o `010_` só ganha a linha dita acima),
 `supabase/config.jsonc`, `supabase/seed.sql`, `package.json`, `pnpm-lock.yaml` (nenhuma dependência nova),
 `eslint.config.mjs`, `playwright.config.ts`, `.github/**`, `src/*/AGENTS.md`, `src/*/CLAUDE.md`, `ARCHITECTURE.md`, `AGENTS.md`.
 
@@ -350,7 +372,8 @@ entrarem na `previas`, a base do PR passa à `previas`, antes do pedido de merge
 | **E26·3·C** | **para**: a ligação da profissional muda para a tabela nova da Equipe; plano refeito e nova 5b |
 
 ## 13. Riscos e não verificado
-- **Bloqueante para construir:** a spec Entrar (E36·A) e a transação por ação (§5.1); as tabelas de Clientes e do
+- **Bloqueante para construir:** a spec Entrar (E36·A) na branch (contrato do §5.1, gatilho de registro, `010_` em
+  lista); as tabelas de Clientes e do
   Catálogo (Fase banco). Nomes de funções, tabelas e arquivos da Agenda, de Clientes e do Catálogo vêm dos planos deles;
   se mudarem, este plano se ajusta (nova 5b).
 - O gatilho de conflito com bloqueio grava em `public.bloqueios`, tabela da Agenda: o Engenheiro de dados da Agenda
@@ -359,9 +382,11 @@ entrarem na `previas`, a base do PR passa à `previas`, antes do pedido de merge
   `btree_gist`, a exclusão vira gatilho com a mesma trava do §4.4, decisão do Engenheiro de dados no ADR 0009); se o
   `dblink` liga ao próprio banco local no `supabase test db` (sem ele, o CA-04 precisa de um teste com duas ligações fora
   do pgTAP, que muda o `ci.yml` e a lista do §10; volta à 5b); o comportamento do `Intl` do Node 26, do Workers e do
-  Chromium nas horas que não existem (o `horario.test.ts` prova o Node); a forma de ligar ao banco e a transação (spec Entrar).
+  Chromium nas horas que não existem (o `horario.test.ts` prova o Node); que a função `security invoker` chamada pela Data API respeita os
+  privilégios por coluna e o pré-pedido da spec Entrar (o teste 270 prova no banco local).
 - Com E26·1·B, a profissional lê, na linha de agendamento de outra, o `cliente_id` (um id, sem nome; a RLS de Clientes
-  não lhe mostra a cliente). O servidor não o devolve. Esconder também no banco pediria visão própria: o Engenheiro de
-  segurança decide na revisão se é preciso.
+  não lhe mostra a cliente). O servidor não o devolve, mas a tabela fica alcançável pela Data API para quem tem o token
+  (ADR 0018, Consequências; o token não chega ao JavaScript da página). Esconder também no banco pediria visão própria: o
+  Engenheiro de segurança decide na revisão se é preciso.
 - Numeração: ADR 0009 e 0010 e os prefixos `agendamento_2xx` podem colidir com módulos em paralelo; o Documentador
   confere no PR e renumera.
