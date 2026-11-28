@@ -2,6 +2,8 @@
 // variáveis postas por scripts/banco-local.mjs (tarefa D1, Engenheiro de DevOps). Nada é impresso nem gravado.
 // A chave local de administração só existe aqui (tests/) e só em memória: cria as contas e os estúdios fictícios.
 // Sem as variáveis, os testes ficam pulados (não passam nem falham): ver `bancoPronto`.
+import { spawnSync } from 'node:child_process'
+import { fileURLToPath } from 'node:url'
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { lerAmbiente, type Ambiente } from '@/data/ambiente'
 import type { CookieAGravar, CookieDoPedido } from '@/data/cliente'
@@ -19,12 +21,52 @@ const chaveAdmin = process.env[VARIAVEL_DA_CHAVE_ADMIN]
 /** Banco local com Auth, Data API e as variáveis da execução. */
 export const bancoPronto = ambiente !== null && Boolean(chaveAdmin)
 
+const pedidosFeitos: string[] = []
+/** Id do último pedido que passou pelas portas (para achar a linha do registro dele; CA-09a). */
+export const ultimoPedido = (): string => {
+  const id = pedidosFeitos.at(-1)
+  if (!id) throw new Error('nenhum pedido feito')
+  return id
+}
+
 export const infra: Infra = {
   ambiente: () => ambiente,
   abrirConexao,
   agora: () => Date.now(),
   esperar: (ms) => new Promise((pronto) => setTimeout(pronto, ms)),
-  novoPedidoId: () => crypto.randomUUID(),
+  novoPedidoId: () => {
+    const id = crypto.randomUUID()
+    pedidosFeitos.push(id)
+    return id
+  },
+}
+
+const RAIZ = fileURLToPath(new URL('../..', import.meta.url))
+const SUPABASE = fileURLToPath(new URL('../../node_modules/.bin/supabase', import.meta.url))
+const FORMA_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+/** Confere que o valor é uuid antes de pô-lo numa consulta (só ids gerados pelo teste entram no SQL). */
+export function uuid(valor: string): string {
+  if (!FORMA_UUID.test(valor)) throw new Error('valor não é uuid')
+  return `'${valor}'::uuid`
+}
+
+/**
+ * Uma instrução SQL no banco LOCAL, como `postgres`, pela CLI do projeto (`supabase db query`, alvo local por padrão;
+ * nunca `--remote`; AGENTS.md §1). Só para ler o registro e empurrar o relógio da sessão para trás (CA-04, CA-09,
+ * CA-15). Devolve as linhas; erro → exceção sem o texto do banco.
+ */
+export function sql<T = Record<string, unknown>>(consulta: string): T[] {
+  const r = spawnSync(SUPABASE, ['db', 'query', '--output-format', 'json', consulta], {
+    cwd: RAIZ,
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe'],
+  })
+  if (r.status !== 0 || r.stdout.includes('"_tag":"Error"')) throw new Error('consulta ao banco local falhou')
+  // Instrução sem linhas (ex.: update) responde só a etiqueta do comando ("UPDATE 1"), não JSON.
+  if (!r.stdout.trimStart().startsWith('{')) return []
+  const dados = JSON.parse(r.stdout) as { rows?: T[] }
+  return dados.rows ?? []
 }
 
 /** Cliente de administração local; manda a chave do servidor (o pré-pedido exige em todo pedido, D16). */
