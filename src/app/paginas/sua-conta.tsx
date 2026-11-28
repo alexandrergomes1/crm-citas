@@ -1,0 +1,174 @@
+// Sua conta (spec RF-14, RF-30; ficha E41; DESIGN.md §6, §8, §8b "Sua conta"): a barra com a bolinha da pessoa e o
+// menu (computador) ou a folha (celular). Itens na ordem do §8b; Minha conta, Preferências e Meu faturamento
+// esmaecidos com "em desenvolvimento" (aria-disabled); "Trocar de estúdio" só com mais de um estúdio.
+import { useEffect, useId, useRef, useState, type KeyboardEvent } from 'react'
+import type { Textos } from '@/app/i18n/textos'
+import { Folha } from '@/app/ui/camadas'
+import { SuaConta } from '@/app/ui/conteudo'
+
+export type ItemSuaConta = {
+  readonly id: 'minhaConta' | 'preferencias' | 'meuFaturamento' | 'trocarDeEstudio' | 'sair'
+  readonly rotulo: string
+  /** função que ainda não existe: esmaecida, com "em desenvolvimento" (DESIGN.md §8) */
+  readonly emDesenvolvimento: boolean
+}
+
+/** Itens na ordem do DESIGN.md §8b. */
+export function itensDaConta(textos: Textos, quantosEstudios: number): ItemSuaConta[] {
+  const t = textos.suaConta
+  const itens: ItemSuaConta[] = [
+    { id: 'minhaConta', rotulo: t.minhaConta, emDesenvolvimento: true },
+    { id: 'preferencias', rotulo: t.preferencias, emDesenvolvimento: true },
+    { id: 'meuFaturamento', rotulo: t.meuFaturamento, emDesenvolvimento: true },
+  ]
+  if (quantosEstudios > 1) itens.push({ id: 'trocarDeEstudio', rotulo: t.trocarDeEstudio, emDesenvolvimento: false })
+  itens.push({ id: 'sair', rotulo: t.sair, emDesenvolvimento: false })
+  return itens
+}
+
+/** O desenho escolhido pelo tokens.css (ponto único de troca; E25·3): o computador mostra o menu. */
+function ehComputador(): boolean {
+  return getComputedStyle(document.documentElement).getPropertyValue('--mostra-computador').trim() !== 'none'
+}
+
+export interface MenuSuaContaProps {
+  textos: Textos
+  /** primeira letra do e-mail da própria pessoa (DESIGN.md §8b) */
+  inicial: string
+  quantosEstudios: number
+  onTrocar: () => void
+  onSair: () => void
+  /** só para o teste por renderToString: abre num dos desenhos */
+  abertoInicial?: 'menu' | 'folha'
+}
+
+export function MenuSuaConta({ textos, inicial, quantosEstudios, onTrocar, onSair, abertoInicial }: Readonly<MenuSuaContaProps>) {
+  const [aberto, setAberto] = useState<'menu' | 'folha' | null>(abertoInicial ?? null)
+  const botao = useRef<HTMLButtonElement>(null)
+  const raiz = useRef<HTMLDivElement>(null)
+  const refs = useRef<Array<HTMLButtonElement | null>>([])
+  const idMenu = useId()
+  const itens = itensDaConta(textos, quantosEstudios)
+  const nome = textos.suaConta.nome
+
+  // A peça SuaConta (item 4) não recebe atributos ARIA: o estado do botão é posto aqui (padrão Menu Button do APG)
+  useEffect(() => {
+    const el = botao.current
+    if (!el) return
+    el.setAttribute('aria-haspopup', ehComputador() ? 'menu' : 'dialog')
+    el.setAttribute('aria-expanded', aberto ? 'true' : 'false')
+    if (aberto === 'menu') el.setAttribute('aria-controls', idMenu)
+    else el.removeAttribute('aria-controls')
+  }, [aberto, idMenu])
+
+  useEffect(() => {
+    if (aberto !== 'menu') return
+    refs.current[0]?.focus()
+    function fora(evento: MouseEvent) {
+      if (raiz.current && !raiz.current.contains(evento.target as Node)) setAberto(null)
+    }
+    document.addEventListener('mousedown', fora)
+    return () => document.removeEventListener('mousedown', fora)
+  }, [aberto])
+
+  function fechar(devolverFoco: boolean) {
+    setAberto(null)
+    if (devolverFoco) botao.current?.focus()
+  }
+
+  function escolher(item: ItemSuaConta) {
+    if (item.emDesenvolvimento) return
+    setAberto(null)
+    if (item.id === 'trocarDeEstudio') onTrocar()
+    if (item.id === 'sair') onSair()
+  }
+
+  function tecladoMenu(evento: KeyboardEvent<HTMLDivElement>) {
+    const atual = refs.current.findIndex((el) => el === document.activeElement)
+    const ultimo = itens.length - 1
+    const destino: Record<string, number> = {
+      ArrowDown: atual >= ultimo ? 0 : atual + 1,
+      ArrowUp: atual <= 0 ? ultimo : atual - 1,
+      Home: 0,
+      End: ultimo,
+    }
+    if (evento.key === 'Escape') {
+      evento.preventDefault()
+      fechar(true)
+      return
+    }
+    if (evento.key === 'Tab') {
+      fechar(false)
+      return
+    }
+    const alvo = destino[evento.key]
+    if (alvo === undefined) return
+    evento.preventDefault()
+    refs.current[alvo]?.focus()
+  }
+
+  return (
+    <div className="ds-menu" ref={raiz}>
+      <SuaConta
+        ref={botao}
+        nome={nome}
+        inicial={inicial}
+        onClick={() => setAberto((a) => (a ? null : ehComputador() ? 'menu' : 'folha'))}
+      />
+      <div
+        id={idMenu}
+        role="menu"
+        aria-label={nome}
+        className="ds-menu__lista ds-menu__lista--fim"
+        hidden={aberto !== 'menu'}
+        onKeyDown={tecladoMenu}
+      >
+        {itens.map((item, indice) => (
+          <button
+            key={item.id}
+            ref={(el) => {
+              refs.current[indice] = el
+            }}
+            type="button"
+            role="menuitem"
+            tabIndex={-1}
+            aria-disabled={item.emDesenvolvimento ? true : undefined}
+            className={item.emDesenvolvimento ? 'ds-menu__item sua-conta__item sua-conta__item--em-desenvolvimento' : 'ds-menu__item sua-conta__item'}
+            onClick={() => escolher(item)}
+          >
+            <span className="sua-conta__rotulo">{item.rotulo}</span>
+            {item.emDesenvolvimento ? <span className="sua-conta__nota">{textos.comum.emDesenvolvimento}</span> : null}
+          </button>
+        ))}
+      </div>
+      <Folha aberta={aberto === 'folha'} onFechar={() => setAberto(null)} titulo={nome} nomeFechar={textos.comum.fechar}>
+        <ul className="ds-lista sua-conta__folha" aria-label={nome}>
+          {itens.map((item) => (
+            <li key={item.id} className="sua-conta__linha">
+              <button
+                type="button"
+                aria-disabled={item.emDesenvolvimento ? true : undefined}
+                className={item.emDesenvolvimento ? 'sua-conta__botao sua-conta__item--em-desenvolvimento' : 'sua-conta__botao'}
+                onClick={() => escolher(item)}
+              >
+                <span className="sua-conta__rotulo">{item.rotulo}</span>
+                {item.emDesenvolvimento ? <span className="sua-conta__nota">{textos.comum.emDesenvolvimento}</span> : null}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </Folha>
+    </div>
+  )
+}
+
+export type BarraSuaContaProps = MenuSuaContaProps
+
+/** A barra da área com sessão: só Sua conta, à direita (ficha: "só a barra com a bolinha"). */
+export function BarraSuaConta(props: Readonly<BarraSuaContaProps>) {
+  return (
+    <header className="sua-conta__barra">
+      <MenuSuaConta {...props} />
+    </header>
+  )
+}

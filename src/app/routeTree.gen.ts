@@ -9,12 +9,24 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppRouteImport } from './routes/_app'
+import { Route as EntrarRouteImport } from './routes/entrar'
+import { Route as EscolherEstudioRouteImport } from './routes/escolher-estudio'
 import { Route as VitrineRouteImport } from './routes/vitrine'
+import { Route as AppIndexRouteImport } from './routes/_app/index'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EntrarRoute = EntrarRouteImport.update({
+  id: '/entrar',
+  path: '/entrar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EscolherEstudioRoute = EscolherEstudioRouteImport.update({
+  id: '/escolher-estudio',
+  path: '/escolher-estudio',
   getParentRoute: () => rootRouteImport,
 } as any)
 const VitrineRoute = VitrineRouteImport.update({
@@ -22,40 +34,74 @@ const VitrineRoute = VitrineRouteImport.update({
   path: '/vitrine',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppIndexRoute = AppIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
+  '/': typeof AppIndexRoute
+  '/entrar': typeof EntrarRoute
+  '/escolher-estudio': typeof EscolherEstudioRoute
   '/vitrine': typeof VitrineRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
+  '/entrar': typeof EntrarRoute
+  '/escolher-estudio': typeof EscolherEstudioRoute
   '/vitrine': typeof VitrineRoute
+  '/': typeof AppIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
+  '/_app': typeof AppRouteWithChildren
+  '/entrar': typeof EntrarRoute
+  '/escolher-estudio': typeof EscolherEstudioRoute
   '/vitrine': typeof VitrineRoute
+  '/_app/': typeof AppIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/vitrine'
+  fullPaths: '/' | '/entrar' | '/escolher-estudio' | '/vitrine'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/vitrine'
-  id: '__root__' | '/' | '/vitrine'
+  to: '/entrar' | '/escolher-estudio' | '/vitrine' | '/'
+  id:
+    | '__root__'
+    | '/_app'
+    | '/entrar'
+    | '/escolher-estudio'
+    | '/vitrine'
+    | '/_app/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
+  EntrarRoute: typeof EntrarRoute
+  EscolherEstudioRoute: typeof EscolherEstudioRoute
   VitrineRoute: typeof VitrineRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
+    '/_app': {
+      id: '/_app'
+      path: ''
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/entrar': {
+      id: '/entrar'
+      path: '/entrar'
+      fullPath: '/entrar'
+      preLoaderRoute: typeof EntrarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/escolher-estudio': {
+      id: '/escolher-estudio'
+      path: '/escolher-estudio'
+      fullPath: '/escolher-estudio'
+      preLoaderRoute: typeof EscolherEstudioRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/vitrine': {
@@ -65,11 +111,30 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VitrineRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/': {
+      id: '/_app/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
+interface AppRouteChildren {
+  AppIndexRoute: typeof AppIndexRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppIndexRoute: AppIndexRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
+  EntrarRoute: EntrarRoute,
+  EscolherEstudioRoute: EscolherEstudioRoute,
   VitrineRoute: VitrineRoute,
 }
 export const routeTree = rootRouteImport

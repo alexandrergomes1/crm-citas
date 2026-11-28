@@ -1,0 +1,43 @@
+/* Tela sem menu (DESIGN.md §8b; ficha E41·4·A) e tela Entrar. Só var(--...); o ponto de troca mora no tokens.css.
+ * O molde "tela sem menu" vale também para Escolher estúdio (a rota dela liga esta folha). */
+.tela-sem-menu {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  padding: var(--margem);
+}
+
+/* No computador o bloco fica centrado; no celular, no alto (as duas folgas só existem no computador) */
+.tela-sem-menu::before,
+.tela-sem-menu::after {
+  content: '';
+  display: var(--mostra-computador);
+  flex: 1;
+}
+
+.tela-sem-menu__bloco {
+  width: 100%;
+  max-width: var(--w-painel);
+  margin-inline: auto;
+}
+
+.tela-sem-menu__bloco > .ds-bloco {
+  gap: var(--sp-16);
+  padding: var(--sp-24);
+}
+
+.tela-sem-menu__titulo {
+  font-size: var(--fs-20);
+}
+
+.entrar__formulario {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-16);
+}
+
+/* Enviando: esmaecido 60 %, sem `disabled` (o foco e o leitor ficam; ficha E41·3·A) */
+.entrar__formulario .ds-botao[aria-disabled='true'] {
+  opacity: var(--opac-desativado);
+  cursor: not-allowed;
+}

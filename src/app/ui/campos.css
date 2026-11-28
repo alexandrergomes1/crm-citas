@@ -74,6 +74,30 @@
   pointer-events: none;
 }
 
+/* Senha: espaço à direita para o olho (botão de ícone sem fundo, dentro do campo; DESIGN.md §5) */
+.ds-campo__controle--senha {
+  padding-right: calc(var(--sp-4) + var(--toque));
+}
+
+.ds-campo__olho {
+  position: absolute;
+  top: 50%;
+  right: var(--sp-4);
+  display: flex;
+  transform: translateY(-50%);
+  color: var(--ink2);
+}
+
+.ds-campo__olho .ds-botao-icone {
+  color: inherit;
+}
+
+/* Travado ao enviar: esmaecido 60 %, sem sumir do leitor nem perder o foco (DESIGN.md §8; ficha E41·3·A) */
+.ds-campo__olho [aria-disabled='true'] {
+  opacity: var(--opac-desativado);
+  cursor: not-allowed;
+}
+
 .ds-campo__controle[aria-invalid='true'] {
   border-color: var(--danger);
 }
@@ -84,6 +108,12 @@
   gap: var(--sp-8);
   font-size: var(--fs-13);
   color: var(--danger);
+}
+
+/* Erro do formulário: uma linha acima da ação, no tamanho do texto (DESIGN.md §8) */
+.ds-campo__erro--formulario {
+  align-items: flex-start;
+  font-size: var(--fs-texto);
 }
 
 /* Busca em pílula; a lupa fica dentro do campo */

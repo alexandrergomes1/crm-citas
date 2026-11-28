@@ -23,6 +23,8 @@ import {
   Crown,
   DoorOpen,
   EllipsisVertical,
+  Eye,
+  EyeOff,
   Funnel,
   Heart,
   Hourglass,
@@ -46,7 +48,7 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 
-/** Ícones do DESIGN.md (§5 status, situação, etiquetas; §8b menu principal e Agendar). */
+/** Ícones do DESIGN.md (§5 status, situação, etiquetas, senha; §8b menu principal e Agendar). */
 const nomeados = {
   clock: Clock,
   'thumbs-up': ThumbsUp,
@@ -76,6 +78,9 @@ const nomeados = {
   briefcase: Briefcase,
   settings: Settings,
   'calendar-plus': CalendarPlus,
+  // Senha: Mostrar e Esconder (DESIGN.md §5; ficha E41·2·A)
+  eye: Eye,
+  'eye-off': EyeOff,
 } satisfies Record<string, LucideIcon>
 
 /**

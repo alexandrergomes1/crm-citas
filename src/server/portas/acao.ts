@@ -79,3 +79,21 @@ export function acao<E extends z.ZodType, S, M extends Modo = 'estudio'>(
   // A definição fica presa ao manipulador: molde.test.ts confere que o construtor (acaoGet/acaoPost) é o do `metodo`.
   return Object.assign(manipulador, { definicaoDaAcao: definicao })
 }
+
+/**
+ * Envelope que a tela manda (plan.md §4): modo `estudio` leva `estudioDaTela`; os outros, só `dados`.
+ * Só tipo: a validação continua no servidor, nas portas (D13).
+ */
+export type EnvelopeDe<E extends z.ZodType, M extends Modo = 'estudio'> = M extends 'estudio'
+  ? { readonly estudioDaTela: string; readonly dados: z.input<E> }
+  : { readonly dados: z.input<E> }
+
+/**
+ * Devolve o tipo da entrada à tela (pendência do plan.md §4, item a): o construtor (`acaoGet`/`acaoPost`) aceita
+ * `unknown`, e a tela declara a chamada com este tipo, sem conversão (`const chamar: ChamadaDaTela<typeof x, ...> = x`).
+ * O resultado continua o que a própria ação devolve.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- só para casar com o tipo do TanStack Start
+export type ChamadaDaTela<F extends (...args: any[]) => Promise<unknown>, E extends z.ZodType, M extends Modo = 'estudio'> = (
+  opcoes: { readonly data: EnvelopeDe<E, M> },
+) => ReturnType<F>

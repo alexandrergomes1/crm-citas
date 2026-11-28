@@ -7,6 +7,7 @@ import {
   type KeyboardEvent,
   type InputHTMLAttributes,
   type ReactNode,
+  type Ref,
   type SelectHTMLAttributes,
   type TextareaHTMLAttributes,
 } from 'react'
@@ -74,6 +75,72 @@ export function CampoTexto({ rotulo, obrigatorio, erro, type = 'text', ...resto 
         className="ds-campo__controle"
       />
     </Moldura>
+  )
+}
+
+export interface CampoSenhaProps extends CampoBase, Omit<AtributosInput, 'type' | 'maxLength'> {
+  /** nome do olho para o leitor: "Mostrar senha" e "Esconder senha" (DESIGN.md §6) */
+  rotuloMostrar: string
+  rotuloEsconder: string
+  /** enviando: campo só leitura e olho travado (DESIGN.md §8, ficha E41·3·A) */
+  travado?: boolean
+  ref?: Ref<HTMLInputElement>
+}
+
+/**
+ * Senha com o botão do olho dentro do campo, à direita (DESIGN.md §5; ficha E41·2·A). Sem maxlength (o navegador
+ * cortaria o que se cola; RF-32) e colar permitido (WCAG 3.3.8). O olho muda o nome, sem aria-pressed (WCAG 4.1.2).
+ */
+export function CampoSenha({ rotulo, obrigatorio, erro, rotuloMostrar, rotuloEsconder, travado = false, ref, ...resto }: Readonly<CampoSenhaProps>) {
+  const { id, idErro, descrito } = useIdsDoCampo(erro)
+  const [mostrando, setMostrando] = useState(false)
+  return (
+    <Moldura id={id} idErro={idErro} rotulo={rotulo} obrigatorio={obrigatorio} erro={erro}>
+      <span className="ds-campo__caixa">
+        <input
+          autoComplete="current-password"
+          {...resto}
+          ref={ref}
+          id={id}
+          type={mostrando ? 'text' : 'password'}
+          readOnly={travado || resto.readOnly}
+          required={obrigatorio}
+          aria-invalid={erro ? true : undefined}
+          aria-describedby={descrito}
+          className="ds-campo__controle ds-campo__controle--senha"
+        />
+        <span className="ds-campo__olho">
+          <BotaoIcone
+            nome={mostrando ? rotuloEsconder : rotuloMostrar}
+            icone={mostrando ? 'eye-off' : 'eye'}
+            aria-controls={id}
+            aria-disabled={travado ? true : undefined}
+            onClick={() => {
+              if (!travado) setMostrando((m) => !m)
+            }}
+          />
+        </span>
+      </span>
+    </Moldura>
+  )
+}
+
+export interface ErroFormularioProps {
+  /** frase pronta; vazia, a linha não aparece */
+  mensagem?: string
+}
+
+/**
+ * Erro que não pode dizer qual campo falhou: numa linha acima da ação, com ícone e palavra, sem contorno vermelho
+ * (DESIGN.md §8; ficha E41·3·A). Anunciado ao leitor (role="alert").
+ */
+export function ErroFormulario({ mensagem }: Readonly<ErroFormularioProps>) {
+  if (!mensagem) return null
+  return (
+    <p role="alert" className="ds-campo__erro ds-campo__erro--formulario">
+      <Icone nome="circle-alert" tamanho="20" />
+      <span>{mensagem}</span>
+    </p>
   )
 }
 
