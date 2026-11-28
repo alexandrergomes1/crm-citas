@@ -4,7 +4,8 @@
 - **Escrito por:** Arquiteto de software · **Norma:** modelo C4 e ADR (mais OWASP ASVS 4.0.3 nível 2, Clean Architecture,
   Twelve-Factor, boas práticas do Postgres e do Supabase) · **Revisão:** 5b (Gerente de projeto) feita com
   ajustes, 28/11; etapa 5 (Analista de requisitos) pendente
-- **Decisões técnicas:** `docs/adr/0018-entrar-sessao-e-camada-de-servico.md` (D1 a D18; D5 e D18 mudados em 28/11). **Decisões de banco:**
+- **Decisões técnicas:** `docs/adr/0018-entrar-sessao-e-camada-de-servico.md` (D1 a D18; D5 e D18 mudados em 28/11);
+  `docs/adr/0020-permissao-por-chave-modulo-acao.md` (porta 3 por chave `modulo.acao`, Aceito em 28/11; §5a). **Decisões de banco:**
   `docs/adr/0019-...md`, escrito pelo Engenheiro de dados na tarefa B1 (não neste plano), dentro dos limites do §6.
 - **Bases lidas em 28/11/2026 (só leitura):** item 2 (esta branch: `package.json`, `vite.config.ts`, `eslint.config.mjs`,
   `ci.yml`, `supabase/config.jsonc`, `src/`); item 3 (`/home/user/wt-banco`: ADR 0005, `plan.md` R-1 a R-7, as 4
@@ -73,7 +74,8 @@ Todo pedido do servidor à Data API leva `x-chave-servidor` (ADR 0018 · D16); s
    morta, vencida (12 h) ou parada (1 h) → `sem_login` (o servidor então encerra a sessão, 3.4) e estúdio diferente →
    `estudio_trocado`. Sem estúdio escolhido → `sem_estudio`. Devolve `usuarioId`, `orgId`, `papel`, `idioma`, `fuso`,
    `moeda` e atualiza o "último uso".
-4. **Porta 3:** `permissao(papel)` → `sem_permissao`.
+4. **Porta 3:** `alcanceDe(sessao, permissao)` (chave `modulo.acao`, ADR 0020 · D3 e D6); sem alcance → `sem_permissao`;
+   com alcance, `ctx.alcance` (`todos` ou `proprios`) segue ao trabalho.
 5. **Porta 4:** `entrada.safeParse(dados)` com `z.strictObject` → `entrada_invalida`, sem trabalho e sem banco de dados
    do módulo (ver L-2).
 6. **Porta 5:** `trabalho(ctx, dados)`; `ctx.banco` manda os cabeçalhos `x-chave-servidor`, `x-pedido`, `x-acao` (o
@@ -118,10 +120,12 @@ Modo `pessoa` (lista de estúdios, escolher, trocar, sair): passos 1, 3 (sem cab
 type Papel = 'dona' | 'recepcao' | 'profissional'
 type CodigoDeErro = 'sem_login' | 'estudio_trocado' | 'sem_estudio' | 'sem_permissao'
   | 'entrada_invalida' | 'conflito' | 'limite' | 'erro_interno'
+type Alcance = 'todos' | 'proprios'   // ADR 0020 · D3
+type Chave = (typeof CHAVES)[number] // src/domain/acesso/chaves.ts, `as const` (ADR 0020 · D2)
 type Resultado<S> = { ok: true; valor: S } | { ok: false; codigo: CodigoDeErro }
 
 type ContextoEstudio = {
-  pedidoId: string; usuarioId: string; orgId: string; papel: Papel
+  pedidoId: string; usuarioId: string; orgId: string; alcance: Alcance   // sem papel (ADR 0020 · D5)
   idioma: 'pt' | 'es' | 'en'; fuso: string; moeda: string
   banco: Banco            // de src/data: token da pessoa + cabeçalhos do pedido; ≤ 1 gravação
 }
@@ -130,7 +134,7 @@ acao<E extends z.ZodType, S>(def: {
   nome: `${string}.${string}`          // ex.: 'agenda.bloqueio.criar'; único no catálogo
   metodo: 'GET' | 'POST'               // 'estudio' e 'nenhuma': sempre POST; GET só em 'opcional'/'pessoa' com entrada vazia
   sessao: 'estudio'                    // 'pessoa' | 'opcional' | 'nenhuma' só na lista fechada de src/server/sessao
-  permissao: readonly Papel[] | ((papel: Papel) => boolean)   // regra pura de src/domain/<modulo>/acesso.ts
+  permissao: Chave                     // 'modulo.acao' do catálogo, do mesmo módulo do nome; 'qualquer' só nos modos sem estúdio (ADR 0020 · D1)
   entrada: E                           // z.strictObject(...); sem campo de estúdio
   grava: boolean
   trabalho: (ctx: ContextoEstudio, dados: z.output<E>) => Promise<S>
@@ -144,7 +148,7 @@ acao<E extends z.ZodType, S>(def: {
 
 ```ts
 export const listarBloqueios = acaoPost.handler(acao({
-  nome: 'agenda.bloqueio.listar', metodo: 'POST', sessao: 'estudio', permissao: ['dona', 'recepcao'],
+  nome: 'agenda.bloqueio.listar', metodo: 'POST', sessao: 'estudio', permissao: 'agenda.ver',
   entrada: z.strictObject({ dia: z.iso.date() }), grava: false,
   trabalho: (ctx, d) => lerBloqueiosDoDia(ctx.banco, d.dia),
 }))
@@ -183,6 +187,27 @@ export const listarBloqueios = acaoPost.handler(acao({
 | `src/domain/idioma.ts` (+ `.test.ts`) | `Accept-Language` → `pt`, `es` ou `en`; fora deles, `pt` |
 
 Nunca: `getSession()` no servidor; chave secreta ou de serviço em `src/`; `@supabase/*` fora de `src/data`.
+
+## 5a. Matriz de permissões (ADR 0020 · Engenheiro de software; parte do banco: Engenheiro de dados)
+A porta 3 deixa de receber papel ou função do papel e passa a receber uma **chave** `modulo.acao` do catálogo fechado.
+Nesta spec a matriz nasce **sem linhas de módulo** (o Entrar não tem ação do modo `estudio`); cada spec de módulo
+acrescenta as próprias linhas, citando a resposta do dono (ADR 0020, tabela "Matriz padrão inicial").
+
+| Arquivo | O que tem |
+|---|---|
+| `src/domain/acesso/chaves.ts` (novo) | catálogo fechado `as const`: ações base `ver`, `criar`, `editar`, `remover`; sensíveis à parte `ver_saude`, `estornar`, `exportar`, `gerenciar_acessos`; tipos `Chave` e `Alcance`; função pura "módulo da chave" (D1, D2) |
+| `src/domain/acesso/matriz.ts` (novo) | matriz padrão papel × chave → alcance, só `recepcao` e `profissional`; dona = `todos` por regra fixa; ausente = não pode; `alcancePadrao(papel, chave)` puro e a exportação das linhas para o teste do banco (D3, D4, D7) |
+| `src/domain/acesso/matriz.test.ts` (novo) | dona tem tudo; ausente = não pode; chave fora do catálogo = não pode; toda linha usa chave do catálogo; nenhuma linha para `dona` |
+| `src/server/portas/tipos.ts` | `Permissao` = `Chave` ou `'qualquer'` (só fora do modo `estudio`); `ContextoEstudio` troca `papel` por `alcance`; `Infra` ganha `alcanceDe(sessao, chave)` (D5, D6) |
+| `src/server/portas/executar.ts` | `podeOPapel` vira consulta a `alcanceDe`; falha fechada mantida; entrega `ctx.alcance` (D3, D6) |
+| `src/server/portas/catalogo.ts` | `conferirDefinicao` recusa, ao montar, chave fora do catálogo e chave de outro módulo que o do nome; toda ação do modo `estudio` tem chave (D1, D8) |
+| `src/server/portas/acao.ts` | exemplo do comentário com chave; `infraReal` com `alcanceDe` lido da matriz do código (D6) |
+| `src/server/portas/executar.test.ts`, `molde.test.ts` | trocar `['dona', 'recepcao']` e as funções por chaves; novos: sem alcance → `sem_permissao` sem trabalho nem banco do módulo; `ctx.alcance` certo; trabalho não recebe `papel`; chave fora do catálogo e de outro módulo recusadas no molde |
+| `supabase/migrations/<ts>_matriz_permissoes.sql` (novo; nome final no ADR do banco) | cópia **gerada** da matriz (aqui vazia de linhas de módulo) e a função de acesso sem parâmetro de estúdio (papel e estúdio da sessão; dona → tudo; chave desconhecida → nada), `security invoker` ou como o Engenheiro de dados decidir no ADR (D7) |
+| `supabase/tests/database/110_matriz_permissoes_test.sql` (novo) e o teste de comparação | compara, linha a linha, a matriz exportada do código com a cópia do banco, mais dona = tudo e chave fora do catálogo = nada; roda no `pnpm db:test`, job `banco` da CI; diferença → vermelho (D8). Forma da exportação (arquivo gerado ou script) decidida pelo Engenheiro de dados |
+
+`src/server/sessao/acoes.ts` **não muda** (as 5 ações são de modo sem estúdio, `'qualquer'`). A forma do teste "trabalho
+não lê o papel" (tipo, lint ou teste) é do Engenheiro de software, desde que falhe se o papel voltar ao `ctx`.
 
 ## 6. Banco (Engenheiro de dados decide o desenho no ADR 0019, dentro destes limites)
 Migrations por `pnpm exec supabase migration new <nome>`, depois das do item 3 (carimbo maior). Sugestão de 5:
@@ -276,6 +301,7 @@ Nenhum outro muda. `docs/decisoes/`, `docs/BACKLOG.md` e `docs/STATUS.md` só pe
 | `package.json`: scripts `db:*` · dependências e os outros scripts (`test:integracao`, `pacote:conferir`) | Engenheiro de dados · Engenheiro de software |
 | `pnpm-lock.yaml`, `tsconfig.json`, `eslint.config.mjs`, `eslint.camadas.test.ts`, `vitest.integracao.config.ts` | Engenheiro de software |
 | `src/server/portas/{acao,executar,tipos,erros,catalogo}.ts`, `src/server/portas/{executar,erros,molde}.test.ts` | Engenheiro de software |
+| `src/domain/acesso/{chaves,matriz}.ts`, `src/domain/acesso/matriz.test.ts` (ADR 0020, §5a) | Engenheiro de software |
 | `src/server/http/middleware.ts`, `src/server/sessao/{acoes,tentativas}.ts`, `src/server/sessao/acoes.test.ts` | Engenheiro de software |
 | `src/data/{ambiente,cliente,sessao,erros}.ts`, `src/data/{cliente,erros}.test.ts` | Engenheiro de software (consultas conferidas pelo Engenheiro de dados) |
 | `src/domain/idioma.ts`, `src/domain/idioma.test.ts` | Engenheiro de software |
@@ -285,11 +311,12 @@ Nenhum outro muda. `docs/decisoes/`, `docs/BACKLOG.md` e `docs/STATUS.md` só pe
 | `src/app/ui/campos.tsx`, `src/app/ui/campos.css`, `src/app/ui/icone.tsx` (como na ficha; o "sim" do dono vem com a aprovação da spec) | Engenheiro de software |
 | `supabase/migrations/<ts>_{registro,registro_funcoes,sessoes,tentativas_entrada,estudios_da_pessoa_e_pre_pedido}.sql` (nomes finais no ADR 0019) | Engenheiro de dados |
 | `supabase/tests/database/010_base_estrutura_test.sql` (só a lista de privilégios), `060_` a `100_` (5 novos), `supabase/moldes/registro_tabela_test.sql` | Engenheiro de dados |
+| `supabase/migrations/<ts>_matriz_permissoes.sql`, `supabase/tests/database/110_matriz_permissoes_test.sql` e o teste ou script de comparação com a matriz do código (ADR 0020 · D7 e D8, §5a); acréscimo ao ADR 0019 ou ADR novo do banco | Engenheiro de dados |
 | `supabase/config.jsonc` (só `auth.enable_signup` e `auth.signing_keys_path`), `.gitignore` (arquivo da chave local) | Engenheiro de dados |
 | `tests/integracao/{preparo,entrar,portas,registro,sessao}.test.ts` (o `preparo` sem `.test`) | Engenheiro de software |
 | `e2e/preparo-global.ts`, `e2e/entrar.spec.ts`, `e2e/escolher-estudio.spec.ts`, `e2e/inicio.spec.ts` (passa a entrar antes), `playwright.config.ts` | Engenheiro de software |
 | `scripts/banco-local.mjs`, `scripts/conferir-pacote.mjs`, `.github/workflows/ci.yml` | Engenheiro de DevOps |
-| `docs/adr/0018-...md` (este plano) · `docs/adr/0019-...md` | Arquiteto · Engenheiro de dados |
+| `docs/adr/0018-...md` (este plano), `docs/adr/0020-permissao-por-chave-modulo-acao.md` · `docs/adr/0019-...md` | Arquiteto · Engenheiro de dados |
 | `specs/20261128-030000-entrar-servico/ficha-visual.md` e `ficha/` · `DESIGN.md` (nomes e peças, só depois do "sim" do dono à ficha) | Designer de produto |
 | `specs/20261128-030000-entrar-servico/spec.md` (aprovação e ajustes das lacunas do §13) | Analista de requisitos |
 | `CHANGELOG.md`, `CONTRIBUTING.md` ("Como rodar" com o banco local), `docs/STATUS.md`, `docs/BACKLOG.md` | Documentador |

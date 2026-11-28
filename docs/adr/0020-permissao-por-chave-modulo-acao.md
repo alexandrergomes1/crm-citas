@@ -1,12 +1,14 @@
 # ADR 0020 · Porta 3 por chave `modulo.acao` e matriz padrão no código
 
-- **Status:** Proposto · decisões técnicas (`AGENTS.md` §5) · 28/11/2026. Vale quando o dono aprovar a spec
-  `specs/20261128-030000-entrar-servico/spec.md` com a RF-18 ajustada (ver "Custo").
+- **Status:** Aceito · 28/11/2026 · decisões técnicas (`AGENTS.md` §5). Entra na branch `feat/entrar-servico`, antes do
+  primeiro módulo (recomendação abaixo, seguida pelo Gerente de projeto); RF-18 da spec já ajustada pelo Analista de
+  requisitos (chave `modulo.acao`, matriz padrão, a mesma no servidor e no banco, personalização no item 6a).
 - **Autor:** Arquiteto de software · **Norma:** modelo C4 e ADR; OWASP ASVS 4.0.3 V1.4.4 (um só mecanismo de acesso),
   V1.4.5 (acesso por função e dado, não só por papel), V4.1.1 (decidido no servidor), V4.1.3 (menor privilégio),
   V4.1.5 (falha fechada), V4.2.1 (dado de outra pessoa); RGPD art. 9 e 32; LGPD art. 11.
-- **Conferência (E16·1):** pendente · Engenheiro de segurança (acesso), Engenheiro de dados que não escreveu (parte do
-  banco), Revisor de código (contrato da porta 3).
+- **Conferência (E16·1):** a cargo do Revisor de código (contrato da porta 3, catálogo, matriz) e do Engenheiro de
+  segurança (acesso, falha fechada, saúde à parte) na revisão do PR #7; a parte do banco (D7, D8), pelo Engenheiro de
+  dados que não a escreveu. Pendente até essa revisão.
 - **Dentro de:** ADR 0018 (D12, molde único) e ADR 0005 (T5 e T6, adiados; T7 descartado). **Substitui** o tipo
   `Permissao` do `plan.md` §4 do Entrar (lista de papéis ou função do papel).
 - **Origem:** E42·A ajustada (28/11/2026): personalização só no item 6a da fila, "desde que não prejudique o
@@ -73,8 +75,8 @@ para "Assumptions").
 - `src/server/sessao/acoes.ts`: **sem mudança** (as 5 ações usam `'qualquer'`, modos sem estúdio).
 - Banco (Engenheiro de dados, ADR próprio): uma migration com a cópia vazia e a função de acesso, e o teste de
   comparação da D8 no `pnpm db:test`.
-- Documentos: RF-18 da spec (Analista de requisitos), `plan.md` §3.2 e §4 e `tasks.md` (Arquiteto), depois da
-  aprovação deste ADR.
+- Documentos: RF-18 da spec (feito, Analista de requisitos); `plan.md` §3.2, §4, §5a e §10 e `tasks.md` S7 e B7
+  (Arquiteto, 28/11).
 
 **Fora desta branch:** os planos de Agenda, Agendamento, Clientes, Formulários, Catálogo, Checkout e Caixa (nas
 branches deles) trocam "função do papel" por chave e alcance e citam as linhas da matriz que acrescentam.
