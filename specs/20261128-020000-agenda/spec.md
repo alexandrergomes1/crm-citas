@@ -129,7 +129,7 @@ Analista; quem decide é o Engenheiro de dados no plano, com ADR e revisão de o
 | RNF-02 | A tela de um dia faz um número fixo de idas ao banco, que não cresce com o número de itens (teto no plano). | `ARCHITECTURE.md` §5 e §11 |
 | RNF-03 | WCAG 2.2 AA: contraste, toque 44/40, foco visível, status nunca só por cor, grade navegável por teclado. | `DESIGN.md` §9 |
 | RNF-04 | Nome de cliente, motivo do bloqueio ou dado de saúde nunca em URL, registro de erro ou notificação; a URL só leva a data. | `ARCHITECTURE.md` §7 |
-| RNF-05 | Textos por arquivo de idioma; data e hora no formato do idioma e no fuso do estúdio. | `ARCHITECTURE.md` §11 |
+| RNF-05 | Todos os textos da Agenda em português, espanhol e inglês, por arquivo de idioma; data e hora no formato do idioma e no fuso do estúdio. | E3·1; `ARCHITECTURE.md` §11 |
 
 ## 9. Critérios de aceite
 | ID | Critério | Prova |
@@ -157,21 +157,22 @@ Analista; quem decide é o Engenheiro de dados no plano, com ADR e revisão de o
 
 ## 11. Fora de escopo
 Os recursos "depois" da §2.1; marcar, remarcar, mudar status e cancelar agendamento (Agendamento); cadastro de
-profissional e expediente (Equipe); unidades (`locations`); busca na Agenda; portal público; textos em espanhol e
-inglês além da estrutura; banco de produção e publicação.
+profissional e expediente (Equipe); unidades (`locations`); busca na Agenda; portal público; banco de produção e publicação.
 
 ## 12. Dúvidas ao dono (máx. 3)
-**E26·1 · O que a profissional vê na Agenda** (acesso, dado de cliente)
+E26·1 e E26·2 valem também para a spec do Agendamento, que não repete a pergunta (revisão 5b do Gerente de projeto).
+
+**E26·1 · O que a profissional vê na Agenda e nos agendamentos** (acesso, dado de cliente)
 - **A:** tudo do estúdio, com nome das clientes de todas.
 - **B:** a própria coluna completa; as outras só como "ocupado", sem cliente nem serviço.
 - **C:** só a própria coluna.
 - **Recomendo B:** vê o dia da equipe para se organizar, sem ver cliente alheia (RGPD art. 5(1)(c), minimização).
 
-**E26·2 · Quem cria, altera e exclui bloqueio** (acesso)
-- **A:** dona e recepção para todas; a profissional só os próprios.
+**E26·2 · Quem cria, altera e exclui bloqueios e agendamentos** (cria, remarca e cancela agendamento) (acesso)
+- **A:** dona e recepção em todos; a profissional só nos próprios (bloqueios e agendamentos dela).
 - **B:** só dona e recepção.
 - **C:** qualquer papel, para qualquer profissional.
-- **Recomendo A:** a profissional marca a própria pausa sem mexer na agenda das outras (OWASP ASVS V4, menor
+- **Recomendo A:** a profissional organiza a própria agenda sem mexer na das outras (OWASP ASVS V4, menor
   privilégio).
 
 **E26·3 · Quem aparece como coluna na Agenda** (tela, acesso)
