@@ -3,8 +3,9 @@
 - **Status:** Draft
 - **Aprovação do dono:** (pendente)
 - **Aprovação do merge:** (pendente)
-- **Pasta:** `specs/20261128-022000-catalogo/` · **Branch:** `feat/catalogo` (da `previas`); construção em PR de
-  rascunho, nada é juntado sem o dono (E22·B)
+- **Pasta:** `specs/20261128-022000-catalogo/` · **Branch:** `feat/catalogo`, empilhada por merge sobre
+  `feat/banco-ligacao`, `feat/design-system-codigo` e `feat/entrar-servico` (decisão do Engenheiro de DevOps);
+  construção em PR de rascunho, nada é juntado sem o dono (E22·B)
 - **Item da fila:** 5 de `docs/BACKLOG.md` (núcleo, um módulo por spec: Catálogo, E3·2), em paralelo por ordem do dono (E22·B)
 - **Tipo:** Tela, com Banco e Código; mexe com dinheiro (preço) (`docs/guias/processo-sdd.md` §3 e §4) ·
   **Revisores:** Revisor de design; Engenheiro de dados (quem não fez) e Auditor de risco (banco, dinheiro, acesso);
@@ -164,6 +165,8 @@ teste de isolamento em cada tabela. RN-01, RN-03 a RN-05 também como regra (CHE
   idioma do estúdio**. Depende do item 3 (moeda do estúdio, `ARCHITECTURE.md`:117); a construção da regra de preço
   espera isso existir.
 - **Item 4** (design system no código): componentes do `DESIGN.md`.
+- **E36·A · Entrar e camada de serviço** (`specs/20261128-030000-entrar-servico/spec.md`, branch
+  `feat/entrar-servico`): login, sessão, as 6 portas e o registro (porta 6), de que dependem o RF-09, o RF-10 e o RN-07.
 - **Agenda:** quem é profissional (E26·3), só se E30·3·B.
 - **Agendamento:** consome o RF-08 e leva o estado vazio para cá; usa os dados de exemplo enquanto o Catálogo não
   existir (RF-15 dele).

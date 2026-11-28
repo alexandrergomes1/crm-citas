@@ -8,11 +8,11 @@
 
 ## Antes de construir (portão)
 - [ ] **T0** · Gerente de projeto e Analista de requisitos: E30·1, E30·2, E30·3 respondidas e gravadas; L-2 a L-8 do
-  `plan.md` §2 resolvidas (L-3 é dinheiro: vai ao dono); spec "Approved" com a linha "Aprovação do dono"; spec
-  "Entrar e camada de serviço" (`feat/entrar-servico`, E36·A) construída; base de idiomas e `navegacao.ts` existentes
-  (`plan.md` §10). Se a E30 vier diferente da recomendação, aplicar o `plan.md` §3 e voltar à 5b.
+  `plan.md` §2 resolvidas (L-3 é dinheiro: vai ao dono); spec "Entrar e camada de serviço" (`feat/entrar-servico`,
+  E36·A) construída, com a base `src/app/i18n/{pt,es,en}.ts` e `navegacao.ts`. O "Approved" da spec não é portão
+  daqui: fica no pedido de merge (T21, E22·B). Se a E30 vier diferente da recomendação, aplicar o `plan.md` §3 e voltar à 5b.
 - [ ] **T1** · Engenheiro de DevOps: merge de `feat/banco-ligacao`, `feat/design-system-codigo` e `feat/entrar-servico`
-  na `feat/catalogo` (e `feat/agenda`, se a base de idiomas vier de lá); regenerar `src/app/routeTree.gen.ts` se houver
+  na `feat/catalogo`; regenerar `src/app/routeTree.gen.ts` se houver
   conflito; conferir os arquivos das bases do cabeçalho do plano; PR de rascunho empilhado.
 
 ## Fase 1 · Ficha visual (etapa 6, antes da aprovação do dono)
@@ -28,7 +28,7 @@
   `docs/adr/0011-catalogo-tabelas-do-antigo.md`; leitura do antigo só das migrations citadas (E22·B, nada copiado).
 - [ ] **T4** · Migrations M1 e M2 (e M3 se E30·3·B) com `pnpm exec supabase migration new`; data e hora depois das do
   item 3 e da E36·A.
-- [ ] **T5** · pgTAP 210 e 220 (cópias do molde), 230, 240 (e 250 se E30·3·B); `pnpm db:start`, `pnpm db:test`,
+- [ ] **T5** · pgTAP 510 e 520 (cópias do molde), 530, 540 (e 550 se E30·3·B); `pnpm db:start`, `pnpm db:test`,
   `pnpm db:stop` verdes; o `010_` do item 3 continua verde.
 
 ## Fase 3 · Domínio (Engenheiro de software; teste antes do código)
@@ -50,7 +50,7 @@
 - [ ] **T14** · `consultas.ts` + teste (ativos para o Agendamento; preço e moeda para o Checkout; arquivado marcado).
 
 ## Fase 5 · Telas e idiomas (Engenheiro de software)
-- [ ] **T15** · `src/app/i18n/catalogo/{pt,es,en}.ts` e a linha na base de idiomas; textos dos códigos de erro e da duração.
+- [ ] **T15** · bloco `catalogo` em `src/app/i18n/{pt,es,en}.ts` (base da `feat/entrar-servico`); textos dos códigos de erro e da duração.
 - [ ] **T16** · L-5: `categoria` opcional por linha em `src/app/ui/bloco-lista.tsx` e `.css`, mais o caso em
   `componentes.test.tsx`.
 - [ ] **T17** · Rotas `catalogo.tsx` e `catalogo.servicos.tsx`, linha em `navegacao.ts`, `src/app/paginas/catalogo/*`
@@ -67,4 +67,4 @@
 - [ ] **T20** · QA: veredito CA-01 a CA-12 pelo `plan.md` §11; escopo pelo `git diff --name-only` × §9.
 - [ ] **T21** · Analista de requisitos confere o pedido; Documentador atualiza `docs/STATUS.md`, `docs/BACKLOG.md`,
   `CHANGELOG.md` e `docs/decisoes/` no mesmo PR; Gerente de projeto pede o merge no molde, com commit, CI verde e
-  link da prévia.
+  link da prévia; o portão "Approved" (spec com a linha "Aprovação do dono") é conferido aqui, antes do pedido (E22·B).

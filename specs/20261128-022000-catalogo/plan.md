@@ -79,7 +79,7 @@ Cada uma com recomendação; o plano funciona com a recomendação e diz o que m
 - **L-7 · "Nunca usado" (RF-04) depende de tabelas que ainda não existem.** O Catálogo não sabe o que o Agendamento e
   o Checkout gravam. Decisão técnica (ADR 0012 · D3): quem usa o serviço aponta para ele com chave estrangeira
   `on delete restrict`; o Catálogo traduz a recusa em `servico_em_uso`. **Pede** uma linha nas specs do Agendamento
-  (`appointment_items`) e do Checkout (itens da venda). Até lá, CA-05 se prova com tabela de teste no pgTAP (§4.4).
+  (`agendamento_itens`, nome do plano do Agendamento, com `on delete restrict` para `servicos`) e do Checkout (itens da venda). Até lá, CA-05 se prova com tabela de teste no pgTAP (§4.4).
 - **L-8 (só texto da spec):** o cabeçalho diz "Branch: `feat/catalogo` (da `previas`)", mas a branch é empilhada (§10).
 
 ## 3. Dúvidas E30 em aberto: o plano usa a recomendação; o que muda em cada outra
@@ -88,9 +88,9 @@ se constroem as variantes nem chave de liga e desliga (mesma regra do ADR 0006 �
 
 | Dúvida | Com a recomendação (base deste plano) | Se o dono escolher outra |
 |---|---|---|
-| E30·1 · quem grava | **A:** só `dona` grava (políticas de insert, update e delete com `(select app.eh_dona())`); recepção e profissional só leem; a tela esconde Adicionar e ⋮ de escrita, e o servidor recusa (porta 3) | **B:** `(select app.papel_da_sessao()) in ('dona','recepcao')`. **C:** só a condição do estúdio. Mudam `acesso.ts`, as políticas de M1 e M2, o teste 240 e o e2e de papéis |
+| E30·1 · quem grava | **A:** só `dona` grava (políticas de insert, update e delete com `(select app.eh_dona())`); recepção e profissional só leem; a tela esconde Adicionar e ⋮ de escrita, e o servidor recusa (porta 3) | **B:** `(select app.papel_da_sessao()) in ('dona','recepcao')`. **C:** só a condição do estúdio. Mudam `acesso.ts`, as políticas de M1 e M2, o teste 540 e o e2e de papéis |
 | E30·2 · forma do preço | **A:** `preco_centavos integer not null check (preco_centavos between 0 and 10000000)` (0,00 a 100 000,00 em moeda de 2 casas); domínio igual | **C:** faixa `between 1 and 10000000`. **B:** mais `a_partir_de boolean not null default false` em `servicos`, campo na tela, chave nos três idiomas, e o RF-08 entrega a marca ao Checkout (o Checkout volta ao dono pela spec dele, §10 de lá) |
-| E30·3 · quem faz cada serviço | **A:** sem tabela nova; `consultas.ts` não filtra por profissional; filtro "profissional" fica "em desenvolvimento" | **B:** migration M3 `servicos_profissionais`, teste 250, `src/data/catalogo/servicos-profissionais.ts`, campo de escolha no formulário, filtro "profissional" ligado; quem pode ser ligado segue a E26·3 da Agenda (papel `dona` ou `profissional`, ativo, pela recomendação de lá) |
+| E30·3 · quem faz cada serviço | **A:** sem tabela nova; `consultas.ts` não filtra por profissional; filtro "profissional" fica "em desenvolvimento" | **B:** migration M3 `servicos_profissionais`, teste 550, `src/data/catalogo/servicos-profissionais.ts`, campo de escolha no formulário, filtro "profissional" ligado; quem pode ser ligado segue a E26·3 da Agenda (papel `dona` ou `profissional`, ativo, pela recomendação de lá) |
 
 ## 4. Banco (tipo Banco; quem decide é o Engenheiro de dados)
 
@@ -156,14 +156,14 @@ profissional_id)`; `(org_id, servico_id)` → `servicos (org_id, id) on delete c
 `membros (org_id, user_id) on delete cascade`; gatilho confere papel pela E26·3 e vínculo ativo; `grant select, insert,
 delete`; políticas ler `S`, gravar `S and G`.
 
-### 4.4 Testes pgTAP (`supabase/tests/database/`, banco local, `pnpm db:test`; faixa 2xx para não colidir com a Agenda)
+### 4.4 Testes pgTAP (`supabase/tests/database/`, banco local, `pnpm db:test`; faixa 5xx do Catálogo, decisão técnica)
 | Arquivo | Prova |
 |---|---|
-| `210_catalogo_categorias_isolamento_test.sql` | cópia do molde do item 3: A não lê, cria, altera nem apaga de B; sem papel e sem login, nada (CA-02, CA-03) |
-| `220_catalogo_servicos_isolamento_test.sql` | idem para `servicos` (CA-02, CA-03) |
-| `230_catalogo_restricoes_test.sql` | duração 0, 4, 7, 721, negativa recusadas e 5, 720 aceitas; preço −1 e 10 000 001 recusados, 0 e 10 000 000 aceitos; nome vazio, com espaço na ponta, 61/121 caracteres e repetido ("Depilação" × "depilacao") recusado; categoria de outro estúdio recusada (chave composta); categoria com serviço (ativo ou arquivado) não se apaga; serviço apontado por uma **tabela de teste** com `on delete restrict`, criada e desfeita dentro da transação, não se apaga (CA-05, L-7); `ordem_cor` não muda ao apagar outra e a nova não repete a de uma viva (RN-06) |
-| `240_catalogo_papeis_test.sql` | E30·1·A: dona grava, recepção e profissional só leem; `org_id` de B no `insert` recusado e `insert` sem `org_id` nasce no estúdio da sessão (CA-03, CA-04 no banco) |
-| `250_catalogo_servicos_profissionais_test.sql` | só E30·3·B: isolamento (molde), recepção não pode ser ligada, pessoa de outro estúdio recusada |
+| `510_catalogo_categorias_isolamento_test.sql` | cópia do molde do item 3: A não lê, cria, altera nem apaga de B; sem papel e sem login, nada (CA-02, CA-03) |
+| `520_catalogo_servicos_isolamento_test.sql` | idem para `servicos` (CA-02, CA-03) |
+| `530_catalogo_restricoes_test.sql` | duração 0, 4, 7, 721, negativa recusadas e 5, 720 aceitas; preço −1 e 10 000 001 recusados, 0 e 10 000 000 aceitos; nome vazio, com espaço na ponta, 61/121 caracteres e repetido ("Depilação" × "depilacao") recusado; categoria de outro estúdio recusada (chave composta); categoria com serviço (ativo ou arquivado) não se apaga; serviço apontado por uma **tabela de teste** com `on delete restrict`, criada e desfeita dentro da transação, não se apaga (CA-05, L-7); `ordem_cor` não muda ao apagar outra e a nova não repete a de uma viva (RN-06) |
+| `540_catalogo_papeis_test.sql` | E30·1·A: dona grava, recepção e profissional só leem; `org_id` de B no `insert` recusado e `insert` sem `org_id` nasce no estúdio da sessão (CA-03, CA-04 no banco) |
+| `550_catalogo_servicos_profissionais_test.sql` | só E30·3·B: isolamento (molde), recepção não pode ser ligada, pessoa de outro estúdio recusada |
 
 O `010_base_estrutura_test.sql` do item 3 já confere `org_id`, RLS ligada e forçada e nenhum privilégio para `anon`
 em toda tabela de `public`: passa a valer para as novas.
@@ -221,7 +221,8 @@ pgTAP (§4.4) e o e2e (§7). Contagem agregada: forma conforme o cliente do banc
   com o `Submenu`) e `src/app/routes/catalogo.servicos.tsx` (`validateSearch` aceita só `categoria` (uuid), `situacao`,
   `ordem`, `pagina`, e `servico` (uuid) para o painel de edição; a busca fica no estado da tela, não na URL: RNF-04).
   As outras seções (Pacotes, Combos, Planos de assinatura, Produtos) mostram "em desenvolvimento".
-- **Navegação:** uma linha em `src/app/navegacao.ts` liga o Catálogo (3º item, `tag`).
+- **Navegação:** uma linha em `src/app/navegacao.ts` (o menu da casca, que nasce na `feat/entrar-servico`) liga o
+  Catálogo (3º item, `tag`).
 - **Tela** em `src/app/paginas/catalogo/`, só com componentes do item 4 e as peças que o dono aprovar na ficha:
 
 | Arquivo | O que tem |
@@ -235,8 +236,8 @@ pgTAP (§4.4) e o e2e (§7). Contagem agregada: forma conforme o cliente do banc
 | `catalogo.css` | só `var(--...)` do `tokens.css` (regra RT-9 do item 4) |
 | `catalogo.test.tsx` | `renderToString`: uma só ação preta por tela; "+ Adicionar" do celular com contorno; nenhum texto fixo fora do arquivo de idioma; categoria sempre com nome escrito |
 
-- **Idiomas (RNF-03):** dicionário do módulo em `src/app/i18n/catalogo/{pt,es,en}.ts` (chaves do `pt.ts` como tipo das
-  outras), juntado pela base de idiomas (ADR 0006 · D1; arquivo por módulo, ADR 0012 · D5). Inclui o texto de cada
+- **Idiomas (RNF-03):** um bloco `catalogo` na base comum `src/app/i18n/{pt,es,en}.ts`, que nasce na
+  `feat/entrar-servico` (chaves do `pt.ts` como tipo das outras; ADR 0006 · D1; ADR 0012 · D5). Inclui o texto de cada
   código de erro do §5.3 e o formato "N h M min". Nomes de serviço e categoria ficam como o estúdio escreveu.
 - **Faixa na tabela (L-5):** propriedade opcional `categoria` por linha em `src/app/ui/bloco-lista.tsx` e
   `bloco-lista.css`, mais um caso em `src/app/ui/componentes.test.tsx`; nada mais muda em `src/app/ui/`.
@@ -278,8 +279,8 @@ Fora desta lista nada muda (`AGENTS.md` §6). Arquivo que uma ferramenta crie fo
 
 **Banco (Engenheiro de dados):** `supabase/migrations/<ts>_catalogo_categorias.sql` ·
 `supabase/migrations/<ts>_catalogo_servicos.sql` · `supabase/migrations/<ts>_catalogo_servicos_profissionais.sql` (só
-E30·3·B) · `supabase/tests/database/210_catalogo_categorias_isolamento_test.sql` · `220_catalogo_servicos_isolamento_test.sql`
-· `230_catalogo_restricoes_test.sql` · `240_catalogo_papeis_test.sql` · `250_catalogo_servicos_profissionais_test.sql`
+E30·3·B) · `supabase/tests/database/510_catalogo_categorias_isolamento_test.sql` · `520_catalogo_servicos_isolamento_test.sql`
+· `530_catalogo_restricoes_test.sql` · `540_catalogo_papeis_test.sql` · `550_catalogo_servicos_profissionais_test.sql`
 (só E30·3·B) · `docs/adr/0011-catalogo-tabelas-do-antigo.md`.
 
 **Domínio:** `src/domain/catalogo/{tipos,preco,duracao,nome,servico,lista,acesso}.ts` e
@@ -292,9 +293,9 @@ E30·3·B) · `supabase/tests/database/210_catalogo_categorias_isolamento_test.s
 `src/data/estudio.ts` (só se a E36·A não trouxer idioma e moeda no contexto, §5.1).
 
 **Telas:** `src/app/routes/catalogo.tsx` · `src/app/routes/catalogo.servicos.tsx` · `src/app/routeTree.gen.ts` (gerado) ·
-`src/app/navegacao.ts` (só a linha do Catálogo) · `src/app/paginas/catalogo/{secoes,servicos,servico-formulario,acoes-linha,categorias,filtros}.tsx`
+`src/app/navegacao.ts` (só a linha do Catálogo; arquivo da `feat/entrar-servico`) · `src/app/paginas/catalogo/{secoes,servicos,servico-formulario,acoes-linha,categorias,filtros}.tsx`
 · `src/app/paginas/catalogo/catalogo.css` · `src/app/paginas/catalogo/catalogo.test.tsx` ·
-`src/app/i18n/catalogo/{pt,es,en}.ts` · o arquivo da base de idiomas que junta os dicionários (só a linha do Catálogo) ·
+`src/app/i18n/{pt,es,en}.ts` (só o bloco `catalogo`; arquivos da `feat/entrar-servico`) ·
 `src/app/ui/bloco-lista.tsx`, `src/app/ui/bloco-lista.css`, `src/app/ui/componentes.test.tsx` (só a L-5).
 
 **Testes de tela:** `e2e/preparo/catalogo-dados.ts` · `e2e/catalogo.spec.ts` · `e2e/catalogo-estados.spec.ts` ·
@@ -317,19 +318,18 @@ migrations dos itens 2 e 3 e da E36·A, `package.json`, `pnpm-lock.yaml`, `eslin
 - `feat/catalogo` recebe, **por merge**, `feat/banco-ligacao` e `feat/design-system-codigo` (as duas já trazem a
   `chore/fundacao-tecnica`) e `feat/entrar-servico` (E36·A). PR de rascunho empilhado; nunca se junta numa base. Quando
   as bases entrarem na `previas`, a base do PR passa à `previas`, antes do pedido de merge.
-- **Base de idiomas e `navegacao.ts`:** hoje só o plano da Agenda os cria. Recomendo que entrem pela E36·A (a tela
-  Entrar já precisa de idiomas e da estrutura); se não, a `feat/catalogo` recebe também a `feat/agenda` e espera por
-  ela. Decisão de fila: Gerente de projeto.
-- Conflitos esperados: `src/app/routeTree.gen.ts` (regenera-se) e as linhas de `navegacao.ts` e da base de idiomas.
+- **Base de idiomas e `navegacao.ts`:** nascem na `feat/entrar-servico` (revisão 5b); o Catálogo só acrescenta o bloco
+  `catalogo` e a linha do menu.
+- Conflitos esperados: `src/app/routeTree.gen.ts` (regenera-se) e as linhas de `navegacao.ts` e dos blocos em `src/app/i18n/{pt,es,en}.ts`.
 
 ## 11. Critério → prova
 | CA | Prova | Quem confere |
 |---|---|---|
-| CA-01 | `src/domain/catalogo/*.test.ts` e `src/server/catalogo/servicos.test.ts` (fração, L-4); cor estável: pgTAP 230 | QA; Auditor de risco (preço) |
-| CA-02 | pgTAP 210, 220, 230 (e 250) verdes | Engenheiro de dados revisor; QA |
-| CA-03 | pgTAP 210, 220, 240; testes do servidor | QA; Engenheiro de segurança |
-| CA-04 | testes do servidor; pgTAP 240 | Revisor de código; Engenheiro de segurança |
-| CA-05 | pgTAP 230 (tabela de teste); `servicos.test.ts`, `categorias.test.ts`; `consultas.test.ts` (arquivado fora dos ativos) | QA |
+| CA-01 | `src/domain/catalogo/*.test.ts` e `src/server/catalogo/servicos.test.ts` (fração, L-4); cor estável: pgTAP 530 | QA; Auditor de risco (preço) |
+| CA-02 | pgTAP 510, 520, 530 (e 550) verdes | Engenheiro de dados revisor; QA |
+| CA-03 | pgTAP 510, 520, 540; testes do servidor | QA; Engenheiro de segurança |
+| CA-04 | testes do servidor; pgTAP 540 | Revisor de código; Engenheiro de segurança |
+| CA-05 | pgTAP 530 (tabela de teste); `servicos.test.ts`, `categorias.test.ts`; `consultas.test.ts` (arquivado fora dos ativos) | QA |
 | CA-06 | `servicos.test.ts` e `categorias.test.ts` (registro com preço antes e depois, sem nome de pessoa) | Auditor de risco |
 | CA-07, CA-08 | `e2e/catalogo.spec.ts` e `e2e/catalogo-estados.spec.ts` verdes nos 2 projetos | QA |
 | CA-09 | `catalogo.test.tsx`, `e2e/catalogo-acessibilidade.spec.ts`; checklist `DESIGN.md` §10 nas capturas | Revisor de design; QA |
@@ -343,9 +343,9 @@ migrations dos itens 2 e 3 e da E36·A, `package.json`, `pnpm-lock.yaml`, `eslin
 - Itens 3 e 4 conferidos no código das branches; E36·A ainda sem spec lida: nomes do contrato (§5.1) vêm do plano da
   Agenda. Se mudarem, este plano se ajusta (nova 5b).
 - **Não verificado:** colação ICU não determinística e índice único sobre ela no Postgres 17 do banco local (alternativa:
-  coluna normalizada); `default (app.estudio_da_sessao())` em coluna com `force row level security` (o teste 240
+  coluna normalizada); `default (app.estudio_da_sessao())` em coluna com `force row level security` (o teste 540
   prova); a saída exata do `Intl.NumberFormat` para EUR e BRL em `pt`, `es`, `en` no Node 26 e no Chromium do teste;
   `Intl.NumberFormat.format` com texto decimal (ES2023) no Cloudflare Workers; contagem agregada pelo cliente do banco
   que a E36·A escolher; os corpos das funções do antigo da L-2 (lidos só os nomes).
-- Numeração: ADR 0011 e 0012 e a faixa 2xx do pgTAP foram dadas a este módulo; o Documentador confere no PR.
+- Numeração: ADR 0011 e 0012 e a faixa 5xx do pgTAP foram dadas a este módulo; o Documentador confere no PR.
 - Ordem das `<ts>` das migrations: depois das do item 3 e da E36·A; conferir ao criar.
