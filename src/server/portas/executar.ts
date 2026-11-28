@@ -218,10 +218,15 @@ export async function executar<E extends z.ZodType, S, M extends Modo>(
   // `sessao.ler`: sem sessão devolve só o idioma do navegador.
   async function opcional(): Promise<Resultado<S>> {
     let sessao: ContextoDaSessao | null = null
-    if (await conexao.quemE()) {
+    let inicial: string | null = null
+    // Uma leitura do token só: a inicial segue no contexto (revisão de código 5).
+    const quem = await conexao.quemE()
+    if (quem) {
       const lido = await lerContexto(conexao)
-      if (lido.ok) sessao = lido.contexto
-      else if (lido.codigo !== 'sem_login') return falha(lido.codigo)
+      if (lido.ok) {
+        sessao = lido.contexto
+        inicial = quem.inicial ?? null
+      } else if (lido.codigo !== 'sem_login') return falha(lido.codigo)
     }
     if (!envelope.success) return falha('entrada_invalida')
     const dados = def.entrada.safeParse(dadosBrutos)
@@ -230,6 +235,7 @@ export async function executar<E extends z.ZodType, S, M extends Modo>(
       pedidoId,
       idiomaDoNavegador: idiomaDoNavegador(pedido.cabecalho('accept-language')),
       sessao,
+      inicial,
       conexao,
     }
     return trabalhar(conexao, def as DefinicaoDeAcao<E, S, 'opcional'>, ctx, dados.data, false)

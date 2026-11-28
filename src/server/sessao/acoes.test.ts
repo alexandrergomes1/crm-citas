@@ -308,41 +308,43 @@ describe('sessao.ler', () => {
   it('sem sessão: só o idioma do navegador, sem inicial e sem ler o token', async () => {
     const { conexao } = conexaoFalsa()
     const lido = await definicao('sessao.ler').trabalho(
-      { pedidoId: PEDIDO, idiomaDoNavegador: 'es', sessao: null, conexao } as never,
+      { pedidoId: PEDIDO, idiomaDoNavegador: 'es', sessao: null, inicial: null, conexao } as never,
       {},
     )
     expect(lido).toEqual({ comSessao: false, comEstudio: false, idioma: 'es', inicial: null })
     expect(conexao.quemE).not.toHaveBeenCalled()
   })
 
-  it('com estúdio: idioma do estúdio (RF-35) e a inicial do token (DESIGN.md §8b)', async () => {
-    const { conexao } = conexaoFalsa({
-      quemE: vi.fn(async () => ({ usuarioId: PESSOA, sessaoId: PEDIDO, inicial: 'P' })),
-    })
+  it('com estúdio: idioma do estúdio (RF-35) e a inicial do contexto, sem ler o token de novo (DESIGN.md §8b; revisão de código 5)', async () => {
+    const { conexao } = conexaoFalsa()
     const lido = await definicao('sessao.ler').trabalho(
-      { pedidoId: PEDIDO, idiomaDoNavegador: 'es', sessao: contexto({ orgId: ORG_A, papel: 'dona', idioma: 'en' }), conexao } as never,
+      {
+        pedidoId: PEDIDO,
+        idiomaDoNavegador: 'es',
+        sessao: contexto({ orgId: ORG_A, papel: 'dona', idioma: 'en' }),
+        inicial: 'P',
+        conexao,
+      } as never,
       {},
     )
     expect(lido).toEqual({ comSessao: true, comEstudio: true, idioma: 'en', inicial: 'P' })
+    expect(conexao.quemE).not.toHaveBeenCalled()
   })
 
-  it('token sem e-mail ou que deixou de valer: inicial null, o resto igual', async () => {
-    for (const quem of [{ usuarioId: PESSOA, sessaoId: PEDIDO }, null]) {
-      const { conexao } = conexaoFalsa({ quemE: vi.fn(async () => quem) })
-      const lido = await definicao('sessao.ler').trabalho(
-        { pedidoId: PEDIDO, idiomaDoNavegador: 'pt', sessao: contexto(), conexao } as never,
-        {},
-      )
-      expect(lido).toEqual({ comSessao: true, comEstudio: false, idioma: 'pt', inicial: null })
-    }
+  it('token sem e-mail: inicial null, o resto igual', async () => {
+    const { conexao } = conexaoFalsa()
+    const lido = await definicao('sessao.ler').trabalho(
+      { pedidoId: PEDIDO, idiomaDoNavegador: 'pt', sessao: contexto(), inicial: null, conexao } as never,
+      {},
+    )
+    expect(lido).toEqual({ comSessao: true, comEstudio: false, idioma: 'pt', inicial: null })
+    expect(conexao.quemE).not.toHaveBeenCalled()
   })
 
   it('a resposta não leva o e-mail nem outro campo além dos quatro (AGENTS.md §6)', async () => {
-    const { conexao } = conexaoFalsa({
-      quemE: vi.fn(async () => ({ usuarioId: PESSOA, sessaoId: PEDIDO, inicial: 'P' })),
-    })
+    const { conexao } = conexaoFalsa()
     const lido = await definicao('sessao.ler').trabalho(
-      { pedidoId: PEDIDO, idiomaDoNavegador: 'pt', sessao: contexto({ orgId: ORG_A }), conexao } as never,
+      { pedidoId: PEDIDO, idiomaDoNavegador: 'pt', sessao: contexto({ orgId: ORG_A }), inicial: 'P', conexao } as never,
       {},
     )
     expect(Object.keys(lido as object).sort()).toEqual(['comEstudio', 'comSessao', 'idioma', 'inicial'])

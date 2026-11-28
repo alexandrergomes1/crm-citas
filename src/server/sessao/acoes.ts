@@ -136,13 +136,12 @@ export type SessaoLida = {
 
 /** Trabalho de `sessao.ler`, sem framework, para o teste de unidade. */
 export async function trabalhoDeLerSessao(ctx: ContextoOpcional): Promise<SessaoLida> {
-  // A inicial vem do token já conferido pela porta 1 (getClaims confere a assinatura de novo; nada se guarda).
-  const quem = ctx.sessao === null ? null : await ctx.conexao.quemE()
+  // A inicial vem da leitura do token da porta 1, entregue no contexto (o token não é lido de novo; nada se guarda).
   return {
     comSessao: ctx.sessao !== null,
     comEstudio: ctx.sessao?.orgId != null,
     idioma: ctx.sessao?.idioma ?? ctx.idiomaDoNavegador,
-    inicial: quem?.inicial ?? null,
+    inicial: ctx.sessao === null ? null : ctx.inicial,
   }
 }
 

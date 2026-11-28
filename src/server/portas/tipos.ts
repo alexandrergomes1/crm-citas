@@ -47,6 +47,11 @@ export type ContextoOpcional = {
   readonly pedidoId: string
   readonly idiomaDoNavegador: Idioma
   readonly sessao: ContextoDaSessao | null
+  /**
+   * Inicial do e-mail, da mesma leitura do token da porta 1 (o token não é lido de novo; revisão de código 5).
+   * `null` sem sessão ou quando o token não traz e-mail.
+   */
+  readonly inicial: string | null
   readonly conexao: Conexao
 }
 

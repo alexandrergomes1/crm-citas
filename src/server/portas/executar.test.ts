@@ -37,6 +37,8 @@ const contextoA: ContextoDaSessao = {
 
 type Falsos = {
   claims?: boolean
+  /** inicial do e-mail no token (sessao.ler) */
+  inicial?: string
   contexto?: ContextoDaSessao | ErroDoBanco
   violou?: boolean
 }
@@ -48,7 +50,8 @@ function conexaoFalsa(falsos: Falsos = {}) {
   const conexao: Conexao = {
     quemE: vi.fn(async () => {
       passos.push('quemE')
-      return falsos.claims === false ? null : { usuarioId: PESSOA, sessaoId: PEDIDO }
+      if (falsos.claims === false) return null
+      return falsos.inicial ? { usuarioId: PESSOA, sessaoId: PEDIDO, inicial: falsos.inicial } : { usuarioId: PESSOA, sessaoId: PEDIDO }
     }),
     contexto: vi.fn(async () => {
       passos.push('contexto')
@@ -415,6 +418,34 @@ describe('executar · outros modos', () => {
     const [ctx] = vi.mocked(def.trabalho).mock.calls[0]!
     expect(ctx).toMatchObject({ sessao: null, idiomaDoNavegador: 'en' })
     expect(passos).toEqual(['quemE', 'trabalho'])
+  })
+
+  it('opcional com sessão: a inicial vem da única leitura do token (revisão de código 5)', async () => {
+    const { conexao, passos } = conexaoFalsa({ inicial: 'P' })
+    const def = definicao<'opcional'>(
+      { sessao: 'opcional', permissao: 'qualquer', metodo: 'GET', grava: false, entrada: z.strictObject({}) },
+      passos,
+    )
+    const resposta = await executar(def, pedido(undefined, 'GET'), infraFalsa(conexao))
+    expect(resposta.resultado.ok).toBe(true)
+    const [ctx] = vi.mocked(def.trabalho).mock.calls[0]!
+    expect(ctx).toMatchObject({ sessao: contextoA, inicial: 'P' })
+    expect(conexao.quemE).toHaveBeenCalledTimes(1)
+    expect(passos).toEqual(['quemE', 'contexto', 'trabalho'])
+  })
+
+  it('opcional: token sem e-mail ou sessão vencida → inicial null', async () => {
+    for (const falsos of [{}, { inicial: 'P', contexto: new ErroDoBanco('sem_login') }, { claims: false }]) {
+      const { conexao, passos } = conexaoFalsa(falsos)
+      const def = definicao<'opcional'>(
+        { sessao: 'opcional', permissao: 'qualquer', metodo: 'GET', grava: false, entrada: z.strictObject({}) },
+        passos,
+      )
+      await executar(def, pedido(undefined, 'GET'), infraFalsa(conexao))
+      const [ctx] = vi.mocked(def.trabalho).mock.calls[0]!
+      expect(ctx).toMatchObject({ inicial: null })
+      expect(conexao.quemE).toHaveBeenCalledTimes(1)
+    }
   })
 
   it('opcional com sessão vencida: encerra e segue como sem sessão', async () => {
