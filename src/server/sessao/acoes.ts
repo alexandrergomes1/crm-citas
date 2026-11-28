@@ -191,13 +191,16 @@ export const listarEstudios = acaoGet.handler(
   }),
 )
 
+/** Escolher e trocar: só o identificador do estúdio, uuid (RF-12, RF-14). */
+export const entradaDeEscolher = z.strictObject({ orgId: z.uuid() })
+
 export const escolherEstudio = acaoPost.handler(
   acao({
     nome: 'estudio.escolher',
     metodo: 'POST',
     sessao: 'pessoa',
     permissao: 'qualquer',
-    entrada: z.strictObject({ orgId: z.uuid() }),
+    entrada: entradaDeEscolher,
     grava: true,
     // Escolher e trocar (RF-12, RF-14): sem vínculo ativo → sem_permissao, nada muda (CA-05).
     trabalho: async ({ conexao }, { orgId }) => {

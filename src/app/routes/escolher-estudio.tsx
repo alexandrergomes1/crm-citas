@@ -2,13 +2,12 @@ import { createFileRoute, redirect } from '@tanstack/react-router'
 import { textosDe } from '@/app/i18n/textos'
 import { EscolherEstudio } from '@/app/paginas/escolher-estudio'
 import type { ChamadaDaTela } from '@/server/portas/acao'
-import { escolherEstudio, listarEstudios, sair } from '@/server/sessao/acoes'
-import type { z } from 'zod'
+import { escolherEstudio, listarEstudios, sair, type entradaDeEscolher } from '@/server/sessao/acoes'
 import entrarCss from '@/app/paginas/entrar.css?url'
 import escolherCss from '@/app/paginas/escolher-estudio.css?url'
 
 // Tela Escolher estúdio (spec RF-11 a RF-14). O estúdio vai no corpo da ação, nunca no endereço (RF-33).
-const chamarEscolher: ChamadaDaTela<typeof escolherEstudio, z.ZodObject<{ orgId: z.ZodUUID }>, 'pessoa'> = escolherEstudio
+const chamarEscolher: ChamadaDaTela<typeof escolherEstudio, typeof entradaDeEscolher, 'pessoa'> = escolherEstudio
 
 /** Sair: encerra no servidor e volta a Entrar com a página recarregada (nada fica na memória; CA-13). */
 async function sairEVoltar(): Promise<void> {
