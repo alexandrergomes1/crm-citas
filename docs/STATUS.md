@@ -44,6 +44,16 @@
   4. Autorizar gravar em `.claude/` para ligar as travas do Claude Code, hoje só propostas
      (`specs/20261128-005000-fundacao-tecnica/travas-claude-propostas/`, ADR 0003).
 
+## Item 3 da fila · ligar o banco
+- **Situação:** em revisão, PR #5 (rascunho), branch `feat/banco-ligacao`, empilhado sobre o PR #4. Nada é juntado
+  sem o dono.
+- **Spec:** `specs/20261128-010000-banco-ligacao/` (Status: Draft). ADR 0005.
+- **Fase A construída:** estrutura base, trava por estúdio e 77 testes de banco, só no banco local.
+- **Pendente do dono:**
+  1. Aprovar a spec.
+  2. Responder E24·1 (região do banco existente) e E24·2 (o que fazer com o esquema antigo).
+  3. Depois: Fase B, o job da CI que aplica no banco de desenvolvimento, com aprovação no ambiente do GitHub.
+
 ## Falta na base
 - `docs/produto/`: um arquivo por módulo (item 1 da fila).
 - Pendências: e-mail de segurança quando houver domínio (E14·1); gitleaks e Dependabot (E14·3); travas automáticas do projeto antigo (item 2 da fila).
