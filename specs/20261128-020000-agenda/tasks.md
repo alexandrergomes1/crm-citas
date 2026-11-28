@@ -10,8 +10,8 @@
 
 ## Antes de construir (portão)
 - [ ] **T0** · Gerente de projeto e Analista de requisitos: lacunas L-2 e L-4 do `plan.md` §3.1 levadas ao dono (L-3 vai
-  pela ficha). **À espera do dono:** E50·1 (`plan.md` §3.2) e E50·I1 a I8 (`plan.md` §3.3). O núcleo segue sem elas;
-  a parte que depende de cada resposta para até ela chegar.
+  pela ficha). **À espera do dono:** E54·1 a E54·8 (`plan.md` §3.3); o núcleo segue sem elas. Pessoa que deixou de ser
+  coluna: pendência da Equipe (spec §12, `plan.md` §3.2).
 - [ ] **T1** · Engenheiro de DevOps: conferir que a `feat/agenda` está em dia com a `previas` (PR #7 dentro) e abrir o
   PR de rascunho com base na `previas`. Sem merge de bases (não há mais branch empilhada).
 
@@ -23,7 +23,7 @@
 
 ## Fase 2 · Banco (Engenheiro de dados)
 - [ ] **T3** · **Decide** tabela por tabela (`plan.md` §4.1) e a forma de `public.bloqueios` (§4.3: condição "é
-  coluna", leitura de "ocupados", gatilho do mesmo dia, `btree_gist` ou gatilho, `on delete` da ligação até a E50·1).
+  coluna", leitura de "ocupados", gatilho do mesmo dia, `btree_gist` ou gatilho, `on delete` da ligação sem cascata, pendência da Equipe, spec §12).
   Escreve `docs/adr/0007-agenda-tabelas-do-antigo.md`; leitura do antigo só das migrations citadas na spec (nada
   copiado). M1 só depois da L-2.
 - [ ] **T4** · Migrations M2 (`agenda_permissoes`: chaves, 8 linhas, `app.acoes_que_gravam`) e M3 (`agenda_bloqueios`),

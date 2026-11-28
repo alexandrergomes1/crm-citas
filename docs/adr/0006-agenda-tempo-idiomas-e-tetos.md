@@ -5,8 +5,9 @@
   `specs/20261128-030000-entrar-servico/tasks.md`): D6 substituída; D7 a D13 novas.
 - **Autor:** Arquiteto de software · **Norma:** modelo C4 e ADR; Clean Architecture; Twelve-Factor; WCAG 2.2; OWASP
   ASVS 4.0.3 V4.1.1, V4.1.3, V4.1.5, V4.2.1, V8.3.1; RGPD art. 5(1)(c); `ARCHITECTURE.md` §5 e §11
-- **Revisão (E16·1):** pendente · Revisor de código (todas; D10 e D11 tocam o contrato do Entrar) · Engenheiro de
-  segurança (D6 a D11) · Engenheiro de dados (D3, D7, a parte do banco)
+- **Revisão (E16·1):** pendente · Revisor de código (todas) · Engenheiro de segurança (D6 a D9) · Engenheiro de dados
+  (D3, D7, a parte do banco) · **Revisores de D10/D11:** Revisor de código, Engenheiro de segurança e Auditor de risco,
+  ninguém que construiu o Entrar
 - **Aviso ao dono:** em uma linha, no pedido de revisão do plano (`AGENTS.md` §3 regra 3).
 - **Detalhe:** `specs/20261128-020000-agenda/plan.md` §2, §5 e §6. Decisões de banco (tabelas do antigo, forma das
   políticas): ADR 0007, do Engenheiro de dados. Base: ADR 0018 (contrato `acao(...)`, D3, D18, D24) e ADR 0020.
@@ -40,12 +41,12 @@ com `estudioDaTela` e a matriz copiada no banco. O dono respondeu E26·1·B ("Oc
 - Outros módulos que precisem do dia do estúdio usam `src/domain/agenda/dia.ts`; se virar geral, muda de pasta num ADR
   novo.
 - Os módulos seguintes usam `ctx.alcances` (D11) e `SessaoLida.orgId` (D10) sem mudar o contrato de novo.
-- E50·1 e as ideias E50·I1 a I8 esperam o dono; onde cada uma entraria está no `plan.md` §3.2 e §3.3. Se aprovadas,
-  as que mudam tetos (E50·1·B, E50·I7) pedem linha nova aqui.
+- As ideias E54·1 a E54·8 esperam o dono; onde cada uma entraria está no `plan.md` §3.3. Se aprovada, a que muda o
+  teto (E54·7) pede linha nova aqui. Pessoa que deixou de ser coluna: pendência da Equipe (spec §12); defesa: a
+  ligação sem apagar em cascata.
 - Para desfazer qualquer linha: ADR novo que a substitui, com o motivo.
 
 ## Não verificado
-- D10 e D11 tocam arquivos já juntados do Entrar: nada rodado; dependem da revisão do Revisor de código e do
-  Engenheiro de segurança.
+- D10 e D11 tocam arquivos já juntados do Entrar: nada rodado; dependem dos revisores de D10/D11 (acima).
 - D7: a forma da leitura de "ocupados" no banco e o uso de `rpc(..., { get: true })` nela não foram rodados.
 - D2: o comportamento do `Intl` na meia-noite que não existe é provado só pelo teste do CA-01, ainda não escrito.

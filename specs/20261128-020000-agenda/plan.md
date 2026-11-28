@@ -1,6 +1,6 @@
 # Plano · Agenda (primeira versão, item 5 da fila)
 
-- **Spec:** `specs/20261128-020000-agenda/spec.md` (Approved, commit `4e5b364`, ajustes da §14)
+- **Spec:** `specs/20261128-020000-agenda/spec.md` (Approved, commit `509b3b7`)
 - **Escrito por:** Arquiteto de software · **Norma:** modelo C4 e ADR (mais Clean Architecture, Twelve-Factor, WCAG 2.2,
   OWASP ASVS 4.0.3 V4 e boas práticas do Postgres e do Supabase) · **Revisão:** pendente (etapa 5 Analista de
   requisitos; 5b Gerente de projeto), refeita por causa desta revisão (MP1)
@@ -104,15 +104,15 @@ O trabalho hoje só recebe o alcance **da chave da ação** (`ctx.alcance`). Par
 bloqueio, a leitura do dia precisa do alcance de `agenda.criar`, `.editar` e `.remover`. Decisão: o `ContextoEstudio`
 ganha `alcances` (só leitura), com o alcance de cada chave **do módulo da ação**, calculado pela mesma fonte da porta 3
 (`infra.alcanceDe`; falha fechada: ausente = não pode). `agenda.dia.ler` devolve esses alcances à tela. Esconder não
-protege: quem decide é a porta 3 e o banco. Mudança pequena em `src/server/portas/{tipos,executar}.ts` e no teste;
-conferem o Revisor de código e o Engenheiro de segurança.
+protege: quem decide é a porta 3 e o banco. Mudança pequena em `src/server/portas/{tipos,executar}.ts` e no teste.
+**Revisores de D10/D11:** Revisor de código, Engenheiro de segurança e Auditor de risco, ninguém que construiu o Entrar.
 
 ### 2.7 Estúdio da tela · ADR 0006 · D10
 O modo `estudio` exige `estudioDaTela` (uuid) no envelope (`executar.ts`), mas `sessao.ler` hoje só devolve
 `comEstudio`. Decisão: `SessaoLida` ganha `orgId: string | null` (identificador, sem dado pessoal; vai no contexto da
 rota, nunca na URL). Mudam `src/server/sessao/acoes.ts`, o teste dele, `tests/integracao/entrar.test.ts` (forma
 esperada) e o `SEM_SESSAO` de `src/app/routes/__root.tsx`. Recebeu `estudio_trocado` → a tela recarrega (RF-15 do
-Entrar).
+Entrar). **Revisores de D10/D11:** Revisor de código, Engenheiro de segurança e Auditor de risco, ninguém que construiu o Entrar.
 
 ## 3. Lacunas e o que espera o dono
 
@@ -130,30 +130,22 @@ Entrar).
 Resolvidas desde a versão anterior: login e portas (Entrar, PR #7); banco local com Auth nas telas (Entrar mudou o
 `db:start`); linha "Branch" da spec; CA-04 (`estudio_trocado`, spec §9).
 
-### 3.2 À espera do dono · E50·1 (pessoa que deixou de ser coluna e tem horários)
-O núcleo é construído sem ela: as colunas seguem a RF-03 e a leitura do dia pede só os itens das colunas à vista.
-**Para até a resposta:** qualquer código que trate bloqueio de quem não é coluna. Defesa provisória do banco: a ligação
-`bloqueios → membros` sem apagar em cascata (nada some calado; ADR 0007 decide a forma). Onde entra cada opção:
+### 3.2 Pessoa que deixou de ser coluna
+Pendência da spec da Equipe (spec §12); defesa: a ligação sem apagar em cascata.
 
-| Opção | Onde entra |
-|---|---|
-| A (coluna marcada "fora da equipe" nos dias com itens) | `acesso.ts` (`ehColuna` ganha "fora da equipe com itens no dia"), `src/data/agenda/colunas.ts` (mesma ida ao banco), política de gravação (alterar e excluir sim, criar não), peça nova no `DESIGN.md` pela ficha, e2e |
-| B (coluna some, aviso com a lista) | ação nova `agenda.fora.ler` (`agenda.ver`), uma ida a mais (teto do ADR 0006 · D3 sobe), peça de aviso pela ficha |
-| C (apagar os bloqueios futuros ao tirar o papel) | gatilho em `public.membros` (item 3) ou no módulo Equipe, com registro; ADR do Engenheiro de dados; nada na tela da Agenda |
-
-### 3.3 À espera do dono · ideias do antigo E50·I1 a I8 (`ideias-do-antigo.md`; nada entra sem "sim", item por item)
+### 3.3 À espera do dono · ideias do antigo E54·1 a E54·8 (`ideias-do-antigo.md`; nada entra sem "sim", item por item)
 Nenhuma está no plano. Se aprovada, entra assim (o Analista põe na spec, o plano volta à 5b):
 
 | Ideia | Onde entraria | Efeito no teto e no banco |
 |---|---|---|
-| I1 menu no horário vazio | `grade.tsx` e a peça de grade em `src/app/ui/`; abre também pelo teclado; escondido pela RF-11 | nenhum |
-| I2 linha do "agora" | `dia.ts` (posição do agora no fuso) e a peça de grade; cor pelo `DESIGN.md` | nenhum |
-| I3 atalhos de motivo | bloco `agenda` dos 3 arquivos de idioma e `bloqueio-painel.tsx` | nenhum (só texto) |
-| I4 1 h e fim que acompanha | `bloqueio.ts` (função pura com teste) e `bloqueio-painel.tsx` | nenhum |
-| I5 hora sem dois-pontos | `src/domain/agenda/hora.ts` (por idioma, com teste) e o campo de hora em `src/app/ui/campos.tsx` | nenhum |
-| I6 resumo por coluna | `grade.ts` (soma) e a resposta de `agenda.dia.ler`; só na coluna completa | nenhum |
-| I7 dias marcados no calendário | ação nova `agenda.mes.ler` (`agenda.ver`), leitura nova em `src/data/agenda/`; "próprios" só os dias dela | uma ida por mês aberto (ADR novo) |
-| I8 modo Lista no celular | visão nova no "Dia ▾", `src/domain/agenda/lista.ts`, página nova; "livre" depende do expediente (Equipe) | nenhum |
+| E54·1 menu no horário vazio | `grade.tsx` e a peça de grade em `src/app/ui/`; abre também pelo teclado; escondido pela RF-11 | nenhum |
+| E54·2 linha do "agora" | `dia.ts` (posição do agora no fuso) e a peça de grade; cor pelo `DESIGN.md` | nenhum |
+| E54·3 atalhos de motivo | bloco `agenda` dos 3 arquivos de idioma e `bloqueio-painel.tsx` | nenhum (só texto) |
+| E54·4 1 h e fim que acompanha | `bloqueio.ts` (função pura com teste) e `bloqueio-painel.tsx` | nenhum |
+| E54·5 hora sem dois-pontos | `src/domain/agenda/hora.ts` (por idioma, com teste) e o campo de hora em `src/app/ui/campos.tsx` | nenhum |
+| E54·6 resumo por coluna | `grade.ts` (soma) e a resposta de `agenda.dia.ler`; só na coluna completa | nenhum |
+| E54·7 dias marcados no calendário | ação nova `agenda.mes.ler` (`agenda.ver`), leitura nova em `src/data/agenda/`; "próprios" só os dias dela | uma ida por mês aberto (ADR novo) |
+| E54·8 modo Lista no celular | visão nova no "Dia ▾", `src/domain/agenda/lista.ts`, página nova; "livre" depende do expediente (Equipe) | nenhum |
 
 ## 4. Banco (tipo Banco; quem decide é o Engenheiro de dados)
 
@@ -185,7 +177,7 @@ Nenhuma está no plano. Se aprovada, entra assim (o Analista põe na spec, o pla
 | `criado_em` | `timestamptz not null default now()` |
 
 - **Ligação composta (RN-07):** `foreign key (org_id, profissional_id) references public.membros (org_id, user_id)`,
-  **sem** `on delete cascade` até a E50·1 (§3.2). Atenção: apagar em cascata dispararia o gatilho de registro sem
+  **sem** `on delete cascade` (pendência da Equipe, spec §12; §3.2). Atenção: apagar em cascata dispararia o gatilho de registro sem
   `x-acao` da lista, que recusa e desfaz a gravação inteira.
 - **Profissional é coluna (RN-07, E26·3·A):** uma condição só (§2.5 item 2), conferida ao criar **e** ao alterar
   (CA-14).
@@ -336,7 +328,8 @@ sem `x-acao` (ADR 0006 · D13).
 | Ficha visual e peças novas do `DESIGN.md` (T2, etapa 6) | Designer de produto; confere o Revisor de design; aprova o dono |
 | Decisão por tabela, migrations, pgTAP (T3 a T5) | Engenheiro de dados |
 | Matriz no código, domínio, servidor, dados, telas, idiomas, e2e (T6 a T18) | Engenheiro de software |
-| Revisar código e o contrato tocado (§2.6, §2.7) | Revisor de código |
+| Revisar código | Revisor de código |
+| Revisar o contrato tocado (§2.6, §2.7; ADR 0006 · D10 e D11) | Revisor de código, Engenheiro de segurança e Auditor de risco, ninguém que construiu o Entrar |
 | Revisar banco e conferir o ADR 0007 item por item (E16·1) | Engenheiro de dados (outra instância) e Auditor de risco |
 | Revisar acesso e privacidade (chaves, alcance, "Ocupado", CA-09, CA-13) | Engenheiro de segurança e Auditor de risco |
 | Revisar a tela (checklist `DESIGN.md` §10) | Revisor de design |
@@ -386,7 +379,8 @@ marcadores e o `plan(...)`) · `120_agenda_bloqueios_isolamento_test.sql` · `13
 
 **Design system (Engenheiro de software, só peças aprovadas na ficha):** `src/app/ui/grade-agenda.tsx` e `.css` ·
 `src/app/ui/seletor-data.tsx` e `.css` · `src/app/ui/componentes.test.tsx` · `src/app/estilos/app.css` (só os
-`@import`) · `src/app/paginas/vitrine.tsx` · `src/app/paginas/vitrine-dados.ts` · `e2e/vitrine.spec.ts` ·
+`@import`) · `src/app/paginas/vitrine.tsx` · `src/app/paginas/vitrine-dados.ts` · `src/app/paginas/vitrine.css` (se a vitrine pedir) ·
+`e2e/vitrine.spec.ts` ·
 (se a ficha pedir) `src/app/ui/{campos,estrutura,camadas,estados,icone}.tsx` com os `.css` de cada uma ·
 `src/app/estilos/tokens.css` e `src/app/ui/tokens.test.ts` (se token novo aprovado) ·
 `src/app/paginas/sua-conta.tsx` e `sua-conta.css` (se a ficha mudar o lugar de Sua conta) ·
@@ -398,7 +392,7 @@ marcadores e o `plan(...)`) · `120_agenda_bloqueios_isolamento_test.sql` · `13
 **Ficha visual (Designer de produto):** `specs/20261128-020000-agenda/ficha-visual.md` e `ficha/*.png`.
 
 **Texto:** `DESIGN.md`, **só** as linhas das peças que o dono aprovar na ficha (Designer de produto) · `docs/STATUS.md`,
-`docs/BACKLOG.md`, `CHANGELOG.md`, `docs/decisoes/2026-11-27-fundacao.md` (respostas L-2, L-4, E50) (Documentador).
+`docs/BACKLOG.md`, `CHANGELOG.md`, `docs/decisoes/2026-11-27-fundacao.md` (respostas L-2, L-4, E54) (Documentador).
 
 **Processo:** `specs/20261128-020000-agenda/{spec.md,plan.md,tasks.md}` · `docs/adr/0006-agenda-tempo-idiomas-e-tetos.md`.
 
@@ -432,7 +426,7 @@ marcadores e o `plan(...)`) · `120_agenda_bloqueios_isolamento_test.sql` · `13
   `app.pode(...)` chamado em cada política (ADR 0020, risco já aberto); se `rpc(..., { get: true })` serve a função de
   "ocupados" sem gravar nada (ADR 0018 · D18 diz que sim, não rodado aqui); o `Intl` do Node 26 e do Chromium na
   meia-noite que não existe (o teste do CA-01 prova); `Temporal` no Cloudflare Workers (por isso não se usa).
-- O §2.6 e o §2.7 tocam arquivos do Entrar já juntados: se o Revisor de código ou o Engenheiro de segurança recusarem,
+- O §2.6 e o §2.7 tocam arquivos do Entrar já juntados: se os revisores de D10/D11 recusarem,
   RF-11 e o envelope ficam sem caminho e o plano volta à 5b.
 - L-2 sem resposta: as colunas não têm nome; a tela não pode ir à ficha visual completa sem ela.
 - Numeração: ADR 0007 e os pgTAP `120_` a `160_` podem colidir com as specs do núcleo em branches paralelas; o
