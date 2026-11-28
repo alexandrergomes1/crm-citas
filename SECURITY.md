@@ -53,6 +53,9 @@ Valem como estão; não se corrigem nem se contornam sem nova decisão do dono (
 - Risco aceito pelo dono: a ASVS e o dever de prova do RGPD (art. 5(2)) pedem registro de acesso a dado sensível;
   o estúdio pode atribuir a uma funcionária uma mudança feita pelo suporte, e não há prova de acesso à ficha de saúde
   nesse modo (`ARCHITECTURE.md` §6).
+- **E39·3·B (ajuste):** a sessão cai depois de **1 h parada** (máximo de 12 h). Resposta: "E39·3·B (1hr parado)".
+  Fica abaixo da ASVS V3.3.2 nível 2 só na parada (a norma pede 30 min). Risco: aparelho dividido na recepção fica
+  aberto até 1 h. **Confirmação do risco pelo dono: pendente** (mostrado em 28/11, depois da resposta).
 
 ## 6. Incidente e prazos de aviso
 - Roteiro de incidente escrito (`ARCHITECTURE.md` §9).

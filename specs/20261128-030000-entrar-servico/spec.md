@@ -165,8 +165,9 @@ reescrever.
 - **E39·3·A:** entra de novo a cada 12 h desde a entrada, sem corte por parada. Não cumpre sozinha a ASVS V3.3.2
   nível 2 (12 h **ou** 30 min parado, as duas regras).
 - **E39·3·B:** 12 h no máximo e corte após 30 min parado. **Escolhida pelo dono com ajuste: corte após 1 h parado.**
-  Continua no nível 2 da ASVS V3.3.2 pelo limite de 12 h; a parada de 1 h fica acima dos 30 min citados na norma
-  (risco baixo, mostrado ao dono: aparelho dividido na recepção fica aberto até 1 h).
+  Fica abaixo do nível 2 da ASVS V3.3.2 só na parada (1 h contra 30 min; a norma pede as duas regras juntas): desvio
+  aceito pelo dono em E39·3·B, exceção declarada em `SECURITY.md` §5. Risco: aparelho dividido na recepção fica aberto
+  até 1 h (correção do Engenheiro de segurança, 28/11).
 - **E39·3·C:** 30 dias, como app de celular; fica abaixo do nível 2 da ASVS e vira exceção declarada.
 - **Recomendo B:** cumpre a ASVS V3.3.2 nível 2 e protege a recepção, onde o aparelho é dividido. Se o corte por
   parada do Supabase exigir plano pago, o corte é feito pelo servidor; se nem assim der, o trabalho para e vira
