@@ -1,0 +1,129 @@
+/* Peças de conteúdo (RC-20, RC-21; DESIGN.md §3, §8b). Só var(--...). */
+.ds-bolinha {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: var(--d-bolinha);
+  height: var(--d-bolinha);
+  border-radius: var(--r-pilula);
+  background: var(--btn);
+  color: var(--ink2);
+  font-size: var(--fs-13);
+  font-weight: var(--fw-forte);
+  line-height: 1;
+}
+
+.ds-bolinha--tabela {
+  width: var(--d-bolinha-tabela);
+  height: var(--d-bolinha-tabela);
+  font-size: var(--fs-11);
+}
+
+.ds-sua-conta {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  min-width: var(--toque);
+  min-height: var(--toque);
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-pilula);
+  background: transparent;
+}
+
+/* Quadrado da inicial do estúdio */
+.ds-inicial {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: var(--sp-32);
+  height: var(--sp-32);
+  border-radius: var(--r-inicial);
+  background: var(--brand);
+  color: var(--card);
+  font-size: var(--fs-14);
+  font-weight: var(--fw-forte);
+}
+
+/* Linha do tempo */
+.ds-tempo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-12);
+}
+
+.ds-tempo__dia {
+  padding-bottom: var(--sp-8);
+  font-size: var(--fs-13);
+  font-weight: var(--fw-forte);
+  color: var(--ink2);
+}
+
+.ds-tempo__lista {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-tempo__item {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-12);
+  padding-bottom: var(--sp-16);
+}
+
+/* Linha de 2 px --line que liga as bolinhas */
+.ds-tempo__item:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  top: var(--d-bolinha-tempo);
+  bottom: 0;
+  left: calc((var(--d-bolinha-tempo) - var(--w-linha-tempo)) / 2);
+  width: var(--w-linha-tempo);
+  background: var(--line);
+}
+
+.ds-tempo__bolinha {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: var(--d-bolinha-tempo);
+  height: var(--d-bolinha-tempo);
+  border-radius: var(--r-pilula);
+  background: var(--btn);
+  color: var(--ink2);
+}
+
+.ds-tempo__meio {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.ds-tempo__titulo {
+  font-size: var(--fs-15);
+  font-weight: var(--fw-forte);
+}
+
+.ds-tempo__detalhe {
+  font-size: var(--fs-13);
+  color: var(--ink2);
+}
+
+.ds-tempo__hora {
+  flex: none;
+  font-size: var(--fs-12);
+  color: var(--ink3);
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-tempo__ponto {
+  flex: none;
+  align-self: center;
+  width: var(--d-ponto);
+  height: var(--d-ponto);
+  border-radius: var(--r-pilula);
+  background: var(--id);
+}

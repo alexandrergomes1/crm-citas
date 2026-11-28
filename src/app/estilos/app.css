@@ -1,0 +1,15 @@
+/* Folha única do app (plan.md §5; ADR 0004 · D1): fonte, tokens, base e componentes, juntados pelo Vite. */
+@import '@fontsource-variable/geist';
+@import './tokens.css';
+@import './base.css';
+@import '../ui/botao.css';
+@import '../ui/contador.css';
+@import '../ui/seletor.css';
+@import '../ui/campos.css';
+@import '../ui/etiqueta-status.css';
+@import '../ui/bloco-lista.css';
+@import '../ui/camadas.css';
+@import '../ui/estados.css';
+@import '../ui/estrutura.css';
+@import '../ui/conteudo.css';
+@import '../paginas/vitrine.css';

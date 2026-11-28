@@ -59,4 +59,12 @@ describe('lint de camadas', () => {
   it('src/app importando src/domain passa', async () => {
     expect(await erros("export { somar } from '@/domain/exemplo'\n", 'src/app/x.tsx')).toEqual([])
   })
+
+  it('src/app importando lucide-react fora do icone.tsx falha', async () => {
+    expect(await erros("export { Clock } from 'lucide-react'\n", 'src/app/x.tsx')).toHaveLength(1)
+  })
+
+  it('src/app/ui/icone.tsx importando lucide-react passa', async () => {
+    expect(await erros("export { Clock } from 'lucide-react'\n", 'src/app/ui/icone.tsx')).toEqual([])
+  })
 })

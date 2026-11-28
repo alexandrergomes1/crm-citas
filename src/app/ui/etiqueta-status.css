@@ -1,0 +1,56 @@
+/* Etiqueta e Status (RC-10; DESIGN.md §3, §5): ícone + palavra, sem fundo. Só var(--...). */
+.ds-marca {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-4);
+  font-size: var(--fs-12);
+  font-weight: var(--fw-forte);
+  color: var(--ink2);
+  white-space: nowrap;
+}
+
+.ds-marca--pendente {
+  color: var(--warn);
+}
+
+/* verde: ícone --ok, texto --okInk (DESIGN.md §3) */
+.ds-marca--ok {
+  color: var(--okInk);
+}
+
+.ds-marca--ok .ds-ic {
+  color: var(--ok);
+}
+
+.ds-marca--perigo {
+  color: var(--danger);
+}
+
+/* Botão de status: desenho 36, área de toque 44 (DESIGN.md §8b) */
+.ds-botao-status {
+  display: inline-flex;
+  align-items: center;
+  min-height: calc(var(--h-status) + var(--sp-8));
+  min-width: calc(var(--h-status) + var(--sp-8));
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-pilula);
+  background: transparent;
+  color: var(--ink);
+}
+
+.ds-botao-status__desenho {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espaco-ic);
+  height: var(--h-status);
+  padding: 0 var(--sp-12);
+  border-radius: var(--r-pilula);
+  background: var(--btn);
+  font-size: var(--fs-14);
+  font-weight: var(--fw-medio);
+}
+
+.ds-botao-status__desenho.ds-marca--neutro {
+  color: var(--ink);
+}

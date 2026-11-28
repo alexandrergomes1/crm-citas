@@ -61,6 +61,16 @@ jobs:
           name: relatorio-playwright
           path: playwright-report/
           retention-days: 7
+      # CA-7 do item 4 (specs/20261128-010500-design-system-codigo, plano §8): capturas da vitrine SEMPRE, por 7 dias.
+      # O teste grava em testInfo.outputPath('vitrine-*.png'), dentro de test-results/ (padrão do Playwright).
+      # Repositório público: a vitrine só tem dados fictícios (RV-2). Sem captura: o passo falha.
+      - if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: capturas-vitrine
+          path: test-results/**/vitrine-*.png
+          if-no-files-found: error
+          retention-days: 7
 
   banco:
     name: banco

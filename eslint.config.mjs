@@ -73,4 +73,31 @@ export default defineConfig(
       },
     ]),
   },
+  {
+    // Ícone só por src/app/ui/icone.tsx (plan.md §6.4; ADR 0004 · D3). Repete os padrões de camadas acima,
+    // porque um bloco posterior substitui a opção do anterior para os mesmos arquivos.
+    files: ['src/app/**'],
+    ignores: ['src/app/ui/icone.tsx'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              regex: camada('data'),
+              message: 'src/app não importa src/data; use src/server (ARCHITECTURE.md §3).',
+            },
+            {
+              regex: '^@supabase/',
+              message: 'src/app não importa o cliente do banco (ARCHITECTURE.md §3).',
+            },
+            {
+              regex: '^lucide-react(/|$)',
+              message: 'Ícone só por src/app/ui/icone.tsx (DESIGN.md §5).',
+            },
+          ],
+        },
+      ],
+    },
+  },
 )

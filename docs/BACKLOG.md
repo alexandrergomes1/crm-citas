@@ -13,7 +13,7 @@ Cada item entra por spec própria (`docs/guias/processo-sdd.md`).
 | 1 | Terminar a base: um arquivo por módulo em `docs/produto/`, com autorização do dono para ler o projeto antigo | E8 (item 8), pedido (b) anterior ao E1, E20, E21 | em revisão, PR #2 (merge autorizado no E33, aguardando CI) |
 | 2 | Fundação técnica: ferramentas, app vazio, Spec Kit instalado, travas automáticas (gitleaks e Dependabot, E14·3) e CI; travas automáticas: trazer as do projeto antigo pela skill trazer-do-antigo, com autorização do dono item por item (pedido da mensagem 41) | `AGENTS.md` §1, E14·3, Pedido (travas) | feito (PR #4) |
 | 3 | Ligar o banco existente, tabela por tabela, com autorização do dono item por item | pedido (a) anterior ao E1, `AGENTS.md` §3 regra 4 | livre |
-| 4 | Design system no código | `DESIGN.md` | livre |
+| 4 | Design system no código | `DESIGN.md` | em revisão, PR #6 (rascunho) |
 | 5 | Núcleo, um módulo por spec: Agenda, Agendamento, Clientes, Formulários, Catálogo, Checkout, Caixa | E3·2, `ARCHITECTURE.md` §2 | livre |
 | 6 | Os outros módulos, um por vez, incluindo a central de ajuda e o assistente de IA | E3·2, pedido do dono (módulos), E21·1 | livre |
 | 7 | Painel admin básico | E4·2, E4·3, E21·1 | livre |

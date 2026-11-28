@@ -1,0 +1,244 @@
+/* Campos, buscas, caixinha e interruptor (RC-7, RC-8, RC-9; DESIGN.md §5, §8, §8b). Só var(--...). */
+.ds-campo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  min-width: 0;
+}
+
+.ds-campo__rotulo {
+  font-size: var(--fs-13);
+  font-weight: var(--fw-medio);
+  color: var(--ink2);
+}
+
+.ds-campo__obrigatorio {
+  color: var(--ink3);
+}
+
+.ds-campo__caixa {
+  position: relative;
+  display: flex;
+}
+
+.ds-campo__controle {
+  width: 100%;
+  min-height: var(--h-campo);
+  padding: 0 var(--sp-16);
+  border: var(--borda) solid var(--field);
+  border-radius: var(--r-pilula);
+  background: var(--card);
+  color: var(--ink);
+  font-size: var(--fs-texto);
+  appearance: none;
+}
+
+.ds-campo__controle::placeholder {
+  color: var(--ink3);
+}
+
+.ds-campo__controle--multi {
+  padding: var(--sp-12) var(--sp-16);
+  border-radius: var(--r-campo-multi);
+  resize: none;
+  line-height: var(--lh-texto);
+}
+
+.ds-campo__controle--com-icone {
+  padding-right: calc(var(--sp-16) + var(--ic-18) + var(--sp-8));
+}
+
+.ds-campo__controle--data {
+  cursor: pointer;
+}
+
+/* O calendário do navegador fica embaixo do campo, invisível: só ancora o seletor que abre */
+.ds-campo__nativo {
+  position: absolute;
+  bottom: 0;
+  left: var(--sp-16);
+  width: var(--borda);
+  height: var(--borda);
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ds-campo__icone-fim {
+  position: absolute;
+  top: 50%;
+  right: var(--sp-16);
+  transform: translateY(-50%);
+  color: var(--ink2);
+  pointer-events: none;
+}
+
+.ds-campo__controle[aria-invalid='true'] {
+  border-color: var(--danger);
+}
+
+.ds-campo__erro {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-8);
+  font-size: var(--fs-13);
+  color: var(--danger);
+}
+
+/* Busca em pílula; a lupa fica dentro do campo */
+.ds-busca-tela {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-8);
+  min-width: 0;
+  width: var(--w-busca-tela-atual);
+  max-width: 100%;
+}
+
+.ds-busca {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-width: 0;
+}
+
+.ds-busca__lupa {
+  position: absolute;
+  top: 50%;
+  left: var(--sp-16);
+  transform: translateY(-50%);
+  color: var(--ink3);
+  pointer-events: none;
+}
+
+.ds-busca__campo {
+  width: 100%;
+  height: var(--h-controle);
+  padding: 0 var(--sp-16) 0 calc(var(--sp-16) + var(--ic-18) + var(--sp-8));
+  border: var(--borda) solid var(--field);
+  border-radius: var(--r-pilula);
+  background: var(--card);
+  color: var(--ink);
+  font-size: var(--fs-texto);
+  appearance: none;
+}
+
+.ds-busca__campo::placeholder {
+  color: var(--ink3);
+}
+
+.ds-busca__campo::-webkit-search-cancel-button {
+  appearance: none;
+}
+
+.ds-busca--geral {
+  flex: none;
+  width: var(--w-busca-geral);
+  max-width: 100%;
+}
+
+.ds-busca--geral .ds-busca__campo {
+  padding-right: calc(var(--sp-16) + var(--sp-32));
+  background: var(--btn);
+  border-color: transparent;
+  font-size: var(--fs-13);
+}
+
+.ds-busca__atalho {
+  position: absolute;
+  top: 50%;
+  right: var(--sp-12);
+  transform: translateY(-50%);
+  padding: 0 var(--sp-8);
+  border-radius: var(--r-contador);
+  background: var(--card);
+  color: var(--ink2);
+  font-family: var(--font);
+  font-size: var(--fs-11);
+  font-weight: var(--fw-forte);
+  line-height: var(--lh-texto);
+}
+
+/* Caixinha e interruptor: pretos quando ligados; o rótulo é a área de toque */
+.ds-marcavel {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-12);
+  min-height: var(--toque);
+  cursor: pointer;
+}
+
+.ds-caixinha {
+  position: relative;
+  flex: none;
+  width: var(--d-caixinha);
+  height: var(--d-caixinha);
+  margin: 0;
+  border: var(--borda) solid var(--field);
+  border-radius: var(--r-caixinha);
+  background: var(--card);
+  appearance: none;
+  cursor: pointer;
+}
+
+.ds-caixinha:checked {
+  border-color: var(--ink);
+  background: var(--ink);
+}
+
+.ds-caixinha:checked::after {
+  content: '';
+  position: absolute;
+  top: 18%;
+  left: 34%;
+  width: 30%;
+  height: 50%;
+  border: solid var(--card);
+  border-width: 0 calc(var(--borda) * 2) calc(var(--borda) * 2) 0;
+  transform: rotate(45deg);
+}
+
+.ds-interruptor {
+  position: relative;
+  flex: none;
+  width: var(--w-interruptor);
+  height: var(--h-interruptor);
+  margin: 0;
+  border-radius: var(--r-pilula);
+  background: var(--field);
+  appearance: none;
+  cursor: pointer;
+}
+
+.ds-interruptor::after {
+  content: '';
+  position: absolute;
+  top: var(--sp-4);
+  left: var(--sp-4);
+  width: calc(var(--h-interruptor) - var(--sp-8));
+  height: calc(var(--h-interruptor) - var(--sp-8));
+  border-radius: var(--r-pilula);
+  background: var(--card);
+}
+
+.ds-interruptor:checked {
+  background: var(--ink);
+}
+
+.ds-interruptor:checked::after {
+  transform: translateX(calc(var(--w-interruptor) - var(--h-interruptor)));
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ds-interruptor::after {
+    transition: transform var(--dur-interruptor) ease-out;
+  }
+}
+
+.ds-caixinha:disabled,
+.ds-interruptor:disabled,
+.ds-campo__controle:disabled {
+  opacity: var(--opac-desativado);
+  cursor: not-allowed;
+}

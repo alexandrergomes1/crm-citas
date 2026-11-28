@@ -47,6 +47,20 @@
   3. Autorizar gravar em `.claude/` para ligar as travas do Claude Code, hoje só propostas
      (`specs/20261128-005000-fundacao-tecnica/travas-claude-propostas/`, ADR 0003).
 
+## Item 2 da fila · fundação técnica
+- **Situação:** em revisão, PR #4 (rascunho), branch `chore/fundacao-tecnica`. Construção em rascunho antes da
+  aprovação da spec, permitida pelo E22·B; nada é juntado sem o dono.
+- **Spec:** `specs/20261128-005000-fundacao-tecnica/` (Status: Draft).
+- **Decisões do dono de 28/11** (repositório público, E19·1 troca; E22·B): estão no PR #2, ainda não juntado; não
+  estão repetidas nesta branch.
+- **Pendente do dono:**
+  1. Aprovar a spec, incluindo o R15: texto novo do `AGENTS.md` §1 (comandos) e do `docs/guias/processo-sdd.md` §5
+     (branch e comandos do Spec Kit), já aplicados no PR #4 e à espera dessa aprovação.
+  2. Responder E23·2 (prévia online na Cloudflare) e E23·3 (custo).
+  3. D2 (PRs do Dependabot e a `main`) e D3 (proteção de branch): pedido separado, com os cliques exatos.
+  4. Autorizar gravar em `.claude/` para ligar as travas do Claude Code, hoje só propostas
+     (`specs/20261128-005000-fundacao-tecnica/travas-claude-propostas/`, ADR 0003).
+
 ## Falta na base
 - Pendências: e-mail de segurança quando houver domínio (E14·1); travas do Claude Code em `.claude/` (ver item 2).
 - Apagar a branch `chore/base-fundacao`: o acesso da IA foi recusado; o dono apaga no PR #1 (E19·1).

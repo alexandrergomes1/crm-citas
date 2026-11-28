@@ -1,0 +1,23 @@
+/* Pílula de contador (RC-4; DESIGN.md §5, §8b). Só var(--...). */
+.ds-contador {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  height: var(--h-contador);
+  min-width: var(--w-contador-min);
+  padding: 0 var(--folga-contador);
+  border-radius: var(--r-contador);
+  background: var(--pillSoft);
+  color: var(--ink2);
+  font-size: var(--fs-12);
+  font-weight: var(--fw-medio);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-contador--pendente {
+  background: var(--warnSoft);
+  color: var(--warnInk);
+  font-weight: var(--fw-forte);
+}
