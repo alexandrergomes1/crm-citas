@@ -3,6 +3,9 @@
 > **Aprovado pelo dono em 27/11/2026** (o design feito com ele nesse dia). Fonte única de aparência e comportamento
 > das telas: toda tela segue só o que está aqui. Peça, cor, nome ou medida que não está aqui **não se usa**: entra
 > aqui primeiro, com aprovação do dono. Escrito pelo Designer de produto; normas: WCAG 2.2, Material Design, Apple HIG.
+> **Atualizado em 28/11/2026 com as respostas do dono da Agenda** (E55·3·A, E58·A, E59·A, E60·1·A, E60·2, E60·3·A,
+> E60·4, E60·5; ficha `specs/20261128-020000-agenda/ficha-visual.md`) e com as decisões de aparência do Designer nela
+> (marcadas "decisão do Designer").
 > Imagens: `docs/design/imagens/`. **Se texto e imagem divergirem, vale este texto; a imagem é corrigida.** Canvas com todas as versões, para consulta: `docs/design/README.md`.
 >
 > **Comentário do dono para debater depois (27/11, não é decisão):** "nao gostei do botao branco e prefiro o preto
@@ -33,11 +36,11 @@ Se duas coisas da mesma tela disputam o olho, uma delas está no nível errado.
 | `--card` | #FFFFFF | superfície |
 | `--btn` / `--track` | #F2F1ED | controle claro e trilho do seletor |
 | `--line` | #EAE9E4 | linha fina entre itens de uma lista |
-| `--ink` | #16181D | texto principal, ação principal (inclusive o Agendar do celular), marcado (caixinha, interruptor) |
+| `--ink` | #16181D | texto principal, ação principal (inclusive o botão do meio da barra do celular), marcado (caixinha, interruptor) |
 | `--ink2` | #4A4F57 | texto de apoio, rótulo de campo; número da pílula de contador |
 | `--ink3` | #5E636B | detalhe, cabeçalho de tabela, quantidade, texto de exemplo no campo |
 | `--field` | #8C9098 | contorno de campo (3,2:1) |
-| `--id` | #3E5C76 | azul ardósia: **só onde estou** (ícone do menu atual, item atual da barra de baixo). Nunca botão, nunca contador |
+| `--id` | #3E5C76 | azul ardósia: **só onde estou** (ícone do menu atual, item atual da barra de baixo; linha e hora do agora na grade da Agenda, E60·3·A). Nunca botão, nunca contador |
 | `--brand` | #7A5A22 | dourado: só a inicial da empresa |
 | `--warn` / `--warnSoft` | #9A5B06 / #FBEFD9 | âmbar: pendente, reservado, aguardando · o claro também é o fundo da pílula de contador com pendência (número em #8A5205) |
 | `--ok` / `--okInk` / `--okSoft` | #1F6B45 / #17583A / #E3F0E8 | verde: ícone (`--ok`) e texto (`--okInk`) de concluído, pago, em dia · o claro só como fundo de ícone |
@@ -59,13 +62,13 @@ Contraste conferido: todo texto ≥ 4,5:1 sobre fundo, superfície e trilho; con
 
 | Peça | Para quê | Computador | Celular | Nunca |
 |---|---|---|---|---|
-| Ação principal | o mais importante da tela | "+ Adicionar" preto na barra do topo (na Agenda, "Novo agendamento") | **Agendar**, preto, no meio da barra de baixo; em tela sem barra, o botão do rodapé (Checkout, Salvar); em tela sem menu, o botão preto do bloco (Entrar) | duas pretas na mesma tela |
-| Adicionar no celular | criar o item da tela | — | "+ Adicionar" **com contorno** (1 px `--ink3`, fundo transparente), com nome, no topo da tela | preto (o preto do celular é o Agendar) ou cinza (cinza é ferramenta) |
+| Ação principal | o mais importante da tela | "+ Adicionar" preto, com nome, na barra do topo; "+ Adicionar ▾" quando cria mais de um tipo (na Agenda abre Novo agendamento · Bloquear horário; E60·1·A, E60·5) | **botão do meio da barra de baixo**, preto, só com o ícone `calendar-plus` e o nome "Adicionar" no leitor; abre a folha "Adicionar" com as mesmas opções do computador; vale em todo o app (E60·2); em tela sem barra, o botão do rodapé (Checkout, Salvar); em tela sem menu, o botão preto do bloco (Entrar) | duas pretas na mesma tela; "+" redondo preto só ícone no topo (decisão do Designer, Agenda v4: seria a 2ª peça preta e ícone sozinho em ação que não é universal) |
+| Adicionar no celular | criar o item da tela | — | "+ Adicionar" **com contorno** (1 px `--ink3`, fundo transparente), com nome, no topo da tela; na Agenda não há, porque quem cria é o botão do meio da barra (decisão do Designer, Agenda v4) | preto (o preto do celular é o botão do meio da barra) ou cinza (cinza é ferramenta) |
 | Ação secundária | outras ações da tela | "Opções ▾" claro | ⋮ no topo (nome "Opções") | outro nome para o mesmo menu |
 | Botão de ícone | fechar, voltar, ⋮, ajuda, notificações, funil; mostrar/esconder senha, dentro do campo, à direita | sem fundo | sem fundo | fundo cinza em ícone universal |
-| Ícone ou ícone + nome | — | ícone **e** nome em Filtros, Ordenar, Categoria, Modelo, modo de ver, Equipe e Lista de espera; **só nome** em Opções, Hoje e nas ações principais com texto | ícone sozinho só nos universais e no funil | ícone sozinho em ação que não é universal |
+| Ícone ou ícone + nome | — | ícone **e** nome em Filtros, Ordenar, Categoria, Modelo, modo de ver, Equipe e Lista de espera; **só nome** em Opções, Hoje e nas ações principais com texto | ícone sozinho só nos universais, no funil e no botão do meio da barra (E60·2) | ícone sozinho em ação que não é universal |
 | ☰ e ⋮ | navegar × agir | ícone de painel abre e recolhe o menu | ☰ abre as visões da Agenda; ⋮ ações do objeto onde está | ação no ☰; navegação no ⋮ |
-| Menu principal | trocar de módulo | coluna com ícone e nome; atual em fundo claro com ícone azul; recolhe para 84 px quando o módulo tem seções | barra de baixo: Agenda, Clientes, Agendar, Catálogo, Mais; atual em azul com ponto | preto no item atual |
+| Menu principal | trocar de módulo | coluna com ícone e nome; atual em fundo claro com ícone azul; recolhe para 84 px quando o módulo tem seções | barra de baixo: Agenda, Clientes, botão do meio (Adicionar, só ícone; E60·2), Catálogo, Mais; atual em azul com ponto | preto no item atual |
 | Seções | trocar de tela dentro do módulo | submenu ao lado, sem repetir o nome do módulo | lista de seções (nível 1) com ícone simples, nome, quantidade e ›; a seção é o nível 2 com ‹ | aba ou seletor |
 | Seletor | uma entre poucas opções à vista: abas do painel; categorias no celular | trilho claro, escolhido branco | igual; se não cabe, rola com esmaecido na ponta | preto no escolhido; aba que some quando vazia |
 | Aba vazia | nada a mostrar ainda | fica no lugar; estado vazio com "Adicionar <coisa>" | igual | esconder a aba; adicionar só pelo ⋮ |
@@ -86,6 +89,7 @@ Contraste conferido: todo texto ≥ 4,5:1 sobre fundo, superfície e trilho; con
 **Status do agendamento (ícones Lucide):** Reservado `clock` · Confirmado `thumbs-up` · Chegou `door-open` · Iniciado `play` · Concluído `circle-check` · Ausência `user-x` · Cancelado `circle-x` · Bloqueio de horário `lock`.
 **Situação de formulário:** Aguardando a cliente `hourglass` (âmbar) · Bloqueia o checkout `shield-alert` (vermelho) · Concluída `circle-check` (verde).
 **Etiquetas:** 1ª visita `user-plus` · VIP `crown` · Recorrente `repeat` · Retoque pendente `brush` (âmbar) · Alergia `circle-alert`.
+**Equipe (botão "Equipe N de M" da Agenda):** `users` (E60·4, ordem do dono; é também o ícone de Clientes, exceção ao "um ícone por coisa" decidida pelo dono). **Agenda:** Modo de ver `menu` (☰ do celular) · Lista de espera `list-ordered` · Dia `calendar-range` · horário escolhido na lista `check` · botão do meio `calendar-plus` (E55·3·A, E60·2).
 **Senha:** Mostrar `eye` · Esconder `eye-off`. **Sua conta sem e-mail:** `user` (na bolinha, no lugar da inicial; E47·2·A). **Um ícone por coisa em todo o app**; o mapa de ícones entra aqui com aprovação do dono.
 
 ## 6. Nomes dos botões
@@ -93,9 +97,9 @@ Contraste conferido: todo texto ≥ 4,5:1 sobre fundo, superfície e trilho; con
 | Nome | Quando | Nunca escrever |
 |---|---|---|
 | Adicionar | criar o item da lista que está na tela | Novo, Nova cliente, Criar, Cadastrar, Enviar formulário |
-| Adicionar ▾ | o mesmo botão cria mais de um tipo (serviço ou produto no agendamento; receita ou despesa no Financeiro) | + Serviço, + Produto |
+| Adicionar ▾ | o mesmo botão cria mais de um tipo (serviço ou produto no agendamento; receita ou despesa no Financeiro; agendamento ou bloqueio na Agenda, E60·5); no celular, a folha do botão do meio se chama "Adicionar" | + Serviço, + Produto, Novo, Novo ▾ |
 | Adicionar <coisa> | dentro de um estado vazio ou de uma aba: Adicionar nota | Nova nota, Criar |
-| Novo agendamento · Agendar | Agenda (computador) · botão do meio da barra (celular) | Adicionar agendamento |
+| Novo agendamento · Bloquear horário | itens do "Adicionar ▾" da Agenda e da folha "Adicionar" do botão do meio (E60·1·A, E60·5); "Bloquear horário" também no vazio da Agenda | Adicionar agendamento, Agendar, Novo bloqueio |
 | Opções | menu de ações secundárias (importar, exportar, imprimir, ajustar ordem); no celular é o ⋮ | Ações, Menu |
 | Ordenar: <ordem> | mudar a ordem | Classificar, Ajustar ordem |
 | Filtros · Limpar filtros · Mostrar N <itens> | abrir, desligar e aplicar filtros | Filtrar, Aplicar, OK, Limpar |
@@ -105,7 +109,7 @@ Contraste conferido: todo texto ≥ 4,5:1 sobre fundo, superfície e trilho; con
 | Editar · Duplicar · Arquivar · Excluir | ⋮ da linha, nesta ordem; Excluir em vermelho e pede confirmação | Apagar, Remover, Copiar |
 | Salvar · Cancelar · Fechar · Voltar | formulários (Cancelar desfaz e fecha); ✕ fecha e volta para onde estava; ‹ volta uma etapa | Gravar, Confirmar, Sair (no sentido de fechar), Retornar |
 | Abrir o menu · Recolher menu | menu do computador | Expandir, Minimizar |
-| Hoje · Equipe N de M · Lista de espera | atalhos da Agenda | Agora, Profissionais, Espera |
+| Hoje · Equipe N de M · Lista de espera | atalhos da Agenda; "Equipe" só aparece para quem vê mais de uma coluna (a profissional não vê o botão: Assumption 6 da spec da Agenda, **a confirmar pelo dono no pedido de merge**) | Agora, Profissionais, Espera |
 | Checkout · Pagar <valor> · Cancelar agendamento | agendamento e pagamento | Cobrar, Finalizar, Desmarcar |
 | Mais | só o último item da barra de baixo | Menu, Outros |
 | Ajuda · Notificações · Sua conta | topo | Suporte, Avisos, Perfil |
@@ -136,13 +140,49 @@ Belasis usam "estabelecimento"/"salão", que prendem a um mercado ou a um lugar 
 
 | Módulo | Ação principal | Seções | Categoria | Filtros (dentro do botão) | Modo de ver | Outros |
 |---|---|---|---|---|---|---|
-| Agenda | Novo agendamento | — | — | status, profissional, serviço, bloqueio, etiqueta | Dia ▾ | Hoje · Equipe N de M · Lista de espera · Opções |
+| Agenda | Adicionar ▾ (Novo agendamento · Bloquear horário; E60·5) | — | — | status, profissional, serviço, bloqueio, etiqueta | Dia ▾ | Hoje · Equipe N de M · Lista de espera · Opções |
 | Clientes | Adicionar | — | — | etiquetas, cadastro, saldo, última visita, aniversário, origem | — | Ordenar · Opções |
 | Catálogo | Adicionar | Serviços · Pacotes · Combos · Planos de assinatura · Produtos | Categoria | online, profissional, pede formulário | — | Ordenar · Opções |
 | Financeiro | Adicionar ▾ | Visão geral · Relatórios · DRE · Contas a pagar · Comissões | — | tipo, forma de pagamento, profissional | Mês ▾ | Opções |
 | Formulários | Adicionar | Visão geral · Fichas · Modelos · Termos | Modelo | situação, profissional, data | — | Ordenar · Opções |
 
 Os outros módulos seguem o mesmo molde, um por spec. O lugar de cada módulo e seção vem de um mapa só (configuração da navegação), para mudar de lugar sem mexer nas telas.
+
+## 7b. Agenda: peças e nomes (E55·3·A, E58·A, E59·A, E60·1 a E60·5)
+
+**Peças.**
+1. **Grade do dia:** coluna das horas 56 (computador) e 44 (celular), hora 11 `--ink3`, 64 px por hora, linhas `--line` sobre `--card` (E55·3·A).
+2. **Faixa de horas (E59·A, ADR 0006 D17):** 08:00 a 20:00, que se alarga com item fora e até a hora atual (começa na hora cheia antes do primeiro item e termina na hora cheia depois do último ou da hora atual; nunca corta); abre em 08:00 se a hora atual cabe na primeira tela, senão rolada com ela a um terço do alto, sem passar do fim.
+3. **Cabeçalho da coluna:** 44, bolinha 24 e nome de exibição 13 forte; nunca o e-mail (E55·1·A, E55·3·A).
+4. **Cartão do agendamento e do bloqueio:** `--btn`, canto 10, três conteúdos por duração (1 h ou mais: nome, "início–fim · serviço" e status com ícone e palavra; 45 min: nome e ícone, hora e serviço; menos: "hora + nome" e ícone); bloqueio com `lock` e "Bloqueio · <motivo>" (E55·3·A).
+5. **Altura mínima** 44 (celular) e 40 (computador); itens que se cruzam lado a lado, no máximo 3; com 4 ou mais, o 3º lugar vira o cartão "+N" (E55·3·A).
+6. **Celular:** data como botão ▾ abaixo do título; faixa colada ao cabeçalho com ‹ Hoje › · Equipe N de M · ⋮ (Opções); duas colunas de 160 à vista e as outras rolam para o lado, com esmaecido na ponta (E55·3·A).
+7. **Equipe N de M:** menu (computador) e folha (celular) com caixinhas (E55·3·A); ícone `users` (E60·4).
+8. **Linha de aviso do teto** acima da grade, com `circle-alert` (E55·3·A).
+9. **Campo só leitura:** fundo `--page`, sem contorno, com a frase de motivo embaixo (E55·3·A).
+10. **Valor "6 de 7"** à direita na linha que abre, na folha e no painel de Filtros (E55·3·A).
+11. **Lista de espera** dentro do ☰ no celular, "em desenvolvimento" (E55·3·A).
+12. **Linha do agora:** 2 px `--id` na largura das colunas, atrás dos cartões, sem toque; na coluna das horas a hora em pílula `--id` com texto branco 11 forte; só no dia de hoje; anda a cada minuto, sem animação (E60·3·A).
+13. **Horário vazio escolhido:** o toque cai no quarto de hora tocado e marca 1 h em `--btn` com o anel do escolhido; abre menu (computador) ou folha (celular) com "hora · nome de exibição" no topo e Novo agendamento · Bloquear horário (E54·1, E60·1·A).
+14. **Lista de horários** (Início e Fim do bloqueio): de 15 em 15 min, sem digitar; itens 44; o atual com fundo `--btn`, forte e `check` (E54·5 trocada).
+15. **Atalhos de motivo:** botões claros em pílula de 36 (toque 44), texto 13, acima do Motivo; tocar troca o texto do campo (E54·3).
+16. **Lupa esmaecida tocável** no cabeçalho do celular, com o aviso "em desenvolvimento" (E57·B).
+17. **Bloqueio:** painel 480 (computador) e folha (celular), título "Bloqueio de horário"; ao editar, ⋮ com Excluir (E55·3·A).
+
+**Nomes (E55·3·A e E60·5).** Adicionar (botão ▾, folha e nome no leitor do botão do meio) · Novo agendamento ·
+Bloquear horário · Bloqueio · Bloqueio de horário · Profissional · Data · Início · Fim · Motivo · "Exemplo: almoço" ·
+Almoço · Folga · Reunião · Curso · Pessoal · "Preencher o motivo" (leitor) · "Fim mudou para HH:MM" (leitor) ·
+"Você bloqueia só a sua agenda." · Salvar · Cancelar · Bloqueio salvo · Bloqueio excluído · "Excluir este bloqueio?" ·
+"Já há um bloqueio ou agendamento neste horário. Escolha outro horário." · "Não foi possível desfazer: o horário já foi
+ocupado." · Exportar · Imprimir · Modo de ver · Dia · 3 dias · Semana · Mês · Equipe · Status · Bloqueios · "Mostrar
+bloqueios" (leitor) · Mostrar N itens · "HH:MM · <nome>" (topo do menu do horário vazio) · Agora, HH:MM (leitor) · Dia
+anterior · Dia seguinte · "escolher data" (leitor) · "Buscar na agenda, em desenvolvimento" (leitor) · "A busca na
+Agenda está em desenvolvimento." · Carregando a agenda · "Ainda não há bloqueios neste dia" · "Bloqueie um horário
+quando alguém não puder atender." · "Ainda não há agendamentos neste dia" · "Marque um agendamento para este dia." ·
+"Nenhum item com os filtros ligados" · "Os filtros escondem todos os itens deste dia." · "Ainda não há ninguém na
+agenda" · "Cada pessoa da equipe que atende aparece aqui como uma coluna." · Ver equipe · "Não foi possível carregar a
+agenda" · "Este dia tem mais de 500 itens e nem todos aparecem. Escolha menos pessoas em Equipe."
+**Nunca:** Novo (sozinho), Agendar, Ocupado (E58·A), "estúdio".
 
 ## 8. Campos, camadas e estados
 
@@ -151,7 +191,7 @@ Os outros módulos seguem o mesmo molde, um por spec. O lugar de cada módulo e 
   vermelho. Carregando de envio: botão esmaecido com "…ndo" (ex.: "Entrando…"), campos só leitura, sem linhas cinza.
 - **Botões especiais:** Excluir com texto vermelho; desativado esmaecido (opacidade 60 %); quando a função ainda não existe, o texto ao lado diz "em desenvolvimento".
 - **Por cima:** menu aberto (Opções e ⋮) branco com sombra; janelinha de confirmação para o que não se desfaz; aviso embaixo depois de uma ação, com "Desfazer" quando der; folha de baixo no celular (filtros, menus) com linhas que abrem com ▾/▴; painel à direita no computador (filtros; agendamento com 480 px).
-- **Estados de toda tela:** vazio (ícone, frase, "Adicionar <coisa>" com contorno), sem resultado (o que foi buscado e "Limpar filtros"), carregando (linhas cinza só depois de 0,3 s, anunciado ao leitor de tela), erro (o que houve e "Tentar de novo"), sucesso (aviso).
+- **Estados de toda tela:** vazio (ícone, frase, "Adicionar <coisa>" com contorno), sem resultado (o que foi buscado e "Limpar filtros" em botão claro `--btn`), carregando (linhas cinza só depois de 0,3 s, anunciado ao leitor de tela), erro (o que houve e "Tentar de novo" em botão claro `--btn`), sucesso (aviso). Outro botão de estado que não cria (ex.: "Ver equipe") também é claro `--btn`, nunca só contorno sobre branco (decisão do Designer, Agenda v4; é o que a imagem 06 mostra).
 
 ## 8b. Medidas exatas (para quem constrói)
 
@@ -161,7 +201,7 @@ Os outros módulos seguem o mesmo molde, um por spec. O lugar de cada módulo e 
 | Escolhido do seletor | fundo branco; anel 1 px #D8D7D1 + `0 1px 3px rgba(22,24,29,.14)` |
 | Borda do cabeçalho do celular | `0 1px 0 --line` + `0 6px 14px -10px rgba(22,24,29,.25)` |
 | Seletor | trilho com 4 px de folga; item 36 (total 44) no celular e no computador; texto 13; contador dentro: a pílula (regra do contador) |
-| Agendar (barra) | círculo 52 preto `--ink`, ícone `calendar-plus` branco, nome "Agendar" 11 forte |
+| Botão do meio (barra) | círculo 52 preto `--ink`, ícone `calendar-plus` branco, sem nome escrito, centrado na barra de 72; `aria-label="Adicionar"`, `aria-haspopup="dialog"` e `aria-expanded`; abre a folha "Adicionar" (E60·2) |
 | Botão de status | 36 de altura, área de toque 44 |
 | Caixinha · interruptor | 22 com canto 7 · 44 × 26 |
 | Anel de foco | 2 px `--ink3`, afastado 2 px |
@@ -211,7 +251,7 @@ Contraste AA; toque 44/40; foco visível (anel de 2 px); nada só por cor (estad
 
 ## 10. Checklist de quem revisa uma tela (antes do dono ver)
 
-1. Só há **uma** peça preta de ação na tela (no celular, o Agendar da barra)? O "+ Adicionar" do celular está com contorno e com nome?
+1. Só há **uma** peça preta de ação na tela (no celular, o botão do meio da barra)? O "+ Adicionar" do celular está com contorno e com nome?
 2. Algum controle está direto sobre o fundo cinza? (Não pode.)
 3. Cada controle é de um tipo do §5, com o desenho e o nome de §5 e §6?
 4. Azul aparece só em "onde estou"? Âmbar só em pendência/estado? Todo contador está na pílula do §5 (cinza = total; âmbar = há pendência), nenhum número solto ou flutuando sobre ícone?
