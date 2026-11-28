@@ -1,8 +1,9 @@
 # Plano · Design system no código (item 4 da fila)
 
-- **Spec:** `specs/20261128-010500-design-system-codigo/spec.md` (Draft; revisão 5b feita)
+- **Spec:** `specs/20261128-010500-design-system-codigo/spec.md` (Draft; revisão 5b feita com ajustes, 28/11)
 - **Escrito por:** Arquiteto de software · Norma: modelo C4 e ADR (mais WCAG 2.2, WAI-ARIA Authoring Practices e
-  Twelve-Factor) · **Revisão:** pendente (etapa 5 Analista de requisitos; 5b Gerente de projeto)
+  Twelve-Factor) · **Revisão:** etapa 5 (Spec Kit): não roda, porque o Spec Kit entra com o item 2, ainda não
+  juntado · etapa 5b (Gerente de projeto): feita com ajustes, 28/11
 - **Decisões técnicas:** `docs/adr/0004-design-system-no-codigo.md`
 - **Base técnica:** item 2 (`chore/fundacao-tecnica`, `plan.md` e ADR 0002 de lá): mesma pilha e versões. Nenhuma
   versão do item 2 muda aqui.
@@ -23,7 +24,7 @@ Regra de versão igual à do item 2 (ADR 0002 · D4): última estável com pelo 
 
 | Pacote | Versão | Tipo | Licença | Por quê | Fonte lida |
 |---|---|---|---|---|---|
-| `lucide-react` | 1.79.0 (24/11; a 1.80.0 tem menos de 3 dias) | dependência | ISC | o `DESIGN.md` §5 nomeia ícones Lucide; um componente por ícone, sem efeito colateral (`"sideEffects": false`) | `npm view lucide-react time`; pacote baixado: os 28 nomes do `DESIGN.md` §5 e §8b existem em `dist/esm/icons/` (ex.: `clock`, `calendar-plus`, `door-open`, `shield-alert`, `chart-column`), e também os candidatos de função da L-1 (`x`, `chevron-*`, `plus`, `funnel`, `bell`, `search`, `ellipsis-vertical`, `circle-question-mark`, `panel-left`, `arrow-up-down`, `calendar-days`); pede React `^19` (ok com 19.3.1) |
+| `lucide-react` | 1.79.0 (24/11; a 1.80.0 tem menos de 3 dias) | dependência | ISC | o `DESIGN.md` §5 nomeia ícones Lucide; um componente por ícone, sem efeito colateral (`"sideEffects": false`) | `npm view lucide-react time`; pacote baixado: os 28 nomes do `DESIGN.md` §5 e §8b existem em `dist/esm/icons/` (ex.: `clock`, `calendar-plus`, `door-open`, `shield-alert`, `chart-column`), e também os candidatos de função da E25·2 (`x`, `chevron-*`, `plus`, `funnel`, `bell`, `search`, `ellipsis-vertical`, `circle-question-mark`, `panel-left`, `arrow-up-down`, `calendar-days`); pede React `^19` (ok com 19.3.1) |
 | `@fontsource-variable/geist` | 5.3.0 (19/07/2026) | dependência | OFL-1.1 | Geist servida pelo app (Assumption 2 da spec); uma fonte variável cobre 400, 500 e 600; família `'Geist Variable'` | `npm view`; pacote baixado: `index.css` com `@font-face` `font-weight: 100 900`, `woff2`, `font-display: swap`, subconjuntos latin e latin-ext |
 | `@axe-core/playwright` | 4.14.1 (24/11) | dev | MPL-2.0 (só ferramenta de teste) | CA-5: checagem automática WCAG A e AA na vitrine | `npm view` (pede `node >=22.12.0`, `playwright-core >=1.0.0`; usa `axe-core ~4.14.1`); `https://playwright.dev/docs/accessibility-testing` (`AxeBuilder`, `withTags`); o `axe.js` 4.14.1 tem as etiquetas `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`, `wcag22aa` |
 
@@ -56,7 +57,7 @@ Fora desta lista nada muda (`AGENTS.md` §6). Arquivo novo que uma ferramenta cr
 **Ficha visual (Designer de produto)**: `specs/20261128-010500-design-system-codigo/ficha-visual.md` e
 `specs/20261128-010500-design-system-codigo/ficha/*.png` (capturas 390 e 1440 da vitrine, dados fictícios).
 
-**Texto**: `DESIGN.md`, **só** as linhas que o dono aprovar em E25·2 e nas lacunas L-1 e L-2 (§10), escritas pelo
+**Texto**: `DESIGN.md`, **só** as linhas que o dono aprovar em E25·2 e E25·3, escritas pelo
 Designer de produto · `docs/STATUS.md`, `docs/BACKLOG.md`, `CHANGELOG.md`, `docs/decisoes/` (respostas E25), pelo
 Documentador.
 
@@ -80,11 +81,11 @@ Documentador.
 | RT-6 | `--sombra-flutua` · `--sombra-escolhido` (anel `--selRing` + sombra) · `--sombra-cabecalho` · `--borda: 1px` |
 | RT-7 | `--h-controle` e `--toque` (44 celular, 40 computador) · `--h-campo: 44px` · `--h-linha-lista: 64px` · `--h-barra-baixo: 72px` · `--h-cabecalho: 64px` · `--h-linha-tabela: 40px` · `--h-cab-tabela: 36px` · `--h-barra-topo: 64px` · `--w-menu-aberto: 232px` · `--w-menu-recolhido: 84px` · `--w-submenu: 216px` · `--h-seletor: 44px` · `--h-seletor-item: 36px` · `--folga-seletor: 4px` · `--d-agendar: 52px` · `--h-status: 36px` · `--d-caixinha: 22px` · `--w-interruptor: 44px` · `--h-interruptor: 26px` · `--h-contador: 20px` · `--w-contador-min: 20px` · `--folga-contador: 7px` · `--folga-btn-ic-esq: 12px` · `--folga-btn-ic-dir: 10px` · `--espaco-ic: 6px` · `--w-titulo-barra: 280px` · `--w-busca-geral: 320px` · `--w-busca-tela: 280px` · `--w-menu-flutua: 240px` · `--w-janelinha: 340px` · `--w-painel: 480px` · `--d-bolinha: 40px` · `--d-bolinha-tabela: 24px` · `--d-bolinha-tempo: 36px` · `--d-ponto: 8px` · `--w-faixa: 4px` · `--w-linha-tempo: 2px` |
 | RT-8 | `--foco-cor: var(--ink3)` · `--foco-largura: 2px` · `--foco-afastado: 2px` · `--opac-desativado: .6` · `--atraso-carregando: 300ms` |
-| Ícone (só com L-1) | `--ic-14` `--ic-16` `--ic-18` `--ic-20` `--ic-24` · `--ic-traco` |
+| Ícone (só com E25·2) | `--ic-14` `--ic-16` `--ic-18` `--ic-20` `--ic-24` · `--ic-traco` |
 
-- **Celular × computador:** um só ponto de troca, `@media (min-width: <L-2>)`, só no `tokens.css` (troca `--margem`,
+- **Celular × computador:** um só ponto de troca, `@media (min-width: <E25·3>)`, só no `tokens.css` (troca `--margem`,
   `--h-controle`, `--toque` e a escala de texto 15 → 14) e nos componentes que mudam de desenho (RC-18 × RC-19). O
-  número vem da lacuna L-2 (§10). A vitrine e os testes usam 390 e 1440, longe de qualquer ponto de troca proposto.
+  número vem da resposta da E25·3. A vitrine e os testes usam 390 e 1440, longe de qualquer ponto de troca proposto.
 - **RT-9 / CA-2:** nenhum `#`, `rgb(`, `rgba(`, `hsl(` nem número com `px`, `rem` ou `em` fora do `tokens.css`; nenhum
   `style={...}` nos `.tsx` de `src/app/ui` e `src/app/paginas/vitrine.tsx`. Provado por teste (§7).
 
@@ -95,7 +96,7 @@ Documentador.
   '../estilos/app.css?url'` e `links: [{ rel: 'stylesheet', href: appCss }]`, com `/// <reference types="vite/client" />`;
   fonte: `docs/start/framework/react/guide/tailwind-integration.md` do repositório oficial).
 - **Ícones:** só por `src/app/ui/icone.tsx`, que importa por nome **só** os ícones do `DESIGN.md` §5 e §8b (e os de
-  função, se L-1 for aprovada), sempre com `aria-hidden="true"`; o nome acessível fica no botão. Lint barra
+  função, se a E25·2 for aprovada), sempre com `aria-hidden="true"`; o nome acessível fica no botão. Lint barra
   `lucide-react` fora desse arquivo (§6.4).
 - **Acessibilidade sem biblioteca** (ADR 0004 · D2), pelos padrões do WAI-ARIA Authoring Practices:
   - Seletor (RC-6): padrão "Tabs" (`role="tablist"`, `tab`, `aria-selected`, setas, Home e End, foco itinerante).
@@ -181,18 +182,18 @@ com o recorte da captura da vitrine em 390 e em 1440 (arquivos em `ficha/`), e u
 design confere pelo `DESIGN.md` §10 antes do dono. Como a ficha precisa da vitrine pronta, ela é feita depois da
 construção em PR de rascunho (E22·B) e antes da aprovação do dono.
 
-## 10. Lacunas para o Analista de requisitos (a spec não cobre; não decido, `AGENTS.md` §4)
+## 10. Lacunas para o Analista de requisitos · resolvidas na spec em 28/11 (L-1 → E25·2, L-2 → E25·3, L-3 → cabeçalho)
 Achadas ao ler o canvas aprovado (`docs/design/canvas/v6.css`, `K3Controles.dc.html`). Como mudam o que aparece na
 tela, vão ao dono pela spec. Proposta: juntar L-1 à E25·2 (mesma natureza: "medida que o `DESIGN.md` não fixa, tirada
 do canvas aprovado") e L-2 como E25·3, para ficar em 3 dúvidas.
-- **L-1 · Ícones.** O `DESIGN.md` não fixa tamanho nem traço do ícone, nem o nome Lucide dos ícones de função (✕, ‹,
+- **L-1 · Ícones** (resolvida: spec E25·2 e RT-3b). O `DESIGN.md` não fixa tamanho nem traço do ícone, nem o nome Lucide dos ícones de função (✕, ‹,
   ›, ▾, ⋮, +, funil, sininho, ajuda, painel, lupa, calendário, Ordenar). O canvas usa SVG do Lucide com 14, 16, 18, 20 e
   24 px e traço 1,75. Recomendação: A, usar os do canvas e gravar no `DESIGN.md` (como E25·2·A). Sem isso, o
   `icone.tsx` só pode ter os ícones já nomeados e os botões de função não podem ser construídos.
-- **L-2 · Ponto de troca celular → computador.** O `DESIGN.md` testa em 390 e 1440 mas não diz a partir de que
+- **L-2 · Ponto de troca celular → computador** (resolvida: spec E25·3 e RT-3b). O `DESIGN.md` testa em 390 e 1440 mas não diz a partir de que
   largura o desenho vira o de computador (tablet). Recomendação: 840 px, a classe "expanded" do Material Design 3
   (window size classes), norma já seguida pelo `DESIGN.md`.
-- **L-3 (só texto da spec):** o cabeçalho da spec diz "Branch: `feat/design-system-codigo` (da `previas`)", mas a
+- **L-3 (só texto da spec; resolvida no cabeçalho da spec: branch empilhada sobre a `chore/fundacao-tecnica`):** o cabeçalho da spec diz "Branch: `feat/design-system-codigo` (da `previas`)", mas a
   construção sai da `chore/fundacao-tecnica` (E22·B, D-1). Ajustar a linha.
 
 ## 11. Como provar cada critério de aceite
