@@ -13,16 +13,19 @@
   revisões de código, segurança e design: aprovam com ressalvas, ressalvas resolvidas (commits `f5bed79`, `99d0877`);
   typecheck e lint limpos, 353 testes de unidade. Falta: T1–T3 (telas), i18n, `tests/integracao/registro.test.ts`,
   auditor de risco, revisão de dados, QA e CI. Não verificado aqui (sem Docker): `pnpm db:test`, integração, e2e.
-- **Avaliação do antigo** (só leitura, nada copiado): `docs/produto/avaliacao-crm-agenda/regras-do-banco.md` (40
-  regras: 16 ideias a aproveitar) e `permissoes-e-pin.md` (15 ideias e modelo proposto). Esperam autorização do dono.
+- **Avaliação do antigo** (só leitura, nada copiado; E43·A autorizou as ideias): `docs/produto/avaliacao-crm-agenda/`
+  `regras-do-banco.md` (74 regras, 2 leituras), `seguranca-do-banco.md` (25) e `permissoes-e-pin.md`. Banco do antigo
+  **esgotado** para o núcleo. As ideias entram em cada spec quando a branch dela for trabalhada.
+- **Matriz de permissões (ADR 0020, E42·A):** porta 3 por chave `modulo.acao`; S7 (`bfbb9b9`) e B7 (`8fd1a24`);
+  385 testes de unidade; `pnpm db:test` não rodou (sem Docker). Personalização: item 6a da fila.
 - **Specs revisadas, sem código** (aprovadas): agenda, agendamento, clientes, formulários, catálogo, checkout, caixa.
 
 ## Esperando o dono
-1. **E40:** a mensagem do dono traz "E40-B" e "E40·A"; qual vale? A cifra da ficha de saúde não se constrói antes.
-2. **E39·3:** confirmar 1 h parado sabendo que fica abaixo da ASVS nível 2 (que pede 30 min).
-3. **E42 · Perfis e permissões:** spec nova antes do núcleo (pedido do dono de 28/11).
-4. **E43 · Ideias do antigo:** autorizar as ideias marcadas "aproveitar" nos dois relatórios.
-5. **E38·A:** travas em `.claude/` com o dono presente. **D2:** PRs do Dependabot e a `main`.
+1. **E44:** outras partes do antigo que valeria ler (código de regras, testes de tela); o dono discute e libera.
+2. **E45:** estúdio sem o módulo Caixa: o pagamento em dinheiro é aceito sem caixa? (a regra do Checkout exige caixa).
+3. **E46:** guardar o histórico de mudança de preço (antigo, novo, quem mudou)?
+4. **E38·A:** travas em `.claude/` com o dono presente. **D2:** PRs do Dependabot e a `main`.
+5. Apagar `chore/base-fundacao` (o dono, na página de branches).
 
 ## Já aprovado
 
