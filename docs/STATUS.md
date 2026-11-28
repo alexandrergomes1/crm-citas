@@ -21,11 +21,12 @@
 - **Specs revisadas, sem código** (aprovadas): agenda, agendamento, clientes, formulários, catálogo, checkout, caixa.
 
 ## Esperando o dono
-1. **E44:** outras partes do antigo que valeria ler (código de regras, testes de tela); o dono discute e libera.
-2. **E45:** estúdio sem o módulo Caixa: o pagamento em dinheiro é aceito sem caixa? (a regra do Checkout exige caixa).
-3. **E46:** guardar o histórico de mudança de preço (antigo, novo, quem mudou)?
-4. **E38·A:** travas em `.claude/` com o dono presente. **D2:** PRs do Dependabot e a `main`.
-5. Apagar `chore/base-fundacao` (o dono, na página de branches).
+1. **E38·A:** travas em `.claude/` com o dono presente. **D2:** PRs do Dependabot e a `main`.
+2. Apagar `chore/base-fundacao` (o dono, na página de branches).
+
+**Respondidas em 28/11 e ainda por aplicar nas specs (Analista, quando cada branch for trabalhada):** E29·1 (PIN),
+E29·3 (troca), E31·1 (caixa opcional), E32·1 (aviso de caixa aberto), E40·B, E45·A (Checkout e Caixa), E46·A
+(Catálogo), E44 (ler a parte do antigo de cada módulo ao fazer a spec), ideias E43·A de cada módulo.
 
 ## Já aprovado
 
