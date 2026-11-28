@@ -13,9 +13,10 @@ on:
 permissions:
   contents: read
 
+# Só o PR cancela a execução anterior; envio à previas e à main roda até o fim (o verde fica registrado).
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   verificar:
@@ -91,12 +92,12 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-      # gitleaks 8.30.1 pela linha de comando (MIT, sem token), histórico inteiro a cada execução.
+      # gitleaks 8.30.1 pela linha de comando (MIT, sem token), toda a história de HEAD a cada execução.
       # --log-opts=HEAD: todo commit que chega a HEAD (no PR, o commit de merge = base + PR), não as outras
       # branches que o fetch-depth 0 também baixa (ADR 0003 · S1). --redact: o log é público, o segredo sai
       # mascarado. Achou: saída 1, CI vermelha. -u: o git aceita a pasta montada (plano §10, R-7).
       # A imagem não é vista pelo Dependabot (está dentro de run:): troca à mão, por PR (ADR 0002).
-      - name: gitleaks no histórico inteiro
+      - name: gitleaks em toda a história de HEAD (não varre as outras branches)
         run: >-
           docker run --rm -u "$(id -u):$(id -g)" -v "$GITHUB_WORKSPACE:/repo"
           zricethezav/gitleaks:v8.30.1@sha256:c00b6bd0aeb3071cbcb79009cb16a60dd9e0a7c60e2be9ab65d25e6bc8abbb7f

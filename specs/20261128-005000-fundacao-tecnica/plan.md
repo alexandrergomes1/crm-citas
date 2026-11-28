@@ -88,7 +88,11 @@ comandos do §5); `docs/STATUS.md`, `docs/BACKLOG.md`, `CHANGELOG.md` (R16); `do
 repositório público e aprovação do R15).
 
 **Processo**: `specs/20261128-005000-fundacao-tecnica/{spec.md,plan.md,tasks.md}`;
-`docs/adr/0002-fundacao-tecnica-ferramentas-e-versoes.md`.
+`specs/20261128-005000-fundacao-tecnica/travas-claude-propostas/` (7 arquivos: `decisao-com-prova.mjs`,
+`decisao-com-prova.test.mjs`, `guarda.mjs`, `guarda.test.mjs`, `inicio-de-sessao.mjs`, `inicio-de-sessao.test.mjs`,
+`settings.json`; propostas das travas T1, T3, T4 e T5 do §13, fora de `.claude/` até a decisão do ADR 0003);
+`docs/adr/0002-fundacao-tecnica-ferramentas-e-versoes.md`. (`.specify/**` e `.claude/skills/speckit-*/SKILL.md` já
+estão no bloco "Spec Kit" acima.)
 
 Fora: `SECURITY.md` (D1, fora da spec), `.claude/rules/`, `.cursor/`, `scripts/` (ver §13),
 `ARCHITECTURE.md`, `DESIGN.md`, `CONTRIBUTING.md`, qualquer configuração do repositório no GitHub.
@@ -182,13 +186,13 @@ roda a checagem de tipos, o lint e os testes." pelo texto abaixo; o resto do par
 | `telas` | o mesmo preparo → `pnpm exec playwright install --with-deps chromium` → `pnpm test:e2e`; relatório enviado como artefato **só se falhar**, `retention-days: 7` | CA2 |
 | `banco` | o mesmo preparo → `pnpm db:start` → `pnpm db:test` → `pnpm db:stop` (sempre) | CA6 |
 | `travas` (só se T1 a T7 do §13 entrarem) | checkout → setup-node → `node` nos testes de cada trava trazida → JSON do `.claude/settings.json` válido | R17 |
-| `segredos` | checkout com `fetch-depth: 0` → `docker run --rm -v "$GITHUB_WORKSPACE:/repo" <imagem do §2> git --redact --verbose /repo` (código de saída 1 se achar) | CA8, CA12 |
+| `segredos` | checkout com `fetch-depth: 0` → `docker run --rm -v "$GITHUB_WORKSPACE:/repo" <imagem do §2> git --redact --verbose --log-opts=HEAD /repo` (código de saída 1 se achar; `--log-opts=HEAD` pelo S1 do ADR 0003) | CA8, CA12 |
 
 - **gitleaks pela linha de comando (imagem oficial), não pela gitleaks-action.** A ação não pede licença em conta pessoal
   (README da gitleaks-action: "`GITLEAKS_LICENSE` ... required for organizations, not required for user accounts"), mas
   desde a v2 tem licença própria (não MIT), pede `GITHUB_TOKEN` e comenta no PR. A linha de comando é MIT, não pede token,
   e continua grátis se o repositório for para uma organização. `--redact` esconde o segredo no log, que é **público**.
-  Varre o histórico inteiro a cada execução (R11).
+  Varre a cada execução todo o histórico que chega a HEAD (no PR, base + PR), não as outras branches (S1 do ADR 0003; R11).
 - **Playwright** (`playwright.config.ts`): 2 projetos Chromium, `celular` (390×844) e `computador` (1440×900); `webServer`
   com `pnpm dev`, `url: http://localhost:3000`, `reuseExistingServer: !process.env.CI`
   (`https://playwright.dev/docs/test-webserver`). O teste acha "crm-citas" e confere

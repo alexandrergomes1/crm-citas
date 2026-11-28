@@ -1,6 +1,9 @@
 {
   "permissions": {
     "deny": [
+      "Edit(/.claude/**)",
+      "Edit(/.githooks/**)",
+      "Read(**/.env*)",
       "Skill(design-skills:design-elevation)",
       "Skill(design-skills:ux-research)",
       "Skill(design-skills:ux-strategy)",
