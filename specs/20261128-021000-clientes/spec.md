@@ -3,8 +3,9 @@
 - **Status:** Draft
 - **Aprovação do dono:** (pendente)
 - **Aprovação do merge:** (pendente)
-- **Pasta:** `specs/20261128-021000-clientes/` · **Branch:** `feat/clientes` (da `previas`); construção em PR de
-  rascunho, nada é juntado sem o dono (E22·B)
+- **Pasta:** `specs/20261128-021000-clientes/` · **Branch:** `feat/clientes` (da `previas`), empilhada por merge sobre
+  `feat/banco-ligacao`, `feat/design-system-codigo` e `feat/entrar-servico` (decisão do Engenheiro de DevOps); construção
+  em PR de rascunho, nada é juntado sem o dono (E22·B)
 - **Item da fila:** 5 de `docs/BACKLOG.md` (núcleo, um módulo por spec: Clientes, E3·2), em paralelo por ordem do dono (E22·B)
 - **Tipo:** Tela, com Banco e Código (`docs/guias/processo-sdd.md` §3 e §4) · **Revisores:** Revisor de design;
   Engenheiro de dados (quem não fez) e Auditor de risco (banco e dado de cliente); Engenheiro de segurança (acesso,
@@ -173,6 +174,8 @@ e teste de isolamento em cada tabela.
   O país do estúdio (para o código do telefone, RN-02) hoje não está no item 3: ou o Engenheiro de dados o acrescenta
   lá, ou o plano de Clientes traz a migration que o cria, decisão do plano com ADR.
 - **Item 4** (design system no código): componentes do `DESIGN.md`.
+- **Spec "Entrar e camada de serviço"** (E36·A do dono, 28/11/2026: "E36a"; branch `feat/entrar-servico`, antes do
+  núcleo): login e as 6 portas (`ARCHITECTURE.md` §4) por onde passa toda ação desta spec (RF-11).
 - **Agendamento:** atendimentos e status (aba Atendimentos, última visita); usa a tabela e as regras desta spec no
   cadastro rápido (E27·1). Sem ele construído, a aba fica vazia e a última visita "nunca".
 - **Agenda:** mostra o nome da cliente no cartão; cliente apagada aparece como "Cliente removida" (RN-07).
