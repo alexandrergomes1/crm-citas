@@ -62,3 +62,58 @@
 ## Não verificado
 Nenhum teste rodado nem banco subido; migrations do antigo lidas por cabeçalhos, comentários e trechos, não linha a
 linha; ADRs 0007, 0009, 0011, 0013 e 0017 não abertos; a falha da última dona foi deduzida das políticas, não provada.
+
+---
+
+## 2ª leitura (final) · testes, funções de gravação, configuração
+
+- **Escrito por:** Engenheiro de dados · **Norma:** boas práticas oficiais do Postgres e do Supabase
+- **Pedido do dono:** E43·A (28/11/2026), "para ja matar essa questao do BD do anterior". Só leitura, nada copiado, sem
+  segredo. Não repete `seguranca-do-banco.md`. O antigo não tem `config.toml`, pg_cron nem funções de retenção.
+- **Veredito:** banco do antigo **esgotado para o núcleo**. Fora do núcleo restam Mensagens, Financeiro (relatórios no
+  fuso), pacotes e saldo, úteis só quando essas specs vierem.
+
+| # | Ideia | Onde no antigo | Spec nova | Saída | Motivo e norma |
+|---|---|---|---|---|---|
+| 41 | Repetir a mesma troca de status não faz nada nem cria histórico | `tests/101`, `tests/137` | Agendamento | **aproveitar** (Analista ajusta o CA) | toque duplo não vira erro; idempotência (RFC 9110 §9.2.2) |
+| 42 | O registro não grava alteração que não mudou nada | `tests/149`, `tests/151` | Entrar (`app.registrar_mudanca`) | **aproveitar** | `WHEN (old.* IS DISTINCT FROM new.*)`; registro sem linhas falsas |
+| 43 | O registro diz quais colunas mudaram (nomes, nunca valores) | `tests/149`, `154`, `158` | Entrar | **aproveitar** | ASVS V7.1.3; RGPD art. 5(1)(c) |
+| 44 | Mudança de preço guarda antigo, novo e quem mudou | `tests/151`, `20261114030100` | Catálogo | **aproveitar, depois de perguntar ao dono** (dinheiro) | trilha de preço; ASVS V7.1.3 |
+| 45 | Migration espera no máximo 5 s por trava (`lock_timeout`) | `20260615144330`, `20261114060300`, `20261114120000` | Guia de migrations | **aproveitar** | mudança sem derrubar o sistema (doc. do Postgres) |
+| 46 | Correção pela profissional: versão nova, motivo até 500 caracteres, original assinada intacta | `20261114120000`, `20261114120100`, `tests/158` | Formulários | **aproveitar**, cifrado | é a E29·3 (troca); ASVS V11.1; RGPD art. 16 |
+| 47 | Reenviar à cliente: ficha nova aponta para a anterior; "substituída" é calculada; a anterior vale até a nova ser assinada | mesmos | Formulários | **aproveitar** (melhor que o plano novo) | a assinada não muda nem num campo |
+| 48 | Uma correção pendente por ficha (índice único parcial) | mesmos | Formulários | **aproveitar** | evita fichas paralelas |
+| 49 | A correção nasce com as respostas, sem os aceites: a cliente aceita o termo de novo | `20261114120100` | Formulários | **aproveitar** | consentimento novo; RGPD art. 7(1) |
+| 50 | O banco confere obrigatórias ao assinar | `tests/132`, `157` | Formulários | descartar no banco | no novo as respostas chegam cifradas; a regra fica no servidor, com teste |
+| 51 | Limite do link por link e por IP (não só por estúdio) | `tests/157` | Formulários | **aproveitar** (completa a #1 da segurança) | um link vazado não esgota o estúdio; ASVS V11.1.4 |
+| 52 | Robô de pré-visualização (WhatsApp) não marca abertura | `tests/132` | Formulários | **aproveitar** | senão o robô gasta o limite |
+| 53 | Trava pelo `xmin` falha em subtransação | `tests/97` | Checkout | **aproveitar a lição** | comparar com `now()`; teste com SAVEPOINT |
+| 54 | Regra só no gatilho de inserção deixa passar o UPDATE | `tests/122` | Todos | **aproveitar** como item de teste | toda regra testada por insert e update |
+| 55 | Chave de repetição vale só para o mesmo alvo | `tests/110`, `111` | Checkout, Caixa | **aproveitar** como caso de teste | |
+| 56 | RLS com função por linha é lenta (o antigo mediu 5,8 s) | `20261114050300` | Clientes, Formulários, Agendamento | **aproveitar** | conjunto calculado uma vez; teste de volume como profissional (guia de RLS do Supabase) |
+| 57 | Teste de ponta a ponta no banco: cliente → agendamento → checkout → caixa | `tests/95` | Nenhum hoje | **aproveitar** | pega erro de encaixe entre módulos |
+| 58 | A regra da última dona não impede apagar o estúdio inteiro | `tests/20` | Base (com a #1) | **aproveitar** | RGPD art. 17 |
+| 59 | Módulo ligado por estúdio e conferido no banco | `20261028210000`, `tests/20` | Caixa, Checkout (E31·1: caixa opcional) | **aproveitar a ideia** | o plano do Checkout exige caixa para dinheiro: estúdio sem caixa não receberia dinheiro; vai ao Analista |
+| 60 | Estúdio desativado nega tudo | `tests/144`, `148` | Base | descartar (v1) | com a spec de plano e assinatura; decide o dono |
+| 61 | Conta existente nunca é ligada a estúdio por quem dá acesso; teto de 10 acessos novos por dia | `tests/154` | Equipe e convite (futuro) | **aproveitar** | ASVS V2.3, V11.1.4 |
+| 62 | Bloquear o estúdio inteiro ou a equipe toda | `tests/101`, `135`, `150` | Agenda | descartar (v1) | regra de produto; só se o dono pedir |
+| 63 | Reabrir caixa | `20261031600000`, `tests/145` | Caixa | descartar | E32·2·B não tem reabrir |
+| 64 | Hora de abertura vinda do app | `tests/145` | Caixa | já coberto (melhor) | |
+| 65 | Fechamento recusado se entrou lançamento depois da contagem | `20261031600000` | Caixa | já coberto (melhor) | |
+| 66 | Conflito de horário provado só em sequência | `tests/101` | Agendamento | já coberto (melhor) | o novo prova com duas ligações reais |
+| 67 | Hora inexistente na troca de horário de verão recusada | `20261114020100`, `tests/150` | Agendamento | já coberto | |
+| 68 | Índices parciais da agenda | `20260614_001`, `20261114010100` | Agendamento | já coberto | |
+| 69 | "Existe ficha?" falha fechada | `tests/152` | Catálogo, Formulários | já coberto (melhor) | |
+| 70 | Leitura de dado de saúde registrada | `tests/152` | Formulários RF-12 | já coberto | |
+| 71 | Extensões no esquema padrão | `20260609_001`, `20260601000001` | Agendamento, Clientes | já coberto (melhor) | |
+| 72 | Retenção e tarefas agendadas | não existem | Registro e sessões | nada a trazer | prazo de guarda é pergunta ao dono antes de produção (RGPD art. 5(1)(e)) |
+| 73 | Telefone repetido | antigo: não único | Clientes | **achado do novo** | o plano ainda segue E28·1·A; a E28·1·B pede índice único parcial `(org_id, telefone)` |
+| 74 | Imitação do Supabase para testar sem Docker | `tests/00`, `tests/10` | — | descartar | o novo usa o banco local oficial |
+
+**Resumo da 2ª leitura:** 19 para aproveitar (#41–49, #51–59, #61), 8 já cobertas, 5 para descartar, 1 sem nada (#72),
+1 achado do novo (#73). Maiores: #46 a #49 (o antigo já resolvia a E29·3 troca), #56 (desempenho da RLS), #59 (caixa
+opcional × regra do dinheiro), #53, #42 e #43, #57.
+
+**Não verificado:** nenhum teste rodado; testes do núcleo lidos pelas mensagens e comentários (só `10` e `60` inteiros);
+funções lidas por mensagens de erro e comentários; Storage só por busca; seed não lido; configuração remota
+desconhecida; #56 deduzida, não medida no novo.
