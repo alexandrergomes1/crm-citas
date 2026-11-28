@@ -5,13 +5,26 @@ import { z } from 'zod'
 import type { Banco } from '@/data/cliente'
 import { ErroDoBanco } from '@/data/erros'
 import type { Conexao, ContextoDaSessao } from '@/data/sessao'
+import { alcanceNaMatriz, type LinhaDaMatriz } from '@/domain/acesso/matriz'
+import type { ChaveDe } from '@/domain/acesso/chaves'
 import { Recusa } from './erros'
 import { TEMPO_MINIMO_SEM_SESSAO_MS, executar } from './executar'
-import type { DefinicaoDeAcao, Infra, Modo, PedidoHttp } from './tipos'
+import type { Chave, DefinicaoDeAcao, FonteDeAlcance, Infra, Modo, PedidoHttp } from './tipos'
 
 const ORG_A = '11111111-2222-4333-8444-555555555555'
 const PESSOA = '0a1b2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d'
 const PEDIDO = '6f1c2d3e-4a5b-4c6d-8e7f-8a9b0c1d2e3f'
+
+// Catálogo e matriz fictícios da porta 3 (o do sistema nasce vazio nesta spec; ADR 0020).
+const CATALOGO_TESTE = { teste: ['ver', 'criar'] } as const
+const MATRIZ_TESTE: readonly LinhaDaMatriz<ChaveDe<typeof CATALOGO_TESTE>>[] = [
+  { papel: 'recepcao', chave: 'teste.criar', alcance: 'todos' },
+  { papel: 'profissional', chave: 'teste.ver', alcance: 'proprios' },
+]
+const fonteDeTeste: FonteDeAlcance = (sessao, chave) =>
+  alcanceNaMatriz(CATALOGO_TESTE, MATRIZ_TESTE, sessao.papel, chave)
+/** Chave do catálogo fictício (fora do tipo `Chave` do sistema, que está vazio). */
+const chave = (texto: string) => texto as unknown as Chave
 
 const contextoA: ContextoDaSessao = {
   usuarioId: PESSOA,
@@ -74,7 +87,7 @@ function conexaoFalsa(falsos: Falsos = {}) {
   return { conexao, passos }
 }
 
-function infraFalsa(conexao: Conexao, ambiente = true) {
+function infraFalsa(conexao: Conexao, ambiente = true, alcanceDe: FonteDeAlcance | null = fonteDeTeste) {
   let relogio = 1_000
   const infra: Infra = {
     ambiente: () =>
@@ -92,6 +105,7 @@ function infraFalsa(conexao: Conexao, ambiente = true) {
       relogio += ms
     }),
     novoPedidoId: () => PEDIDO,
+    ...(alcanceDe ? { alcanceDe: vi.fn(alcanceDe) } : {}),
   }
   return infra
 }
@@ -112,7 +126,7 @@ function definicao<M extends Modo = 'estudio'>(
     nome: 'teste.criar',
     metodo: 'POST',
     sessao: 'estudio' as M,
-    permissao: ['dona', 'recepcao'],
+    permissao: chave('teste.criar'),
     entrada: z.strictObject({ titulo: z.string().min(1).max(10) }),
     grava: true,
     trabalho: vi.fn(async (_ctx: unknown, dados: unknown) => {
@@ -140,7 +154,8 @@ describe('executar · modo estudio · ordem das portas (CA-07)', () => {
       }),
     )
     const [ctx] = vi.mocked(def.trabalho).mock.calls[0]!
-    expect(ctx).toMatchObject({ pedidoId: PEDIDO, usuarioId: PESSOA, orgId: ORG_A, papel: 'recepcao', idioma: 'es' })
+    expect(ctx).toMatchObject({ pedidoId: PEDIDO, usuarioId: PESSOA, orgId: ORG_A, alcance: 'todos', idioma: 'es' })
+    expect(infra.alcanceDe).toHaveBeenCalledWith(contextoA, 'teste.criar')
   })
 
   it('porta 1: sem token → sem_login, nada no banco e nada registrado (RF-28)', async () => {
@@ -202,30 +217,72 @@ describe('executar · modo estudio · ordem das portas (CA-07)', () => {
     expect(passos).not.toContain('trabalho')
   })
 
-  it('porta 3: papel sem permissão → sem_permissao, antes da porta 4', async () => {
+  it('porta 3: célula ausente → sem_permissao, antes da porta 4, sem trabalho nem banco do módulo', async () => {
     const { conexao, passos } = conexaoFalsa({ contexto: { ...contextoA, papel: 'profissional' } })
     const def = definicao({}, passos)
     // Entrada também errada: a porta 3 recusa primeiro.
     const resposta = await executar(def, pedido({ estudioDaTela: ORG_A, dados: { x: 1 } }), infraFalsa(conexao))
     expect(resposta.resultado).toEqual({ ok: false, codigo: 'sem_permissao' })
     expect(passos).toEqual(['quemE', 'contexto', 'recusa:teste.criar:sem_permissao'])
+    expect(def.trabalho).not.toHaveBeenCalled()
   })
 
-  it('porta 3 por regra pura: a regra recebe o papel da sessão', async () => {
-    const regra = vi.fn((papel: string) => papel === 'dona')
-    const { conexao } = conexaoFalsa()
-    const resposta = await executar(definicao({ permissao: regra }), pedido(corpoCerto), infraFalsa(conexao))
-    expect(regra).toHaveBeenCalledWith('recepcao')
-    expect(resposta.resultado).toEqual({ ok: false, codigo: 'sem_permissao' })
+  it.each([
+    ['dona', 'teste.criar', 'todos'],
+    ['dona', 'teste.ver', 'todos'],
+    ['recepcao', 'teste.criar', 'todos'],
+    ['profissional', 'teste.ver', 'proprios'],
+  ] as const)('porta 3: %s em %s → ctx.alcance %s', async (papel, permissao, alcance) => {
+    const { conexao } = conexaoFalsa({ contexto: { ...contextoA, papel } })
+    const def = definicao({ permissao: chave(permissao) })
+    const resposta = await executar(def, pedido(corpoCerto), infraFalsa(conexao))
+    expect(resposta.resultado.ok).toBe(true)
+    const [ctx] = vi.mocked(def.trabalho).mock.calls[0]!
+    expect(ctx).toMatchObject({ alcance })
   })
 
-  it('regra de permissão que lança → sem_permissao (falha fechada)', async () => {
-    const { conexao } = conexaoFalsa()
-    const regra = () => {
-      throw new Error('quebrou')
+  it('o trabalho recebe o alcance e não o papel (ADR 0020 · D5)', async () => {
+    const { conexao } = conexaoFalsa({ contexto: { ...contextoA, papel: 'dona' } })
+    const def = definicao()
+    await executar(def, pedido(corpoCerto), infraFalsa(conexao))
+    const [ctx] = vi.mocked(def.trabalho).mock.calls[0]!
+    expect(ctx).toHaveProperty('alcance', 'todos')
+    expect(ctx).not.toHaveProperty('papel')
+    expect(JSON.stringify(Object.values(ctx as object))).not.toContain('dona')
+    // No tipo também: o trabalho do modo estudio não enxerga papel.
+    const trabalho: DefinicaoDeAcao<z.ZodType, unknown>['trabalho'] = async (c) => {
+      // @ts-expect-error — ContextoEstudio não tem papel
+      return c.papel
     }
-    const resposta = await executar(definicao({ permissao: regra }), pedido(corpoCerto), infraFalsa(conexao))
+    expect(trabalho).toBeTypeOf('function')
+  })
+
+  it('chave fora do catálogo → sem_permissao, mesmo para a dona', async () => {
+    const { conexao, passos } = conexaoFalsa({ contexto: { ...contextoA, papel: 'dona' } })
+    const def = definicao({ permissao: chave('teste.remover') }, passos)
+    const resposta = await executar(def, pedido(corpoCerto), infraFalsa(conexao))
     expect(resposta.resultado).toEqual({ ok: false, codigo: 'sem_permissao' })
+    expect(passos).not.toContain('trabalho')
+  })
+
+  it('sem fonte injetada: usa a matriz do código, que não tem a chave de teste → sem_permissao', async () => {
+    const { conexao, passos } = conexaoFalsa({ contexto: { ...contextoA, papel: 'dona' } })
+    const resposta = await executar(definicao({}, passos), pedido(corpoCerto), infraFalsa(conexao, true, null))
+    expect(resposta.resultado).toEqual({ ok: false, codigo: 'sem_permissao' })
+    expect(passos).not.toContain('trabalho')
+  })
+
+  it.each<[string, FonteDeAlcance]>([
+    ['lança', () => {
+      throw new Error('quebrou')
+    }],
+    ['devolve alcance desconhecido', () => 'sim' as never],
+    ['devolve true', () => true as never],
+  ])('fonte que %s → sem_permissao (falha fechada)', async (_nome, fonte) => {
+    const { conexao, passos } = conexaoFalsa()
+    const resposta = await executar(definicao({}, passos), pedido(corpoCerto), infraFalsa(conexao, true, fonte))
+    expect(resposta.resultado).toEqual({ ok: false, codigo: 'sem_permissao' })
+    expect(passos).not.toContain('trabalho')
   })
 })
 

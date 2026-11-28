@@ -4,12 +4,14 @@
 // atribuído a uma variável; por isso o molde tem duas partes, sempre juntas):
 //
 //   export const criarBloqueio = acaoPost.handler(
-//     acao({ nome: 'agenda.bloqueio.criar', metodo: 'POST', sessao: 'estudio', permissao: podeBloquear,
+//     acao({ nome: 'agenda.bloqueio.criar', metodo: 'POST', sessao: 'estudio', permissao: 'agenda.criar',
 //            entrada: z.strictObject({ ... }), grava: true, trabalho: async (ctx, dados) => { ... } }),
 //   )
 //
 // - `acaoGet`/`acaoPost` são os construtores (createServerFn); o método do construtor tem de ser o `metodo` da
 //   definição (conferido a cada pedido e no molde.test.ts).
+// - `permissao`: chave `modulo.acao` do catálogo (src/domain/acesso/chaves.ts), do mesmo módulo do nome; o trabalho
+//   recebe `ctx.alcance` (`todos` ou `proprios`), nunca o papel (ADR 0020 · D1, D3, D5).
 // - `.validator` só de passagem (`unknown`): a porta 4 é feita depois das portas 1 a 3, em executar.ts (D13).
 // - A tela chama `criarBloqueio({ data: { estudioDaTela, dados } })` e recebe `{ ok, valor } | { ok: false, codigo }`.
 import { createServerFn, createServerOnlyFn } from '@tanstack/react-start'
@@ -19,7 +21,7 @@ import { lerAmbiente } from '@/data/ambiente'
 import { abrirConexao } from '@/data/sessao'
 import { registrar } from './catalogo'
 import type { Resultado } from './erros'
-import { executar } from './executar'
+import { alcanceDaMatrizDoCodigo, executar } from './executar'
 import type { DefinicaoDeAcao, DefinicaoQualquer, Infra, Modo } from './tipos'
 
 /** Construtor das ações de leitura (GET). */
@@ -34,6 +36,8 @@ const infraReal: Infra = {
   agora: () => Date.now(),
   esperar: (ms) => new Promise((pronto) => setTimeout(pronto, ms)),
   novoPedidoId: () => crypto.randomUUID(),
+  // Porta 3: matriz padrão do código; o item 6a troca só esta fonte (ADR 0020 · D6).
+  alcanceDe: alcanceDaMatrizDoCodigo,
 }
 
 // Lê o pedido e grava a resposta pelo TanStack Start; o resto é executar.ts (sem framework).

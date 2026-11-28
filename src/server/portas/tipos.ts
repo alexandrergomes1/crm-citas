@@ -3,10 +3,11 @@ import type { z } from 'zod'
 import type { Ambiente } from '@/data/ambiente'
 import type { Banco, CookieAGravar, CookieDoPedido } from '@/data/cliente'
 import type { Conexao, ContextoDaSessao, OpcoesDaConexao, Papel } from '@/data/sessao'
+import type { Alcance, Chave } from '@/domain/acesso/chaves'
 import type { Idioma } from '@/domain/idioma'
 import type { Resultado } from './erros'
 
-export type { Papel }
+export type { Alcance, Chave, Papel }
 export const PAPEIS: readonly Papel[] = ['dona', 'recepcao', 'profissional']
 
 /** `estudio` para todo módulo; os outros só para a lista fechada de catalogo.ts (D12). */
@@ -14,12 +15,16 @@ export type Modo = 'estudio' | 'pessoa' | 'opcional' | 'nenhuma'
 
 export type Metodo = 'GET' | 'POST'
 
-/** Entregue ao trabalho de toda ação de módulo (porta 5). */
+/**
+ * Entregue ao trabalho de toda ação de módulo (porta 5). Leva o **alcance** da chave da ação, nunca o papel: o módulo
+ * não decide por papel (ADR 0020 · D5). O papel segue na sessão e no registro.
+ */
 export type ContextoEstudio = {
   readonly pedidoId: string
   readonly usuarioId: string
   readonly orgId: string
-  readonly papel: Papel
+  /** `todos` ou `proprios`; o que "próprios" quer dizer é regra do módulo (ADR 0020 · D3). */
+  readonly alcance: Alcance
   readonly idioma: Idioma
   readonly fuso: string
   readonly moeda: string
@@ -64,11 +69,17 @@ export type ContextoDo<M extends Modo> = M extends 'estudio'
       ? ContextoOpcional
       : ContextoSemSessao
 
-/** Regra pura de src/domain/<modulo>/acesso.ts, ou a lista de papéis. `qualquer` só fora do modo estudio. */
-export type Permissao<M extends Modo = Modo> =
-  | readonly Papel[]
-  | ((papel: Papel) => boolean)
-  | (M extends 'estudio' ? never : 'qualquer')
+/**
+ * Porta 3 (ADR 0020 · D1): no modo `estudio`, uma chave `modulo.acao` do catálogo (src/domain/acesso/chaves.ts), do
+ * mesmo módulo do nome da ação; nunca papel nem função. `qualquer` só nos modos sem estúdio da lista fechada (D12).
+ */
+export type Permissao<M extends Modo = Modo> = M extends 'estudio' ? Chave : 'qualquer'
+
+/**
+ * Fonte de permissões da porta 3 (ADR 0020 · D6): alcance da sessão na chave, ou null (= não pode). Hoje lê a matriz
+ * do código; o item 6a troca só esta fonte. Lançar ou devolver outra coisa conta como "não pode" (falha fechada).
+ */
+export type FonteDeAlcance = (sessao: ContextoDaSessao, chave: Chave) => Alcance | null
 
 export type NomeDaAcao = `${string}.${string}`
 
@@ -111,4 +122,6 @@ export type Infra = {
   readonly agora: () => number
   readonly esperar: (ms: number) => Promise<void>
   readonly novoPedidoId: () => string
+  /** Fonte da porta 3; sem ela, a matriz padrão do código (ADR 0020 · D6). */
+  readonly alcanceDe?: FonteDeAlcance
 }

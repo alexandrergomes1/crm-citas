@@ -7,7 +7,7 @@ import { lerAmbiente, type Ambiente } from '@/data/ambiente'
 import type { CookieAGravar, CookieDoPedido } from '@/data/cliente'
 import { abrirConexao } from '@/data/sessao'
 import { executar } from '@/server/portas/executar'
-import type { DefinicaoDeAcao, Infra, Modo, RespostaHttp } from '@/server/portas/tipos'
+import type { DefinicaoDeAcao, FonteDeAlcance, Infra, Modo, RespostaHttp } from '@/server/portas/tipos'
 import type { z } from 'zod'
 
 // Nome combinado com a tarefa D1 (scripts/banco-local.mjs). Se D1 escolher outro, muda só aqui.
@@ -95,11 +95,13 @@ export class Navegador {
   async chamar<E extends z.ZodType, S, M extends Modo>(
     def: DefinicaoDeAcao<E, S, M>,
     corpo: unknown,
+    /** Fonte da porta 3 só para ações de teste com catálogo de teste (ADR 0020 · D6); sem ela, a matriz do código. */
+    alcanceDe?: FonteDeAlcance,
   ): Promise<RespostaHttp<S>> {
     const resposta = await executar(
       def,
       { metodo: def.metodo, corpo, cookies: this.lista(), cabecalho: () => null, ip: this.ip },
-      infra,
+      alcanceDe ? { ...infra, alcanceDe } : infra,
     )
     this.aplicar(resposta.cookies)
     return resposta

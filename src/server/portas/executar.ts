@@ -3,7 +3,7 @@
 //   1 quem é: getClaims (token válido)            → sem_login, nada no banco (RF-28)
 //   - envelope { estudioDaTela, dados }            → entrada_invalida
 //   1+2 contexto da sessão no banco (pré-pedido)   → sem_login (encerra) · estudio_trocado · sem_estudio
-//   3 o que pode (papel)                           → sem_permissao
+//   3 o que pode (chave → alcance; ADR 0020)      → sem_permissao
 //   4 dados certos (zod estrito)                   → entrada_invalida, sem trabalho (CA-08)
 //   5 trabalho com ctx.banco (≤ 1 gravação)        → conflito · erro_interno
 //   6 registro: gravou → gatilho no banco; recusa nas etapas 2 a 5 → registrar_recusa (melhor esforço)
@@ -11,18 +11,20 @@ import { z } from 'zod'
 import { ehCookieDaSessao } from '@/data/cliente'
 import { codigoDe, ErroDoBanco } from '@/data/erros'
 import type { Conexao, ContextoDaSessao } from '@/data/sessao'
+import { alcancePadrao } from '@/domain/acesso/matriz'
 import { idiomaDoNavegador } from '@/domain/idioma'
 import { codigoDoErro, falha, sucesso, type CodigoDeErro, type Resultado } from './erros'
 import type {
+  Alcance,
+  Chave,
   ContextoEstudio,
   ContextoOpcional,
   ContextoPessoa,
   ContextoSemSessao,
   DefinicaoDeAcao,
+  FonteDeAlcance,
   Infra,
   Modo,
-  Papel,
-  Permissao,
   PedidoHttp,
   RespostaHttp,
 } from './tipos'
@@ -33,13 +35,19 @@ export const TEMPO_MINIMO_SEM_SESSAO_MS = 700
 const envelopeDoEstudio = z.strictObject({ estudioDaTela: z.uuid(), dados: z.unknown() })
 const envelopeSemEstudio = z.strictObject({ dados: z.unknown() }).optional()
 
-function podeOPapel(permissao: Permissao, papel: Papel | null): boolean {
-  if (permissao === 'qualquer') return true
-  if (papel === null) return false
+/** Fonte padrão da porta 3: a matriz do código (ADR 0020 · D4, D6). Sem papel → não pode. */
+export const alcanceDaMatrizDoCodigo: FonteDeAlcance = (sessao, chave) =>
+  sessao.papel === null ? null : alcancePadrao(sessao.papel, chave)
+
+// Porta 3 (ADR 0020 · D3, D6): alcance da sessão na chave. Falha fechada (ASVS V4.1.5): fonte que lança ou devolve
+// algo fora de `todos`/`proprios` → não pode.
+function alcanceDaSessao(fonte: FonteDeAlcance, sessao: ContextoDaSessao, chave: Chave): Alcance | null {
+  if (sessao.papel === null) return null
   try {
-    return typeof permissao === 'function' ? permissao(papel) === true : permissao.includes(papel)
+    const alcance: unknown = fonte(sessao, chave)
+    return alcance === 'todos' || alcance === 'proprios' ? alcance : null
   } catch {
-    return false
+    return null
   }
 }
 
@@ -161,9 +169,13 @@ export async function executar<E extends z.ZodType, S, M extends Modo>(
     const sessao = lido.contexto
 
     if (comEstudio && (sessao.orgId === null || sessao.papel === null)) return recusar(conexao, def.nome, 'sem_estudio')
-    // Porta 3.
-    if (!podeOPapel(def.permissao as Permissao, sessao.papel)) {
-      return recusar(conexao, def.nome, sessao.papel === null ? 'sem_estudio' : 'sem_permissao')
+    // Porta 3: modo estudio pela chave e pela fonte; fora dele só 'qualquer' (o molde já confere; aqui, falha fechada).
+    let alcance: Alcance | null = null
+    if (comEstudio) {
+      alcance = alcanceDaSessao(infra.alcanceDe ?? alcanceDaMatrizDoCodigo, sessao, def.permissao as Chave)
+      if (alcance === null) return recusar(conexao, def.nome, 'sem_permissao')
+    } else if (def.permissao !== 'qualquer') {
+      return recusar(conexao, def.nome, 'sem_permissao')
     }
     // Porta 4: depois das portas 1 a 3 (D13).
     const dados = def.entrada.safeParse(dadosBrutos)
@@ -172,14 +184,15 @@ export async function executar<E extends z.ZodType, S, M extends Modo>(
     const idioma = sessao.idioma ?? idiomaDoNavegador(pedido.cabecalho('accept-language'))
     let resultado: Resultado<S>
     if (comEstudio) {
-      if (sessao.orgId === null || sessao.papel === null || !sessao.fuso || !sessao.moeda) {
+      if (sessao.orgId === null || alcance === null || !sessao.fuso || !sessao.moeda) {
         return recusar(conexao, def.nome, 'erro_interno')
       }
+      // Sem papel: o trabalho recebe só o alcance (ADR 0020 · D5).
       const ctx: ContextoEstudio = {
         pedidoId,
         usuarioId: sessao.usuarioId,
         orgId: sessao.orgId,
-        papel: sessao.papel,
+        alcance,
         idioma,
         fuso: sessao.fuso,
         moeda: sessao.moeda,

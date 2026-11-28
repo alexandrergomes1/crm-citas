@@ -3,8 +3,13 @@ import { readFileSync, readdirSync, statSync } from 'node:fs'
 import { join, relative } from 'node:path'
 import { beforeAll, describe, expect, it } from 'vitest'
 import { z } from 'zod'
+import { MODULOS, ehChave } from '@/domain/acesso/chaves'
 import { MODOS_SEM_ESTUDIO, acoesDoCatalogo, conferirDefinicao, registrar } from './catalogo'
-import type { DefinicaoQualquer } from './tipos'
+import type { Chave, DefinicaoQualquer } from './tipos'
+
+// Catálogo de chaves fictício (o do sistema nasce vazio nesta spec; ADR 0020).
+const CHAVES_TESTE = { agenda: ['ver', 'criar'], caixa: ['ver'] } as const
+const chave = (texto: string) => texto as unknown as Chave
 
 const RAIZ = join(import.meta.dirname, '..', '..')
 
@@ -22,7 +27,7 @@ const valida: DefinicaoQualquer = {
   nome: 'agenda.bloqueio.criar',
   metodo: 'POST',
   sessao: 'estudio',
-  permissao: ['dona'],
+  permissao: chave('agenda.criar'),
   entrada: z.strictObject({}),
   grava: true,
   trabalho: async () => null,
@@ -59,13 +64,24 @@ describe('catálogo (CA-21)', () => {
   })
 
   it('definição no molde passa', () => {
-    expect(conferirDefinicao(valida)).toBeNull()
+    expect(conferirDefinicao(valida, CHAVES_TESTE)).toBeNull()
+  })
+
+  it('toda ação do modo estudio no catálogo tem chave do catálogo de chaves, do mesmo módulo (ADR 0020 · D8)', () => {
+    for (const def of acoesDoCatalogo()) {
+      if (def.sessao === 'estudio') {
+        expect(ehChave(def.permissao), def.nome).toBe(true)
+        expect(conferirDefinicao(def, MODULOS), def.nome).toBeNull()
+      } else {
+        expect(def.permissao, def.nome).toBe('qualquer')
+      }
+    }
   })
 
   it('GET passa só em opcional/pessoa com strictObject({}) vazio', () => {
     const get = { ...valida, permissao: 'qualquer', metodo: 'GET', grava: false, entrada: z.strictObject({}) } as const
-    expect(conferirDefinicao({ ...get, nome: 'sessao.ler', sessao: 'opcional' } as DefinicaoQualquer)).toBeNull()
-    expect(conferirDefinicao({ ...get, nome: 'estudio.listar', sessao: 'pessoa' } as DefinicaoQualquer)).toBeNull()
+    expect(conferirDefinicao({ ...get, nome: 'sessao.ler', sessao: 'opcional' } as DefinicaoQualquer, CHAVES_TESTE)).toBeNull()
+    expect(conferirDefinicao({ ...get, nome: 'estudio.listar', sessao: 'pessoa' } as DefinicaoQualquer, CHAVES_TESTE)).toBeNull()
   })
 
   it.each<[string, Partial<DefinicaoQualquer>]>([
@@ -84,9 +100,16 @@ describe('catálogo (CA-21)', () => {
     ['ação da lista no modo estudio', { nome: 'sessao.sair' }],
     ['ação da lista em outro modo', { nome: 'sessao.ler', sessao: 'pessoa' }],
     ['permissão "qualquer" no modo estudio', { permissao: 'qualquer' }],
+    ['chave fora do catálogo', { permissao: chave('agenda.remover') }],
+    ['módulo fora do catálogo', { permissao: chave('clientes.ver') }],
+    ['chave de outro módulo que o do nome', { permissao: chave('caixa.ver') }],
+    ['chave sem ponto', { permissao: chave('agenda') }],
+    ['papel no lugar da chave', { permissao: ['dona'] as unknown as Chave }],
+    ['função no lugar da chave', { permissao: (() => true) as unknown as Chave }],
+    ['chave num modo sem estúdio', { nome: 'sessao.sair', sessao: 'pessoa', permissao: chave('agenda.ver') }],
   ])('fora do molde: %s → recusada ao carregar', (_nome, mudar) => {
     const def = { ...valida, ...mudar } as DefinicaoQualquer
-    expect(conferirDefinicao(def)).not.toBeNull()
+    expect(conferirDefinicao(def, CHAVES_TESTE)).not.toBeNull()
     expect(() => registrar(def)).toThrow()
   })
 })
