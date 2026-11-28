@@ -12,7 +12,7 @@
 - **Fontes:** E3·2; E21; E21·3 ("E21-3b"); E22·B; `docs/produto/caixa.md`, `checkout.md`, `financeiro.md` (branch
   `docs/produto-modulos`); `ARCHITECTURE.md` §3 a §7, §10 e §11; `SECURITY.md` §3 a §5; `DESIGN.md` §1 a §10;
   `src/*/AGENTS.md`; spec do item 3 (`specs/20261128-010000-banco-ligacao/spec.md`, branch `feat/banco-ligacao`,
-  RG-01 a RG-08); spec do Checkout (`specs/20261128-022500-checkout/spec.md`, branch `feat/checkout`, E31·2 e E31·3).
+  RG-01 a RG-08); spec do Checkout (`specs/20261128-022500-checkout/spec.md`, branch `feat/checkout`, versão dividida: E31·1 formas e Caixa, E31·2 quem fecha, E31·3 total zero e teto, RF-11 ligação com o Caixa; §12 = spec seguinte "Checkout · estorno e desconto").
 
 ## 1. Pedido do dono (literal)
 > "Primeira versão com o núcleo (Agenda, Agendamento, Clientes, Formulários, Catálogo, Checkout, Caixa)" — E3·2, "A".
@@ -27,10 +27,11 @@ contagem cega, reabrir · aviso na hora de fechar. Para quem: dona, recepção.
 | Recurso candidato | Primeira versão | Motivo |
 |---|---|---|
 | Abrir o caixa com valor inicial (troco) | **sim** | é o começo do turno |
-| Entradas e saídas vindas do Checkout (pagamentos e estornos) | **sim**, conforme **E31·2** | a gaveta só confere se o dinheiro do Checkout passar por ela |
+| Entradas vindas do Checkout (pagamentos) | **sim**, conforme **E31·1** (RF-11 do Checkout) | a gaveta só confere se o dinheiro do Checkout passar por ela |
+| Saídas por estorno do Checkout | depois, com a spec "Checkout · estorno e desconto" (§12 do Checkout) | o estorno não está na v1 do Checkout |
 | Sangria (retirada) e suprimento (reforço) | conforme **E32·1** | dinheiro: decisão do dono |
 | Fechar com contagem, esperado e diferença registrados | **sim**; forma da contagem conforme **E32·2** | é o fim do turno |
-| Aviso na hora de fechar (atendimentos de hoje sem checkout) | **sim**, só aviso, não impede | candidata; Assumption 4 |
+| Aviso na hora de fechar (atendimentos de hoje sem checkout) | **sim**, só aviso, não impede | candidata; Assumption 2 |
 | Histórico de caixas (lista e detalhe, só leitura) | **sim**; quem vê conforme **E32·3** | sem ele a diferença não se acompanha |
 | Reabrir caixa fechado | conforme **E32·2** (recomendação: depois) | dinheiro: decisão do dono |
 | Mais de um caixa aberto ao mesmo tempo (gavetas, pontos, pessoas) | conforme **E32·1** (recomendação: depois) | dinheiro: decisão do dono |
@@ -55,7 +56,7 @@ principal com submenu; no celular, dentro de **Mais** (a barra de baixo é fixa 
 |---|---|---|
 | **Caixa atual · fechado** | estado vazio: "Nenhum caixa aberto" e a ação principal **Abrir caixa** | igual; o preto do celular é o Agendar da barra, então Abrir caixa abre tela sem barra com o botão preto do rodapé (`DESIGN.md` §5) |
 | **Abrir caixa** | painel à direita (480 px): Valor inicial* (com o símbolo da moeda), Observação (opcional, até 300); Salvar · Cancelar | tela sem barra, ‹ voltar, mesmo campo, botão preto no rodapé |
-| **Caixa atual · aberto** | bloco "Aberto por <pessoa> em <data e hora>"; lista do que entrou e saiu (hora, tipo, forma, valor, quem), paginada; resumo por forma; "Dinheiro esperado" se E32·2·B; ação principal **Fechar caixa**; Opções ▾ com Sangria e Suprimento (se E32·1·A) | igual, lista em linhas de 64; ⋮ com Sangria e Suprimento; Fechar caixa abre tela sem barra |
+| **Caixa atual · aberto** | bloco "Aberto por <pessoa> em <data e hora>"; lista do que entrou e saiu (hora, tipo, forma, valor, quem), paginada; resumo por forma; "Dinheiro esperado" se E32·2·B; ação principal **Fechar caixa**; Opções ▾ com Sangria e Suprimento (E32·1) | igual, lista em linhas de 64; ⋮ com Sangria e Suprimento; Fechar caixa abre tela sem barra |
 | **Sangria · Suprimento** | janelinha (340): Valor*, Motivo* (3 a 200; o campo avisa para não escrever dado de cliente ou de saúde); Salvar · Cancelar | folha de baixo, mesmos campos |
 | **Fechar caixa** | passo 1: aviso (se houver) "N atendimentos de hoje sem checkout", sem impedir; campo **Dinheiro contado***; passo 2: esperado, contado e diferença com palavra e ícone (Confere · Sobra · Falta); Motivo da diferença* quando ≠ 0; confirmação na janelinha ("não se desfaz") | tela sem barra, os mesmos passos, ‹ volta um passo, botão preto no rodapé |
 | **Histórico** | tabela paginada (20 por página, mais recente primeiro): abertura, fechamento, quem abriu, quem fechou, entradas em dinheiro, diferença (com palavra) | lista em linhas de 64 com os mesmos dados resumidos |
@@ -76,16 +77,16 @@ o módulo Caixa na tabela do §7 e no mapa da navegação; os botões Abrir caix
 |---|---|---|
 | RF-01 | **Abrir:** quem a E32·3 permite abre um caixa informando o valor inicial em dinheiro (RN-03) e, se quiser, uma observação; o caixa nasce **Aberto**, com quem abriu, quando e a moeda do estúdio (ISO 4217). | candidata |
 | RF-02 | **Quantos abertos:** conforme **E32·1** (recomendação: no máximo um caixa Aberto por estúdio); um segundo pedido de abrir é recusado com "já existe um caixa aberto". | E32·1 |
-| RF-03 | **Entradas do Checkout:** cada pagamento e cada estorno do Checkout fica ligado ao caixa Aberto no momento, conforme **E31·2** (recomendação A: dinheiro só com caixa aberto; as outras formas entram se houver caixa aberto, sem exigir; estorno em dinheiro sai do caixa aberto). A ligação é feita pelo servidor, nunca pelo pedido da tela. | E31·2; spec do Checkout RF-12 |
-| RF-04 | O estorno de um pagamento que entrou num caixa já Fechado sai do caixa **Aberto agora**, nunca do fechado (RF-09). | RN-07; Assumption 2 |
-| RF-05 | **Sangria e suprimento** (se E32·1·A ou B): valor (RN-03) e motivo obrigatório (3 a 200 caracteres), sempre em dinheiro, só com caixa Aberto; a sangria nunca é maior que o dinheiro esperado na gaveta naquele momento. | E32·1; RN-05 |
+| RF-03 | **Entradas do Checkout:** cada pagamento do Checkout fica ligado ao caixa Aberto no momento, conforme **E31·1** (recomendação A do Checkout: dinheiro só com caixa aberto; as outras formas entram se houver caixa aberto, sem exigir). A ligação é feita pelo servidor, nunca pelo pedido da tela. | E31·1; spec do Checkout RF-11 |
+| RF-04 | **Abertura e dias:** valor inicial zero permitido ou não, e caixa aberto de um dia para o outro, conforme **E32·1**. | E32·1 |
+| RF-05 | **Sangria e suprimento** (conforme E32·1): valor (RN-03) e motivo obrigatório (3 a 200 caracteres), sempre em dinheiro, só com caixa Aberto; a sangria nunca é maior que o dinheiro esperado na gaveta naquele momento. | E32·1; RN-05 |
 | RF-06 | **Fechar:** informa-se o dinheiro contado (RN-03); o sistema calcula e grava, de uma vez (tudo ou nada), o esperado em dinheiro (RN-04), o contado, a diferença (RN-06) e o resumo por forma; o caixa vira **Fechado**, com quem fechou e quando. Diferença ≠ 0 exige motivo (5 a 300 caracteres; o campo avisa para não escrever dado de cliente ou de saúde). | candidata; E32·2 |
 | RF-07 | **Contagem:** cega ou aberta conforme **E32·2** (recomendação: cega, o esperado só aparece depois de informado o contado). | E32·2 |
-| RF-08 | **Aviso ao fechar:** se houver atendimentos de hoje (fuso do estúdio) em Chegou, Iniciado ou Concluído sem checkout Pago, a tela mostra quantos, sem nomes, e deixa fechar. | candidata ("aviso na hora de fechar"); Assumption 4 |
-| RF-09 | **Fechado não muda:** caixa Fechado, seus movimentos, contagem, esperado e diferença não se alteram nem se apagam, por ninguém e por nenhuma via; nenhum pagamento, estorno, sangria ou suprimento entra nele. Reabrir conforme **E32·2**. | ASVS V11.1 (regra de negócio); E32·2 |
-| RF-10 | **Corrida com o fechamento:** se entrar pagamento, estorno ou movimento entre a tela de contagem e a confirmação, o fechamento é recusado com "entrou um pagamento novo, confira a contagem"; nada fica fora de um caixa nem entra num caixa fechado. | ASVS V11.1.6 |
+| RF-08 | **Aviso ao fechar:** se houver atendimentos de hoje (fuso do estúdio) em Chegou, Iniciado ou Concluído sem checkout Pago, a tela mostra quantos, sem nomes, e deixa fechar. | candidata ("aviso na hora de fechar"); Assumption 2 |
+| RF-09 | **Fechado não muda:** caixa Fechado, seus movimentos, contagem, esperado e diferença não se alteram nem se apagam, por ninguém e por nenhuma via; nenhum pagamento, sangria ou suprimento entra nele. Reabrir conforme **E32·2**. | ASVS V11.1 (regra de negócio); E32·2 |
+| RF-10 | **Corrida com o fechamento:** se entrar pagamento ou movimento entre a tela de contagem e a confirmação, o fechamento é recusado com "entrou um pagamento novo, confira a contagem"; nada fica fora de um caixa nem entra num caixa fechado. | ASVS V11.1.6 |
 | RF-11 | **Histórico:** lista paginada dos caixas (Aberto e Fechados), mais recente primeiro, e o detalhe só leitura de cada um; quem vê conforme **E32·3**. | candidata; E32·3 |
-| RF-12 | Abrir, sangria, suprimento e fechar passam pelas 6 portas e ficam no registro (porta 6): ação, valores, quem e quando, **sem** nome de cliente, telefone, motivo em texto livre ou dado de saúde. As exceções E6·1 e E6·2 valem como estão (RG-08). | `ARCHITECTURE.md` §4, §6 e §7 |
+| RF-12 | Abrir, sangria, suprimento e fechar passam pelas 6 portas e ficam no registro (porta 6): ação, valores, quem e quando, **sem** nome de cliente, telefone, motivo em texto livre ou dado de saúde. **Exceção E6·1 (vale como está):** no modo "entrar como o estúdio", abrir, sangria, suprimento e fechar feitos pelo dono ficam **sem autor registrado** (nem na porta 6 nem em "quem abriu" ou "quem fechou"); risco aceito pelo dono, à vista: o estúdio não sabe quem mexeu no dinheiro nesse modo e pode atribuir a diferença a uma funcionária. O plano diz como, sem contornar a exceção (RG-08). | `ARCHITECTURE.md` §4, §6 e §7; E6·1; `SECURITY.md` §5 |
 | RF-13 | Valores mostrados na moeda e no formato do idioma da pessoa e da moeda do estúdio; o caixa guarda a moeda com que foi aberto, e nada de outra moeda entra nele. | `ARCHITECTURE.md` §11; ISO 4217 |
 | RF-14 | **Plano B:** enquanto o Checkout não existir, o Caixa funciona só com abertura, movimentos e fechamento (entradas do Checkout = 0, mostradas "em desenvolvimento", `DESIGN.md` §8); os testes usam dados de exemplo locais, fictícios, escritos do zero (RG-07). | `DESIGN.md` §8; item 3 RG-07 |
 
@@ -94,9 +95,9 @@ o módulo Caixa na tabela do §7 e no mapa da navegação; os botões Abrir caix
 |---|---|
 | RN-01 | Todo valor é **número inteiro na menor unidade da moeda** (centavos); nunca número com vírgula flutuante, nem na tela, nem no servidor, nem no banco (igual à RN-01 do Checkout). |
 | RN-02 | Moedas de uso têm 2 casas (EUR, BRL, USD); outra quantidade de casas é recusada na primeira versão (RN-02 do Checkout). |
-| RN-03 | Valor inicial e dinheiro contado: de 0 a 1.000.000,00 (100.000.000 centavos); sangria e suprimento: maior que 0 e até 1.000.000,00; fora disso, recusado (mesmo limite da RN-06 do Checkout). |
-| RN-04 | **Esperado em dinheiro** = valor inicial + pagamentos em dinheiro do caixa − estornos em dinheiro do caixa + suprimentos − sangrias. Outras formas não entram no esperado em dinheiro; aparecem só no resumo por forma (entradas − estornos). |
-| RN-05 | Sangria > esperado em dinheiro no momento: recusada. Estorno em dinheiro > esperado em dinheiro no momento: recusado (a gaveta não fica negativa). |
+| RN-03 | Valor inicial ≥ 0 ou > 0 conforme **E32·1**; dinheiro contado ≥ 0; sangria e suprimento > 0. Teto de cada valor: o mesmo da **E31·3** do Checkout (sem teto, se E31·3·A); acima, recusado. Fração de centavo recusada. |
+| RN-04 | **Esperado em dinheiro** = valor inicial + pagamentos em dinheiro do caixa + suprimentos − sangrias. Outras formas não entram no esperado em dinheiro; aparecem só no resumo por forma (soma das entradas). Saídas por estorno entram com a spec "Checkout · estorno e desconto". |
+| RN-05 | Sangria > esperado em dinheiro no momento: recusada (a gaveta não fica negativa). |
 | RN-06 | **Diferença** = contado − esperado. 0 = Confere; > 0 = Sobra; < 0 = Falta. Mostrada sempre com palavra e ícone, nunca só pela cor. |
 | RN-07 | Todo movimento pertence a um único caixa, do mesmo estúdio e da mesma moeda; o caixa de cada movimento é decidido pelo servidor no momento da gravação. |
 
@@ -106,7 +107,7 @@ o módulo Caixa na tabela do §7 e no mapa da navegação; os botões Abrir caix
 | ID | Requisito | Fonte |
 |---|---|---|
 | RNF-01 | WCAG 2.2 AA: estado do caixa e diferença com palavra (Aberto, Fechado, Confere, Sobra, Falta), toque 44/40, foco visível, nada só por cor. | `DESIGN.md` §9 |
-| RNF-02 | Toque duplo, repetição de rede ou duas pessoas ao mesmo tempo: abrir grava **um** caixa; fechar fecha **uma** vez; sangria e suprimento repetidos gravam **um** (chave de idempotência). | ASVS V11.1.6 |
+| RNF-02 | **Idempotência:** cada pedido de abrir, sangria, suprimento e fechar leva uma chave presa a **estúdio + caixa + resumo do conteúdo** (ação, valor, contado; em abrir, o caixa é "nenhum aberto"). A mesma chave com o mesmo conteúdo devolve o mesmo resultado, sem gravar de novo; **a mesma chave com outro conteúdo é recusada**. Toque duplo, repetição de rede ou duas pessoas ao mesmo tempo: um caixa aberto, um fechamento, um movimento. Mesmo molde do RNF-02 do Checkout. | ASVS V11.1.6; `ARCHITECTURE.md` §10 |
 | RNF-03 | Fechar e gravar pagamento do Checkout ao mesmo tempo nunca deixam pagamento em caixa fechado nem fora da conta (RF-10). | ASVS V11.1.6 |
 | RNF-04 | Nenhum dado pessoal ou de saúde em URL, registro de erro ou notificação; o caixa abre pelo id. | `ARCHITECTURE.md` §7 |
 | RNF-05 | Textos nos três idiomas (pt, es, en), pela estrutura de idiomas do item 4. | E3·1; `ARCHITECTURE.md` §11 |
@@ -121,30 +122,33 @@ Lido só para entender (E22·B, nada copiado): `crm-agenda/supabase/migrations/2
 |---|---|---|
 | `cash_sessions` | **reescrever** | antigo usa `numeric(12,2)` (RN-01 pede inteiro em centavos); guarda `responsible_name` em texto (dado pessoal duplicado; basta quem abriu, pelo id); esperado, contado e diferença em `jsonb` (a primeira versão conta só dinheiro: colunas inteiras); campos de reabrir e `left_in_drawer` (depois, salvo E32·2·C); servem as ideias: índice único parcial de um Aberto por estúdio, checagem Aberto/Fechado coerente, `unique (id, org_id)` para ligar filhos do mesmo estúdio |
 | `cash_movements` | **reescrever** | só sangria e suprimento, em centavos, motivo obrigatório, chave estrangeira composta com `org_id` (a ideia do antigo serve); sem alteração nem exclusão depois de gravado |
-| `transactions.cash_session_id` e o gatilho que carimba o caixa | **descartar** nesta spec | `transactions` é do Financeiro (depois); aqui a ligação vai nos pagamentos e estornos do Checkout (RF-03), gravada na mesma transação do pagamento |
+| `transactions.cash_session_id` e o gatilho que carimba o caixa | **descartar** nesta spec | `transactions` é do Financeiro (depois); aqui a ligação vai nos pagamentos do Checkout (RF-03), gravada na mesma transação do pagamento |
 | `transactions` | **adiada** (Financeiro) | lançamento financeiro geral |
 
 Regras que valem (RG-04): `org_id` obrigatório, trava RLS pela função de checagem do item 3, índice por `org_id` e
-teste de isolamento em cada tabela. Sugestões ao Engenheiro de dados: valores em inteiro de 64 bits com checagem no
-banco (RN-03); moeda na linha do caixa; fechamento, sangria e ligação do pagamento com o caixa numa só transação, com
+teste de isolamento em cada tabela. **Exigido no banco (não é sugestão):** (a) restrição única parcial que permite no
+máximo **um caixa Aberto por estúdio** (RF-02, se E32·1·A ou B); (b) toda ligação com o caixa (movimentos e
+pagamentos do Checkout) por **chave estrangeira composta (caixa, `org_id`)**, para nunca ligar a caixa de outro
+estúdio; (c) chave de idempotência única por estúdio (RNF-02). Sugestões ao Engenheiro de dados: valores em inteiro de
+64 bits com checagem no banco (RN-03); moeda na linha do caixa; fechamento, sangria e ligação do pagamento com o caixa numa só transação, com
 trava na linha do caixa Aberto (para o RF-10) e com a sessão da pessoa (sem chave de serviço); esperado gravado no
 fechamento (cópia), não recalculado depois. A forma exata é decisão dele, com ADR, combinada com o Engenheiro de dados
-do Checkout (coluna de caixa em `sale_payments` e `sale_refunds` ou equivalente).
+do Checkout (coluna de caixa em `sale_payments` ou equivalente; `sale_refunds` entra com a spec de estorno).
 
 ## 8. Critérios de aceite (verificáveis)
 | ID | Critério | Prova |
 |---|---|---|
-| CA-01 | RN-01 a RN-07: esperado com todos os tipos de movimento, diferença Confere/Sobra/Falta, limites (0, 1 centavo, 100.000.000, 100.000.001), fração de centavo recusada, moeda de 3 casas recusada. | unidade (`src/domain`) |
-| CA-02 | Abrir com caixa já Aberto recusado (E32·1); duas aberturas simultâneas: só uma; mesmo pedido repetido: mesmo resultado. | teste de banco na CI |
+| CA-01 | RN-01 a RN-07: esperado com todos os tipos de movimento, diferença Confere/Sobra/Falta, valor inicial 0 conforme E32·1, teto conforme E31·3 (no teto e 1 centavo acima), fração de centavo recusada, moeda de 3 casas recusada. | unidade (`src/domain`) |
+| CA-02 | Abrir com caixa já Aberto recusado (E32·1), pela restrição única do banco; duas aberturas simultâneas: só uma; mesma chave e mesmo conteúdo: mesmo resultado; mesma chave com outro conteúdo: recusada. | teste de banco na CI |
 | CA-03 | Sangria maior que o esperado em dinheiro recusada; sangria e suprimento sem caixa Aberto recusados; repetidos gravam um. | unidade e banco |
-| CA-04 | Pagamento e estorno do Checkout ligados ao caixa Aberto conforme E31·2 (dinheiro com e sem caixa aberto; outra forma com e sem caixa aberto; estorno de pagamento de caixa já fechado sai do aberto). O servidor ignora caixa vindo da tela. | teste de servidor e de banco |
+| CA-04 | Pagamento do Checkout ligado ao caixa Aberto conforme E31·1 (dinheiro com e sem caixa aberto; outra forma com e sem caixa aberto). O servidor ignora caixa vindo da tela; ligação a caixa de outro estúdio recusada pela chave composta. | teste de servidor e de banco |
 | CA-05 | Fechar grava esperado, contado e diferença; diferença ≠ 0 sem motivo recusada; fechar duas vezes: um só fechamento. | unidade e banco |
 | CA-06 | Pagamento gravado entre a contagem e a confirmação: fechamento recusado; pagamento e fechamento simultâneos: o pagamento fica no caixa antes de fechar ou é recusado, nunca em caixa fechado. | teste de banco na CI |
 | CA-07 | Caixa Fechado e seus movimentos não se alteram nem se apagam (nem com a sessão da dona); nada entra nele. | teste de banco na CI |
 | CA-08 | Contagem conforme E32·2 (cega: a resposta do servidor não traz o esperado antes de receber o contado). | teste de servidor |
 | CA-09 | O estúdio A não lê, cria, altera nem apaga caixa ou movimento do estúdio B; sem login ou sem papel, nada. | teste de isolamento na CI (molde do item 3) |
 | CA-10 | Permissão por papel conforme E32·3 (cada papel × abrir, sangria/suprimento, fechar, ver aberto, ver histórico). | teste de servidor e de banco |
-| CA-11 | Abrir, movimentar e fechar geram registro (porta 6) com valores, sem dado pessoal nem motivo em texto livre; URL só com id. | teste automático e revisão do Engenheiro de segurança |
+| CA-11 | Abrir, movimentar e fechar geram registro (porta 6) com valores, sem dado pessoal nem motivo em texto livre; URL só com id; no modo "entrar como o estúdio", nada registrado e sem autor (E6·1). | teste automático e revisão do Engenheiro de segurança |
 | CA-12 | Ponta a ponta em 390 e 1440: abrir, suprimento, sangria, pagamento em dinheiro (Checkout ou dado de exemplo), fechar com Falta e motivo, ver no Histórico. | Playwright (`e2e/`) |
 | CA-13 | Estados vazio, carregando, erro e sucesso presentes; checklist do `DESIGN.md` §10 sem falha. | e2e e Revisor de design |
 | CA-14 | Cada tabela do §7 tem ADR com saída, motivo, norma e o papel que conferiu; nada do antigo copiado sem ADR. | `docs/adr/` |
@@ -154,22 +158,26 @@ do Checkout (coluna de caixa em `sale_payments` e `sale_refunds` ou equivalente)
 ## 9. Dependências
 - **Item 2** (CI, app vazio) · **item 3** (estúdio, moeda e fuso do estúdio, papéis, função de checagem, molde do
   teste) · **item 4** (design system no código e idiomas).
-- **Checkout** (spec em paralelo): pagamentos e estornos com forma e valor em centavos, e a resposta da **E31·2**. Se
-  E31·2·C, o Caixa não recebe entradas do Checkout na primeira versão (RF-03 sai) e esta spec é ajustada antes do plano.
-  Se E31·2·B, toda forma exige caixa aberto; o RF-03 muda só no texto.
+- **Checkout** (spec em paralelo): pagamentos com forma e valor em centavos (RF-11 do Checkout), a resposta da
+  **E31·1** e o teto da **E31·3**. Se E31·1·C, o Caixa não recebe entradas do Checkout na primeira versão (RF-03 sai) e
+  esta spec é ajustada antes do plano. Se E31·1·B, toda forma exige caixa aberto; o RF-03 muda só no texto.
+- **Checkout · estorno e desconto** (spec seguinte, §12 do Checkout): traz as saídas por estorno para o caixa, com as
+  regras dela (de qual caixa sai, gaveta sem ficar negativa).
 - **Agendamento:** status e data dos atendimentos de hoje, só para o aviso do RF-08 (sem ele, o aviso fica "em
   desenvolvimento").
 - **`DESIGN.md`:** o módulo Caixa e os nomes do §4 entram nele, com o dono, na ficha visual (etapa 6).
 
 ## 10. Dúvidas ao dono (máx. 3; todas de dinheiro ou acesso)
-**E32·1 · Quantos caixas abertos e retiradas da gaveta** (dinheiro)
-- **E32·1·A:** um caixa aberto por estúdio, com sangria (retirada) e suprimento (reforço), sempre com motivo; a
-  retirada nunca passa do dinheiro que deveria estar na gaveta.
-- **E32·1·B:** um caixa aberto por estúdio, sem sangria e suprimento na primeira versão.
-- **E32·1·C:** vários caixas abertos ao mesmo tempo (uma gaveta por ponto ou por pessoa), com sangria e suprimento.
-- **Recomendo A:** uma gaveta por estúdio é o caso comum e a conta fecha com uma regra só; sem sangria, tirar dinheiro
-  para um pagamento vira "Falta" no fechamento. C muda a ligação de cada pagamento e entra depois sem refazer os dados.
-  Desfaz-se tirando os botões; os registros ficam.
+**E32·1 · Abertura, dias e retiradas da gaveta** (dinheiro)
+- **E32·1·A:** um caixa aberto por estúdio; valor inicial pode ser **zero** (estúdio sem troco); o caixa pode ficar
+  aberto **de um dia para o outro**, com o aviso "aberto desde <data>"; sangria (retirada) e suprimento (reforço)
+  sempre com motivo, e a retirada nunca passa do dinheiro que deveria estar na gaveta.
+- **E32·1·B:** como A, mas o valor inicial é maior que zero e o caixa de um dia anterior precisa ser fechado antes de
+  receber dinheiro hoje.
+- **E32·1·C:** vários caixas abertos ao mesmo tempo (uma gaveta por ponto ou por pessoa); o resto como A.
+- **Recomendo A:** uma gaveta por estúdio é o caso comum e a conta fecha com uma regra só; não trava o balcão de manhã
+  por um esquecimento da véspera; sem sangria, tirar dinheiro vira "Falta" no fechamento. C entra depois sem refazer os
+  dados. Desfaz-se mudando a regra de abertura; os registros ficam.
 
 **E32·2 · Como se fecha o caixa** (dinheiro)
 - **E32·2·A:** contagem **cega**: quem fecha informa o dinheiro contado antes de ver o esperado; a diferença fica
@@ -189,17 +197,15 @@ do Checkout (coluna de caixa em `sale_payments` e `sale_refunds` ou equivalente)
   privilégio, OWASP ASVS V4; ISO 31000), sem travar a recepção no balcão. Desfaz-se mudando a permissão do papel.
 
 ## 11. Assumptions (decisões do papel, à vista na aprovação; recuse pelo número)
-1. O caixa pode ficar aberto de um dia para o outro; a tela mostra "aberto desde <data>" e não fecha sozinho.
-2. Estorno de pagamento de caixa já fechado sai do caixa aberto agora (decorre do RF-09, "fechado não muda").
-3. A contagem é do total em dinheiro (sem cédula por cédula); as outras formas aparecem só como resumo.
-4. O aviso ao fechar só informa quantos atendimentos de hoje estão sem checkout, sem nomes, e não impede fechar.
-5. Sem número sequencial do caixa na primeira versão; ele se identifica por data, hora e quem abriu.
-6. Valor inicial pode ser 0 (estúdio que não guarda troco).
-7. Tabelas: as sugestões do §7 são do Engenheiro de dados decidir no plano, com ADR.
+1. A contagem é do total em dinheiro (sem cédula por cédula); as outras formas aparecem só como resumo.
+2. O aviso ao fechar só informa quantos atendimentos de hoje estão sem checkout, sem nomes, e não impede fechar.
+3. Sem número sequencial do caixa na primeira versão; ele se identifica por data, hora e quem abriu.
+4. Tabelas: as sugestões do §7 são do Engenheiro de dados decidir no plano, com ADR (as exigências do §7 não são).
 
 ## 12. Fora de escopo
 - Tudo marcado "depois" no §2, em especial reabrir (salvo E32·2·C), várias gavetas (salvo E32·1·C), relatórios,
   exportação, DRE e lançamentos manuais (Financeiro), e conferência de cartão e Pix com extrato (integração).
-- Telas e regras do Checkout (formas de pagamento, estorno), que são da spec do Checkout.
+- Telas e regras do Checkout (formas de pagamento) e todo estorno e desconto, que entram com a spec "Checkout ·
+  estorno e desconto" (§12 do Checkout).
 - **Documento fiscal** e obrigações fiscais do estúdio: o sistema não emite nem calcula.
 - Avisos à pessoa (WhatsApp, e-mail) e o sininho.
