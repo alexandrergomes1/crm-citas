@@ -2,11 +2,11 @@
 -- Molde oficial: https://supabase.com/docs/guides/local-development/testing/overview
 -- Login simulado: set_config('request.jwt.claims') + set local role authenticated (é o que auth.uid() lê).
 begin;
-select plan(12);
+select plan(14);
 
 -- Preparo (como postgres): pessoas e estúdios fictícios, escritos do zero (RG-07).
 -- A = ...0a · B = ...0b · a1 dona A · a2 recepção A · a3 profissional A · b1 dona B
--- c1 sem papel · d1 vínculo inativo em A · m1 profissional em A (atual) e recepção em B
+-- c1 e e1 sem papel · d1 vínculo inativo em A · f1 profissional em A (atual) e recepção em B
 insert into auth.users (id, email) values
   ('00000000-0000-0000-0000-0000000000a1', 'a1@exemplo.test'),
   ('00000000-0000-0000-0000-0000000000a2', 'a2@exemplo.test'),
@@ -48,6 +48,10 @@ select throws_ok($$insert into public.estudios (nome, idioma, fuso_horario) valu
   '23502', null, 'moeda vazia recusada (sem padrão)');
 select throws_ok($$insert into public.estudios (nome, moeda, idioma, fuso_horario) values ('X', 'EUR', 'pt', 'Marte/Base')$$,
   '22023', null, 'fuso inexistente recusado');
+select throws_ok($$insert into public.estudios (nome, moeda, idioma, fuso_horario) values ('X', 'EUR', 'pt', 'posix/Europe/Madrid')$$,
+  '22023', null, 'fuso não canônico (posix/) recusado');
+select throws_ok($$insert into public.estudios (nome, moeda, idioma, fuso_horario) values ('X', 'EUR', 'pt', 'Factory')$$,
+  '22023', null, 'fuso fictício Factory recusado');
 select throws_ok($$insert into public.estudios (nome, moeda, idioma) values ('X', 'EUR', 'pt')$$,
   '23502', null, 'fuso vazio recusado (sem padrão)');
 

@@ -2,11 +2,11 @@
 -- Molde oficial: https://supabase.com/docs/guides/local-development/testing/overview
 -- Login simulado: set_config('request.jwt.claims') + set local role authenticated (é o que auth.uid() lê).
 begin;
-select plan(14);
+select plan(18);
 
 -- Preparo (como postgres): pessoas e estúdios fictícios, escritos do zero (RG-07).
 -- A = ...0a · B = ...0b · a1 dona A · a2 recepção A · a3 profissional A · b1 dona B
--- c1 sem papel · d1 vínculo inativo em A · m1 profissional em A (atual) e recepção em B
+-- c1 e e1 sem papel · d1 vínculo inativo em A · f1 profissional em A (atual) e recepção em B
 insert into auth.users (id, email) values
   ('00000000-0000-0000-0000-0000000000a1', 'a1@exemplo.test'),
   ('00000000-0000-0000-0000-0000000000a2', 'a2@exemplo.test'),
@@ -51,6 +51,12 @@ select is(
 select is(
   (select count(*)::int from pg_catalog.pg_class c
      join pg_catalog.pg_namespace n on n.oid = c.relnamespace
+    where n.nspname = 'public' and c.relkind in ('r', 'p') and not c.relforcerowsecurity),
+  0, 'toda tabela de public tem RLS forçada');
+
+select is(
+  (select count(*)::int from pg_catalog.pg_class c
+     join pg_catalog.pg_namespace n on n.oid = c.relnamespace
     where n.nspname = 'public' and c.relkind in ('r', 'p')
       and not exists (select 1 from pg_catalog.pg_index i
                        join pg_catalog.pg_attribute a on a.attrelid = i.indrelid and a.attnum = i.indkey[0]
@@ -82,6 +88,24 @@ select is(
   (select count(*)::int from pg_catalog.pg_proc p
     where p.pronamespace = 'app'::regnamespace and pg_catalog.has_function_privilege('anon', p.oid, 'execute')),
   0, 'anon não executa nenhuma função de app');
+select is(
+  (select count(*)::int from pg_catalog.pg_proc p
+    where p.pronamespace = 'public'::regnamespace and pg_catalog.has_function_privilege('anon', p.oid, 'execute')),
+  0, 'anon não executa nenhuma função de public');
+select is(
+  (select coalesce(array_agg(p.oid::regprocedure::text order by 1), array[]::text[])
+     from pg_catalog.pg_proc p
+    where p.pronamespace in ('public'::regnamespace, 'app'::regnamespace)
+      and pg_catalog.has_function_privilege('authenticated', p.oid, 'execute')),
+  array['app.eh_dona()', 'app.escolher_estudio(uuid)', 'app.estudio_da_sessao()', 'app.papel_da_sessao()'],
+  'authenticated executa só as 4 funções da trava em public e app');
+select is(
+  (select count(*)::int from pg_catalog.pg_class c
+     join pg_catalog.pg_namespace n on n.oid = c.relnamespace
+    where c.relkind = 'S' and n.nspname in ('public', 'app')
+      and (pg_catalog.has_sequence_privilege('anon', c.oid, 'usage, select, update')
+           or pg_catalog.has_sequence_privilege('authenticated', c.oid, 'usage, select, update'))),
+  0, 'anon e authenticated sem uso de sequência em public e app');
 select ok(not pg_catalog.has_schema_privilege('anon', 'app', 'usage'), 'anon sem uso do esquema app');
 
 select is(

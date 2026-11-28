@@ -1,7 +1,8 @@
 -- MOLDE do teste de isolamento por estúdio (spec 20261128-010000-banco-ligacao, CA-07; plan.md §5).
 -- Fica fora de supabase/tests/ para não rodar. Cada spec de módulo copia para
 -- supabase/tests/database/<nnn>_isolamento_<tabela>_test.sql e troca os marcadores:
---   <tabela>          nome da tabela em public (tem org_id not null, RLS e índice por org_id)
+--   <tabela>          nome da tabela em public (tem org_id not null, RLS ligada e forçada
+--                     (enable + force row level security) e índice por org_id)
 --   <colunas>         colunas obrigatórias para criar uma linha, além de org_id
 --   <valores_a>       valores dessas colunas para a linha de A (fictícios, escritos do zero)
 --   <valores_b>       idem para B

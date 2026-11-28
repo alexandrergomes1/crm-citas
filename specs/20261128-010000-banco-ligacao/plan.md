@@ -39,8 +39,8 @@ porque as funções leem `membros` e as políticas usam as funções.
 
 | # | Nome | Conteúdo |
 |---|---|---|
-| M1 | `estudios` | tabela `public.estudios`, RLS ligada sem política (fecha tudo até M4), `revoke all` de `anon` e `authenticated`, gatilho do fuso |
-| M2 | `membros` | tabela `public.membros`, RLS ligada sem política, índices, `revoke all` de `anon` e `authenticated` |
+| M1 | `estudios` | tabela `public.estudios`, RLS ligada e forçada sem política (fecha tudo até M4), `revoke all` de `anon` e `authenticated`, gatilho do fuso |
+| M2 | `membros` | tabela `public.membros`, RLS ligada e forçada sem política, índices, `revoke all` de `anon` e `authenticated` |
 | M3 | `trava_por_estudio` | esquema `app`, as 4 funções, `revoke`/`grant` de execução |
 | M4 | `politicas_base` | políticas de `estudios` e `membros`; `grant` por coluna a `authenticated` |
 
@@ -195,5 +195,7 @@ fundação **não** mudam.
   verificado**, lidos na referência oficial antes de escrever o workflow.
 - R-5 · Privilégios padrão do Supabase dão tudo a `anon` e `authenticated` em tabela nova de `public`; por isso o
   `revoke all` explícito em M1 e M2 e o teste `010_`.
-- R-6 · Pessoa sem estúdio escolhido vê nada até chamar `escolher_estudio`; o fluxo de primeira entrada é do servidor,
-  em spec futura.
+- R-6 · Pessoa sem estúdio escolhido vê nada até chamar `escolher_estudio`; o caminho de chamada (servidor, depois do
+  login) entra na spec da primeira entrada.
+- R-7 · Convite de membro só pelo servidor: o erro da chave estrangeira para `auth.users` revela se um id tem conta
+  (ADR 0005, Consequências). Vai à spec da tela de equipe.

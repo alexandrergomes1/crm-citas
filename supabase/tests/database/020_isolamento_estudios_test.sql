@@ -6,7 +6,7 @@ select plan(13);
 
 -- Preparo (como postgres): pessoas e estúdios fictícios, escritos do zero (RG-07).
 -- A = ...0a · B = ...0b · a1 dona A · a2 recepção A · a3 profissional A · b1 dona B
--- c1 sem papel · d1 vínculo inativo em A · m1 profissional em A (atual) e recepção em B
+-- c1 e e1 sem papel · d1 vínculo inativo em A · f1 profissional em A (atual) e recepção em B
 insert into auth.users (id, email) values
   ('00000000-0000-0000-0000-0000000000a1', 'a1@exemplo.test'),
   ('00000000-0000-0000-0000-0000000000a2', 'a2@exemplo.test'),

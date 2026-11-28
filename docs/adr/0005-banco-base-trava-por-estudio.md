@@ -42,6 +42,9 @@ migration abaixo; nenhum seed, dado ou segredo foi aberto (RG-01):
 | D3 | Toda política é `to authenticated` e compara `org_id = (select app.estudio_da_sessao())`; escrita também pede `(select app.eh_dona())` | Guia de RLS do Supabase (papel explícito; função envolvida em `select` para rodar uma vez por consulta) |
 | D4 | Validação: `check` para idioma, moeda e papel; gatilho `before insert or update` para o fuso (consulta a `pg_timezone_names`, que um `check` não pode fazer) | Documentação do Postgres (CREATE TABLE: expressão de `check` não pode ter subconsulta) |
 | D5 | Teste de isolamento em pgTAP com `supabase test db`, banco local | ADR 0002 · D10; spec §11 Assumption 2 |
+| D7 | `enable` e `force row level security` em toda tabela do estúdio (também no molde) | Defesa em profundidade (documentação do Postgres, ALTER TABLE): a dona da tabela passa a seguir a trava. Hoje o dono `postgres` tem `BYPASSRLS` (conferido no banco local) e as funções `SECURITY DEFINER` continuam lendo `membros`; se um dia a dona da tabela for um papel sem `BYPASSRLS`, as funções da trava precisam ser revistas (leriam `membros` sob a própria trava) |
+| D8 | Moeda: só o formato (3 letras maiúsculas). A lista oficial ISO 4217 fica para a spec do Checkout | É regra de dinheiro (RG-03); o formato já impede lixo. Fuso: só nome canônico de `pg_timezone_names`, recusando as cópias `posix/` e `right/` e o fictício `Factory` (`posixrules` nem aparece na lista do Postgres 17, conferido) |
+| D9 | Privilégios padrão do Supabase (tudo para `anon` e `authenticated` em `public`) **não** são alterados; o teste `010_` falha se alguma tabela, função ou sequência de `public` ou `app` ficar com privilégio para `anon`, ou se `authenticated` executar outra função além das 4 da trava | Mexer no padrão muda o comportamento do projeto remoto inteiro; o teste pega o esquecimento de `revoke` na hora (mesma garantia, menos alcance) |
 | D6 | Aplicação no banco remoto de desenvolvimento só por um job da CI no `push` à `previas`, num ambiente do GitHub com aprovação do dono, construído só depois das respostas E24·1 e E24·2 | `AGENTS.md` §1 e §8; RG-05; `plan.md` §7 |
 
 ## Consequências
@@ -50,4 +53,9 @@ migration abaixo; nenhum seed, dado ou segredo foi aberto (RG-01):
 - Pessoa em mais de um estúdio vê um de cada vez; a tela de troca de estúdio vai à spec que tiver essa tela.
 - Ninguém com login cria ou apaga estúdio: isso é do cadastro de estúdio (`ARCHITECTURE.md` §2), por tarefa interna.
 - A dona pode tirar o próprio papel de dona; a regra "sempre uma dona" é decisão de acesso e vai à spec da tela de equipe.
+- **Convite de membro passa pelo servidor** (`src/server`, com a sessão da dona), nunca por `insert` direto de quem
+  chama: a chave estrangeira para `auth.users` responde de forma diferente para id que existe e que não existe, e isso
+  revela se uma pessoa tem conta (enumeração, ASVS V2.2/V3). Registrado para a spec da tela de equipe.
+- `app.escolher_estudio` ainda não tem quem a chame: o caminho (servidor, depois do login, quando
+  `estudio_da_sessao()` for nulo) entra na spec da primeira entrada (`plan.md` R-6).
 - Para desfazer qualquer linha: ADR novo que a substitui, com o motivo.

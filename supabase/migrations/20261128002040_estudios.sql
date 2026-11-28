@@ -24,7 +24,10 @@ set search_path = ''
 as $$
 begin
   -- Nulo segue para o not null da coluna (erro 23502), que o Postgres confere depois do gatilho.
-  if new.fuso_horario is not null and not exists (select 1 from pg_catalog.pg_timezone_names t where t.name = new.fuso_horario) then
+  -- Só nomes canônicos: fora as cópias posix/ e right/ e o fuso fictício Factory.
+  if new.fuso_horario is not null and (
+       new.fuso_horario ~ '^(posix|right)/' or new.fuso_horario = 'Factory'
+       or not exists (select 1 from pg_catalog.pg_timezone_names t where t.name = new.fuso_horario)) then
     raise exception 'Fuso horario invalido' using errcode = '22023';
   end if;
   return new;
@@ -37,4 +40,5 @@ create trigger estudios_conferir_fuso
   for each row execute function app.conferir_fuso();
 
 alter table public.estudios enable row level security;
+alter table public.estudios force row level security;
 revoke all on table public.estudios from anon, authenticated;

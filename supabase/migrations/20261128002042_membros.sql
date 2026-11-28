@@ -17,4 +17,5 @@ create index membros_user_id_idx on public.membros (user_id);
 create unique index membros_estudio_atual_unico on public.membros (user_id) where estudio_atual;
 
 alter table public.membros enable row level security;
+alter table public.membros force row level security;
 revoke all on table public.membros from anon, authenticated;
