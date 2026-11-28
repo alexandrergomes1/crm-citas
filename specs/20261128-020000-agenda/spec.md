@@ -138,7 +138,7 @@ Analista; quem decide é o Engenheiro de dados no plano, com ADR e revisão de o
 | CA-01 | RN-01 a RN-06 e RN-08 têm teste em `src/domain`, inclusive dia de 23 h e de 25 h, meia-noite e sobreposição encostada. | unidade, CI verde |
 | CA-02 | O estúdio A não lê, cria, altera nem apaga bloqueio do estúdio B; bloqueio com profissional de outro estúdio é recusado. | isolamento, CI verde |
 | CA-03 | Sem login e sem papel no estúdio: nada é lido nem gravado; cada papel lê e grava só o que a §3 (após E26·1 e E26·2) permite. | teste de banco e do servidor, CI verde |
-| CA-04 | Estúdio vindo no pedido é ignorado. | teste do servidor |
+| CA-04 | Pedido que traz estúdio é recusado (`estudio_trocado`, contrato da camada de serviço, spec Entrar RF-15/CA-05), sem ler nem gravar nada. | teste do servidor |
 | CA-05 | Em 390 e 1440: abre em hoje; troca de dia e Hoje; Equipe N de M; filtros e "Limpar filtros"; criar, alterar, conflito recusado e excluir bloqueio com "Desfazer". | e2e, CI verde |
 | CA-06 | Em 390 e 1440: estados carregando, vazio, sem resultado, sem profissional e erro aparecem como na §4. | e2e |
 | CA-07 | Uma só peça preta de ação por tela; nenhuma peça, cor ou nome fora do `DESIGN.md`. | checklist §10 do `DESIGN.md`, Revisor de design |
