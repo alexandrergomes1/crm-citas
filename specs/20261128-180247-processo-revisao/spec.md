@@ -166,7 +166,7 @@ como item ou ideia, sem decidir) · **dúvida** (§5) · **fora** (outra branch,
 | 36 | Opção de captcha no entrar (R-13) | 9ep B2 | fila "a decidir" (acesso) | fila |
 | 37 | Configurar o banco online (hash da chave do servidor, chaves assimétricas) | 9ep B4 | `SECURITY.md` §7 (antes da produção) | falta |
 | 38 | Skills do TanStack não aprovadas ("recomendo manter") | 9ep B5 | ADR (decisão técnica do DevOps) | falta |
-| 39 | Prazo de guarda do registro de auditoria e das sessões | 9ep B6; ADR 0018 e 0019 | `SECURITY.md` §7 | dúvida E66·1 |
+| 39 | Prazo de guarda do registro de auditoria e das sessões | 9ep B6; ADR 0018 e 0019 | `SECURITY.md` §7 (o prazo); o banco, por spec própria (linha 57) | dúvida E66·1 |
 | 40 | Cadastro e convite de equipe (senha até 72 bytes, "Esqueci a senha" E39·1·B, trava antes de estúdios reais) | 9ep B10; 8F1 #26 | fila (item) e `docs/produto/equipe.md` | falta + fila |
 | 41 | Planos da Agenda e do Agendamento voltam à 5b | 9ep B11 | `docs/STATUS.md` | falta |
 | 42 | Cloudflare R2 também para arquivos (assinaturas, fotos) | 8F1 #4 | `ARCHITECTURE.md` | falta |
@@ -184,6 +184,7 @@ como item ou ideia, sem decidir) · **dúvida** (§5) · **fora** (outra branch,
 | 54 | Revisão das conversas: feita, com as 4 conversas | 958 #55; linha "Ordem (revisar as conversas)" | `docs/decisoes/` (marcar feito, citar as 4) | falta |
 | 55 | "Pode pedir as liberações que precisar" | 9ep #10 | só valeu naquela hora | nada |
 | 56 | As 4 lacunas do Arquiteto de 27/11 (21:34) e o trecho da conversa 7Rj antes de 27/11 18:13 | 7Rj | — | não verificado |
+| 57 | Guardar o endereço de internet (IP) de cada entrada, se a E66·1 for A | Engenheiro de segurança (E66·1); Marco Civil art. 15 | fila: item com spec própria (mudança de banco) | fila (não é deste 4b) |
 
 ## 4. Critérios de aceite
 - **CA-01.** Os textos de T1, T2, T3, T4, T5, T6 (parte do `AGENTS.md`) e T8 estão nos arquivos indicados com a
@@ -204,17 +205,20 @@ como item ou ideia, sem decidir) · **dúvida** (§5) · **fora** (outra branch,
   confere cada RF e cada linha do §3.
 
 ## 5. Dúvidas (3, juntas, para a aprovação)
-- **E66·1 · Por quanto tempo o sistema guarda quem entrou e o que cada pessoa mudou (dado de cliente).**
-  - **O que é:** o "registro de auditoria" é a lista que o sistema guarda de quem entrou e do que cada pessoa mudou.
-    As "sessões" são as entradas no sistema (cada vez que alguém entra e até sair).
-  - **Como está:** nada disso se apaga hoje (ADR 0018 e 0019; `SECURITY.md` §7).
-  - **Opções:** **A** as entradas (sessões e tentativas de entrar) ficam 6 meses, o registro de auditoria fica 1 ano,
-    e depois o sistema apaga sozinho · **B** tudo fica 5 anos · **C** decidir só antes de abrir a estúdios reais.
-  - **O que muda:** o prazo escolhido entra no `SECURITY.md` §7 e vira tarefa antes da produção. Nada se apaga
-    nesta tarefa.
-  - **Recomendo A:** guarda só o necessário. As bases legais (Marco Civil da Internet art. 15; RGPD art. 5(1)(e);
-    LGPD art. 15 e 16) estão **a conferir pelo Engenheiro de segurança**, que pode mudar a recomendação antes do envio.
-  - **Como voltar atrás:** o dono troca o prazo por nova decisão, antes da produção sem custo nenhum.
+- **E66·1 · Quanto tempo guardar as entradas no sistema e o registro do que cada pessoa fez.** (dado de cliente;
+  texto conferido pelo Engenheiro de segurança)
+  - **Como está:** hoje nada se apaga, e o sistema não guarda o endereço de internet de quem entra.
+  - **Opções:** **A** · guardar data, hora e endereço de internet de cada entrada por 6 meses e o registro do que foi
+    feito por 1 ano; depois apaga sozinho · **B** · tudo por 5 anos · **C** · decidir só antes de abrir a estúdios
+    reais.
+  - **Recomendo A.** No Brasil, a lei obriga a empresa que oferece um sistema pela internet a guardar por 6 meses a
+    data, a hora e o endereço de internet de cada uso (Marco Civil, art. 15). Na Europa, a regra é guardar só pelo
+    tempo necessário (RGPD art. 5). O prazo de 1 ano é escolha nossa, para investigar problemas, e não uma exigência
+    da lei.
+  - **O que muda:** a opção A passa a guardar o endereço de internet, que é dado pessoal, só com acesso restrito. As
+    tentativas de entrar continuam apagadas em 15 minutos. Guardar o endereço de internet é mudança de banco: vira
+    item da fila com spec própria (tabela §3, linha 57), não entra neste 4b.
+  - **Como voltar atrás:** muda-se o prazo; o que já foi apagado não volta.
 - **E66·2 · Página pública que mostra se o sistema está no ar (página de status).**
   - **O que é:** uma página aberta a todos que diz se o sistema está funcionando ou fora do ar.
   - **Como está:** em 27/11 ela veio na lista do "que falta", e o dono comentou "acho que ninguem fica avisando
@@ -274,11 +278,16 @@ ou C) · `CHANGELOG.md`.
 - **Tamanho.** São muitos arquivos de regra num PR só. O plano pode dividir em commits por tema (travas, molde,
   pastas, registros) para a revisão.
 
+- **Para a T-10 (cópia das revisões de conversa para o repositório):** cortar o identificador da linha 48 de
+  `sessao-9ep.md` e trocar o caminho interno da linha 7 de `sessao-958.md` por "transcrição local da sessão".
+
 ## 10. Não verificado
 - As conversas inteiras: só as 4 tabelas do Documentador, que também deixam trechos "não verificado" (linha 56).
 - A resposta dada ao dono às 14:17 (linha 49) e os 7 itens de segurança de 27/11 (linha 30).
 - Que o material da Fresha foi visto (linha 20): é informação da conversa principal, sem registro no repositório.
-- As fontes legais da recomendação E66·1: a conferir pelo Engenheiro de segurança.
+- E66·1: o Engenheiro de segurança conferiu o Marco Civil (art. 15 e art. 5, VIII, na cópia oficial) e a LGPD
+  (art. 15 e 16), e viu que a Espanha não tem prazo mínimo para SaaS. A regra de Portugal e o texto do RGPD não
+  foram conferidos na fonte nesta sessão.
 
 ## Anexo A · Texto exato das travas (auditoria-processo.md §4, `feat/agenda` em `85501a0`)
 
@@ -318,7 +327,7 @@ ou C) · `CHANGELOG.md`.
 - `.claude/agents/analista-requisitos.md`, em "Faz", acrescentar: "Fala do dono que cita nome de botão, peça ou cor: confira no `DESIGN.md` antes de gravar. Se diverge, grave a intenção (ex.: 'botão de criar com opções') e passe ao Designer, que mostra como recomendada a opção que segue o `DESIGN.md`."
 
 ## 11. Mensagem de aprovação ao dono (formato novo)
-Vai ao dono só depois do plano, da conferência do Spec Kit (etapa 5) e da revisão 5b, com o "Revisado por" preenchido.
+Vai ao dono só depois do plano, da conferência do Spec Kit (etapa 5) e da revisão 5b.
 
 ---
 **E66 · Aprovar a spec: revisão do processo** (fala o Analista de requisitos · norma IEEE 29148)
@@ -331,12 +340,18 @@ Vai ao dono só depois do plano, da conferência do Spec Kit (etapa 5) e da revi
      estavam no lugar errado.
    - **Atenção:** muda o `AGENTS.md`, a constituição do projeto, ou seja as regras que toda IA segue.
    - [Abrir a spec](https://github.com/alexandrergomes1/crm-citas/blob/chore/processo-revisao/specs/20261128-180247-processo-revisao/spec.md)
-2. **E66·1 · Por quanto tempo guardar quem entrou e o que cada pessoa mudou (dado de cliente).**
-   - **O que é:** o "registro de auditoria" é a lista que o sistema guarda de quem entrou e do que cada pessoa mudou.
-     As "sessões" são as entradas no sistema. Hoje nada se apaga.
-   - **Opções:** **A** 6 meses para as entradas e 1 ano para o registro, depois apaga sozinho · **B** 5 anos ·
-     **C** decidir só antes de abrir a estúdios reais.
-   - **Recomendo A:** guarda só o necessário. As bases legais estão a conferir pelo Engenheiro de segurança.
+2. **E66·1 · Quanto tempo guardar as entradas no sistema e o registro do que cada pessoa fez.**
+   - **Como está:** hoje nada se apaga, e o sistema não guarda o endereço de internet de quem entra.
+   - **Opções:** **A** · guardar data, hora e endereço de internet de cada entrada por 6 meses e o registro do que
+     foi feito por 1 ano; depois apaga sozinho · **B** · tudo por 5 anos · **C** · decidir só antes de abrir a
+     estúdios reais.
+   - **Recomendo A.** No Brasil, a lei obriga a empresa que oferece um sistema pela internet a guardar por 6 meses a
+     data, a hora e o endereço de internet de cada uso (Marco Civil, art. 15). Na Europa, a regra é guardar só pelo
+     tempo necessário (RGPD art. 5). O prazo de 1 ano é escolha nossa, para investigar problemas, e não uma
+     exigência da lei.
+   - **O que muda:** a opção A passa a guardar o endereço de internet, que é dado pessoal, só com acesso restrito. As
+     tentativas de entrar continuam apagadas em 15 minutos.
+   - **Como voltar atrás:** muda-se o prazo; o que já foi apagado não volta.
 3. **E66·2 · Página pública que mostra se o sistema está no ar.**
    - **O que é:** uma página aberta que diz se o sistema funciona ou caiu. Você disse "acho que ninguem fica
      avisando quedas nao".
@@ -358,7 +373,7 @@ Vai ao dono só depois do plano, da conferência do Spec Kit (etapa 5) e da revi
   nome escolhido para atender a sua ordem, não fala sua) · A2 "Desfaz-se assim" vira "Como voltar atrás" · A3 o
   Documentador confere que cada papel gravou · A4 o que é "decisão simples" do Designer · A5 ideias futuras na fila
   sem número de ordem · A6 o texto das travas não muda, só o lugar.
-- **Revisado por:** Gerente de projeto (5b) [preencher].
+- **Revisado por:** Gerente de projeto (5b, com ajustes resolvidos) e Engenheiro de segurança (E66·1).
 - **Sem você, e fora deste PR:** a ficha de tela da trava T7 é uma parada própria quando a Agenda voltar, e a trava
   automática do `git stash` entra no PR das travas do Claude (E38·A1).
 ---
