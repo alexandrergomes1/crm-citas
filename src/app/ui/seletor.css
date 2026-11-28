@@ -1,0 +1,72 @@
+/* Seletor (RC-6; DESIGN.md §5, §8b): trilho claro, escolhido branco com anel e sombra. Só var(--...). */
+.ds-seletor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-12);
+  min-width: 0;
+}
+
+.ds-seletor__rolagem {
+  display: flex;
+  min-width: 0;
+}
+
+/* Não cabe: rola, com esmaecido na ponta */
+.ds-seletor__rolagem--rola {
+  overflow-x: auto;
+  scrollbar-width: none;
+  mask-image: linear-gradient(to right, var(--ink) calc(100% - var(--sp-32)), transparent);
+}
+
+.ds-seletor__trilho {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  height: var(--h-seletor);
+  padding: 0 var(--folga-seletor);
+  border-radius: var(--r-pilula);
+  background: var(--track);
+}
+
+/* A aba ocupa os 44 do trilho (toque); o desenho dela é o item de 36 */
+.ds-seletor__aba {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  height: var(--h-seletor);
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-pilula);
+  background: transparent;
+  color: var(--ink2);
+  font-size: var(--fs-13);
+  font-weight: var(--fw-medio);
+}
+
+.ds-seletor__desenho {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espaco-ic);
+  height: var(--h-seletor-item);
+  padding: 0 var(--sp-12);
+  border-radius: var(--r-pilula);
+  white-space: nowrap;
+}
+
+.ds-seletor__aba[aria-selected='true'] {
+  color: var(--ink);
+  font-weight: var(--fw-forte);
+}
+
+.ds-seletor__aba[aria-selected='true'] .ds-seletor__desenho {
+  background: var(--card);
+  box-shadow: var(--sombra-escolhido);
+}
+
+.ds-seletor__aba:focus-visible {
+  outline-offset: calc(var(--foco-afastado) * -1);
+}
+
+.ds-seletor__painel:focus-visible {
+  border-radius: var(--r-bloco);
+}

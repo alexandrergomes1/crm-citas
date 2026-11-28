@@ -1,0 +1,87 @@
+/* Botões (RC-1, RC-2, RC-3; DESIGN.md §4, §5, §8). Só var(--...). */
+.ds-botao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--espaco-ic);
+  flex: none;
+  min-height: var(--h-controle);
+  min-width: var(--toque);
+  padding: 0 var(--sp-16);
+  border: var(--borda) solid transparent;
+  border-radius: var(--r-pilula);
+  background: transparent;
+  color: var(--ink);
+  font-size: var(--fs-texto);
+  font-weight: var(--fw-medio);
+  line-height: var(--lh-titulo);
+  white-space: nowrap;
+}
+
+.ds-botao--principal {
+  background: var(--ink);
+  color: var(--card);
+}
+
+.ds-botao--claro {
+  background: var(--btn);
+}
+
+/* "+ Adicionar" do celular: contorno 1 px --ink3, fundo transparente (DESIGN.md §5) */
+.ds-botao--contorno {
+  border-color: var(--ink3);
+}
+
+/* Excluir: texto vermelho, sem fundo (DESIGN.md §8; vale o texto, não a imagem 06) */
+.ds-botao--excluir {
+  color: var(--danger);
+}
+
+.ds-botao--cheio {
+  flex: 1;
+}
+
+.ds-botao:disabled,
+.ds-botao-icone:disabled {
+  opacity: var(--opac-desativado);
+  cursor: not-allowed;
+}
+
+.ds-botao-com-nota {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-12);
+}
+
+.ds-botao-com-nota__nota {
+  font-size: var(--fs-13);
+  color: var(--ink3);
+}
+
+/* Botão de ícone: sem fundo; área de toque 44/40 (DESIGN.md §5; RA-2) */
+.ds-botao-icone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--espaco-ic);
+  flex: none;
+  width: var(--toque);
+  height: var(--toque);
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-pilula);
+  background: transparent;
+  color: var(--ink);
+}
+
+/* Ícone + pílula no mesmo botão: folga 12/10, espaço 6 (DESIGN.md §8b) */
+.ds-botao-icone--contador {
+  width: auto;
+  min-width: var(--toque);
+  height: var(--h-controle);
+  padding: 0 var(--folga-btn-ic-dir) 0 var(--folga-btn-ic-esq);
+}
+
+.ds-botao-icone--claro {
+  background: var(--btn);
+}

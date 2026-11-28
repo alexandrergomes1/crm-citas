@@ -1,0 +1,58 @@
+/* Sua conta (DESIGN.md §8, §8b; ficha E41): barra com a bolinha, menu (computador) e folha (celular). Só var(--...). */
+.sua-conta__barra {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: var(--h-cabecalho);
+  padding: 0 var(--sp-8) 0 var(--margem);
+  background: var(--card);
+  box-shadow: var(--sombra-cabecalho);
+}
+
+/* Menu: o nome e, embaixo, "em desenvolvimento" (240 não cabe numa linha; ficha) */
+.sua-conta__item {
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  padding-block: var(--sp-4);
+  /* item de menu aberto em pílula, mesmo com duas linhas (DESIGN.md §4; revisão de design R6) */
+  border-radius: var(--r-pilula);
+}
+
+.sua-conta__nota {
+  font-size: var(--fs-13);
+  color: var(--ink2);
+}
+
+/* Desativado esmaecido 60 % só no nome; a nota fica legível (DESIGN.md §8) */
+.sua-conta__item--em-desenvolvimento {
+  cursor: not-allowed;
+}
+
+.sua-conta__item--em-desenvolvimento .sua-conta__rotulo {
+  opacity: var(--opac-desativado);
+}
+
+.sua-conta__item--em-desenvolvimento:hover {
+  background: transparent;
+}
+
+/* Folha: linhas de lista com linha fina; "em desenvolvimento" ao lado */
+.sua-conta__linha + .sua-conta__linha {
+  border-top: var(--borda) solid var(--line);
+}
+
+.sua-conta__botao {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-12);
+  width: 100%;
+  min-height: var(--h-linha-lista);
+  padding: 0 var(--sp-8);
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-size: var(--fs-texto);
+  text-align: left;
+}

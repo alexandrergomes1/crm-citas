@@ -1,0 +1,186 @@
+/* Bloco, listas, tabela, grupo e resumo (RC-11, RC-12, RC-22; DESIGN.md §2, §3, §4, §8b). Só var(--...). */
+.ds-bloco {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-12);
+  min-width: 0;
+  padding: var(--sp-16);
+  border-radius: var(--r-bloco);
+  background: var(--card);
+}
+
+.ds-bloco--sem-folga {
+  padding: var(--sp-4) 0;
+}
+
+.ds-bloco__cabecalho {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-8);
+}
+
+.ds-bloco--sem-folga .ds-bloco__cabecalho {
+  padding: var(--sp-12) var(--sp-16) 0;
+}
+
+.ds-bloco__titulo {
+  flex: 1;
+  font-size: var(--fs-16);
+}
+
+.ds-cat-1 { --cat: var(--c1); }
+.ds-cat-2 { --cat: var(--c2); }
+.ds-cat-3 { --cat: var(--c3); }
+.ds-cat-4 { --cat: var(--c4); }
+
+.ds-lista {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-linha {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-12);
+  min-height: var(--h-linha-lista);
+  padding: var(--sp-8) var(--sp-4) var(--sp-8) var(--sp-16);
+}
+
+.ds-linha + .ds-linha {
+  border-top: var(--borda) solid var(--line);
+}
+
+/* Faixa de 4 px da categoria, à esquerda */
+.ds-linha--cat::before {
+  content: '';
+  position: absolute;
+  top: var(--sp-12);
+  bottom: var(--sp-12);
+  left: 0;
+  width: var(--w-faixa);
+  border-radius: 0 var(--w-faixa) var(--w-faixa) 0;
+  background: var(--cat);
+}
+
+.ds-linha__meio {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.ds-linha__titulo {
+  overflow: hidden;
+  font-weight: var(--fw-forte);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ds-linha__detalhe {
+  overflow: hidden;
+  font-size: var(--fs-13);
+  color: var(--ink2);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ds-linha__fim {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--sp-4);
+  font-weight: var(--fw-forte);
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-grupo {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-8);
+  padding: var(--sp-16) var(--sp-16) var(--sp-4);
+  font-size: var(--fs-14);
+  font-weight: var(--fw-forte);
+}
+
+
+.ds-tabela__rolagem {
+  overflow-x: auto;
+}
+
+.ds-tabela {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-13);
+}
+
+.ds-tabela th {
+  height: var(--h-cab-tabela);
+  padding: 0 var(--sp-12);
+  border-bottom: var(--borda) solid var(--line);
+  color: var(--ink3);
+  font-size: var(--fs-12);
+  font-weight: var(--fw-forte);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.ds-tabela td {
+  height: var(--h-linha-tabela);
+  padding: 0 var(--sp-12);
+  border-bottom: var(--borda) solid var(--line);
+  white-space: nowrap;
+}
+
+.ds-tabela tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.ds-tabela .ds-tabela__numero {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-resumo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-8);
+}
+
+.ds-resumo__linha {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-12);
+}
+
+.ds-resumo__botao {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-4);
+  min-height: var(--toque);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink2);
+}
+
+.ds-resumo__valor {
+  font-size: var(--fs-18);
+  font-weight: var(--fw-forte);
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-resumo__detalhe {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  font-size: var(--fs-13);
+  color: var(--ink2);
+}
+
+.ds-resumo__detalhe[hidden] {
+  display: none;
+}

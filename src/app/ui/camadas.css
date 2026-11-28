@@ -1,0 +1,209 @@
+/* Camadas por cima (RC-13 a RC-16; DESIGN.md §4, §8, §8b). Só var(--...). */
+.ds-menu {
+  position: relative;
+  display: inline-flex;
+}
+
+/* Menu aberto: branco, canto 20, sombra do que flutua, 240 */
+.ds-menu__lista {
+  position: absolute;
+  z-index: 10;
+  top: calc(100% + var(--sp-4));
+  translate: var(--desloca-menu, 0) 0;
+  display: flex;
+  flex-direction: column;
+  width: var(--w-menu-flutua);
+  max-width: calc(100vw - var(--margem) - var(--margem));
+  padding: var(--sp-8);
+  border-radius: var(--r-bloco);
+  background: var(--card);
+  box-shadow: var(--sombra-flutua);
+}
+
+.ds-menu__lista--inicio {
+  left: 0;
+}
+
+.ds-menu__lista--fim {
+  right: 0;
+}
+
+.ds-menu__lista[hidden] {
+  display: none;
+}
+
+.ds-menu__item {
+  display: flex;
+  align-items: center;
+  min-height: var(--toque);
+  padding: 0 var(--sp-12);
+  border: 0;
+  border-radius: var(--r-pilula);
+  background: transparent;
+  color: var(--ink);
+  font-size: var(--fs-texto);
+  text-align: left;
+}
+
+.ds-menu__item:hover,
+.ds-menu__item:focus-visible {
+  background: var(--btn);
+}
+
+.ds-menu__item--perigo {
+  color: var(--danger);
+}
+
+/* <dialog>: a tela de trás não conta (sem cor de fundo extra: o DESIGN.md não define uma) */
+.ds-camada {
+  flex-direction: column;
+  gap: var(--sp-16);
+  max-width: 100%;
+  max-height: 100%;
+  padding: var(--sp-24);
+  border: 0;
+  background: var(--card);
+  color: var(--ink);
+  box-shadow: var(--sombra-flutua);
+}
+
+.ds-camada[open] {
+  display: flex;
+}
+
+.ds-camada::backdrop {
+  background: transparent;
+}
+
+.ds-camada--janelinha {
+  width: var(--w-janelinha);
+  max-width: calc(100% - var(--margem) - var(--margem));
+  border-radius: var(--r-janelinha);
+}
+
+.ds-camada--folha {
+  width: 100%;
+  margin: auto 0 0;
+  padding: var(--sp-8) var(--sp-16) var(--sp-20);
+  border-radius: var(--r-folha) var(--r-folha) 0 0;
+}
+
+.ds-camada--painel {
+  width: var(--w-painel);
+  height: 100%;
+  margin: 0 0 0 auto;
+}
+
+.ds-camada__pegador {
+  align-self: center;
+  width: var(--d-bolinha);
+  height: var(--sp-4);
+  border-radius: var(--r-pilula);
+  background: var(--line);
+}
+
+.ds-camada__cabecalho {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-8);
+}
+
+.ds-camada__titulo {
+  flex: 1;
+  font-size: var(--fs-18);
+}
+
+.ds-camada__corpo {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.ds-camada__texto {
+  color: var(--ink2);
+}
+
+.ds-camada__rodape {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--sp-8);
+}
+
+.ds-camada--folha .ds-camada__rodape,
+.ds-camada--painel .ds-camada__rodape {
+  padding-top: var(--sp-12);
+  border-top: var(--borda) solid var(--line);
+}
+
+/* Linha que abre com ▾/▴ */
+.ds-abre + .ds-abre {
+  border-top: var(--borda) solid var(--line);
+}
+
+.ds-abre__cabecalho {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-12);
+  width: 100%;
+  min-height: var(--h-linha-lista);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-weight: var(--fw-medio);
+  text-align: left;
+}
+
+.ds-abre__rotulo {
+  flex: 1;
+}
+
+.ds-abre__valor {
+  font-size: var(--fs-13);
+  font-weight: var(--fw-normal);
+  color: var(--ink2);
+}
+
+.ds-abre__corpo {
+  display: flex;
+  flex-direction: column;
+  padding: 0 0 var(--sp-12) var(--sp-16);
+}
+
+.ds-abre__corpo[hidden] {
+  display: none;
+}
+
+/* Aviso embaixo: pílula branca com sombra, "Desfazer" quando der */
+.ds-aviso-regiao {
+  display: flex;
+  justify-content: center;
+}
+
+.ds-aviso {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-12);
+  min-height: var(--h-campo);
+  padding: 0 var(--sp-20);
+  border-radius: var(--r-pilula);
+  background: var(--card);
+  box-shadow: var(--sombra-flutua);
+}
+
+.ds-aviso__icone {
+  color: var(--ok);
+}
+
+.ds-aviso__desfazer {
+  min-height: var(--toque);
+  padding: 0 var(--sp-4);
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-weight: var(--fw-forte);
+  text-decoration: underline;
+  text-underline-offset: var(--sp-4);
+}

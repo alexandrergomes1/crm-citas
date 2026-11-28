@@ -196,14 +196,16 @@
     // JWT issuer URL. If not set, defaults to auth.external_url.
     // "jwt_issuer": "",
     // Path to JWT signing key. DO NOT commit your signing keys file to git.
-    // "signing_keys_path": "./signing_keys.json",
+    // ADR 0018 · D17 e ADR 0019: chave assimétrica (ES256) gerada a cada `pnpm db:start`; o arquivo está no .gitignore.
+    "signing_keys_path": "./signing_keys.json",
     // If disabled, the refresh token will never expire.
     "enable_refresh_token_rotation": true,
     // Allows refresh tokens to be reused after expiry, up to the specified interval in seconds.
     // Requires enable_refresh_token_rotation = true.
     "refresh_token_reuse_interval": 10,
     // Allow/disallow new user signups to your project. Existing users can still sign in.
-    "enable_signup": true,
+    // RF-09 e CA-16: ninguém cria conta pelo app (ADR 0019).
+    "enable_signup": false,
     // Allow/disallow anonymous sign-ins to your project.
     "enable_anonymous_sign_ins": false,
     // Allow/disallow testing manual linking of accounts

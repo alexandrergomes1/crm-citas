@@ -1,0 +1,244 @@
+/* Vitrine (RV-1 a RV-3; plan.md §6.3). Só var(--...): nenhuma cor ou medida escrita aqui (RT-9). */
+.vt {
+  display: flex;
+  flex-direction: column;
+  gap: var(--entre-blocos);
+  padding: var(--margem);
+}
+
+.vt-cabecalho {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.vt-cabecalho__titulo {
+  font-size: var(--fs-20);
+}
+
+.vt-grade {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--w-painel)), 1fr));
+  gap: var(--entre-blocos);
+  align-items: start;
+}
+
+/* Cada quadro é um bloco branco: controle nunca direto sobre o fundo (DESIGN.md §2) */
+.vt-quadro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-12);
+  min-width: 0;
+  padding: var(--sp-16);
+  border-radius: var(--r-bloco);
+  background: var(--card);
+}
+
+.vt-quadro--largo {
+  grid-column: 1 / -1;
+}
+
+.vt-quadro__titulo {
+  font-size: var(--fs-16);
+}
+
+.vt-subtitulo {
+  margin-top: var(--sp-8);
+  font-size: var(--fs-14);
+}
+
+.vt-legenda {
+  font-size: var(--fs-13);
+  color: var(--ink3);
+}
+
+.vt-subtexto {
+  font-size: var(--fs-13);
+  color: var(--ink2);
+}
+
+.vt-pendentes {
+  color: var(--warn);
+  font-weight: var(--fw-forte);
+}
+
+.vt-fila {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-8);
+}
+
+.vt-pilha {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-16);
+}
+
+.vt-coluna {
+  flex-direction: column;
+  gap: var(--sp-12);
+  min-width: 0;
+}
+
+/* Fundo dentro do quadro, para mostrar a camada "bloco sobre fundo" */
+.vt-fundo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--entre-blocos);
+  padding: var(--sp-12);
+  border-radius: var(--r-bloco);
+  background: var(--page);
+}
+
+.vt-foco-demo .ds-botao {
+  outline: var(--foco-largura) solid var(--foco-cor);
+  outline-offset: var(--foco-afastado);
+}
+
+.vt-celula {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-8);
+}
+
+.vt-estrutura {
+  display: flex;
+  min-height: var(--w-painel);
+  border-radius: var(--r-bloco);
+  background: var(--page);
+  overflow: hidden;
+  gap: var(--borda);
+}
+
+.vt-coluna--inicio {
+  align-items: flex-start;
+}
+
+.vt-celular {
+  overflow: hidden;
+  border-radius: var(--r-bloco);
+  background: var(--page);
+}
+
+/* Tokens */
+.vt-grade-cores,
+.vt-grade-formas,
+.vt-lista-tokens {
+  display: grid;
+  gap: var(--sp-12);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.vt-grade-cores {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--w-titulo-barra)), 1fr));
+}
+
+.vt-grade-formas {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--w-submenu)), 1fr));
+}
+
+.vt-cor,
+.vt-forma,
+.vt-espaco {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-12);
+  font-size: var(--fs-13);
+}
+
+.vt-cor__amostra {
+  flex: none;
+  width: var(--d-bolinha);
+  height: var(--d-bolinha);
+  border: var(--borda) solid var(--line);
+  border-radius: var(--r-inicial);
+}
+
+.vt-cor__nome {
+  flex: 1;
+}
+
+.vt-valor {
+  color: var(--ink2);
+}
+
+.vt-cor--page { background: var(--page); }
+.vt-cor--card { background: var(--card); }
+.vt-cor--btn { background: var(--btn); }
+.vt-cor--track { background: var(--track); }
+.vt-cor--line { background: var(--line); }
+.vt-cor--ink { background: var(--ink); }
+.vt-cor--ink2 { background: var(--ink2); }
+.vt-cor--ink3 { background: var(--ink3); }
+.vt-cor--field { background: var(--field); }
+.vt-cor--id { background: var(--id); }
+.vt-cor--brand { background: var(--brand); }
+.vt-cor--warn { background: var(--warn); }
+.vt-cor--warnSoft { background: var(--warnSoft); }
+.vt-cor--ok { background: var(--ok); }
+.vt-cor--okInk { background: var(--okInk); }
+.vt-cor--okSoft { background: var(--okSoft); }
+.vt-cor--danger { background: var(--danger); }
+.vt-cor--dangerSoft { background: var(--dangerSoft); }
+.vt-cor--c1 { background: var(--c1); }
+.vt-cor--c2 { background: var(--c2); }
+.vt-cor--c3 { background: var(--c3); }
+.vt-cor--c4 { background: var(--c4); }
+.vt-cor--pillSoft { background: var(--pillSoft); }
+.vt-cor--warnInk { background: var(--warnInk); }
+.vt-cor--selRing { background: var(--selRing); }
+
+.vt-texto {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--sp-12);
+}
+
+.vt-texto--forte > span:first-child { font-weight: var(--fw-forte); }
+.vt-texto--fs-20 > span:first-child { font-size: var(--fs-20); }
+.vt-texto--fs-18 > span:first-child { font-size: var(--fs-18); }
+.vt-texto--fs-16 > span:first-child { font-size: var(--fs-16); }
+.vt-texto--fs-15 > span:first-child { font-size: var(--fs-15); }
+.vt-texto--fs-14 > span:first-child { font-size: var(--fs-14); }
+.vt-texto--fs-13 > span:first-child { font-size: var(--fs-13); }
+.vt-texto--fs-12 > span:first-child { font-size: var(--fs-12); }
+.vt-texto--fs-11 > span:first-child { font-size: var(--fs-11); }
+
+.vt-espaco__barra {
+  height: var(--sp-12);
+  background: var(--ink3);
+}
+
+.vt-espaco--sp-4 { width: var(--sp-4); }
+.vt-espaco--sp-8 { width: var(--sp-8); }
+.vt-espaco--sp-12 { width: var(--sp-12); }
+.vt-espaco--sp-16 { width: var(--sp-16); }
+.vt-espaco--sp-20 { width: var(--sp-20); }
+.vt-espaco--sp-24 { width: var(--sp-24); }
+.vt-espaco--sp-32 { width: var(--sp-32); }
+
+.vt-forma__amostra {
+  flex: none;
+  width: var(--d-agendar);
+  height: var(--d-bolinha);
+  border: var(--borda) solid var(--field);
+  background: var(--card);
+}
+
+.vt-raio--r-pilula { border-radius: var(--r-pilula); }
+.vt-raio--r-bloco { border-radius: var(--r-bloco); }
+.vt-raio--r-campo-multi { border-radius: var(--r-campo-multi); }
+.vt-raio--r-menu-recolhido { border-radius: var(--r-menu-recolhido); }
+.vt-raio--r-janelinha { border-radius: var(--r-janelinha); }
+.vt-raio--r-folha { border-radius: var(--r-folha) var(--r-folha) 0 0; }
+.vt-raio--r-inicial { border-radius: var(--r-inicial); }
+.vt-raio--r-caixinha { border-radius: var(--r-caixinha); }
+.vt-raio--r-contador { border-radius: var(--r-contador); }
+
+.vt-sombra--sombra-flutua { border-color: transparent; border-radius: var(--r-bloco); box-shadow: var(--sombra-flutua); }
+.vt-sombra--sombra-escolhido { border-color: transparent; border-radius: var(--r-pilula); box-shadow: var(--sombra-escolhido); }
+.vt-sombra--sombra-cabecalho { border-color: transparent; border-radius: 0; box-shadow: var(--sombra-cabecalho); }

@@ -1,0 +1,56 @@
+/* Estados de tela (RC-17; DESIGN.md §8). Só var(--...). */
+.ds-estado {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-8);
+  padding: var(--sp-24) var(--sp-16);
+  text-align: center;
+}
+
+.ds-estado__icone {
+  display: grid;
+  place-items: center;
+  width: var(--d-bolinha);
+  height: var(--d-bolinha);
+  border-radius: var(--r-pilula);
+  background: var(--btn);
+  color: var(--ink2);
+}
+
+.ds-estado__icone--erro {
+  background: var(--dangerSoft);
+  color: var(--danger);
+}
+
+.ds-estado__titulo {
+  font-size: var(--fs-16);
+  font-weight: var(--fw-forte);
+}
+
+.ds-estado__frase {
+  margin-bottom: var(--sp-8);
+  font-size: var(--fs-13);
+  color: var(--ink2);
+}
+
+.ds-carregando {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-12);
+  padding: var(--sp-16);
+}
+
+.ds-carregando__linha {
+  height: var(--sp-12);
+  border-radius: var(--r-pilula);
+  background: var(--btn);
+}
+
+.ds-carregando__linha:nth-child(2) {
+  width: 80%;
+}
+
+.ds-carregando__linha:nth-child(3) {
+  width: 60%;
+}
