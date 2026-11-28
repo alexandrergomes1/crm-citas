@@ -272,6 +272,59 @@ test('POST nativo em /entrar (se o botão fosse forçado): a página volta como 
   expect((await context.cookies()).filter((k) => k.name.startsWith('__Host-sessao'))).toEqual([])
 })
 
+test('pedido forjado de outro site à ação Entrar é recusado; da mesma origem é aceito (RF-10, ASVS V4.2.2)', async ({
+  page,
+  playwright,
+  baseURL,
+}, info) => {
+  const c = conta(info, 'um')
+  // O pedido de verdade da ação Entrar (endereço, cabeçalhos e corpo), parado antes de chegar ao servidor
+  let capturado: Request | undefined
+  await page.route(SERVIDOR, async (rota) => {
+    if (rota.request().method() !== 'POST') return rota.fallback()
+    capturado = rota.request()
+    await rota.abort()
+  })
+  await page.goto('/entrar')
+  await preencherEntrar(page, c)
+  await expect.poll(() => capturado).toBeDefined()
+  const pedido = capturado!
+  await page.unroute(SERVIDOR)
+
+  // Repetido fora do navegador, com a origem de cada caso (o resto dos cabeçalhos e o corpo iguais)
+  const fora = ['origin', 'referer', 'cookie', 'host', 'content-length']
+  const cabecalhos = Object.fromEntries(
+    Object.entries(await pedido.allHeaders()).filter(([k]) => !fora.includes(k) && !k.startsWith('sec-fetch-') && !k.startsWith(':')),
+  )
+  const corpo = pedido.postDataBuffer() ?? undefined
+  const origem = new URL(baseURL!).origin
+  const enviar = async (extra: Record<string, string>) => {
+    const r = await playwright.request.newContext()
+    const resposta = await r.post(pedido.url(), { headers: { ...cabecalhos, ...extra }, data: corpo, maxRedirects: 0 })
+    const resultado = {
+      status: resposta.status(),
+      sessao: resposta.headersArray().some((h) => h.name.toLowerCase() === 'set-cookie' && h.value.startsWith('__Host-sessao')),
+    }
+    await r.dispose()
+    return resultado
+  }
+
+  // Outro site: Origin de fora, o que o navegador marca como cross-site, ou nenhuma prova de origem → 403, sem sessão
+  const forjados: Record<string, string>[] = [
+    { origin: 'https://site-de-fora.example' },
+    { 'sec-fetch-site': 'cross-site', origin: 'https://site-de-fora.example' },
+    { 'sec-fetch-site': 'same-site' },
+    { referer: 'https://site-de-fora.example/pagina' },
+    {},
+  ]
+  for (const extra of forjados) {
+    expect(await enviar(extra), JSON.stringify(extra)).toEqual({ status: 403, sessao: false })
+  }
+  // A mesma origem do app: a ação roda e a entrada dá certo
+  expect(await enviar({ origin: origem })).toEqual({ status: 200, sessao: true })
+  expect(await enviar({ 'sec-fetch-site': 'same-origin' })).toEqual({ status: 200, sessao: true })
+})
+
 // CA-20: antes de escolher o estúdio, vale o idioma do navegador (spec RF-34)
 for (const [locale, idioma, titulo, rotulo] of [
   ['es-ES', 'es', 'Entrar', 'Correo electrónico'],
