@@ -174,7 +174,18 @@ describe('executar · modo estudio · ordem das portas (CA-07)', () => {
     const { conexao, passos } = conexaoFalsa({ contexto: new ErroDoBanco('sem_login') })
     const resposta = await executar(definicao({}, passos), pedido(corpoCerto), infraFalsa(conexao))
     expect(resposta.resultado).toEqual({ ok: false, codigo: 'sem_login' })
-    expect(passos).toEqual(['quemE', 'contexto', 'sairLocal'])
+    expect(passos).toEqual(['quemE', 'contexto', 'encerrar', 'sairLocal'])
+  })
+
+  it('sessão vencida: encerrarSessao falha → ainda sem_login e signOut local (plan.md §3.4)', async () => {
+    const { conexao, passos } = conexaoFalsa({ contexto: new ErroDoBanco('sem_login') })
+    vi.mocked(conexao.encerrarSessao).mockImplementationOnce(async () => {
+      passos.push('encerrar')
+      throw new ErroDoBanco('erro_interno')
+    })
+    const resposta = await executar(definicao({}, passos), pedido(corpoCerto), infraFalsa(conexao))
+    expect(resposta.resultado).toEqual({ ok: false, codigo: 'sem_login' })
+    expect(passos).toEqual(['quemE', 'contexto', 'encerrar', 'sairLocal'])
   })
 
   it('porta 2: estúdio trocado em outro aparelho → estudio_trocado, sem trabalho (CA-06)', async () => {
@@ -357,7 +368,7 @@ describe('executar · outros modos', () => {
     )
     const resposta = await executar(def, pedido(undefined, 'GET'), infraFalsa(conexao))
     expect(resposta.resultado.ok).toBe(true)
-    expect(passos).toEqual(['quemE', 'contexto', 'sairLocal', 'trabalho'])
+    expect(passos).toEqual(['quemE', 'contexto', 'encerrar', 'sairLocal', 'trabalho'])
   })
 
   it('nenhuma: completa até o tempo mínimo em todo resultado (RF-02)', async () => {

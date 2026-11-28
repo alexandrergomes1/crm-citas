@@ -69,15 +69,16 @@ describe.skipIf(!bancoPronto)('sessao.entrar (integração)', () => {
     expect(codigos[10]).toBe('limite')
   }, 60_000)
 
-  it('CA-18a: senha de 64 caracteres entra; a de 200 passa da porta 4 sem cortar', async () => {
+  it('CA-18a: senha de 64 caracteres entra; a de 128 passa da porta 4 sem cortar', async () => {
     const senha64 = 'a1-'.repeat(21) + 'xy'
     const email = emailFicticio('senha-64')
     await vincular(orgA, await criarPessoa(email, senha64), 'recepcao')
     expect((await new Navegador().chamar(def('sessao.entrar'), { dados: { email, senha: senha64 } })).resultado.ok).toBe(true)
 
-    // O Auth local recusou criar conta com senha de 200 (provável teto de 72 bytes do bcrypt; não confirmado). A de 200 chega ao Auth
-    // inteira (porta 4 aceita até 1024) e a resposta é a frase única, não entrada_invalida.
-    const r = await new Navegador().chamar(def('sessao.entrar'), { dados: { email, senha: 'ç'.repeat(200) } })
+    // Limite do Supabase Auth: 72 bytes, confirmado em supabase/auth (master) internal/api/password.go
+    // (MaxPasswordLength = 72; conta bytes). A de 128 caracteres (256 bytes) chega ao Auth inteira (porta 4 aceita
+    // até 128) e a resposta é a frase única, não entrada_invalida.
+    const r = await new Navegador().chamar(def('sessao.entrar'), { dados: { email, senha: 'ç'.repeat(128) } })
     expect(r.resultado).toEqual({ ok: false, codigo: 'sem_login' })
   })
 

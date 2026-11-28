@@ -87,8 +87,8 @@ describe('sessao.entrar (plan.md §3.1)', () => {
     expect(passos).toEqual(['conferirTentativa', 'entrarComSenha', 'iniciarSessao', 'meusEstudios', `escolherEstudio(${ORG_A})`])
   })
 
-  it('a senha chega igual, sem cortar (64 e 200 caracteres; CA-18a)', async () => {
-    for (const tamanho of [64, 200]) {
+  it('a senha chega igual, sem cortar (64 e 128 caracteres; CA-18a)', async () => {
+    for (const tamanho of [64, 128]) {
       const senha = `${' '}${'é'.repeat(tamanho - 2)}${' '}`
       const lida = entradaDeEntrar.parse({ email: credenciais.email, senha })
       expect(lida.senha).toBe(senha)
@@ -98,12 +98,12 @@ describe('sessao.entrar (plan.md §3.1)', () => {
     }
   })
 
-  it('entrada estrita: campo a mais, vazio ou senha acima de 1024 → recusada', () => {
+  it('entrada estrita: campo a mais, vazio ou senha acima de 128 → recusada (ASVS V2.1.2)', () => {
     expect(entradaDeEntrar.safeParse({ ...credenciais, lembrar: true }).success).toBe(false)
     expect(entradaDeEntrar.safeParse({ email: '', senha: 'x' }).success).toBe(false)
     expect(entradaDeEntrar.safeParse({ email: 'a@b.c', senha: '' }).success).toBe(false)
-    expect(entradaDeEntrar.safeParse({ email: 'a@b.c', senha: 'x'.repeat(1025) }).success).toBe(false)
-    expect(entradaDeEntrar.safeParse({ email: 'a@b.c', senha: 'x'.repeat(1024) }).success).toBe(true)
+    expect(entradaDeEntrar.safeParse({ email: 'a@b.c', senha: 'x'.repeat(129) }).success).toBe(false)
+    expect(entradaDeEntrar.safeParse({ email: 'a@b.c', senha: 'x'.repeat(128) }).success).toBe(true)
   })
 
   it('com cookie de sessão: encerra a anterior antes (RF-05)', async () => {
@@ -153,14 +153,27 @@ describe('sessao.entrar (plan.md §3.1)', () => {
     expect(passos.slice(-3)).toEqual(['iniciarSessao', 'sairLocal', 'registrarTentativaFalha'])
   })
 
-  it('iniciar_sessao recusa (session_id já visto, amr antigo) → sem_login e signOut', async () => {
-    const { conexao } = conexaoFalsa({
+  it('iniciar_sessao recusa (session_id já visto, amr antigo) → sem_login, signOut e linha de falha (RF-24a, CA-09a)', async () => {
+    const { conexao, passos } = conexaoFalsa({
       iniciarSessao: vi.fn(async () => {
+        passos.push('iniciarSessao')
         throw new ErroDoBanco('sem_login')
       }),
     })
     expect(await motivo(trabalhoDeEntrar(ctxEntrar(conexao), credenciais))).toBe('sem_login')
+    expect(passos.slice(-3)).toEqual(['iniciarSessao', 'sairLocal', 'registrarTentativaFalha'])
+    expect(conexao.registrarTentativaFalha).toHaveBeenCalledTimes(1)
+  })
+
+  it('iniciar_sessao com erro do banco que não é sem_login → erro_interno, sem linha de falha', async () => {
+    const { conexao } = conexaoFalsa({
+      iniciarSessao: vi.fn(async () => {
+        throw new ErroDoBanco('erro_interno')
+      }),
+    })
+    expect(await motivo(trabalhoDeEntrar(ctxEntrar(conexao), credenciais))).toBe('erro_interno')
     expect(conexao.sairLocal).toHaveBeenCalled()
+    expect(conexao.registrarTentativaFalha).not.toHaveBeenCalled()
   })
 
   it('mais de um estúdio, nenhum escolhido → Escolher estúdio', async () => {

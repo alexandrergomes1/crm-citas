@@ -87,8 +87,16 @@ async function lerContexto(conexao: Conexao): Promise<Lido> {
     return { ok: true, contexto: await conexao.contexto() }
   } catch (erro) {
     const codigo = erro instanceof ErroDoBanco ? codigoDe(erro) : 'erro_interno'
-    // Sessão morta, vencida (12 h) ou parada (1 h): encerra no navegador também (plan.md §3.4).
-    if (codigo === 'sem_login') await conexao.sairLocal()
+    // Sessão morta, vencida (12 h) ou parada (1 h): marca encerrada no banco (melhor esforço) e encerra no
+    // navegador também (plan.md §3.4). Erro de encerrarSessao não muda a resposta sem_login.
+    if (codigo === 'sem_login') {
+      try {
+        await conexao.encerrarSessao()
+      } catch {
+        // segue para o signOut local
+      }
+      await conexao.sairLocal()
+    }
     return { ok: false, codigo }
   }
 }

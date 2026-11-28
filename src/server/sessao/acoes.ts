@@ -11,10 +11,10 @@ import { chavesDaTentativa } from './tentativas'
 /** Para onde a tela vai depois de entrar (RF-11). */
 export type DestinoDepoisDeEntrar = 'inicio' | 'escolher_estudio'
 
-// Senha sem cortar nem alterar, até 1024 (RF-32, CA-18a; ASVS V2.1.2); e-mail até 254 (RFC 5321).
+// Senha sem cortar nem alterar, até 128 caracteres (RF-32, CA-18a; ASVS V2.1.2); e-mail até 254 (RFC 5321).
 export const entradaDeEntrar = z.strictObject({
   email: z.string().min(1).max(254),
-  senha: z.string().min(1).max(1024),
+  senha: z.string().min(1).max(128),
 })
 
 /** Fluxo de entrar (plan.md §3.1), sem framework, para o teste de unidade. */
@@ -61,7 +61,12 @@ export async function trabalhoDeEntrar(
     estudios = await conexao.iniciarSessao()
   } catch (erro) {
     await conexao.sairLocal()
-    throw new Recusa(codigoDe(erro) === 'sem_login' ? 'sem_login' : 'erro_interno')
+    if (codigoDe(erro) === 'sem_login') {
+      // session_id já visto ou entrada por senha antiga: conta como falha de entrar (RF-24a, CA-09a).
+      await conexao.registrarTentativaFalha()
+      throw new Recusa('sem_login')
+    }
+    throw new Recusa('erro_interno')
   }
 
   // Sem estúdio ativo: mesma resposta de senha errada, sessão encerrada (RF-11).

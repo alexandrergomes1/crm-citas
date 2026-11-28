@@ -1,9 +1,8 @@
 // Molde único e catálogo (ADR 0018 · D12; CA-17, CA-21). Lê o código de src/ como texto; nada é criado.
 import { readFileSync, readdirSync, statSync } from 'node:fs'
 import { join, relative } from 'node:path'
-import { describe, expect, it } from 'vitest'
+import { beforeAll, describe, expect, it } from 'vitest'
 import { z } from 'zod'
-import * as sessao from '@/server/sessao/acoes'
 import { MODOS_SEM_ESTUDIO, acoesDoCatalogo, conferirDefinicao, registrar } from './catalogo'
 import type { DefinicaoQualquer } from './tipos'
 
@@ -29,18 +28,33 @@ const valida: DefinicaoQualquer = {
   trabalho: async () => null,
 }
 
+// Todo arquivo de src/ que declara ação com acao({ (acao.ts só o cita no comentário do molde). Carregá-los põe as
+// ações no catálogo.
+const comAcao = codigo.filter(({ caminho, texto }) => caminho !== 'server/portas/acao.ts' && texto.includes('acao({'))
+const modulos: Record<string, unknown>[] = []
+
 describe('catálogo (CA-21)', () => {
+  beforeAll(async () => {
+    for (const { caminho } of comAcao) modulos.push((await import(join(RAIZ, caminho))) as Record<string, unknown>)
+  })
+
   it('as ações de sessão estão no catálogo, cada uma no seu modo da lista fechada', () => {
     const noCatalogo = new Map<string, string>(acoesDoCatalogo().map((def) => [def.nome, def.sessao]))
     for (const [nome, modo] of Object.entries(MODOS_SEM_ESTUDIO)) expect(noCatalogo.get(nome)).toBe(modo)
   })
 
-  it('cada ação exportada usa o construtor do seu método', () => {
-    const exportadas = Object.values(sessao).filter(
-      (valor): valor is typeof valor & { method: string; definicaoDaAcao: DefinicaoQualquer } =>
-        typeof valor === 'function' && 'definicaoDaAcao' in valor,
-    )
-    expect(exportadas).toHaveLength(Object.keys(MODOS_SEM_ESTUDIO).length)
+  it('cada ação exportada usa o construtor do seu método (todo arquivo de src/ com acao({)', () => {
+    expect(modulos.length).toBeGreaterThan(0)
+    const exportadas: { method: string; definicaoDaAcao: DefinicaoQualquer }[] = []
+    for (const modulo of modulos) {
+      for (const valor of Object.values(modulo)) {
+        if (typeof valor === 'function' && 'definicaoDaAcao' in valor && 'method' in valor) {
+          exportadas.push(valor as unknown as { method: string; definicaoDaAcao: DefinicaoQualquer })
+        }
+      }
+    }
+    const declaradas = comAcao.reduce((total, { texto }) => total + (texto.match(/\bacao\(\{/g)?.length ?? 0), 0)
+    expect(exportadas).toHaveLength(declaradas)
     for (const fn of exportadas) expect(fn.method).toBe(fn.definicaoDaAcao.metodo)
   })
 
@@ -48,11 +62,23 @@ describe('catálogo (CA-21)', () => {
     expect(conferirDefinicao(valida)).toBeNull()
   })
 
+  it('GET passa só em opcional/pessoa com strictObject({}) vazio', () => {
+    const get = { ...valida, permissao: 'qualquer', metodo: 'GET', grava: false, entrada: z.strictObject({}) } as const
+    expect(conferirDefinicao({ ...get, nome: 'sessao.ler', sessao: 'opcional' } as DefinicaoQualquer)).toBeNull()
+    expect(conferirDefinicao({ ...get, nome: 'estudio.listar', sessao: 'pessoa' } as DefinicaoQualquer)).toBeNull()
+  })
+
   it.each<[string, Partial<DefinicaoQualquer>]>([
     ['nome sem ponto', { nome: 'criar' as DefinicaoQualquer['nome'] }],
     ['nome com maiúscula', { nome: 'Agenda.criar' }],
     ['nome longo demais', { nome: `a.${'b'.repeat(70)}` as DefinicaoQualquer['nome'] }],
     ['grava por GET', { metodo: 'GET' }],
+    ['GET no modo estudio, mesmo sem gravar', { metodo: 'GET', grava: false }],
+    ['GET no modo nenhuma', { nome: 'sessao.entrar', sessao: 'nenhuma', permissao: 'qualquer', metodo: 'GET', grava: false }],
+    ['GET com campo na entrada', { nome: 'estudio.listar', sessao: 'pessoa', permissao: 'qualquer', metodo: 'GET', grava: false, entrada: z.strictObject({ q: z.string() }) }],
+    ['GET com entrada não estrita', { nome: 'estudio.listar', sessao: 'pessoa', permissao: 'qualquer', metodo: 'GET', grava: false, entrada: z.object({}) }],
+    ['GET com entrada solta', { nome: 'sessao.ler', sessao: 'opcional', permissao: 'qualquer', metodo: 'GET', grava: false, entrada: z.looseObject({}) }],
+    ['GET com entrada que não é objeto', { nome: 'sessao.ler', sessao: 'opcional', permissao: 'qualquer', metodo: 'GET', grava: false, entrada: z.string() }],
     ['modo sem estúdio fora da lista', { sessao: 'pessoa' }],
     ['modo nenhuma fora da lista', { sessao: 'nenhuma' }],
     ['ação da lista no modo estudio', { nome: 'sessao.sair' }],
