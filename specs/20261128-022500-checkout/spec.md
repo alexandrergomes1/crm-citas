@@ -4,7 +4,8 @@
 - **Aprovação do dono:** (pendente)
 - **Aprovação do merge:** (pendente)
 - **Item da fila:** 5 (`docs/BACKLOG.md`), módulo Checkout do núcleo (E3·2), em paralelo por ordem do dono (E22·B)
-- **Branch:** `feat/checkout` (a partir da `previas`), construção em PR de rascunho; nada é juntado sem o dono (E22·B)
+- **Branch:** `feat/checkout` (a partir da `previas`), empilhada por merge sobre `feat/agendamento` e `feat/caixa` (e as
+  bases delas), decisão do Engenheiro de DevOps; construção em PR de rascunho; nada é juntado sem o dono (E22·B)
 - **Tipo:** Tela, com Banco e Código, e **dinheiro** (`docs/guias/processo-sdd.md` §3) · **Revisores:** Revisor de
   design, Engenheiro de dados (quem não fez), Auditor de risco e Engenheiro de segurança (dinheiro e acesso),
   Revisor de código e QA
@@ -73,7 +74,7 @@ avançar de Revisar para Pagar; os nomes das formas de pagamento.
 |---|---|---|
 | RF-01 | Abrir o checkout de um agendamento nos status Chegou, Iniciado ou Concluído; nunca em Reservado, Confirmado, Ausência ou Cancelado. | Assumption 1 |
 | RF-02 | Os itens começam com os serviços do agendamento; pode-se tirar um item ou adicionar outro serviço **ativo** do Catálogo. Mudar itens do checkout não muda o agendamento. | candidata; Assumption 2 |
-| RF-03 | O preço de cada item é o do Catálogo no momento do pagamento e **não se edita nesta spec** (desconto e ajuste: spec seguinte, §12). O servidor busca o preço no Catálogo e ignora preço ou total vindos da tela. | divisão (§12); ASVS V11.1 (lógica de negócio no servidor) |
+| RF-03 | O preço de cada item é o do Catálogo no momento do pagamento (serviço arquivado conforme a E31·3) e **não se edita nesta spec** (desconto e ajuste: spec seguinte, §12). O servidor busca o preço no Catálogo e ignora preço ou total vindos da tela. | divisão (§12); ASVS V11.1 (lógica de negócio no servidor) |
 | RF-04 | Cada item guarda cópia do nome e do preço do momento do pagamento; mudar o Catálogo depois não muda checkout pago. | princípio contábil do registro histórico |
 | RF-05 | **Total** = soma dos preços dos itens (cada preço de 0 a 100.000,00, pela spec do Catálogo, E30·2). Total zero e teto por conta seguem a **E31·3**. | E31·3; spec do Catálogo (E30·2) |
 | RF-06 | **Pagar:** com total maior que zero, uma ou mais linhas (até 5, limite de tela), cada uma com forma (lista da **E31·1**) e valor maior que zero, e a soma das linhas é **igual** ao total, nem mais nem menos. Com total zero (se a E31·3 permitir), a etapa Pagar não tem linhas: a conta fecha sem pagamento e o checkout fica **Sem valor**. | candidata; RN-03; E31·3 |
@@ -164,6 +165,8 @@ Lido só para entender (E22·B, nada copiado): `crm-agenda/supabase/migrations/`
 | CA-16 | Revisores do tipo (incluindo Auditor de risco e Engenheiro de segurança) sem "Bloqueia", veredito do QA e conferência do dono na prévia. | relatórios no PR |
 
 ## 9. Dependências
+- **Spec "Entrar e camada de serviço"** (E36·A do dono, 28/11/2026: "E36a"; branch `feat/entrar-servico`): login,
+  sessão e as 6 portas que fechar a conta usa.
 - **Item 2** (CI, app vazio) · **item 3** (estúdio, papéis, função de checagem, molde do teste) · **item 4** (design
   system no código).
 - **Agendamento:** status (RF-01), painel e botão "Checkout"; serviços do agendamento.
@@ -197,6 +200,10 @@ Lido só para entender (E22·B, nada copiado): `crm-agenda/supabase/migrations/`
   "Concluído, sem valor"; sem teto por conta, vale só o limite por serviço do Catálogo.
 - **E31·3·B:** como A, e um teto fixo por conta, nunca menor que 100.000,00 (o maior preço do Catálogo); acima, recusa.
 - **E31·3·C:** total zero não é permitido; avaliação gratuita não passa pelo Checkout; sem teto por conta.
+- **Nas três opções, serviço arquivado:** agendamento antigo com serviço que depois foi arquivado no Catálogo
+  **(i)** cobra-se o preço do serviço guardado no Catálogo (o arquivado não perde o preço; o Agendamento não copia
+  preço) — **recomendado**, para não travar a conta de quem já foi atendida; ou **(ii)** não deixa fechar até trocar o
+  item por um serviço ativo. Responda junto: ex. "E31·3·A·i".
 - **Recomendo A:** a avaliação gratuita fica registrada como atendida sem inventar pagamento, e o limite do Catálogo
   já barra valor absurdo por serviço (ASVS V5.1.4, limites de entrada). Se o dono escolher E30·2·C (preço > 0), a
   E31·3 perde o caso zero. Desfaz-se mudando a regra; nada gravado se perde.

@@ -6,12 +6,13 @@
 - Só os arquivos do `plan.md` §8. Quem constrói não revisa. Antes de enviar: `pnpm typecheck`, `pnpm lint`, `pnpm test`,
   `pnpm db:test` (banco **local**). A IA nunca aplica no banco remoto nem publica.
 - Construção em PR de rascunho pode começar antes da aprovação (E22·B); o pedido de merge só com "Status: Approved", as
-  respostas E31·1 a E31·3 gravadas e o Caixa e o Agendamento já na `previas`.
+  respostas E31·1 a E31·3 e **E24·3** gravadas (até a E24·3, vale a recusa provisória, mostrada ao dono no pedido) e o Caixa e o Agendamento já na `previas`.
 
 ## Preparo
 | # | Tarefa | Papel | Pronto quando |
 |---|---|---|---|
-| T0 | Conferir E31·1–E31·3, E24·3 e as lacunas L-2 a L-6; se outra que não a recomendação, aplicar o §11 do plano (ou parar e voltar à 5b) | Gerente de projeto | respostas citadas no PR |
+| T0a | Conferir que as respostas E31·1–E31·3, E24·3 e das lacunas L-2, L-4 e L-6 estão gravadas (só confere) | Gerente de projeto | respostas citadas no PR |
+| T0b | Resposta diferente da recomendação: aplicar o §11 do plano, ou parar e voltar à 5b onde ele manda | Arquiteto de software | plano ajustado, ou parada relatada |
 | T1 | Branch empilhada: merge de `feat/agendamento` e `feat/caixa` (nesta ordem); PR de rascunho | Engenheiro de DevOps | CI roda na pilha; ADR 0017 presente; nada juntado numa base |
 | T2 | **Ficha visual antes das telas** (etapa 6): Revisar, Pagar, Concluído (e "sem valor"), Ver checkout, botão no painel, em 390 e 1440; nomes que faltam no `DESIGN.md` §6 (avançar; formas) | Designer de produto; confere o Revisor de design; aprova o dono | ficha aprovada; linhas do `DESIGN.md` gravadas |
 
@@ -27,7 +28,7 @@
 |---|---|---|
 | T6 | `src/domain/checkout/*` e testes (plano §5.2) | CA-01, CA-02, CA-04 em unidade verdes |
 | T7 | `src/data/checkout/*` e a **troca dos 3 encaixes** (`src/data/agendamento/checkout.ts`, `src/data/caixa/entradas-por-forma.ts`, `src/data/caixa/atendimentos-sem-checkout.ts`) | consultas conferidas pelo Engenheiro de dados; testes do Agendamento e do Caixa continuam verdes |
-| T8 | `src/server/checkout/*` e testes (plano §5.3); `consultas.ts` do Agendamento e de Clientes só se L-5 mandar | CA-03, CA-05, CA-10, CA-11 no servidor verdes; idas ≤ teto (§6) |
+| T8 | `src/server/checkout/*` e testes (plano §5.3); `src/server/agendamento/consultas.ts` e `src/server/clientes/consultas.ts`, só leitura (ADR 0017 · D11), conferidos pelo Engenheiro de software de cada módulo | CA-03, CA-05, CA-10, CA-11 no servidor verdes; idas ≤ teto (§6) |
 | T9 | Telas, rota, botão do painel e bloco `checkout` dos idiomas (plano §5.5), **só depois da T2** | `checkout.test.tsx` verde |
 | T10 | e2e (plano §7) nos projetos 390 e 1440 | verdes |
 

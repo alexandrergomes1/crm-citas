@@ -8,7 +8,8 @@
   Caixa; mora na `feat/caixa` e chega aqui pelo merge, §9). **Decisões por tabela do antigo:**
   `docs/adr/0015-checkout-tabelas-do-antigo.md`, escrito pelo Engenheiro de dados na T3 (não aqui).
 - **Portão:** construção em PR de rascunho pode começar antes da aprovação (E22·B); o pedido de merge só com a spec
-  "Status: Approved" e as respostas E31 gravadas.
+  "Status: Approved" e as respostas E31 e **E24·3** (moeda do estúdio, item 3) gravadas. Até a resposta da E24·3 vale a
+  **recusa provisória** (falha fechada, L-4), e o pedido de merge a mostra ao dono.
 - **Dependência fixada pelo dono (E36·A):** login, sessão, as 6 portas, a transação por ação e o registro (porta 6) vêm
   da spec "Entrar e camada de serviço" (`feat/entrar-servico`). O Checkout **usa**, não constrói.
 - **Bases lidas em 28/11/2026 (só leitura, nada editado lá):** item 3 (`/home/user/wt-banco`: ADR 0005, as 4
@@ -33,7 +34,7 @@ src/app/paginas/checkout/* (Revisar · Pagar · Concluído · Ver checkout)    U
    ▼
 src/server/checkout/fechar.ts ── 6 portas da E36·A, uma transação por ação
    ├─► src/domain/checkout/* (status permitido, total, soma, formas, acesso, registro, resumo)
-   ├─► src/server/catalogo/consultas.ts (preços atuais) · consulta do Agendamento (status, serviços) · Clientes (nome, só na tela)
+   ├─► src/server/catalogo/consultas.ts (preços atuais) · src/server/agendamento/consultas.ts · src/server/clientes/consultas.ts (só leitura, ADR 0017 · D11)
    ▼  com a sessão da pessoa
 src/data/checkout/* ──► public.checkouts · public.checkout_itens · public.checkout_pagamentos   (RLS)
                         gatilhos: preço e nome copiados do Catálogo, total conferido no fim, imutável, RF-17
@@ -46,15 +47,17 @@ src/data/checkout/* ──► public.checkouts · public.checkout_itens · publi
   é ativo. **Recomendo:** o que já estava no agendamento pode ser cobrado mesmo arquivado (pelo preço atual do
   Catálogo); só o adicionado precisa estar ativo. Na outra opção, a conta de um agendamento com serviço arquivado não
   fecha sem tirá-lo.
-- **L-3 · Quantos itens por conta.** A spec limita 5 linhas de pagamento, mas não os itens. **Recomendo** 20 (o
-  Agendamento aceita 10 e "Adicionar" soma alguns; limite de entrada, ASVS V11.1.4). Texto de tela: confirmar.
+- **L-3 · (fechada pela 5b):** até 20 itens por conta e teto técnico de 9 007 199 254 740 991 centavos são decisões
+  técnicas (ASVS V11.1.4), no ADR 0017 · D10 e D5.
 - **L-4 · Moeda do estúdio que muda (E24·3 em aberto; dinheiro).** O preço do Catálogo é lido como centavos da moeda
   **atual** do estúdio, e o checkout guarda essa moeda (RF-15). Se a dona trocar a moeda, preços antigos mudam de
-  sentido (Catálogo L-3), e o caixa aberto recusa pagamento na moeda nova (Caixa L-2). Decisão do dono pela E24·3.
-- **L-5 · Leituras de outros módulos.** O Checkout precisa ler, pelo servidor do outro módulo (ADR 0010 · D5), o status
-  e os serviços do agendamento e o nome da cliente para o resumo. O plano do Agendamento não tem uma consulta para outros
-  módulos (só `verAgendamento`, que é ação com portas) e o de Clientes não foi conferido para isso. **Recomendo** que
-  os dois planos ganhem `consultas.ts` (como o do Catálogo); senão, este plano os cria (lista §8, condicional).
+  sentido (Catálogo L-3), e o caixa aberto recusa pagamento na moeda nova (Caixa L-2). Decisão do dono pela E24·3, que
+  é **portão do pedido de merge**. Até a resposta vale a **recusa provisória** (falha fechada): o banco recusa pagamento
+  em moeda diferente da do caixa aberto; o pedido de merge mostra isso ao dono.
+- **L-5 · (fechada pela 5b):** leituras de outros módulos pelo servidor, só leitura (ADR 0017 · D11). Este plano cria
+  `src/server/agendamento/consultas.ts`, que lê só "ler um por id" de `src/data/agendamento/agendamentos.ts`
+  (Agendamento: status, serviços, `cliente_id`), e `src/server/clientes/consultas.ts`, que lê só
+  `src/data/clientes/repositorio.ts` (Clientes: nome, só para a tela). Nenhum dos dois grava ou registra.
 - **L-6 · Profissional e "Ver checkout".** Com E31·2·A, a profissional não fecha nem vê o checkout; no painel dela o
   botão não aparece. Confirmar no texto da E31·2 que "ver" vai junto.
 - **L-7 (só texto):** o cabeçalho diz "Branch: `feat/checkout` (a partir da `previas`)"; a branch é empilhada (§9).
@@ -106,7 +109,7 @@ versão das políticas e restrições; nada de chave de liga e desliga.
 - **Um fechado por agendamento (RF-08, ADR 0017 · D4):** `create unique index checkouts_um_fechado on public.checkouts (org_id, agendamento_id) where estado in ('pago','sem_valor')`.
 - Índices: o do índice parcial serve à leitura por agendamento; `(org_id, fechado_em desc)`.
 
-**`public.checkout_itens`:** `org_id`, `checkout_id`, `ordem smallint not null check (ordem between 1 and 20)` (L-3),
+**`public.checkout_itens`:** `org_id`, `checkout_id`, `ordem smallint not null check (ordem between 1 and 20)` (ADR 0017 · D10),
 `servico_id uuid not null`, `nome text not null`, `preco_centavos integer not null check (preco_centavos between 0 and
 10000000)`; `primary key (org_id, checkout_id, ordem)`; `(org_id, checkout_id) → checkouts (org_id, id) on delete
 restrict`; `(org_id, servico_id) → public.servicos (org_id, id) on delete restrict` (ADR 0012 · D3: serviço cobrado não se
@@ -181,7 +184,7 @@ recusada; os 7 status; resumo igual para o mesmo conteúdo e diferente para outr
 | Arquivo | O que tem |
 |---|---|
 | `esquemas.ts` | abrir e ver (`agendamentoId` uuid); fechar (`chave` uuid, `agendamentoId`, `servicoIds` 1 a 20 uuid, `pagamentos` 0 a 5 de `{forma, valor inteiro}`). **Sem preço, total, caixa, moeda ou estúdio**; chave desconhecida descartada |
-| `ler.ts` | `abrirCheckout` (status e serviços do agendamento, preços **atuais** pelo `servicosParaCobrar` do Catálogo, nome da cliente só para a tela, se já tem checkout); `verCheckout` (resumo gravado) |
+| `ler.ts` | `abrirCheckout` (status e serviços do agendamento por `agendamentoParaCobrar`, nome da cliente por `nomeParaResumo`, preços **atuais** pelo `servicosParaCobrar` do Catálogo, se já tem checkout); `verCheckout` (resumo gravado) |
 | `fechar.ts` | `fecharCheckout`: relê agendamento e preços; calcula total e confere pelo domínio; resumo SHA-256 (Web Crypto); grava checkout, itens e pagamentos na transação. Erros: `23505` na chave → mesmo resumo devolve o existente, outro → `conflito`; `23505` no índice parcial → `ja_tem_checkout`; soma → `soma_diferente`; dinheiro sem caixa → `abra_o_caixa`; status → `status_nao_permite`. Registro `checkout.fechado` (detalhes do `registro.ts`) |
 | `*.test.ts` (2) | banco falso: estúdio, preço, total e caixa do pedido ignorados (CA-03); papel × ação (CA-10); mesma chave e mesmo conteúdo → mesmo resultado, outro → `conflito` (CA-05 no servidor); registro sem nome de cliente nem texto (marcador fictício, CA-11); idas ≤ teto (§6) |
 
@@ -209,7 +212,7 @@ recusada; os 7 status; resumo igual para o mesmo conteúdo e diferente para outr
   nomes das formas e o texto de cada código de erro. Os nomes que faltam no `DESIGN.md` §6 entram pela ficha.
 
 ## 6. Tetos
-- Itens por conta: 20 (L-3); linhas de pagamento: 5; lista de serviços para "Adicionar": 50 por página (Catálogo).
+- Itens por conta: 20 (ADR 0017 · D10); linhas de pagamento: 5; lista de serviços para "Adicionar": 50 por página (Catálogo).
 - Idas ao banco: abrir ≤ 3 (agendamento e itens, preços, checkout existente); fechar ≤ 4 (agendamento, preços,
   transação, registro); ver ≤ 2.
 
@@ -233,8 +236,9 @@ Fora desta lista nada muda (`AGENTS.md` §6). Arquivo que uma ferramenta crie fo
 `{regras,valores,acesso,registro,resumo}.test.ts`.
 
 **Servidor:** `src/server/checkout/{esquemas,ler,fechar}.ts` e `{ler,fechar}.test.ts` ·
-`src/server/agendamento/consultas.ts` e `src/server/clientes/consultas.ts` (só se os planos de lá não os trouxerem, L-5;
-só leitura, para outros módulos).
+`src/server/agendamento/consultas.ts` (lê só `src/data/agendamento/agendamentos.ts`) e `src/server/clientes/consultas.ts`
+(lê só `src/data/clientes/repositorio.ts`): novos, só leitura pelo servidor (ADR 0017 · D11) · `consultas.test.ts` de cada
+um (não grava, não registra, estúdio do contexto).
 
 **Dados:** `src/data/checkout/{checkouts,exemplo-local}.ts` · `src/data/agendamento/checkout.ts` (troca) ·
 `src/data/caixa/entradas-por-forma.ts` e `src/data/caixa/atendimentos-sem-checkout.ts` (troca).
@@ -256,8 +260,8 @@ das lacunas) (Documentador).
 **Processo:** `specs/20261128-022500-checkout/{spec.md,plan.md,tasks.md}`. O ADR 0017 chega pela `feat/caixa`.
 
 **Intactos:** `src/app/ui/**`, `src/app/estilos/**`, `src/server/portas/**` e o cliente do banco (E36·A),
-`src/domain/{catalogo,caixa,agendamento}/**` (reusados, não alterados), o resto de `src/server/{caixa,catalogo,agendamento}/**`
-e de `src/data/{caixa,agendamento}/**`, as migrations e testes dos itens 2 e 3, da E36·A, do Caixa e dos outros módulos,
+`src/domain/{catalogo,caixa,agendamento}/**` (reusados, não alterados), o resto de `src/server/{caixa,catalogo,agendamento,clientes}/**`
+e de `src/data/{caixa,agendamento,clientes}/**` (inclusive `agendamentos.ts` e `repositorio.ts`, lidos e não alterados), as migrations e testes dos itens 2 e 3, da E36·A, do Caixa e dos outros módulos,
 `supabase/config.jsonc`, `supabase/seed.sql`, `supabase/moldes/**`, `package.json`, `pnpm-lock.yaml` (nenhuma
 dependência nova), `eslint.config.mjs`, `playwright.config.ts`, `.github/**`, `src/*/AGENTS.md`, `src/*/CLAUDE.md`,
 `ARCHITECTURE.md`, `AGENTS.md`, `SECURITY.md`.
