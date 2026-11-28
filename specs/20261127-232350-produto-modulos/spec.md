@@ -6,14 +6,8 @@
   (`docs/decisoes/2026-11-27-fundacao.md`); respostas E21 (§5)
 - **Branch:** `docs/produto-modulos` · **Tipo:** texto (`docs/guias/processo-sdd.md` §3)
 - **Data:** 27/11/2026
-- **Aprovação do dono:** "E21 aprovo
-  E21-1: Módulos, inverta o partes do sistema pelo "depois um por vez". Pois esses do item 2(partes do sistema) é
-  novo e entra depois dos "um por vez".
-  E21-2a
-  E21-3b" · 28/11/2026 · https://claude.ai/code/session_018cV8b9epaQJNqguG5c5Aqb
-- **Aprovação do merge:** "E33 juntar" · 28/11/2026 · https://claude.ai/code/session_018cV8b9epaQJNqguG5c5Aqb ·
-  commit `5b0b552` (PR #2), com a exceção "sem CI" (a branch é anterior à CI), como no E19. Gravado pelo Engenheiro
-  de DevOps.
+- **Aprovação do dono:** "E21 aprovo / E21-1: Módulos, inverta o partes do sistema pelo "depois um por vez". Pois esses do item 2(partes do sistema) é novo e entra depois dos "um por vez". / E21-2a / E21-3b" (as quebras de linha da fala estão como " / ") · 28/11/2026 · https://claude.ai/code/session_018cV8b9epaQJNqguG5c5Aqb
+- **Aprovação do merge:** "E33 juntar" · 28/11/2026 · https://claude.ai/code/session_018cV8b9epaQJNqguG5c5Aqb · commit `5b0b552` (PR #2), com a exceção "sem CI" do E19; juntado depois do PR #4 (E37·A), com a branch atualizada pela `previas` · gravado pelo Engenheiro de DevOps.
 
 ## 1. Pedido literal
 - E20·A: ler o projeto antigo "só para listar os módulos e recursos que você desenhou; não copio nada, ignoro
