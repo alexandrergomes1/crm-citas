@@ -44,8 +44,9 @@ export const ehSegredo = (a) => {
   const antes = ultimo.split(/[*?[]/)[0];
   return antes.startsWith('.') && SEGREDOS.some((n) => n.startsWith(antes));
 };
-// A trava não se desliga sozinha: a IA não grava nas próprias travas nem nas regras de envio.
-export const ehTrava = (a) => /(^|[/\\])\.claude[/\\](settings[^/\\]*\.json$|hooks([/\\]|$))|(^|[/\\])\.githooks([/\\]|$)/.test(String(a));
+// A trava não se desliga sozinha: a IA não grava nas próprias travas nem nas regras de envio. Inclui o
+// .specify/extensions.yml, porque as skills do Spec Kit executam os comandos "obrigatórios" dele.
+export const ehTrava = (a) => /(^|[/\\])\.claude[/\\](settings[^/\\]*\.json$|hooks([/\\]|$))|(^|[/\\])\.githooks([/\\]|$)|(^|[/\\])\.specify[/\\]extensions\.ya?ml$/.test(String(a));
 const WORKFLOW = /(^|[\\/])\.github[\\/]workflows[\\/]/;
 const relWorkflow = (f) => { const n = String(f).replace(/\\/g, '/'); return n.slice(n.indexOf('.github/workflows/')); };
 

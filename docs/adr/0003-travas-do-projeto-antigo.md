@@ -50,6 +50,9 @@ código confere (CA12).
 | S4 | Registro: o Engenheiro de dados mudou o `project_id` do `supabase/config.jsonc` para `"crm-citas"` | Nome fixo do projeto local, igual em toda máquina e na CI (não depende do nome da pasta). Decisão dele; registrada aqui a pedido do coordenador |
 | S5 | Cinco jobs com nomes curtos e fixos (`verificar`, `telas`, `banco`, `segredos`, `travas`) | São os nomes de check que o ruleset do D3 vai exigir |
 
+- **Ajuste do Engenheiro de segurança (28/11):** a T1 trata também `.specify/extensions.yml` como trava (a IA não cria nem
+  edita), porque as skills do Spec Kit executam os comandos "obrigatórios" desse arquivo.
+
 ## Limites conhecidos
 - A T1 lê o texto do comando: não pega tudo (variável de shell, curinga, outra forma de gravar arquivo). O gancho
   `pre-push` pode ser pulado com `--no-verify` e só vale onde foi ligado. Sem o ruleset do D3, nada disso impede o merge
