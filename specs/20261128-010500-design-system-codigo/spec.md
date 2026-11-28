@@ -1,6 +1,8 @@
 # Spec · Design system no código
 
-- **Pasta:** `specs/20261128-010500-design-system-codigo/` · **Branch:** `feat/design-system-codigo` (da `previas`)
+- **Pasta:** `specs/20261128-010500-design-system-codigo/` · **Branch:** `feat/design-system-codigo`, empilhada sobre
+  `chore/fundacao-tecnica` (item 2), por merge; PR redirecionado à `previas` quando o item 2 entrar (decisão técnica
+  do Engenheiro de DevOps)
 - **Item da fila:** 4 de `docs/BACKLOG.md` ("Design system no código", fonte `DESIGN.md`)
 - **Tipo:** Tela (`docs/guias/processo-sdd.md` §3 e §4: ficha visual, aprovação da spec, pedido de merge com prévia)
 - **Status:** Draft
@@ -42,6 +44,8 @@ Fonte única: `DESIGN.md`. Valor diferente do `DESIGN.md` é defeito.
 - **RT-3 Tipografia** (`DESIGN.md` §4): fonte Geist; escala 20 forte · 18 forte · 16 forte · 15 · 14 · 13 · 12 · 11
   (mínimo, só barra de baixo, menu recolhido, hora da grade); pesos citados 500 e 600 (§8b). Peso de "forte" e
   altura de linha: ver E25·2.
+- **RT-3b Ícones e troca de desenho:** tamanho, traço e nome Lucide dos ícones de função: ver E25·2. Largura a partir
+  da qual vale o desenho de computador: ver E25·3.
 - **RT-4 Espaços** (§4): 4 · 8 · 12 · 16 · 20 · 24 · 32; margem da tela 16 (celular) e 24 (computador); entre blocos 12.
 - **RT-5 Raios** (§4, §8b): pílula (botão, campo de uma linha, busca, chip, seletor, item de menu aberto, aviso);
   bloco e menu aberto 20; campo de várias linhas 16; item do menu recolhido 16; janelinha 24; folha 28 no topo;
@@ -134,16 +138,21 @@ pelo Designer de produto e conferida pelo Revisor de design antes do dono.
 
 - **E25·1 · Onde a vitrine fica.** A: só em desenvolvimento e na prévia, fora da produção. B: também na produção,
   atrás do login. Desfaz: ligar ou desligar a rota. **Recomendo A** (não expõe página interna aos estúdios).
-- **E25·2 · Peso "forte" e altura de linha** (o `DESIGN.md` não fixa número). A: usar os do canvas aprovado
-  (`docs/design/canvas/v6.css`: forte = 600; altura de linha 1,2 nos títulos e 1,4 no texto) e gravar no
-  `DESIGN.md`. B: o Designer de produto propõe outros valores na ficha. Desfaz: troca de um token.
-  **Recomendo A** (é o que está nas imagens aprovadas).
+- **E25·2 · Medidas que o `DESIGN.md` não fixa: peso "forte", altura de linha e ícones.** A: usar as do canvas
+  aprovado (`docs/design/canvas/v6.css` e `K3Controles.dc.html`): forte = 600; altura de linha 1,2 nos títulos e
+  1,4 no texto; ícones Lucide com traço 1,75 e tamanhos 14, 16, 18, 20 (padrão) e 24; e os nomes Lucide dos ícones
+  de função (✕, ‹, ›, ▾, ⋮, +, funil, sininho, ajuda, painel, lupa, calendário, Ordenar) como no canvas; tudo gravado
+  no `DESIGN.md`. B: o Designer de produto propõe outros valores na ficha. Desfaz: troca de um token ou de um nome.
+  **Recomendo A** (é o que está nas imagens aprovadas; sem isso os botões de função não podem ser construídos).
+- **E25·3 · Largura em que a tela vira a de computador** (o `DESIGN.md` testa 390 e 1440, mas não diz onde troca;
+  ex.: tablet). A: a partir de 840 px, classe "expanded" do Material Design 3 (norma já seguida pelo `DESIGN.md`).
+  B: outra largura escolhida pelo dono. Desfaz: troca de um token. **Recomendo A.**
 
 ## 11. Assumptions (decididas pela norma, à vista na aprovação)
 - Nomes dos tokens de RT-2 a RT-8 (que o `DESIGN.md` não nomeia) são escolha técnica do Arquiteto no plano; cores de
   RT-1 mantêm o nome exato.
 - A fonte Geist é servida pelo próprio app (sem chamar serviço externo a cada visita), com `system-ui` de reserva.
-- Ícones pela biblioteca Lucide (citada no `DESIGN.md` §5), só os ícones nomeados no `DESIGN.md`; versão lida na
+- Ícones pela biblioteca Lucide (citada no `DESIGN.md` §5), só os ícones nomeados no `DESIGN.md` e os de função da E25·2; versão lida na
   documentação oficial no plano.
 - Estrutura (RC-18, RC-19) entra só como peça visual com dados fictícios; rotas e mapa de navegação ficam para as
   specs de módulo.
