@@ -12,8 +12,9 @@
 - **PR #7 rascunho** (`feat/entrar-servico`): spec Approved; P4 feita; matriz de permissões (ADR 0020, S7 e B7).
   Revisões: código, segurança, design, dados e **auditor de risco: liberam com ressalvas**, ressalvas resolvidas
   (último `d91ec4a`). Unidade: 398 verdes. Banco: 11 migrations e 12 arquivos pgTAP verdes (280) num Postgres 16
-  local com papéis e auth simulados (não é o Supabase oficial; a prova final é a CI). Falta: T1–T3 (telas), i18n,
-  `tests/integracao/registro.test.ts`, QA e CI. Não verificado: integração e e2e (precisam do Supabase local).
+  local com papéis e auth simulados (não é o Supabase oficial; a prova final é a CI). T1 e T2 feitas (`e61ad94`: telas
+  Entrar, Escolher estúdio, Sua conta; pt/es/en; 481 testes; build sem servidor em `dist/client`). Falta: T3 (e2e),
+  `tests/integracao/registro.test.ts`, revisões das telas, QA, CI e a conferência do dono na prévia. Não verificado: integração e e2e (precisam do Supabase local).
 - **Avaliação do antigo** (só leitura, nada copiado; E43·A autorizou as ideias): `docs/produto/avaliacao-crm-agenda/`
   `regras-do-banco.md` (74 regras, 2 leituras), `seguranca-do-banco.md` (25) e `permissoes-e-pin.md`. Banco do antigo
   **esgotado** para o núcleo. As ideias entram em cada spec quando a branch dela for trabalhada.
@@ -68,13 +69,18 @@ E29·3 (troca), E31·1 (caixa opcional), E32·1 (aviso de caixa aberto), E40·B,
 | E24–E41 | respostas do relatório de 28/11 e aprovação das 10 specs (detalhe e falas em `docs/decisoes/`) |
 
 ## Pendências técnicas para a próxima conversa
-1. Entrar: T1–T3 (telas) com as notas da ficha (autocomplete, olho sem `aria-pressed`, nenhuma consulta automática
-   renova a sessão); provar na T2 que `acaoPost.handler` importado separa servidor e navegador (`pnpm build`).
-2. Entrar: auditor de risco, revisão de dados (Engenheiro de dados que não fez), QA; CI no PR #7.
+1. **Entrar, antes do pedido de merge:** (a) a bolinha de Sua conta sai sem letra: `sessao.ler` deve devolver a
+   inicial do e-mail (`src/server/sessao/acoes.ts`, `src/data/sessao.ts`); (b) o erro de Escolher estúdio desenha um
+   parágrafo vazio; (c) T3: `e2e/` (o `e2e/inicio.spec.ts` quebra, porque `/` agora vai a Entrar); (d)
+   `tests/integracao/registro.test.ts`; (e) revisões: Revisor de design e Revisor de código nas telas (olhar o botão
+   Sua conta com ARIA posto por código, o menu montado com `ds-menu` e as linhas com `ds-linha`), textos es/en sem
+   revisão; (f) QA e CI do PR #7; (g) prévia para o dono conferir as telas (E23·2·A: spec própria da prévia).
+2. Sem Docker aqui: o banco pode ser testado num Postgres 16 local com papéis e auth simulados (`/var/tmp/pgscratch`,
+   porta 54329: stub de `anon`, `authenticated`, `service_role`, `auth.uid()`, `auth.jwt()`, `auth.users`, pgcrypto,
+   btree_gist e pgtap no esquema `extensions`). Não substitui o `pnpm db:test`.
 3. Achado do Engenheiro de dados: pessoa em dois estúdios pode ser marcada no mesmo horário nos dois (Analista).
-4. DevOps: nome da variável `SUPABASE_CHAVE_ADMIN_LOCAL` na CI. `prettier --check` acusa 17 arquivos (não é check
-   exigido; conferir).
-5. Avisos já dados: R-13, R-3. Chave de servidor e de assinatura no banco online só com autorização de publicação.
+4. DevOps: nome da variável `SUPABASE_CHAVE_ADMIN_LOCAL` na CI; `prettier --check` acusa 17 arquivos.
+5. Avisos já dados: R-13, R-3, R-17. Chave de servidor e de assinatura no banco online só com autorização de publicação.
 
 ## Falta na base
 - E-mail de segurança quando houver domínio (E14·1); travas do Claude Code em `.claude/` (E38·A).
