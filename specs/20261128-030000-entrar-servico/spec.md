@@ -1,7 +1,7 @@
 # Spec · Entrar e camada de serviço (as 6 portas)
 
-- **Status:** Draft
-- **Aprovação do dono:** (pendente)
+- **Status:** Approved
+- **Aprovação do dono:** "Aprovo as specs: Entrar e camada de serviço, (...)", com "E39·1·B", "E39·2·A (avaliar depois em producao pra nao ficar mto burocratico. podemos ter o magic link tbm)", "E39·3·B (1hr parado)" e "E41·1·A E41·2·A E41·3·A E41·4·A" · 28/11/2026 · https://claude.ai/code/session_018cV8b8F1poNHjA4eEd3VyN
 - **Aprovação do merge:** (pendente)
 - **Item da fila:** novo, por decisão do dono E36·A, logo antes do núcleo (depois dos itens 2 a 4 de `docs/BACKLOG.md`);
   o Documentador grava o item na fila
@@ -159,10 +159,14 @@ reescrever.
   menor escopo agora; o dado mais sensível (ficha) ainda não existe. Risco até lá: conta só com senha. Desfaz-se com
   spec nova.
 
+**Respostas do dono (28/11/2026):** E39·1·B · E39·2·A (avaliar em produção; link mágico como opção futura, spec própria) · E39·3·B com 1 h parado.
+
 **E39·3 · Tempo da sessão**
 - **E39·3·A:** entra de novo a cada 12 h desde a entrada, sem corte por parada. Não cumpre sozinha a ASVS V3.3.2
   nível 2 (12 h **ou** 30 min parado, as duas regras).
-- **E39·3·B:** 12 h no máximo e corte após 30 min parado.
+- **E39·3·B:** 12 h no máximo e corte após 30 min parado. **Escolhida pelo dono com ajuste: corte após 1 h parado.**
+  Continua no nível 2 da ASVS V3.3.2 pelo limite de 12 h; a parada de 1 h fica acima dos 30 min citados na norma
+  (risco baixo, mostrado ao dono: aparelho dividido na recepção fica aberto até 1 h).
 - **E39·3·C:** 30 dias, como app de celular; fica abaixo do nível 2 da ASVS e vira exceção declarada.
 - **Recomendo B:** cumpre a ASVS V3.3.2 nível 2 e protege a recepção, onde o aparelho é dividido. Se o corte por
   parada do Supabase exigir plano pago, o corte é feito pelo servidor; se nem assim der, o trabalho para e vira

@@ -87,7 +87,7 @@ async function lerContexto(conexao: Conexao): Promise<Lido> {
     return { ok: true, contexto: await conexao.contexto() }
   } catch (erro) {
     const codigo = erro instanceof ErroDoBanco ? codigoDe(erro) : 'erro_interno'
-    // Sessão morta, vencida (12 h) ou parada (30 min): encerra no navegador também (plan.md §3.4).
+    // Sessão morta, vencida (12 h) ou parada (1 h): encerra no navegador também (plan.md §3.4).
     if (codigo === 'sem_login') await conexao.sairLocal()
     return { ok: false, codigo }
   }

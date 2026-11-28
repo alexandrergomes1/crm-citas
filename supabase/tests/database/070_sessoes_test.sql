@@ -107,11 +107,11 @@ select results_eq(
   $$values ('sessao.sair'::text, 'ok'::text, '00000000-0000-0000-0000-00000000000a'::uuid)$$,
   'sair grava sessao.sair com o estúdio da sessão');
 
--- 12 h desde a entrada e 30 min parada (E39·3·B), com o relógio empurrado para trás
+-- 12 h desde a entrada e 1 h parada (E39·3·B, ajuste do dono: "1hr parado"), com o relógio empurrado para trás
 insert into app.sessoes (session_id, user_id, entrou_em, ultimo_uso) values
   ('51000000-0000-0000-0000-000000000006', '00000000-0000-0000-0000-0000000000a2', now() - interval '12 hours 1 second', now()),
-  ('51000000-0000-0000-0000-000000000007', '00000000-0000-0000-0000-0000000000a3', now() - interval '1 hour', now() - interval '31 minutes'),
-  ('51000000-0000-0000-0000-000000000008', '00000000-0000-0000-0000-0000000000a3', now() - interval '11 hours', now() - interval '29 minutes'),
+  ('51000000-0000-0000-0000-000000000007', '00000000-0000-0000-0000-0000000000a3', now() - interval '2 hours', now() - interval '61 minutes'),
+  ('51000000-0000-0000-0000-000000000008', '00000000-0000-0000-0000-0000000000a3', now() - interval '11 hours', now() - interval '59 minutes'),
   ('51000000-0000-0000-0000-000000000009', '00000000-0000-0000-0000-0000000000a3', now() - interval '1 hour', now() - interval '30 seconds');
 select pg_temp.token('00000000-0000-0000-0000-0000000000a2', '51000000-0000-0000-0000-000000000006', 3600);
 set local role authenticated;
@@ -123,11 +123,11 @@ select is((select motivo_fim from app.sessoes where session_id = '51000000-0000-
 select pg_temp.token('00000000-0000-0000-0000-0000000000a3', '51000000-0000-0000-0000-000000000007', 3600);
 set local role authenticated;
 select throws_ok($$select public.contexto_da_sessao()$$,
-  'PGRST', '{"code": "sem_login", "message": "sem_login"}', 'mais de 30 min parada: recusada');
+  'PGRST', '{"code": "sem_login", "message": "sem_login"}', 'mais de 1 h parada: recusada');
 reset role;
 select pg_temp.token('00000000-0000-0000-0000-0000000000a3', '51000000-0000-0000-0000-000000000008', 3600);
 set local role authenticated;
-select is((select papel from public.contexto_da_sessao()), 'profissional', '29 min parada e 11 h: ainda viva');
+select is((select papel from public.contexto_da_sessao()), 'profissional', '59 min parada e 11 h: ainda viva');
 reset role;
 select ok((select ultimo_uso = now() from app.sessoes where session_id = '51000000-0000-0000-0000-000000000008'),
   'o uso empurra o último uso');

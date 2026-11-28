@@ -1,6 +1,6 @@
 -- Entrar e camada de serviço · spec 20261128-030000-entrar-servico · plan.md §3.1, §3.4 e §6 (M3) · ADR 0019 (D8 a D10).
 -- A sessão conferida no banco a cada pedido (ADR 0018 · D4 e D5): uma linha por session_id do token.
--- Nenhuma linha é apagada: sair, vencer (12 h) e parar (30 min) só marcam encerrada_em, que nunca volta a nulo.
+-- Nenhuma linha é apagada: sair, vencer (12 h) e parar (1 h, E39·3·B com o ajuste do dono) só marcam encerrada_em, que nunca volta a nulo.
 -- iniciar_sessao recusa session_id já visto e entrada por senha com mais de 60 s: um cookie antigo não renasce.
 
 -- Os três limites numa só função (E39·3·B; se o dono escolher A ou C, muda só aqui).
@@ -9,7 +9,7 @@ language sql
 immutable
 set search_path = ''
 as $$
-  select interval '12 hours', interval '30 minutes', interval '60 seconds'
+  select interval '12 hours', interval '1 hour', interval '60 seconds'
 $$;
 
 create function app.id_da_sessao()
@@ -68,7 +68,7 @@ create trigger sessoes_sem_truncate
   before truncate on app.sessoes
   for each statement execute function app.sessoes_conferir_mudanca();
 
--- Viva = do token atual, da própria pessoa, não encerrada, menos de 12 h desde a entrada e de 30 min parada.
+-- Viva = do token atual, da própria pessoa, não encerrada, menos de 12 h desde a entrada e de 1 h parada.
 create function app.sessao_viva()
 returns boolean
 language sql

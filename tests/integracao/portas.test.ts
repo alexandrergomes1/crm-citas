@@ -35,8 +35,8 @@ describe.skipIf(!bancoPronto)('CA-04 · sem sessão, nada passa (integração)',
     expect((await new Navegador().chamar(d, undefined)).resultado).toMatchObject({ ok: true, valor: { comSessao: false } })
   })
 
-  // Sessão vencida (12 h / 30 min) e contagem do registro antes e depois pedem acesso SQL ao banco local,
+  // Sessão vencida (12 h / 1 h parada) e contagem do registro antes e depois pedem acesso SQL ao banco local,
   // que o preparo ainda não tem (tarefa D1): ficam no pgTAP 070_ e 060_ até lá.
-  it.todo('sessão vencida (12 h e 30 min) → sem_login (CA-15)')
+  it.todo('sessão vencida (12 h e 1 h parada) → sem_login (CA-15)')
   it.todo('contagem do registro e das tabelas igual antes e depois (CA-04)')
 })

@@ -38,7 +38,7 @@ export type ResultadoDaSenha = { readonly ok: true } | { readonly ok: false; rea
 export interface Conexao {
   /** Porta 1: assinatura e validade do token (getClaims). Sem token válido → null. */
   quemE(): Promise<Declaracoes | null>
-  /** Portas 1 e 2 no banco: sessão viva, 12 h, 30 min e estúdio esperado (pré-pedido). Recusa → ErroDoBanco. */
+  /** Portas 1 e 2 no banco: sessão viva, 12 h, 1 h parada e estúdio esperado (pré-pedido). Recusa → ErroDoBanco. */
   contexto(): Promise<ContextoDaSessao>
   /** Porta 6, recusa nas portas 2 a 5: melhor esforço, nunca lança. */
   registrarRecusa(acao: string, codigo: string): Promise<void>

@@ -1,6 +1,6 @@
 # Plano · Entrar e camada de serviço (as 6 portas) · E36·A
 
-- **Spec:** `specs/20261128-030000-entrar-servico/spec.md` (Draft; E39·1, E39·2 e E39·3 sem resposta)
+- **Spec:** `specs/20261128-030000-entrar-servico/spec.md` (Approved em 28/11/2026; E39·1·B, E39·2·A, E39·3·B com 1 h parado)
 - **Escrito por:** Arquiteto de software · **Norma:** modelo C4 e ADR (mais OWASP ASVS 4.0.3 nível 2, Clean Architecture,
   Twelve-Factor, boas práticas do Postgres e do Supabase) · **Revisão:** 5b (Gerente de projeto) feita com
   ajustes, 28/11; etapa 5 (Analista de requisitos) pendente
@@ -26,7 +26,7 @@ src/app/start.ts ── middleware global: CSRF · Cache-Control no-store
 src/app/routes/* ──► ações (createServerFn só dentro de acao.ts)
                         │
 src/server/portas/acao.ts ──► executar.ts (sem framework):
-   1 quem é: getClaims() ──► 1+2 contexto da sessão no banco (sessão viva? 12 h? 30 min? estúdio, papel, idioma)
+   1 quem é: getClaims() ──► 1+2 contexto da sessão no banco (sessão viva? 12 h? 1 h parada? estúdio, papel, idioma)
    3 o que pode (papel) ──► 4 dados certos (zod estrito) ──► 5 trabalho com ctx.banco (1 gravação no máximo)
    6 registro: gatilho no banco (gravou) · função de recusa (recusou nas portas 2 a 5)
                         │
@@ -65,7 +65,7 @@ Todo pedido do servidor à Data API leva `x-chave-servidor` (ADR 0018 · D16); s
 1. **Porta 1:** `getClaims()`; sem token válido → `sem_login` (nada no banco, RF-28).
 2. Envelope `{ estudioDaTela, dados }`: `estudioDaTela` é `uuid` obrigatório neste modo; forma errada → `entrada_invalida`.
 3. **Portas 1 e 2 no banco:** `public.contexto_da_sessao()` (POST, com `x-estudio-esperado`). O pré-pedido recusa sessão
-   morta, vencida (12 h) ou parada (30 min) → `sem_login` (o servidor então encerra a sessão, 3.4) e estúdio diferente →
+   morta, vencida (12 h) ou parada (1 h) → `sem_login` (o servidor então encerra a sessão, 3.4) e estúdio diferente →
    `estudio_trocado`. Sem estúdio escolhido → `sem_estudio`. Devolve `usuarioId`, `orgId`, `papel`, `idioma`, `fuso`,
    `moeda` e atualiza o "último uso".
 4. **Porta 3:** `permissao(papel)` → `sem_permissao`.
@@ -93,7 +93,7 @@ Modo `pessoa` (lista de estúdios, escolher, trocar, sair): passos 1, 3 (sem cab
   `org_id` da sessão ou vazio) → `signOut({ scope: 'local' })`, que roda **mesmo se** a marcação for recusada ou falhar →
   apaga os cookies → vai a Entrar. O token antigo, mesmo com assinatura válida,
   é recusado pelo pré-pedido no pedido seguinte (CA-13).
-- **Tempo (E39·3·B, se aprovada):** 12 h desde `entrou_em` e 30 min desde `ultimo_uso` (atualizado no passo 3 de 3.2,
+- **Tempo (E39·3·B, aprovada com 1 h parado):** 12 h desde `entrou_em` e 1 h desde `ultimo_uso` (atualizado no passo 3 de 3.2,
   no máximo uma vez por minuto). Vencida → a linha é marcada encerrada e nunca volta (o mesmo `session_id` é recusado
   por `iniciar_sessao`) → `sem_login` → o servidor chama `signOut({ scope: 'local' })` → Entrar; nada gravado se perde (RF-07). Com E39·3·A: só 12 h.
   Com E39·3·C: 30 dias, sem corte por parada.
@@ -168,7 +168,7 @@ Migrations por `pnpm exec supabase migration new <nome>`, depois das do item 3 (
   (é do Pro; o local ficaria diferente do remoto). Realtime e Storage continuam desligados no local; nenhuma tabela entra
   na publicação `supabase_realtime` e nenhum balde de Storage é criado (o teste `010_` confere a publicação).
 - Testes pgTAP novos: `060_registro_test.sql` (CA-10, CA-11 com tabela temporária e gatilho, RF-26), `070_sessoes_test.sql`
-  (iniciar, encerrar, 12 h, 30 min, CA-15; **não ressuscita**: `session_id` encerrado, vencido ou parado recusado por
+  (iniciar, encerrar, 12 h, 1 h parada, CA-15; **não ressuscita**: `session_id` encerrado, vencido ou parado recusado por
   `iniciar_sessao`, `amr` antigo recusado, `delete` recusado), `080_passagem_test.sql` (CA-17: `security invoker`, sem execução para
   `public` e `anon`), `090_tentativas_test.sql` (limites, vencimento, forma da linha de falha, teto global, CA-14 no banco),
   `100_pre_pedido_test.sql` (`estudio_trocado`; sessão morta; sem chave do servidor, com chave errada e com chave certa, para
@@ -288,7 +288,7 @@ de rascunho (E22·B); nunca se junta nelas. Conflitos esperados: `package.json`,
   de renovação (150/5 min, o mesmo para todos). Pede ajustar o texto do RF-06 e do CA-13.
 - **L-2 · CA-08:** "nenhuma ida ao banco" não cabe com a porta 2 antes da 4 (o estúdio e o papel vêm do banco). O plano
   garante: entrada inválida não chama o trabalho e não lê nem grava dado; só houve a leitura do contexto da sessão.
-- **L-3 · E39:** o plano usa E39·3·B; A ou C mudam só os valores (§3.4). E39·1 e E39·2 não mudam o plano.
+- **L-3 · E39:** respondida: E39·3·B com 1 h parado (`app.limites_da_sessao`, §3.4). E39·1 e E39·2 não mudam o plano.
 - **L-4 · tela:** inicial da bolinha Sua conta sem nome guardado (proposta: primeira letra do e-mail da própria pessoa) e
   "Sair" (nome barrado no `DESIGN.md` §6 como sinônimo de Fechar, mas listado no §8b): o Designer leva à ficha.
 - **Registro (5b, 28/11):** Agenda e Agendamento ajustam os planos ao §4 (já pedido) e voltam à 5b quando esta spec ficar Approved.
@@ -312,7 +312,7 @@ de rascunho (E22·B); nunca se junta nelas. Conflitos esperados: `package.json`,
 - **R-7** · `no-store` e o cache de voltar do Chromium (bfcache): **não verificado** (CA-13 prova; se mostrar dado, a tela
   recarrega ao voltar).
 - **R-8** · `@supabase/ssr` sempre grava o cookie com 400 dias (código instalado ignora `maxAge` próprio): a validade real
-  é a do banco (12 h e 30 min). Aceito.
+  é a do banco (12 h e 1 h parada). Aceito.
 - **R-9** · Cloudflare Workers: `supabase-js`, WebCrypto e `cf-connecting-ip` **não verificados** lá (não há publicação
   nesta spec; o Node local é o que roda).
 - **R-10** · Pasta do pacote do navegador para o CA-03 (`dist/client` ou outra): **não verificada** (lida no `build`).
