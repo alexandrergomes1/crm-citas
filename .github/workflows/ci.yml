@@ -37,6 +37,9 @@ jobs:
       - run: pnpm lint
       - run: pnpm test
       - run: pnpm build
+      # CA-03 (specs/20261128-030000-entrar-servico, plan.md §8): o pacote do navegador (dist/client) sem supabase,
+      # sem o endereço e sem a chave. Sem pacote, falha.
+      - run: pnpm pacote:conferir
 
   telas:
     name: telas
@@ -53,6 +56,11 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install --with-deps chromium
+      # Banco local para as telas que entram (specs/20261128-030000-entrar-servico, plan.md §8). Só o banco local,
+      # em Docker. Proibido aqui: supabase link, db push, --remote, --linked (AGENTS.md §1). Nenhum segredo: as
+      # chaves são geradas a cada execução por scripts/banco-local.mjs e nunca impressas.
+      - run: pnpm exec supabase telemetry disable
+      - run: pnpm db:start
       - run: pnpm test:e2e
       # Relatório só quando falha e por 7 dias: o repositório é público e o espaço grátis é curto (plano §9).
       - if: failure()
@@ -71,6 +79,8 @@ jobs:
           path: test-results/**/vitrine-*.png
           if-no-files-found: error
           retention-days: 7
+      - if: always()
+        run: pnpm db:stop
 
   banco:
     name: banco
@@ -90,6 +100,8 @@ jobs:
       - run: pnpm exec supabase telemetry disable
       - run: pnpm db:start
       - run: pnpm db:test
+      # Integração com o banco local (plan.md §8 e §9): o script já roda por scripts/banco-local.mjs.
+      - run: pnpm test:integracao
       - if: always()
         run: pnpm db:stop
 
