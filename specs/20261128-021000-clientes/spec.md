@@ -170,6 +170,8 @@ e teste de isolamento em cada tabela.
 ## 11. Dependências
 - **Item 2** (fundação técnica): app, pnpm, Vitest, Playwright, CI, banco local, Spec Kit, gitleaks.
 - **Item 3** (banco): estúdio com fuso e país, membros, papéis, função de checagem, molde do teste de isolamento.
+  O país do estúdio (para o código do telefone, RN-02) hoje não está no item 3: ou o Engenheiro de dados o acrescenta
+  lá, ou o plano de Clientes traz a migration que o cria, decisão do plano com ADR.
 - **Item 4** (design system no código): componentes do `DESIGN.md`.
 - **Agendamento:** atendimentos e status (aba Atendimentos, última visita); usa a tabela e as regras desta spec no
   cadastro rápido (E27·1). Sem ele construído, a aba fica vazia e a última visita "nunca".
@@ -196,7 +198,7 @@ automático de guarda; banco de produção e publicação.
 Agenda** (o que a profissional vê na Agenda); as duas respostas têm de ser coerentes.
 - **E28·2·A:** vê e busca todas as clientes (nome e telefone) e o perfil; adiciona e edita; não arquiva nem faz os
   pedidos RGPD/LGPD. Coerente só com E26·1·A.
-- **E28·2·B:** vê, busca e abre o perfil só das clientes que já atendeu ou tem marcadas com ela; adiciona cliente nova
+- **E28·2·B:** vê, busca e abre o perfil só das clientes que já atendeu, tem marcadas com ela ou que ela cadastrou (coerente com a E27·1·A do Agendamento); adiciona cliente nova
   (para marcar o próprio agendamento) e edita as que vê; não arquiva nem faz os pedidos RGPD/LGPD; o aviso de
   telefone repetido não lhe mostra nome de cliente que ela não vê. Coerente com E26·1·B.
 - **E28·2·C:** tudo o que a recepção faz.
