@@ -24,7 +24,7 @@ atendimento repetido · linha do tempo do atendimento · política de cancelamen
 
 | Módulo | Cuida de | Não cuida de |
 |---|---|---|
-| **Agenda** (spec própria, `feat/agenda`) | ver e organizar o calendário: visões, filtros, cartões, bloqueios de horário, lista de espera, arrastar | as regras de um agendamento |
+| **Agenda** (spec própria, `feat/agenda`) | ver e organizar o calendário: visões, filtros, cartões, bloqueios de horário; lista de espera e arrastar (depois) | as regras de um agendamento |
 | **Agendamento** (esta spec) | criar, remarcar, cancelar e mudar o status de **um** agendamento; a regra de conflito | desenhar o calendário |
 
 A Agenda abre o "Novo agendamento" e o painel do agendamento, e o arrastar da Agenda usa a regra de remarcar desta spec
@@ -56,8 +56,8 @@ E26·2 da spec da Agenda (branch `feat/agenda`), aplicadas também aos agendamen
 | **Painel do agendamento** | painel à direita de 480 px: botão de status "ícone + nome ▾"; ⋮ do topo com as ações (remarcar, "Cancelar agendamento"); "Checkout" desativado com "em desenvolvimento" até a spec do Checkout (`DESIGN.md` §8) | igual, com as ações no ⋮ do topo do painel (`DESIGN.md` §5) |
 | Remarcar | dentro do painel: profissional, data e hora; "Salvar" e "Cancelar" | igual |
 
-**Estados de toda tela** (`DESIGN.md` §8): vazio ("Ainda não há clientes" / "Ainda não há serviços", com o
-"Adicionar <coisa>" de contorno, conforme E27·1) · sem resultado (o que foi buscado e "Limpar filtros") · carregando
+**Estados de toda tela** (`DESIGN.md` §8): vazio ("Ainda não há clientes", com "Adicionar cliente" de contorno
+conforme E27·1; "Ainda não há serviços", que leva ao Catálogo, ou "em desenvolvimento" se o Catálogo não existir) · sem resultado (o que foi buscado e "Limpar filtros") · carregando
 (linhas cinza depois de 0,3 s, anunciado ao leitor) · erro ("Tentar de novo"; no conflito, a mensagem diz que o
 horário está ocupado, sem nome de cliente) · sucesso (aviso embaixo; "Desfazer" na troca de status, RF-08).
 
