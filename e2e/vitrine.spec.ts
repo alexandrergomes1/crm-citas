@@ -296,10 +296,18 @@ test('CA-7 · capturas com cada camada aberta (janelinha, folha ou painel, menu)
   await menu.getByRole('button', { name: 'Opções da linha' }).click()
   const aberto = page.getByRole('menu', { name: 'Opções da linha' })
   await expect(aberto).toBeVisible()
-  // o menu cabe inteiro na tela
-  const c = await caixa(aberto)
+  // o menu cabe inteiro na tela, com a margem da tela de cada lado (16 celular, 24 computador; DESIGN.md §4)
+  const margem = ehCelular() ? 16 : 24
   const largura = page.viewportSize()?.width ?? 0
-  expect(c.x).toBeGreaterThanOrEqual(0)
-  expect(c.x + c.width).toBeLessThanOrEqual(largura)
+  for (const nome of ['Opções da linha', 'Opções']) {
+    await page.keyboard.press('Escape')
+    await menu.getByRole('button', { name: nome, exact: true }).click()
+    const c = await caixa(page.getByRole('menu', { name: nome }))
+    expect(c.x, nome).toBeGreaterThanOrEqual(margem)
+    expect(c.x + c.width, nome).toBeLessThanOrEqual(largura - margem)
+  }
+  await page.keyboard.press('Escape')
+  await menu.getByRole('button', { name: 'Opções da linha' }).click()
+  await expect(aberto).toBeVisible()
   await capturar('menu')
 })

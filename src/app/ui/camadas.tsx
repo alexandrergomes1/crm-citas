@@ -1,7 +1,7 @@
 // Camadas por cima (spec RC-13 a RC-16, RA-5; DESIGN.md §5, §6, §8, §8b; ADR 0004 · D2).
 // Menu: padrão "Menu Button" do WAI-ARIA APG. Janelinha, folha e painel: <dialog> nativo com showModal()
 // (página de trás inerte, Esc fecha); o foco volta a quem abriu. Texto recebido pronto (RC-23).
-import { useEffect, useId, useRef, useState, type KeyboardEvent, type ReactNode } from 'react'
+import { useEffect, useId, useLayoutEffect, useRef, useState, type KeyboardEvent, type ReactNode } from 'react'
 import { Botao, BotaoIcone } from './botao'
 import { Icone } from './icone'
 
@@ -28,6 +28,21 @@ export function MenuAcoes({ nome, gatilho, itens, alinhar = 'inicio' }: Readonly
   const botao = useRef<HTMLButtonElement>(null)
   const raiz = useRef<HTMLDivElement>(null)
   const refs = useRef<Array<HTMLButtonElement | null>>([])
+  const lista = useRef<HTMLDivElement>(null)
+
+  // O menu aberto fica dentro da tela, a --margem de cada borda (DESIGN.md §4): desloca só o que sobrar
+  useLayoutEffect(() => {
+    const el = lista.current
+    if (!aberto || !el) return
+    el.style.setProperty('--desloca-menu', '0')
+    const margem = Number.parseFloat(getComputedStyle(el).getPropertyValue('--margem')) || 0
+    const r = el.getBoundingClientRect()
+    const largura = document.documentElement.clientWidth
+    let desloca = 0
+    if (r.right > largura - margem) desloca = largura - margem - r.right
+    if (r.left + desloca < margem) desloca = margem - r.left
+    el.style.setProperty('--desloca-menu', `${desloca}px`)
+  }, [aberto])
 
   useEffect(() => {
     if (!aberto) return
@@ -93,7 +108,7 @@ export function MenuAcoes({ nome, gatilho, itens, alinhar = 'inicio' }: Readonly
       ) : (
         <BotaoIcone {...comum} nome={nome} icone="ellipsis-vertical" />
       )}
-      <div id={idMenu} role="menu" aria-label={nome} className={`ds-menu__lista ds-menu__lista--${alinhar}`} hidden={!aberto} onKeyDown={tecladoMenu}>
+      <div ref={lista} id={idMenu} role="menu" aria-label={nome} className={`ds-menu__lista ds-menu__lista--${alinhar}`} hidden={!aberto} onKeyDown={tecladoMenu}>
         {itens.map((item, indice) => (
           <button
             key={item.id}
